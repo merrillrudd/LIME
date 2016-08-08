@@ -19,5 +19,5 @@ Depends:
 Imports:
     TMBhelper, LBSPR, methods
 LinkingTo: TMB, RcppEigen, Rcpp
-Remotes: kaskr/TMB_contrib_R/TMBhelper, AdrianHordyk/LBSPR
+Suggests: TMBhelper, LBSPR
 RoxygenNote: 5.0.1
