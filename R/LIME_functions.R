@@ -1296,6 +1296,10 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 
         ## turn off parameter estimation - depends on data availability
             Map = list()
+                Map[["logS95"]] <- NA
+                Map[["logS95"]] <- factor(Map[["logS95"]])
+
+
            
             if(estimate_same==TRUE){
                 Map[["beta"]] <- NA
@@ -1368,7 +1372,8 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 
         if(REML==FALSE) Random <- c("Nu_input")
         if(REML==TRUE){
-            Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50", "logS95") # 
+            # Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50", "logS95") # 
+            Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
             Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
         }
         if("log_F_sd" %in% est_sigma) Random <- c(Random, "log_F_t_input")
