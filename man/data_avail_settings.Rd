@@ -20,6 +20,6 @@ List, a tagged list of model settings
 \code{data_avail_settings} Specifies 4 distinct life history types for simulation testing
 }
 \details{
-avail_set: "Rich_LC"= 20 years length comp, index, and catch, high ESS; "Moderate_LC"=20 years length comp, index, and catch, lower ESS;  "Sample_LC"=20 years length comp, index, and catch, but only sampled every few years, and catch is reported at a rate of 20%; "Index_LC1"=20 years of abundance index, no catch data, 1 year of Length comp (can also specify "Index_LC10" for 10 years of length comp); "Catch_LC10"=20 years of catch data, 1 year of length comp (can also specify "Catch_LC10" for 10 years of length comp); "LC1" is 1 year of length comp only; can also specify LC2, 5, 10, and 20.
+avail_set: "Rich_LC"= 20 years length comp, index, and catch, high ESS; "Moderate_LC"=20 years length comp, index, and catch, lower ESS;  "Sample_LC"=20 years length comp, index, and catch, but only sampled every few years, and catch is reported at a rate of 20 percent; "Index_LC1"=20 years of abundance index, no catch data, 1 year of Length comp (can also specify "Index_LC10" for 10 years of length comp); "Catch_LC10"=20 years of catch data, 1 year of length comp (can also specify "Catch_LC10" for 10 years of length comp); "LC1" is 1 year of length comp only; can also specify LC2, 5, 10, and 20.
 }
 

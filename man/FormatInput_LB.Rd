@@ -90,6 +90,8 @@ FormatInput_LB(Nyears, DataList, linf, vbk, t0, M, AgeMax, lbhighs, lbmids,
 \item{REML}{default FALSE}
 
 \item{estimate_same}{TRUE=estimate least-common-denominator parameters for all data availability scenarios, FALSE=estimate parameters specific to data availability}
+
+\item{start_f}{year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map

@@ -19,7 +19,7 @@ plotRE(modpath_vec, itervec, modnames = NULL, xaxt = "n", yaxt = "n",
 
 \item{yaxt}{default "n" to remove y axis, follows same rules as plot function}
 
-\item{value}{relative error for specified reference point, "SPR" or "FFref" (associated with F/F40%)}
+\item{value}{relative error for specified reference point, "SPR" or "FFref" (associated with F/F40)}
 
 \item{ylim}{set y axis limits}
 

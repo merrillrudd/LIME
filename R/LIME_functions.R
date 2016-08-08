@@ -12,7 +12,7 @@
 #' @param comp_sample vector of number of individuals sampled each year (set as 1 for proportions)
 #'
 #' @return data frame - number of individuals in each length bin in each year
-
+#' @export
 AgeToLengthComp <- function(L_a, CVlen, highs, lows, tyears, N_at, S_a, comp_sample){
 
 	################################################
@@ -63,9 +63,7 @@ AgeToLengthComp <- function(L_a, CVlen, highs, lows, tyears, N_at, S_a, comp_sam
 #' @param Obj, the fitted TMB object
 
 #' @return List, a tagged list of potentially useful benchmarks
-
-
-
+#' @export
 Calc_derived_quants = function( Obj ){
   # Extract elements
   Data = Obj$env$data
@@ -141,11 +139,11 @@ Calc_derived_quants = function( Obj ){
 #' @param S_a from report file / true file for simulation
 #' @param R from report file / true file for simulation
 #' @param F typically terminal estimated/true F, can be any year
-#' @param ref=FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
+#' @param ref FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
 
 #' @return List, a tagged list of potentially useful benchmarks
-#' @details Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30%)
-
+#' @details Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
+#' @export
 calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
 
     ## calculate spawning biomass per recruit in fished and unfished condition
@@ -191,7 +189,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
 
 #' @return Matrix with relative error for single iteration across all models
 #' @details repeat over all iterations outside of this function to get full distribution of relative errors in the reference points for the simulation study. 
-
+#' @export
     calcRE <- function(modpath_vec, iter, value, yr, timeseries=FALSE){
         if(timeseries==FALSE) RE <- rep(NA, length(modpath_vec))
         if(timeseries==TRUE) RE <- matrix(NA, nrow=yr, ncol=length(modpath_vec))
@@ -303,8 +301,7 @@ Check_Identifiable2 = function( obj ){
 #' @param selex "asymptotic"= assume asymptotic selectivity, "dome"= assume dome-shaped selectivity
 #' 
 #' @return List, a tagged list of life history/starting value information
-
-
+#' @export
 choose_lh_list <- function(species, selex){
 
     ## Costa Rican spotted rose snapper
@@ -517,7 +514,7 @@ choose_lh_list <- function(species, selex){
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Specifically used to merge life history information with other model settings; flexibility to change parameter inputs for sensitivity analysis without changing the baseline life history information that was used to generate data in a simulation study, or carefully compiled for real=life application
-
+#' @export
 create_inputs <- function(param, val, lh_list, data_avail_list){
     
         ## copy life history
@@ -551,8 +548,7 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
 
 #' @return List, a tagged list of life history traits
 #' @details Life histories used from Hordyk et al. 2015 ICES Journal of Marine Science, simulation test of LB-SPR method
-
-
+#' @export
 create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
 
     ## sand sole P. melanostictus
@@ -834,8 +830,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
 #' @param simulation default=TRUE, not set up for simulation=FALSE 
 
 #' @return List, a tagged list of model settings
-#' @details avail_set: "Rich_LC"= 20 years length comp, index, and catch, high ESS; "Moderate_LC"=20 years length comp, index, and catch, lower ESS;  "Sample_LC"=20 years length comp, index, and catch, but only sampled every few years, and catch is reported at a rate of 20%; "Index_LC1"=20 years of abundance index, no catch data, 1 year of Length comp (can also specify "Index_LC10" for 10 years of length comp); "Catch_LC10"=20 years of catch data, 1 year of length comp (can also specify "Catch_LC10" for 10 years of length comp); "LC1" is 1 year of length comp only; can also specify LC2, 5, 10, and 20.
-
+#' @details avail_set: "Rich_LC"= 20 years length comp, index, and catch, high ESS; "Moderate_LC"=20 years length comp, index, and catch, lower ESS;  "Sample_LC"=20 years length comp, index, and catch, but only sampled every few years, and catch is reported at a rate of 20 percent; "Index_LC1"=20 years of abundance index, no catch data, 1 year of Length comp (can also specify "Index_LC10" for 10 years of length comp); "Catch_LC10"=20 years of catch data, 1 year of length comp (can also specify "Catch_LC10" for 10 years of length comp); "LC1" is 1 year of length comp only; can also specify LC2, 5, 10, and 20.
+#' @export
 data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
         
     ### simulation
@@ -892,7 +888,7 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
 #' @param data_dir Directory to look for data files
 
 #' @return List, a tagged list of data to input into TMB model
-
+#' @export
 formatDataList <- function(species, data_dir){
 
     if(species=="SIGSUT"){
@@ -1090,10 +1086,10 @@ formatDataList <- function(species, data_dir){
 #' @param est_sigma list of variance parameters to estimate, must match parameter names
 #' @param REML default FALSE
 #' @param estimate_same TRUE=estimate least-common-denominator parameters for all data availability scenarios, FALSE=estimate parameters specific to data availability
+#' @param start_f year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
-
-
+#' @export
 FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
     lbhighs, lbmids, Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, 
     qcoef, R0, S50, S95, version, model, RecDev_biasadj, site,
@@ -1410,7 +1406,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 
 
 #' @return print how many iterations were written into the model directory
-
+#' @export
 generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list){
 
   lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
@@ -1578,7 +1574,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 #' @param modcombos data frame of all model combinations
 
 #' @return vector of directory paths
-
+#' @export
 model_paths <- function(res_dir, modcombos){
 
     devo_path <- function(combo, res_dir){
@@ -1614,7 +1610,7 @@ model_paths <- function(res_dir, modcombos){
 
 
 #' @return vector of directory paths
-
+#' @export
 plotRE <- function(modpath_vec, itervec, modnames=NULL, xaxt="n", yaxt="n", value, ylim=c(-1,1.5), col.plot="steelblue", col.line="goldenrod", yr){
 
     RE <- t(sapply(itervec, function(x) calcRE(modpath_vec=modpath_vec, iter=x, value=value, yr=yr)))
@@ -1645,8 +1641,7 @@ plotRE <- function(modpath_vec, itervec, modnames=NULL, xaxt="n", yaxt="n", valu
 #' @return displays plot
 #' 
 #' @details possible values for parameter argument for model fits: "B" biomass, "N" abundance, "ML" mean length, "R" recruitment, "F" fishing mortality, "D" relative biomass, "C" catch, "I" abundance index, for kobe plot, "kobe" will show SPR compared with F/F30 and F/F40
-
-
+#' @export
 plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence, parameter, xaxt=TRUE, ylab=FALSE, simulation=TRUE){
         
         FUN = function(InputMat, log=TRUE){
@@ -1785,7 +1780,7 @@ plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence
 #' @author Trevor A. Branch
 
 #' @return adds text to figure
-
+#' @export
 print.letter <- function(label="(a)",xy=c(0.1,0.925),...) { 
             tmp <- par("usr") 
             text.x <- tmp[1]+xy[1]*diff(tmp[1:2]) #x position, diff=difference 
@@ -1807,11 +1802,12 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {
 #' @param sensitivity_inputs (in development) named list (parameters) with matrix of 2 rows (low, high) and # of columns for 'life histories' (artifact of testing multiple life histories in the simulation, would only have 1 column for an assessment)
 #' @param sensitivity_ESS (in development) will do sensitivity analysis for effective sample size of length composition
 #' @param REML default off (FALSE)
+#' @useDynLib LIME
 
 #' @return displays plot
 #' 
 #' @details removes iterations associated with runModel for simulation *** not updated - runModel is the most updated. Need to edit code and edit runModel to also run with real data, and delete this function. 
-
+#' @export
 runAssessment <- function(modpath, DataList, lh_inputs, data_avail, est_sigma, biascorrect=TRUE, sensitivity_inputs=NULL, sensitivity_ESS=NULL, REML=FALSE){
 
   ## copies life history information with any adjustments for sensitivity analyses
@@ -1963,7 +1959,7 @@ runAssessment <- function(modpath, DataList, lh_inputs, data_avail, est_sigma, b
 
 #' @return list of LBSPR output
 #' @details Must load LBSPR package: devtools::install_github("AdrianHordyk/LBSPR")
-
+#' @export
 runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 
   require(LBSPR)
@@ -2056,11 +2052,12 @@ runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 #' @param REML default off (FALSE)
 #' @param rewrite if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param start_f year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
+#' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @details need to adjust to run with real data
-
+#' @export
 runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f){
 
   lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
@@ -2299,7 +2296,7 @@ return(paste0(max(itervec), " iterates run in ", modpath))
 
 
 #' @return named list of attributes of true population/data
-
+#' @export
 SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     Frate, Fequil, SigmaF, Fdynamics, Rdynamics, R0, Fmax, CVlen, mids, highs, lows,
     W_a, L_a, linf, vbk, Mat_a, Amat, comp_sample, Nyears_comp, alt_yrs=FALSE, sample=FALSE,
@@ -2532,6 +2529,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 #' @param beta_y trend in asymptotic length over sites, default 0.02
 
 #' @return data frame of asymptotic length at each site
+#' @export
 spatialgrowth_sim <- function(n_i, Scale=2, Sigma2=1, SD_spatial=0.1, linf, beta_y=0.02){
     require(RandomFields)
 

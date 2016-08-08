@@ -17,9 +17,9 @@ calc_ref(Mat_a, W_a, M, S_a, F, ref = FALSE)
 
 \item{F}{typically terminal estimated/true F, can be any year}
 
-\item{R}{from report file / true file for simulation}
+\item{ref}{FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref}
 
-\item{ref=FALSE}{outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref}
+\item{R}{from report file / true file for simulation}
 }
 \value{
 List, a tagged list of potentially useful benchmarks
@@ -28,6 +28,6 @@ List, a tagged list of potentially useful benchmarks
 \code{calc_ref} Calculates derived spawning potential ratio: lifetime total egg production in fished:unfished states
 }
 \details{
-Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30%)
+Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
 }
 

@@ -58,7 +58,7 @@ SimData_LB(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef, Frate, Fequil, SigmaF,
 
 \item{Mat_a}{maturity at age}
 
-\item{Amat}{Age at 50% maturity}
+\item{Amat}{Age at 50 percent maturity}
 
 \item{comp_sample}{number of indiviuals sampled for lenght composition}
 

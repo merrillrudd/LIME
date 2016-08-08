@@ -11,7 +11,7 @@ calcRE(modpath_vec, iter, value, yr, timeseries = FALSE)
 
 \item{iter}{which iteration? only 1 at a time}
 
-\item{value}{options: "SPR" or "FFref" (FFref is defined as F/F40%)}
+\item{value}{options: "SPR" or "FFref" (FFref is defined as F/F40)}
 
 \item{yr}{if timeseries==FALSE, specify the year for which to take the relative error}
 

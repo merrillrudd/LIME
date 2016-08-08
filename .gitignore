@@ -1,3 +1,7 @@
+*.o
+*.dll
+*.so
+
 # History files
 .Rhistory
 .Rapp.history
