@@ -1804,7 +1804,7 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925)) {
 #' @export
 runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 
-  require(LBSPR)
+  # require(LBSPR)
         
         ## lbspr settings
         setClass("LB_pars", representation(
@@ -2374,7 +2374,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 #' @return data frame of asymptotic length at each site
 #' @export
 spatialgrowth_sim <- function(n_i, Scale=2, Sigma2=1, SD_spatial=0.1, linf, beta_y=0.02){
-    require(RandomFields)
+    # require(RandomFields)
 
     ## sample locations
     lat_min <- -4
