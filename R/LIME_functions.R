@@ -1804,7 +1804,7 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925)) {
 #' @export
 runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 
-  # require(LBSPR)
+  require(LBSPR)
         
         ## lbspr settings
         setClass("LB_pars", representation(
@@ -1827,7 +1827,7 @@ runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
           BinMin = "numeric",
           BinMax = "numeric",
           BinWidth = "numeric"  
-        ), validity=LBSPR:::check_pars)
+        ), validity=check_pars)
 
         LB_pars <- new("LB_pars")
         LB_pars@Linf <- inits$linf
@@ -2389,4 +2389,3 @@ spatialgrowth_sim <- function(n_i, Scale=2, Sigma2=1, SD_spatial=0.1, linf, beta
     df <- data.frame(linf_i=linf_i, y_i=y_i)
     return(df)
 }
-
