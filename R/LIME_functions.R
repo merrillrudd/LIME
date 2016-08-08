@@ -137,7 +137,6 @@ Calc_derived_quants = function( Obj ){
 #' @param W_a from report file / true file for simulation
 #' @param M from report file / true file for simulation
 #' @param S_a from report file / true file for simulation
-#' @param R from report file / true file for simulation
 #' @param F typically terminal estimated/true F, can be any year
 #' @param ref FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
 
@@ -1092,10 +1091,10 @@ formatDataList <- function(species, data_dir){
 #' @export
 FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
     lbhighs, lbmids, Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, 
-    qcoef, R0, S50, S95, version, model, RecDev_biasadj, site,
+    qcoef, R0, S50, S95, version="LIME", model, RecDev_biasadj, site,
     Fpen, Dpen, Dprior, SigRpen, SigRprior, obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML, estimate_same, start_f){
 
-        if(grepl("lb_statespace_v6", version)){
+        if(grepl("LIME", version)){
         ## Rich, Moderate, and Sample names include catch, index, and length comp data - just vary in the sampling and ESS of composition data
         ## fit to length composition data
         if((grepl("Rich",model) | grepl("Moderate", model) | grepl("Sample", model)) & grepl("LC", model)){
@@ -1781,11 +1780,11 @@ plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence
 
 #' @return adds text to figure
 #' @export
-print.letter <- function(label="(a)",xy=c(0.1,0.925),...) { 
+print.letter <- function(label="(a)",xy=c(0.1,0.925)) { 
             tmp <- par("usr") 
             text.x <- tmp[1]+xy[1]*diff(tmp[1:2]) #x position, diff=difference 
             text.y <- tmp[3]+xy[2]*diff(tmp[3:4]) #y position 
-            text(x=text.x, y=text.y, labels=label, ...) 
+            text(x=text.x, y=text.y, labels=label) 
 }
 
 
@@ -1795,6 +1794,7 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {
 #'
 #' @param modpath model directory
 #' @param DataList data list
+#' @param version cpp model version name
 #' @param lh_inputs life history inputs 
 #' @param data_avail other settings for data availability
 #' @param est_sigma which variance parameters to estimate, match parameter names
@@ -1808,7 +1808,7 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {
 #' 
 #' @details removes iterations associated with runModel for simulation *** not updated - runModel is the most updated. Need to edit code and edit runModel to also run with real data, and delete this function. 
 #' @export
-runAssessment <- function(modpath, DataList, lh_inputs, data_avail, est_sigma, biascorrect=TRUE, sensitivity_inputs=NULL, sensitivity_ESS=NULL, REML=FALSE){
+runAssessment <- function(modpath, DataList, version="LIME", lh_inputs, data_avail, est_sigma, biascorrect=TRUE, sensitivity_inputs=NULL, sensitivity_ESS=NULL, REML=FALSE){
 
   ## copies life history information with any adjustments for sensitivity analyses
     if(is.null(sensitivity_inputs)){
@@ -1837,11 +1837,11 @@ runAssessment <- function(modpath, DataList, lh_inputs, data_avail, est_sigma, b
           SD <- summary(Sdreport)
           RecDev_biasadj <- 1 - SD[which(rownames(SD)=="Nu_input"), "Std. Error"]^2 / Report$sigma_R^2    
       }
-      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, S95=inits$S95, version=Version, model=data_avail, RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=DataList$obs_per_year, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE)
+      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, S95=inits$S95, version=version, model=data_avail, RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=DataList$obs_per_year, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE)
       if(bb==1) saveRDS(TmbList, file.path(modpath, "Inputs1.rds")) 
       if(bb==2) saveRDS(TmbList, file.path(modpath, "Inputs2.rds"))  
 
-      dyn.load(paste0(run_exe, "\\", dynlib(Version)))     
+      # dyn.load(paste0(run_exe, "\\", dynlib(version)))     
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
@@ -1934,7 +1934,7 @@ runAssessment <- function(modpath, DataList, lh_inputs, data_avail, est_sigma, b
         if(bb==length(vec)) saveRDS(Derived, file.path(modpath, "Derived_quants.rds"))
   
 
-        dyn.unload( paste0(run_exe,"\\", dynlib(Version)) )  
+        dyn.unload( paste0(run_exe,"\\", dynlib(version)) )  
     } 
         write.csv(df, file.path(modpath, "df.csv"))  
     rm(opt)
@@ -2042,14 +2042,15 @@ runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 #' \code{runModel} run length-based integrated mixed-effects model with generated data
 #'
 #' @param modpath model directory
-#' @param DataList data list
-#' @param lh_inputs life history inputs 
+#' @param itervec number of iterations of data to generate
 #' @param data_avail other settings for data availability
 #' @param est_sigma which variance parameters to estimate, match parameter names
 #' @param biascorrect bias correction for recruitment deviatiosn on (TRUE) or off (FALSE)
 #' @param sensitivity_inputs (in development) named list (parameters) with matrix of 2 rows (low, high) and # of columns for 'life histories' (artifact of testing multiple life histories in the simulation, would only have 1 column for an assessment)
 #' @param sensitivity_ESS (in development) will do sensitivity analysis for effective sample size of length composition
 #' @param REML default off (FALSE)
+#' @param estimate_same TRUE=estimate least-common-denominator parameters for all data availability scenarios, FALSE=estimate parameters specific to data availability
+#' @param lh_list list of life history information
 #' @param rewrite if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param start_f year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
 #' @useDynLib LIME
@@ -2114,11 +2115,11 @@ for(iter in itervec){
           RecDev_biasadj <- 1 - SD[which(rownames(SD)=="Nu_input"), "Std. Error"]^2 / Report$sigma_R^2    
       }
       if(all(is.na(RecDev_biasadj))) RecDev_biasadj <- rep(0, Nyears)
-      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, S95=inits$S95, version=Version, model=as.character(modname), RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=inits$obs_per_yr, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE, start_f=start_f)
+      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, S95=inits$S95, version=version, model=as.character(modname), RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=inits$obs_per_yr, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE, start_f=start_f)
       if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.rds")) 
       if(bb==2) saveRDS(TmbList, file.path(iterpath, "Inputs2.rds"))  
 
-      dyn.load(paste0(run_exe, "\\", dynlib(Version)))     
+      # dyn.load(paste0(run_exe, "\\", dynlib(version)))     
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
@@ -2237,7 +2238,7 @@ for(iter in itervec){
         }
   
 
-        # dyn.unload( paste0(run_exe,"\\", dynlib(Version)) )  
+        # dyn.unload( paste0(run_exe,"\\", dynlib(version)) )  
     } 
         if(iter==1) write.csv(df, file.path(modpath, "df.csv"))  
 

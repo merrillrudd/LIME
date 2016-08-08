@@ -5,9 +5,21 @@ Version: 0.1.0
 Date: 2016-08-08
 Author: Merrill Rudd
 Maintainer: Merrill Rudd <merrillrudd@gmail.com>
-Description: A flexible stock assessment method for fisheries with developing data collection programs. Requires at least one year of length composition data and assumptions about biological parameters. Can integrate time series of catch and abundance index. Mixed effects structure accounts for time-variation in fishing mortality and recruitment. 
+Description: A flexible stock assessment method for fisheries with developing
+    data collection programs. Requires at least one year of length composition data
+    and assumptions about biological parameters. Can integrate time series of catch
+    and abundance index. Mixed effects structure accounts for time-variation in
+    fishing mortality and recruitment.
 License: GPL-2
-Depends: TMB, devtools, RandomFields
-Imports: TMBhelper
+Depends:
+    TMB,
+    devtools,
+    RandomFields,
+    methods
+Imports:
+    TMBhelper, methods
 LinkingTo: TMB, RcppEigen, Rcpp
-Suggests: LBSPR
+Remotes: kaskr/TMB_contrib_R/TMBhelper
+Suggests:
+    LBSPR
+RoxygenNote: 5.0.1
