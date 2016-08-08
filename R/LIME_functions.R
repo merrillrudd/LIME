@@ -1827,7 +1827,7 @@ runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
           BinMin = "numeric",
           BinMax = "numeric",
           BinWidth = "numeric"  
-        ), validity=check_pars)
+        ), validity=LBSPR:::check_pars)
 
         LB_pars <- new("LB_pars")
         LB_pars@Linf <- inits$linf
