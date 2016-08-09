@@ -17,7 +17,7 @@ Depends:
     RandomFields,
     methods
 Imports:
-    TMBhelper, LBSPR, methods
+    TMBhelper, methods
 LinkingTo: TMB, RcppEigen, Rcpp
-Suggests: TMBhelper, LBSPR
+Suggests: TMBhelper
 RoxygenNote: 5.0.1
