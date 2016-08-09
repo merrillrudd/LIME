@@ -285,6 +285,38 @@ Type objective_function<Type>::operator() ()
     temp = 0;
   }
 
+  // ========= spawning potential ratio ==============================
+  matrix<Type> Na0(n_t,AgeMax+1);
+  matrix<Type> Naf(n_t,AgeMax+1);
+  vector<Type> SB0_t(n_t);
+  vector<Type> SBf_t(n_t);
+  SB0_t.setZero();
+  SBf_t.setZero();
+  vector<Type> SPR_t(n_t);
+  for(int t=0;t<n_t;t++){
+    for(int a=0;a<=AgeMax;a++){
+      if(a==0){
+        Na0(t,a) = 1;
+        Naf(t,a) = 1;
+      }
+      if(a>0 & a<AgeMax){
+        Na0(t,a) = Na0(t,a-1)*exp(-M);
+        Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
+      }
+      if(a==AgeMax){
+        Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t)))/(1-exp(-M-S_a(a-1)*F_t(t)));
+      }
+      if(a>0){
+        SB0_t(t) += Na0(t,a)*Mat_a(a)*W_a(a);
+        SBf_t(t) += Naf(t,a)*Mat_a(a)*W_a(a);
+      }
+    }
+    SPR_t(t) = SBf_t(t)/SB0_t(t);
+  }
+
+
+
   // ========= Build likelihood ==============================
 
   // Likelihood contribution from observations
@@ -442,6 +474,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lSB_t );
   ADREPORT( lF_t );
   ADREPORT( lD_t );
+  ADREPORT( SPR_t );
 
   // Parameters
   REPORT( F_equil );
@@ -456,6 +489,7 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_C );
   REPORT( sigma_I );
   REPORT( CV_L );
+  REPORT( SPR_t );
 
   // Random effects
   REPORT( Nu_input );
