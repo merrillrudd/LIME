@@ -1772,24 +1772,6 @@ plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence
 
 }
 
-
-#' Write letters for multi-panel figures
-#'
-#' \code{plotResults} writes letters on multi-panel figures 
-#'
-#' @param label label to plot on multi-panel figure
-#' @param xy setting location of label
-#' @author Trevor A. Branch
-
-#' @return adds text to figure
-#' @export
-print.letter <- function(label="(a)",xy=c(0.1,0.925)) { 
-            tmp <- par("usr") 
-            text.x <- tmp[1]+xy[1]*diff(tmp[1:2]) #x position, diff=difference 
-            text.y <- tmp[3]+xy[2]*diff(tmp[3:4]) #y position 
-            text(x=text.x, y=text.y, labels=label) 
-}
-
 # #' run LBSPR within LIME framework
 # #'
 # #' \code{runLBSPR} sets up LBSPR to run within LIME framework (adjusting for inputs, structure, etc.)
