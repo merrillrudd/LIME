@@ -17,4 +17,7 @@ List, a tagged list of data to input into TMB model
 \description{
 \code{formatDataList} Reads data files from directory for specific species and gets the data into a form to input to the TMB model
 }
+\details{
+required output: I_t: index with each element named by year 1-x, C_t: catch with each element named 1-x, LF: length frequency with years 1-x labeled on the rows and length bin labeled on the columns, LFprop: proportions in each length bin, same dimensions as LF, years: actual years of data, years_i: index years 1-x, lbins: length bins, ML_t: mean length with each element named year 1-x, Nyears: number of years, Nyears_comp: number of years o f length composition data, obs_per_yr: effective sample size of length composition annually
+}
 

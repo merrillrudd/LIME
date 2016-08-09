@@ -6,7 +6,7 @@
 \usage{
 runModel(modpath, itervec, estimate_same = FALSE, REML = FALSE, est_sigma,
   biascorrect = TRUE, data_avail, lh_list, sensitivity_inputs = NULL,
-  sensitivity_ESS = NULL, rewrite, start_f)
+  sensitivity_ESS = NULL, rewrite, start_f, simulation = TRUE)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -32,6 +32,8 @@ runModel(modpath, itervec, estimate_same = FALSE, REML = FALSE, est_sigma,
 \item{rewrite}{if results already exist in the directory, should we rewrite them? TRUE or FALSE}
 
 \item{start_f}{year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.}
+
+\item{simulation}{is this a simulation? default TRUE, FALSE means you are using real data (no need for iterations or multiple life history inputs)}
 }
 \value{
 prints how many iterations were run in model directory
