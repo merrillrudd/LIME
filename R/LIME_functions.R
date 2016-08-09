@@ -884,9 +884,10 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
 #' \code{formatDataList} Reads data files from directory for specific species and gets the data into a form to input to the TMB model
 #'
 #' @param species species code, "SIGSUT" or "CRSNAP"
-#' @param data_dir Directory to look for data files
+#' @param data_dir Directory to look for data files 
 
 #' @return List, a tagged list of data to input into TMB model
+#' @details required output: I_t: index with each element named by year 1-x, C_t: catch with each element named 1-x, LF: length frequency with years 1-x labeled on the rows and length bin labeled on the columns, LFprop: proportions in each length bin, same dimensions as LF, years: actual years of data, years_i: index years 1-x, lbins: length bins, ML_t: mean length with each element named year 1-x, Nyears: number of years, Nyears_comp: number of years o f length composition data, obs_per_yr: effective sample size of length composition annually
 #' @export
 formatDataList <- function(species, data_dir){
 
@@ -1895,20 +1896,30 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925)) {
 #' @param lh_list list of life history information
 #' @param rewrite if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param start_f year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
+#' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (no need for iterations or multiple life history inputs)
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @details need to adjust to run with real data
 #' @export
-runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f){
+runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE){
 
-  lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
-  lh_choose <- lh_list[[lh_num]]
+  if(simulation==TRUE){
+    lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
+    lh_choose <- lh_list[[lh_num]]
+  }
+  if(simulation==FALSE){
+    lh_choose <- lh_list
+  }
+
+  if(simulation==FALSE) itervec <- 1
 
 for(iter in itervec){
 
-    iterpath <- file.path(modpath, iter)
+    if(simulation==TRUE) iterpath <- file.path(modpath, iter)
+    if(simulation==FALSE) iterpath <- modpath
+
     if(rewrite==FALSE){
       if(file.exists(file.path(iterpath, "Derived_quants.rds"))) next
       # if(any(grepl("LBSPR_results", list.files(path=iterpath)))) next
@@ -1916,10 +1927,12 @@ for(iter in itervec){
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
     }
 
-    DataList <- readRDS(file.path(iterpath, "True.rds"))
-    modname <- DataList$DataScenario 
+    if(simulation==TRUE){
+        DataList <- readRDS(file.path(iterpath, "True.rds"))
+        modname <- DataList$DataScenario 
+    }
 
-    if(grepl("MixedEffects", modname)) modname <- strsplit(modname, "_")[[1]][2]
+    if(simulation==TRUE) if(grepl("MixedEffects", modname)) modname <- strsplit(modname, "_")[[1]][2]
     # if(grepl("LBSPR", modname)) modname <- strsplit(modname, "_")[[1]][2]
     ## copies life history information with any adjustments for sensitivity analyses
     if(is.null(sensitivity_inputs)){
@@ -1931,9 +1944,11 @@ for(iter in itervec){
       param_set_input <- paste0("sens_", param_set)
       param <- param_set[which(sapply(1:length(param_set), function(x) grepl(param_set_input[x], modpath)))]
       val_index <- ifelse(grepl("Low", modpath), 1, ifelse(grepl("High", modpath), 2, stop("Not set up for specified level of sensitivity")))
-      val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_num])
+      if(simulation==TRUE) val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_num])
+      if(simulation==FALSE) val <- as.numeric(sensitivity_inputs[[param]][val_index])
     }
-    inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
+    if(simulation==TRUE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
+    if(simulation==FALSE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail, param=param, val=val) 
     Nyears <- inits$Nyears 
 
   # if(grepl("LBSPR", modpath)==TRUE){
