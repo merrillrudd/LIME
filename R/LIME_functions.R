@@ -1789,94 +1789,94 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925)) {
             text(x=text.x, y=text.y, labels=label) 
 }
 
-#' run LBSPR within LIME framework
-#'
-#' \code{runLBSPR} sets up LBSPR to run within LIME framework (adjusting for inputs, structure, etc.)
-#'
-#' @param Nyears_comp number of years of length composition data
-#' @param inits initial values for parameters
-#' @param iterpath directories to run model
-#' @param DataList list of real or generated data
-#' @param species name of species (will set as generic within LBSPR package if not specified)
+# #' run LBSPR within LIME framework
+# #'
+# #' \code{runLBSPR} sets up LBSPR to run within LIME framework (adjusting for inputs, structure, etc.)
+# #'
+# #' @param Nyears_comp number of years of length composition data
+# #' @param inits initial values for parameters
+# #' @param iterpath directories to run model
+# #' @param DataList list of real or generated data
+# #' @param species name of species (will set as generic within LBSPR package if not specified)
 
-#' @return list of LBSPR output
-#' @details Must load LBSPR package: devtools::install_github("AdrianHordyk/LBSPR")
-#' @export
-runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
+# #' @return list of LBSPR output
+# #' @details Must load LBSPR package: devtools::install_github("AdrianHordyk/LBSPR")
+# #' @export
+# runLBSPR <- function(Nyears_comp, inits, iterpath, DataList, species){
 
-  require(LBSPR)
+#   require(LBSPR)
         
-        ## lbspr settings
-        setClass("LB_pars", representation(
-          Species = "character", 
-          MK = "numeric",
-          Linf = "numeric",
-          CVLinf = "numeric",
-          L50 = "numeric",
-          L95 = "numeric",
-          Walpha = "numeric",
-          Wbeta = "numeric",
-          FecB = "numeric",
-          Steepness = "numeric",
-          Mpow = "numeric",
-          R0 = "numeric",
-          SL50 = "numeric",
-          SL95 = "numeric",
-          FM = "numeric",
-          SPR = "vector",
-          BinMin = "numeric",
-          BinMax = "numeric",
-          BinWidth = "numeric"  
-        ), validity=check_pars)
+#         ## lbspr settings
+#         setClass("LB_pars", representation(
+#           Species = "character", 
+#           MK = "numeric",
+#           Linf = "numeric",
+#           CVLinf = "numeric",
+#           L50 = "numeric",
+#           L95 = "numeric",
+#           Walpha = "numeric",
+#           Wbeta = "numeric",
+#           FecB = "numeric",
+#           Steepness = "numeric",
+#           Mpow = "numeric",
+#           R0 = "numeric",
+#           SL50 = "numeric",
+#           SL95 = "numeric",
+#           FM = "numeric",
+#           SPR = "vector",
+#           BinMin = "numeric",
+#           BinMax = "numeric",
+#           BinWidth = "numeric"  
+#         ), validity=check_pars)
 
-        LB_pars <- new("LB_pars")
-        LB_pars@Linf <- inits$linf
-        LB_pars@L50 <- inits$ML50 
-        LB_pars@L95 <- inits$ML95
-        LB_pars@MK <- inits$M/inits$vbk         
+#         LB_pars <- new("LB_pars")
+#         LB_pars@Linf <- inits$linf
+#         LB_pars@L50 <- inits$ML50 
+#         LB_pars@L95 <- inits$ML95
+#         LB_pars@MK <- inits$M/inits$vbk         
 
-        LB_pars@SL50 <- inits$SL50 
-        LB_pars@SL95 <- inits$SL95
-        LB_pars@SPR <- 0.4
-        LB_pars@BinWidth <- inits$binwidth
-        LB_pars@Walpha <- inits$lwa
-        LB_pars@Wbeta <- inits$lwb
-        LB_pars@Steepness <- inits$h
-        LB_pars@R0 <- inits$R0
-        LB_pars@Species <- species
+#         LB_pars@SL50 <- inits$SL50 
+#         LB_pars@SL95 <- inits$SL95
+#         LB_pars@SPR <- 0.4
+#         LB_pars@BinWidth <- inits$binwidth
+#         LB_pars@Walpha <- inits$lwa
+#         LB_pars@Wbeta <- inits$lwb
+#         LB_pars@Steepness <- inits$h
+#         LB_pars@R0 <- inits$R0
+#         LB_pars@Species <- species
 
-        setClass("LB_lengths", representation(
-          LMids = "vector",
-          LData = "matrix",
-          Years = "vector",
-          NYears = "numeric",
-          Elog = "numeric"
-        ))
+#         setClass("LB_lengths", representation(
+#           LMids = "vector",
+#           LData = "matrix",
+#           Years = "vector",
+#           NYears = "numeric",
+#           Elog = "numeric"
+#         ))
 
 
-        LB_lengths <- new("LB_lengths")
-        LB_lengths@LMids <- inits$mids
-        LB_lengths@LData <- t(DataList$LF)
-        LB_lengths@Years <- 1:Nyears_comp
-        LB_lengths@NYears <- Nyears_comp
+#         LB_lengths <- new("LB_lengths")
+#         LB_lengths@LMids <- inits$mids
+#         LB_lengths@LData <- t(DataList$LF)
+#         LB_lengths@Years <- 1:Nyears_comp
+#         LB_lengths@NYears <- Nyears_comp
         
-        lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, yrs=NA, Control=list(modtype="absel"))
+#         lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, yrs=NA, Control=list(modtype="absel"))
 
-        LBSPR_outs <- list()
-        LBSPR_outs$pLF <- lbspr_res@pLCatch
-        LBSPR_outs$SL50 <- lbspr_res@Ests[,"SL50"]
-        LBSPR_outs$SL95 <- lbspr_res@Ests[,"SL95"]
-        LBSPR_outs$FM <- lbspr_res@Ests[,"FM"]
-        LBSPR_outs$SPR <- lbspr_res@Ests[,"SPR"]
+#         LBSPR_outs <- list()
+#         LBSPR_outs$pLF <- lbspr_res@pLCatch
+#         LBSPR_outs$SL50 <- lbspr_res@Ests[,"SL50"]
+#         LBSPR_outs$SL95 <- lbspr_res@Ests[,"SL95"]
+#         LBSPR_outs$FM <- lbspr_res@Ests[,"FM"]
+#         LBSPR_outs$SPR <- lbspr_res@Ests[,"SPR"]
 
-        saveRDS(LBSPR_outs, file.path(iterpath, "LBSPR_results.rds"))
+#         saveRDS(LBSPR_outs, file.path(iterpath, "LBSPR_results.rds"))
 
-        rm(LB_lengths)
-        rm(LB_pars)
+#         rm(LB_lengths)
+#         rm(LB_pars)
 
-        return(LBSPR_outs)
+#         return(LBSPR_outs)
 
-}
+# }
 
 
 #' run LIME model - simulation mode
@@ -1911,7 +1911,7 @@ for(iter in itervec){
     iterpath <- file.path(modpath, iter)
     if(rewrite==FALSE){
       if(file.exists(file.path(iterpath, "Derived_quants.rds"))) next
-      if(any(grepl("LBSPR_results", list.files(path=iterpath)))) next
+      # if(any(grepl("LBSPR_results", list.files(path=iterpath)))) next
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
     }
@@ -1920,7 +1920,7 @@ for(iter in itervec){
     modname <- DataList$DataScenario 
 
     if(grepl("MixedEffects", modname)) modname <- strsplit(modname, "_")[[1]][2]
-    if(grepl("LBSPR", modname)) modname <- strsplit(modname, "_")[[1]][2]
+    # if(grepl("LBSPR", modname)) modname <- strsplit(modname, "_")[[1]][2]
     ## copies life history information with any adjustments for sensitivity analyses
     if(is.null(sensitivity_inputs)){
       param <- FALSE
@@ -1936,11 +1936,11 @@ for(iter in itervec){
     inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
     Nyears <- inits$Nyears 
 
-  if(grepl("LBSPR", modpath)==TRUE){
-    if(file.exists(file.path(iterpath, "LBSPR_results.rds"))) next
-    Nyears_comp <- as.numeric(strsplit(modname, "C")[[1]][2])
-    lbspr <- runLBSPR(Nyears_comp=Nyears_comp, inits=inits, iterpath=iterpath, DataList=DataList, species=as.character(lh_num))
-  } 
+  # if(grepl("LBSPR", modpath)==TRUE){
+  #   if(file.exists(file.path(iterpath, "LBSPR_results.rds"))) next
+  #   Nyears_comp <- as.numeric(strsplit(modname, "C")[[1]][2])
+  #   lbspr <- runLBSPR(Nyears_comp=Nyears_comp, inits=inits, iterpath=iterpath, DataList=DataList, species=as.character(lh_num))
+  # } 
 
   if(grepl("LBSPR", modpath)==FALSE){
     
