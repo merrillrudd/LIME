@@ -105,7 +105,7 @@ Calc_derived_quants = function( Obj ){
     ParHat_new = ParHat
     ParHat_new[["log_F_t_input"]] = rep( log(Fmean+1e-10), Data_new[["n_t"]])
     ParHat_new[["Nu_input"]] = rep(0, Data_new[["n_t"]])
-    Obj_new = MakeADFun(data=Data_new[1:length(Data_new)], parameters=ParHat_new[1:length(ParHat_new)], inner.control=list(maxit=1e3) )
+    Obj_new = MakeADFun(data=Data_new[1:length(Data_new)], parameters=ParHat_new[1:length(ParHat_new)], inner.control=list(maxit=1e3), DLL="LIME" )
     # Extract and return stuff
     Report_new = Obj_new$report()
     if(Return_type=="Yield") Return = rev(Report_new$Cw_t_hat)[1]
@@ -1971,7 +1971,7 @@ for(iter in itervec){
       }
 
       ## first run
-      obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE)  
+      obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
         # if(bb==1) check_id <- Check_Identifiable2(obj)[[4]]
         # fix_f <- grep("Bad", check_id[which(check_id[,"Param"]=="log_F_t_input"),3])      
         # good_f <- c(1:Nyears)[which(1:Nyears %in% fix_f == FALSE)] 
@@ -2010,7 +2010,7 @@ for(iter in itervec){
             if(all(is.na(opt))){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
-                            inner.control=list(maxit=1e3), hessian=FALSE) 
+                            inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
                     obj$env$inner.control <- c(obj$env$inner.control, "step.tol"=c(1e-8,1e-12)[1], "tol10"=c(1e-6,1e-8)[1], "grad.tol"=c(1e-8,1e-12)[1]) 
                 opt <- tryCatch( nlminb( start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), 
                   objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, 
@@ -2036,7 +2036,7 @@ for(iter in itervec){
                if(abs(min(opt_save[["final_gradient"]]))>0.01){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
-                            inner.control=list(maxit=1e3), hessian=FALSE) 
+                            inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
                       obj$env$inner.control <- c(obj$env$inner.control, "step.tol"=c(1e-8,1e-12)[1], "tol10"=c(1e-6,1e-8)[1], "grad.tol"=c(1e-8,1e-12)[1]) 
                 opt <- tryCatch( nlminb( start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), 
                   objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, 
