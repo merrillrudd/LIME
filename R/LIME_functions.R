@@ -762,7 +762,11 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     Mat_a <- rep(NA, (AgeMax+1))
     for(a in 1:(AgeMax+1)){
         if(a==1) Mat_a[a] <- 1e-20
-        if(a>1) Mat_a[a] <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
+        if(a>1){
+            fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+            if(length(fill)==1) Mat_a[a] <- fill
+            if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+        }
     }
     # Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
 
@@ -774,7 +778,11 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         S_a <- rep(NA, (AgeMax+1))
         for(a in 1:(AgeMax+1)){
             if(a==1) S_a[a] <- 1e-20
-            if(a>1) S_a[a] <- S_l[which(names(S_l)==a)][length(S_l[which(names(S_l)==a)])]
+            if(a>1){
+                fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
+                if(length(fill)==1) S_a[a] <- fill
+                if(length(fill)==0) S_a[a] <- S_a[a-1]
+            }
         }
         # S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
         Syoung <- NA
