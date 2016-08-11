@@ -756,11 +756,27 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     W_a <- lwa*L_a^lwb
 
     ## maturity
-    Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
+    Mat_l <- 1 / (1 + exp(ML50 - mids))
+    Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
+    names(Mat_l) <- Mat_ages
+    Mat_a <- rep(NA, (AgeMax+1))
+    for(a in 1:(AgeMax+1)){
+        if(a==1) Mat_a[a] <- 1e-20
+        if(a>1) Mat_a[a] <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
+    }
+    # Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
 
     ## selectivity 
     if(selex=="asymptotic"){
-        S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
+        S_l <- 1/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50)))
+        S_ages <- round(t0-log(1-(mids/linf))/vbk)
+        names(S_l) <- S_ages
+        S_a <- rep(NA, (AgeMax+1))
+        for(a in 1:(AgeMax+1)){
+            if(a==1) S_a[a] <- 1e-20
+            if(a>1) S_a[a] <- S_l[which(names(S_l)==a)][length(S_l[which(names(S_l)==a)])]
+        }
+        # S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
         Syoung <- NA
         Sold <- NA
     }
