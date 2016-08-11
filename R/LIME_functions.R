@@ -861,10 +861,10 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
 
         ### must have at least 1 year of composition data specified to test method with 0 years length comp - just don't include it in data supplied to model
         if("Index_LC0" %in% avail_set){
-            settings$Index_LC10 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
+            settings$Index_LC0 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
         }
         if("Catch_LC0" %in% avail_set){
-            settings$Catch_LC10 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
+            settings$Catch_LC0 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
         }
 
         if("LC1" %in% avail_set){
