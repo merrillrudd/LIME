@@ -841,7 +841,7 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
             settings$Rich_LC <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=Nyears, alt_yrs=FALSE, sample=FALSE)
         }
         if("Moderate_LC" %in% avail_set){
-            settings$Moderate_LC <- list(Nyears=Nyears, comp_sample=100, obs_per_yr=rep(ESS,Nyears), Nyears_comp=Nyears, alt_yrs=FALSE, sample=FALSE)
+            settings$Moderate_LC <- list(Nyears=Nyears, comp_sample=50, obs_per_yr=rep(ESS,Nyears), Nyears_comp=Nyears, alt_yrs=FALSE, sample=FALSE)
         }
         if("Sample_LC" %in% avail_set){
             settings$Sample_LC <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=Nyears, alt_yrs=TRUE, sample=0.2)
@@ -858,6 +858,15 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
         if("Catch_LC10" %in% avail_set){
             settings$Catch_LC10 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=10, alt_yrs=FALSE, sample=FALSE)
         }
+
+        ### must have at least 1 year of composition data specified to test method with 0 years length comp - just don't include it in data supplied to model
+        if("Index_LC0" %in% avail_set){
+            settings$Index_LC10 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
+        }
+        if("Catch_LC0" %in% avail_set){
+            settings$Catch_LC10 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
+        }
+
         if("LC1" %in% avail_set){
             settings$LC1 <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=1, alt_yrs=FALSE, sample=FALSE)
         }
@@ -1138,7 +1147,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
         }
 
         ## index and length composition data
-        if(grepl("Index", model) & grepl("LC", model)){
+        if(grepl("Index", model) & grepl("LC", model) & grepl("LC0", model)==FALSE){
             if(is.matrix(DataList$LF)){
                 n_lc <- nrow(DataList$LF)
                 LC_yrs <- as.numeric(rownames(DataList$LF))
@@ -1149,6 +1158,29 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 LC_yrs <- Nyears
                 LF <- t(as.matrix(DataList$LF))
             }
+            Data <- list(n_t=Nyears, n_lb=ncol(DataList$LF), 
+                n_c=0,
+                n_i=length(DataList$I_t), 
+                n_lc=n_lc,
+                n_ml=0, start_f=start_f,
+                T_yrs=1:Nyears, C_yrs=as.vector(0),
+                I_yrs=as.numeric(names(DataList$I_t)),
+                LC_yrs=LC_yrs,
+                ML_yrs=as.vector(0),
+                rel_c=0, rel_i=0, 
+                obs_per_yr=obs_per_yr, RecType=RecType,
+                I_t=DataList$I_t, C_t=as.vector(0), 
+                ML_t=as.vector(0), LF=LF,
+                linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
+                Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
+                RecDev_biasadj=RecDev_biasadj)       
+        }
+        ## index only
+        if(grepl("Index", model) & grepl("LC", model) & grepl("LC0", model)){
+            n_lc <- 0
+            LC_yrs <- as.vector(0)
+            LF <- as.matrix(0)
             Data <- list(n_t=Nyears, n_lb=ncol(DataList$LF), 
                 n_c=0,
                 n_i=length(DataList$I_t), 
@@ -1200,7 +1232,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
         }
 
         ## catch and length composition data
-        if(grepl("Catch", model) & grepl("LC", model)){
+        if(grepl("Catch", model) & grepl("LC", model) & grepl("LC0", model)==FALSE){
             if(is.matrix(DataList$LF)){
                 n_lc <- nrow(DataList$LF)
                 LC_yrs <- as.numeric(rownames(DataList$LF))
@@ -1229,6 +1261,31 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
                 RecDev_biasadj=RecDev_biasadj)       
         }
+
+        ## catch only
+        if(grepl("Catch", model) & grepl("LC", model) & grepl("LC0", model)){
+            n_lc <- 0
+            LC_yrs <- as.vector(0)
+            LF <- as.matrix(0)
+            Data <- list(n_t=Nyears, n_lb=ncol(DataList$LF), 
+                n_c=length(DataList$C_t),
+                n_i=0, 
+                n_lc=n_lc,
+                n_ml=0, start_f=start_f,
+                T_yrs=1:Nyears, C_yrs=as.numeric(names(DataList$C_t)),
+                I_yrs=as.vector(0),
+                LC_yrs=LC_yrs,
+                ML_yrs=as.vector(0),
+                rel_c=0, rel_i=0, 
+                obs_per_yr=obs_per_yr, RecType=RecType,
+                I_t=as.vector(0), C_t=DataList$C_t, 
+                ML_t=as.vector(0), LF=LF,
+                linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
+                Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
+                RecDev_biasadj=RecDev_biasadj)       
+        }
+
 
         ## catch and mean length data
         if(grepl("Catch", model) & grepl("ML", model)){
