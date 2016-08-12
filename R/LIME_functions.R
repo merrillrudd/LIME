@@ -1974,6 +1974,8 @@ for(iter in itervec){
     if(simulation==FALSE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=input_data, param=param, val=val) 
     Nyears <- inits$Nyears 
 
+    if(simulation==FALSE) DataList <- input_data
+
   if(grepl("LBSPR", modpath)==FALSE){
     
     if(biascorrect==FALSE) vec <- 1
