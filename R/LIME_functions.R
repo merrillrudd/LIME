@@ -448,7 +448,7 @@ choose_lh_list <- function(species, selex){
         binwidth <- 1
 
         ## selectivity
-        L50 <- 20.2
+        ML50 <- 20.2
         SL50 <- 11.3
 
         ## fishing mortality
@@ -458,9 +458,9 @@ choose_lh_list <- function(species, selex){
         M <- 1.6*vbk
         AgeMax <- round(-log(0.01)/M)
         ages <- 0:AgeMax
-        Amat <- round(t0-log(1-(L50/linf))/vbk)
+        Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
-        L95 <- round(linf*(1-exp(-vbk*(A95-t0))))
+        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
         S50 <- ceiling(t0-log(1-(SL50/linf))/vbk)
         S95 <- S50+1
         SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
@@ -478,8 +478,19 @@ choose_lh_list <- function(species, selex){
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- 1/(1+exp(-log(19)*(ages-S50)/(S95-S50))) # Selectivity at age
-            S_a[1] <- 1e-20
+            S_l <- 1/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50)))
+            S_ages <- round(t0-log(1-(mids/linf))/vbk)
+            names(S_l) <- S_ages
+            S_a <- rep(NA, (AgeMax+1))
+            for(a in 1:(AgeMax+1)){
+                if(a==1) S_a[a] <- 1e-20
+                if(a>1){
+                    fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
+                    if(length(fill)==1) S_a[a] <- fill
+                    if(length(fill)==0) S_a[a] <- S_a[a-1]
+                }
+            }
+            # S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
             Syoung <- NA
             Sold <- NA
         }
@@ -532,8 +543,8 @@ choose_lh_list <- function(species, selex){
     Outs$L_a <- L_a
     Outs$W_a <- W_a
     Outs$Amat <- Amat
-    Outs$L50 <- L50
-    Outs$L95 <- L95
+    Outs$ML50 <- ML50
+    Outs$ML95 <- ML95
     Outs$Mat_a <- Mat_a
 
     return(Outs)
