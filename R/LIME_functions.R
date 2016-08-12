@@ -190,15 +190,21 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
 #' @details repeat over all iterations outside of this function to get full distribution of relative errors in the reference points for the simulation study. 
 #' @export
     calcRE <- function(modpath_vec, iter, value, yr, timeseries=FALSE){
-        if(timeseries==FALSE) RE <- rep(NA, length(modpath_vec))
-        if(timeseries==TRUE) RE <- matrix(NA, nrow=yr, ncol=length(modpath_vec))
+        if(timeseries==FALSE){
+            RE <- SQerr <- EE <- rep(NA, length(modpath_vec))
+            converge <- rep(0, length(modpath_vec))
+        }
+        if(timeseries==TRUE){
+            RE <- SQerr <- EE <- matrix(NA, nrow=yr, ncol=length(modpath_vec))
+            converge <- rep(0, length(modpath_vec))
+        }
         Rep <- True <- Est <- list()
         for(m in 1:length(modpath_vec)){
             ## report file
             if(grepl("LBSPR", modpath_vec[m])==FALSE){
                 if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))) Rep[[m]] <- readRDS(file.path(modpath_vec[m], iter, "Report.rds"))
                 if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))==FALSE) next
-                # if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))) Rep[[m]] <- "no_convergence"
+                if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))) converge[m] <- 1
             }
             if(grepl("LBSPR", modpath_vec[m])){
                 if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))==1) Rep[[m]] <- readRDS(file.path(modpath_vec[m], iter, "LBSPR_results.rds"))
@@ -212,7 +218,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
                 ## estimated values
                 if(grepl("LBSPR", modpath_vec[m])==FALSE){
                     if(timeseries==FALSE) Est[[m]] <- with(Rep[[m]], calc_ref(Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[yr], ref=FALSE))
-                if(timeseries==TRUE) Est[[m]] <- with(Rep[[m]], sapply(1:yr, function(x) calc_ref(Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[x], ref=FALSE)))
+                    if(timeseries==TRUE) Est[[m]] <- with(Rep[[m]], sapply(1:yr, function(x) calc_ref(Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[x], ref=FALSE)))
                 }
                 if(grepl("LBSPR", modpath_vec[m])){
                     Est[[m]] <- Rep[[m]]$SPR
@@ -249,11 +255,25 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
             }
 
 
-            if(timeseries==FALSE) RE[m] <- (Est[[m]] - True[[m]])/True[[m]]
-            if(timeseries==TRUE) RE[,m] <- (Est[[m]] - True[[m]])/True[[m]]
+            if(timeseries==FALSE){
+                RE[m] <- (Est[[m]] - True[[m]])/True[[m]]
+                SQerr[m] <- (Est[[m]] - True[[m]])^2
+                EE[m] <- log(Est[[m]]) - log(True[[m]])
+            }
+            if(timeseries==TRUE){
+                RE[,m] <- (Est[[m]] - True[[m]])/True[[m]]
+                SQerr[,m] <- (Est[[m]] - True[[m]])^2
+                EE[,m] <- log(Est[[m]]) - log(True[[m]])
+            }
         }
 
-        return(RE)
+        Outs <- NULL
+        Outs$RelErr <- RE
+        Outs$SqErr <- SQerr
+        Outs$EstErr <- EE
+        Outs$nonconvergence <- converge
+
+        return(Outs)
     }
 
 #' Check for identifiability of fixed effects -- frm TMBhelpers (slightly adjusted by MBR)
