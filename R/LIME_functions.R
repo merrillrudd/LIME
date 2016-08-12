@@ -279,7 +279,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
         Outs$EstErr <- EE
         Outs$nonconvergence <- converge
 
-        return(RE)
+        return(Outs)
     }
 
 #' Check for identifiability of fixed effects -- frm TMBhelpers (slightly adjusted by MBR)
