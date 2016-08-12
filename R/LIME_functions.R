@@ -352,7 +352,7 @@ choose_lh_list <- function(species, selex){
         qcoef <- 1e-5
 
         ## variation terms
-        SigmaF <- 0.1
+        SigmaF <- 0.3
         SigmaC <- 0.2
         SigmaI <- 0.2
         SigmaR <- 0.6
@@ -362,7 +362,7 @@ choose_lh_list <- function(species, selex){
         S95 <- 5 ## 4.43 fully recruited (39.1 cm TL) (from Bystrom thesis)
         
         ## maturity
-        L50 <- 34 ## Rojas 2006 Gulf of Nicoya
+        ML50 <- 34 ## Rojas 2006 Gulf of Nicoya
 
         ## length bins
         binwidth <- 1
@@ -375,9 +375,9 @@ choose_lh_list <- function(species, selex){
 
         ## derived
         ages <- 0:AgeMax
-        Amat <- round(t0-log(1-(L50/linf))/vbk)
+        Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
-        L95 <- round(linf*(1-exp(-vbk*(A95-t0))))
+        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
         SL50 <- round(linf*(1-exp(-vbk*(S50-t0))))
         SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
 
@@ -386,18 +386,30 @@ choose_lh_list <- function(species, selex){
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        Mat_a <- 1 / (1 + exp(Amat - ages)) 
+        Mat_l <- 1 / (1 + exp(ML50 - mids))
+        Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
+        names(Mat_l) <- Mat_ages
+        Mat_a <- rep(NA, (AgeMax+1))
+        for(a in 1:(AgeMax+1)){
+            if(a==1) Mat_a[a] <- 1e-20
+            if(a>1){
+                fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+                if(length(fill)==1) Mat_a[a] <- fill
+                if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+            }
+        }
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- 1/(1+exp(-log(19)*(ages-S50)/(S95-S50))) # Selectivity at age
+            S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
             S_a[1] <- 1e-20
             Syoung <- NA
             Sold <- NA
         }
         if(selex=="dome"){
             S_a_calc <- rep(NA, length(ages))
-            stop("Need to parameterize dome-shape")
+            Syoung <- 3
+            Sold <- 15
             A <- sqrt(2/pi)/(Syoung + Sold)
             for(a in 1:length(ages)){
                 if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
