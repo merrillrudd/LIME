@@ -1070,9 +1070,7 @@ formatDataList <- function(species, data_dir){
         lf <- length_frequency(binwidth=1, linf=cr_lh$linf, lmat=cr_lh$L50, data=lg, plot=FALSE, weight=TRUE)       
 
         ## catch and effort data
-        # fishery_data <- catch_effort(data=lg, sep_index=TRUE)
-        # saveRDS(fishery_data, file.path(data_dir, "cr_snapper_fishery.rds"))
-        fishery_data <- readRDS(file.path(data_dir, "cr_snapper_fishery.rds"))
+        fishery_data <- catch_effort(data=lg, sep_index=TRUE)
         catch <- fishery_data$catch
         cpue_bl <- fishery_data$cpue_bl
         cpue_g <- fishery_data$cpue_g
