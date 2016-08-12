@@ -4,12 +4,12 @@
 \alias{calcRE}
 \title{Calculate relative error}
 \usage{
-calcRE(modpath_vec, iter, value, yr, timeseries = FALSE)
+calcRE(modpath_vec, itervec, value, yr, timeseries = FALSE)
 }
 \arguments{
 \item{modpath_vec}{vector of directories to search for saved true and estimated population parameters}
 
-\item{iter}{which iteration? only 1 at a time}
+\item{itervec}{vector of iterations to check for results}
 
 \item{value}{options: "SPR" or "FFref" (FFref is defined as F/F40)}
 
@@ -18,12 +18,12 @@ calcRE(modpath_vec, iter, value, yr, timeseries = FALSE)
 \item{timeseries}{default: timeseries=FALSE, if timeseries=TRUE, takes the relative error for all years up to the specified year using the 'yr' argument}
 }
 \value{
-Matrix with relative error for single iteration across all models
+list with Relative Error, Squared Error, Estimation Error, and vector flagging convergence issues
 }
 \description{
 \code{calcRE} Calculates the relative error between true and estimated values of SPR and F/Fref
 }
 \details{
-repeat over all iterations outside of this function to get full distribution of relative errors in the reference points for the simulation study.
+Only set up to run with a simulation study where there are multiple iterations of the model runs.
 }
 
