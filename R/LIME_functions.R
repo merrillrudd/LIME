@@ -1918,13 +1918,14 @@ plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence
 #' @param rewrite if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param start_f year (in numbers, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
 #' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (no need for iterations or multiple life history inputs)
+#' @param input_data use this to input data for a real-world application (not simulation)
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @details need to adjust to run with real data
 #' @export
-runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE){
+runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE, input_data=NULL){
 
   if(simulation==TRUE){
     lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
@@ -1954,7 +1955,8 @@ for(iter in itervec){
     }
 
     if(simulation==TRUE) if(grepl("MixedEffects", modname)) modname <- strsplit(modname, "_")[[1]][2]
-    # if(grepl("LBSPR", modname)) modname <- strsplit(modname, "_")[[1]][2]
+    if(simulation==FALSE) modname <- data_avail
+
     ## copies life history information with any adjustments for sensitivity analyses
     if(is.null(sensitivity_inputs)){
       param <- FALSE
@@ -1969,14 +1971,8 @@ for(iter in itervec){
       if(simulation==FALSE) val <- as.numeric(sensitivity_inputs[[param]][val_index])
     }
     if(simulation==TRUE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
-    if(simulation==FALSE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail, param=param, val=val) 
+    if(simulation==FALSE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=input_data, param=param, val=val) 
     Nyears <- inits$Nyears 
-
-  # if(grepl("LBSPR", modpath)==TRUE){
-  #   if(file.exists(file.path(iterpath, "LBSPR_results.rds"))) next
-  #   Nyears_comp <- as.numeric(strsplit(modname, "C")[[1]][2])
-  #   lbspr <- runLBSPR(Nyears_comp=Nyears_comp, inits=inits, iterpath=iterpath, DataList=DataList, species=as.character(lh_num))
-  # } 
 
   if(grepl("LBSPR", modpath)==FALSE){
     
