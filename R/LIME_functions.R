@@ -73,10 +73,9 @@ Calc_derived_quants = function( Obj ){
   SPR <- with(Report, calc_ref(Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[length(F_t)], ref=FALSE))
   F30 <- tryCatch(with(Report, uniroot(calc_ref, lower=0, upper=50, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.3)$root), error=function(e) NA)
   F40 <- tryCatch(with(Report, uniroot(calc_ref, lower=0, upper=50, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.4)$root), error=function(e) NA)
+  FF30 <- FF40 <- NULL
   if(is.na(F30)==FALSE) FF30 <- Report$F_t[length(Report$F_t)]/F30
   if(is.na(F40)==FALSE) FF40 <- Report$F_t[length(Report$F_t)]/F40
-  if(is.na(F30)) FF30 <- NA
-  if(is.na(F40)) FF40 <- NA
 
   ## still need to get Thorson code working with my code for MSY reference points
   # Total biomass
