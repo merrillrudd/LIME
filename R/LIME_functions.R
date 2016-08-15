@@ -2437,7 +2437,7 @@ spatialgrowth_sim <- function(n_i, Scale=2, Sigma2=1, SD_spatial=0.1, linf, beta
 #' @return matrix with AIC, AICc, deltaAIC, and deltaAICc (in that order by column) for each model (down the rows)
 #' @export
 calc_AIC <- function(modpath_vec){
-    aic_mat <- matrix(NA, nrow(length(modpath_vec)), ncol=4)
+    aic_mat <- matrix(NA, nrow=length(modpath_vec), ncol=4)
     colnames(aic_mat) <- c("AIC", "AICc", "deltaAIC", "deltaAICc")
 
     for(i in 1:length(modpath_vec)){
