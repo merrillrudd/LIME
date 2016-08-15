@@ -257,9 +257,9 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
     
 
                 if(timeseries==FALSE){
-                    RE[iter,m] <- (Est - True)/True
-                    SQerr[iter,m] <- (Est - True)^2
-                    EE[iter,m] <- log(Est) - log(True)
+                    RE[iter,m] <- (Est[length(Est)] - True[length(True)])/True[length(True)]
+                    SQerr[iter,m] <- (Est[length(Est)] - True[length(True)])^2
+                    EE[iter,m] <- log(Est[length(Est)]) - log(True[length(True)])
                 }
                 if(timeseries==TRUE){
                     RE[iter,m,] <- (Est - True)/True
