@@ -374,6 +374,15 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         ## fishing mortality
         F1 <- 0.34  
 
+        ## sensitivities
+        if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
+        if("vbk" %in% param_adjust) vbk <- val[which(param_adjust=="vbk")]
+        if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
+        if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
+        if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+
+
         ## derived
         ages <- 0:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
@@ -457,6 +466,15 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## derived
         M <- 1.6*vbk
+
+        ## sensitivities
+        if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
+        if("vbk" %in% param_adjust) vbk <- val[which(param_adjust=="vbk")]
+        if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
+        if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
+        if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+
         AgeMax <- round(-log(0.01)/M)
         ages <- 0:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
