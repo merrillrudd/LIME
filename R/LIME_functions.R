@@ -328,7 +328,7 @@ Check_Identifiable2 = function( obj ){
 #' 
 #' @return List, a tagged list of life history/starting value information
 #' @export
-choose_lh_list <- function(species, selex){
+choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
     ## Costa Rican spotted rose snapper
     if(species=="CRSNAP"){
