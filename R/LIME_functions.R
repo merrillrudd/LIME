@@ -77,7 +77,6 @@ Calc_derived_quants = function( Obj ){
   if(is.na(F30)==FALSE) FF30 <- Report$F_t[length(Report$F_t)]/F30
   if(is.na(F40)==FALSE) FF40 <- Report$F_t[length(Report$F_t)]/F40
 
-  ## still need to get Thorson code working with my code for MSY reference points
   # Total biomass
   TB_t = as.vector( Report$W_a %*% t(Report$N_ta) )
   Cw_t <- as.vector(Report$W_a %*% t(Report$Cn_ta));
@@ -1552,14 +1551,17 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 #' @param write write generated dataset? default=TRUE. FALSE helpful for plotting.
 #' @param lh_list list of life history inputs
 #' @param data_avail_list list of other model settings
+#' @param param_adjust vector of names of parameters to adjust true value, default FALSE to include no parameter
+#' @param val vector of values aligning with names in param_adjust to adjust value to, default FALSE to include no parameter
 
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list){
+generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE){
 
   lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
   lh_choose <- lh_list[[lh_num]]
+  if(all(param_adjust!=FALSE)) lh_choose[param_adjust] <- val
   
   Nyears_comp <- data_avail_list$Nyears_comp
   Nyears <- data_avail_list$Nyears
