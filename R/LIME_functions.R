@@ -857,8 +857,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     }
     if(selex=="dome"){
         S_a_calc <- rep(NA, length(ages))
-        Syoung <- 0.8
-        Sold <- 8
+        Syoung <- S50
+        Sold <- max(c(S50+1),AgeMax*0.75)
         A <- sqrt(2/pi)/(Syoung + Sold)
         for(a in 1:length(ages)){
             if(a==1) S_a_calc[a] <- 1e-20
