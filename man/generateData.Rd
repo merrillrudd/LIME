@@ -6,7 +6,8 @@
 \usage{
 generateData(modpath, modname, itervec, spatial, Fdynamics, Rdynamics,
   LType = 1, plotML = FALSE, plotLF_compare = FALSE, plotLF = FALSE,
-  selex = "asymptotic", write = TRUE, lh_list, data_avail_list)
+  selex = "asymptotic", write = TRUE, lh_list, data_avail_list,
+  param_adjust = FALSE, val = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -36,6 +37,10 @@ generateData(modpath, modname, itervec, spatial, Fdynamics, Rdynamics,
 \item{lh_list}{list of life history inputs}
 
 \item{data_avail_list}{list of other model settings}
+
+\item{param_adjust}{vector of names of parameters to adjust true value, default FALSE to include no parameter}
+
+\item{val}{vector of values aligning with names in param_adjust to adjust value to, default FALSE to include no parameter}
 }
 \value{
 print how many iterations were written into the model directory

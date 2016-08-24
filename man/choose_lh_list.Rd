@@ -4,7 +4,7 @@
 \alias{choose_lh_list}
 \title{Saved life history values}
 \usage{
-choose_lh_list(species, selex)
+choose_lh_list(species, selex, param_adjust = FALSE, val = FALSE)
 }
 \arguments{
 \item{species}{species code name}
