@@ -1561,7 +1561,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 
   lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
   lh_choose <- lh_list[[lh_num]]
-  if(all(param_adjust!=FALSE)) lh_choose[param_adjust] <- val
+  if(param_adjust[1]!=FALSE) lh_choose[param_adjust] <- val
   
   Nyears_comp <- data_avail_list$Nyears_comp
   Nyears <- data_avail_list$Nyears
