@@ -6,7 +6,7 @@
 \usage{
 FormatInput_LB(Nyears, DataList, linf, vbk, t0, M, AgeMax, lbhighs, lbmids,
   Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, qcoef, R0,
-  S50, S95, model, RecDev_biasadj, site, Fpen, Dpen, Dprior, SigRpen, SigRprior,
+  S50, model, RecDev_biasadj, site, Fpen, Dpen, Dprior, SigRpen, SigRprior,
   obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML,
   estimate_same, start_f)
 }
@@ -50,8 +50,6 @@ FormatInput_LB(Nyears, DataList, linf, vbk, t0, M, AgeMax, lbhighs, lbmids,
 \item{R0}{starting value from input list}
 
 \item{S50}{starting value from input list}
-
-\item{S95}{starting value from input list}
 
 \item{model}{data type availability}
 
