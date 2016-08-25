@@ -81,7 +81,6 @@ Type objective_function<Type>::operator() ()
     PARAMETER(beta);
     PARAMETER(log_sigma_R); // magnitude of temporal variation
     PARAMETER(logS50); // Age at 50% selectivity
-    PARAMETER(logS95); // Age at 95% selectivity
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp
@@ -107,7 +106,6 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
-  Type S95 = exp(logS95);
 
   // Transform vectors
   vector<Type> F_t(n_t);
@@ -126,13 +124,14 @@ Type objective_function<Type>::operator() ()
   vector<Type> L_a(AgeMax+1);
   vector<Type> W_a(AgeMax+1);
   for(int a=0;a<=AgeMax;a++){
-    L_a(a) = linf*(Type(1.0)-exp(-vbk*(Type(a) - t0)));
+    L_a(a) = linf*(1-exp(-vbk*(a - t0)));
     W_a(a) = lwa*pow(L_a(a), lwb);
   }
 
   vector<Type> S_a(AgeMax+1);
-  for(int a=0;a<=AgeMax;a++){
-    S_a(a) = 1/(1+exp(-log(19)*(a-S50)/(S95-S50)));
+  S_a(0) = 1e-20;
+  for(int a=1;a<=AgeMax;a++){
+    S_a(a) = 1 / (1 + exp(S50 - a));
   }
   
 
@@ -484,7 +483,6 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_R );
   REPORT( log_sigma_R );
   REPORT( S50 );
-  REPORT( S95 );
   REPORT( S_a );
   REPORT( sigma_C );
   REPORT( sigma_I );

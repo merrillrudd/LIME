@@ -410,7 +410,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
+            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages))) # Selectivity at age
             S_a[1] <- 1e-20
             Syoung <- NA
             Sold <- NA
@@ -839,7 +839,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
 
     ## selectivity 
     if(selex=="asymptotic"){
-        S_l <- 1/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50)))
+        S_l <- 1 / (1 + exp(SL50 - mids))
         S_ages <- round(t0-log(1-(mids/linf))/vbk)
         names(S_l) <- S_ages
         S_a <- rep(NA, (AgeMax+1))
@@ -1164,7 +1164,6 @@ formatDataList <- function(species, data_dir){
 #' @param qcoef starting value from input list
 #' @param R0 starting value from input list
 #' @param S50 starting value from input list
-#' @param S95 starting value from input list
 #' @param model data type availability
 #' @param RecDev_biasadj starting values for rec devs
 #' @param site artifact of development: how many sites to estimate values?
@@ -1189,7 +1188,7 @@ formatDataList <- function(species, data_dir){
 #' @export
 FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
     lbhighs, lbmids, Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, 
-    qcoef, R0, S50, S95, model, RecDev_biasadj, site,
+    qcoef, R0, S50, model, RecDev_biasadj, site,
     Fpen, Dpen, Dprior, SigRpen, SigRprior, obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML, estimate_same, start_f){
 
         ## Rich, Moderate, and Sample names include catch, index, and length comp data - just vary in the sampling and ESS of composition data
@@ -1439,13 +1438,10 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
         }
 
         ## set input parameters - regardless of data availability        
-        Parameters <- list(log_F_sd=log(SigmaF), log_F_t_input=log(rep(F1,Nyears)),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(S50), logS95=log(S95), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L,Nu_input=rep(0,Nyears))
+        Parameters <- list(log_F_sd=log(SigmaF), log_F_t_input=log(rep(F1,Nyears)),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(S50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L,Nu_input=rep(0,Nyears))
 
         ## turn off parameter estimation - depends on data availability
             Map = list()
-                Map[["logS95"]] <- NA
-                Map[["logS95"]] <- factor(Map[["logS95"]])
-
 
            
             if(estimate_same==TRUE){
@@ -2015,7 +2011,7 @@ for(iter in itervec){
           RecDev_biasadj <- 1 - SD[which(rownames(SD)=="Nu_input"), "Std. Error"]^2 / Report$sigma_R^2    
       }
       if(all(is.na(RecDev_biasadj))) RecDev_biasadj <- rep(0, Nyears)
-      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, S95=inits$S95, model=as.character(modname), RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=obs_per_yr, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE, start_f=start_f)
+      TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, model=as.character(modname), RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=obs_per_yr, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE, start_f=start_f)
       if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.rds")) 
       if(bb==2) saveRDS(TmbList, file.path(iterpath, "Inputs2.rds"))  
 
@@ -2049,8 +2045,8 @@ for(iter in itervec){
       obj$env$inner.control <- c(obj$env$inner.control, "step.tol"=c(1e-8,1e-12)[1], "tol10"=c(1e-6,1e-8)[1], "grad.tol"=c(1e-8,1e-12)[1]) 
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
-        Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
-        Upr[match("log50", names(obj$par))] = obj$par[match("logS95", names(obj$par))]
+        # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
+        Upr[match("log50", names(obj$par))] = log(inits$AgeMax)
         Upr[which(names(obj$par)=="log_F_t_input")] = log(5)
         Upr[match("log_F_sd", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
