@@ -1609,8 +1609,10 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 
     iterpath <- file.path(modpath, iter)
     if(write==TRUE) dir.create(iterpath, showWarnings=FALSE) 
-    if(file.exists(iterpath, "True.rds") & rewrite==FALSE) next
-
+    if(rewrite==FALSE){
+      if(file.exists(iterpath, "True.rds")) next
+    }
+    
     ## simulated data with no spatial structure in growth
     DataList <- with(c(lh_choose, data_avail_list), SimData_LB(Nyears=Nyears, AgeMax=AgeMax, 
       M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
