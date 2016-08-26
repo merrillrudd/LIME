@@ -796,6 +796,42 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ML50 <- 19.4
         ML95 <- 20.4
     }
+
+    if(lh==5){
+      ## growth - from Bystrom thesis
+        vbk <- 0.21
+        linf <- 64.58
+        t0 <- -0.01
+        CVlen <- 0.2
+        lwa <- 0.0245
+        lwb <- 2.790
+            
+        ## mortality
+        M <- 0.43 ## based on vbk
+
+        ## recruitment
+        R0 <- 1
+        h <- 1
+
+        ## index
+        qcoef <- 1e-2
+
+        ## variation terms
+        SigmaF <- 0.3
+        SigmaC <- 0.2
+        SigmaI <- 0.2
+        SigmaR <- 0.6
+
+        ## bins
+        binwidth <- 1
+
+        ## selectivity
+        SL50 <- 30.0
+        SL95 <- 39.1
+        
+        ## maturity
+        ML50 <- 34 ## Rojas 2006 Gulf of Nicoya
+    }
     
     ## sensitivities
     if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
