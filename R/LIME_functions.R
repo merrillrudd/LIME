@@ -837,6 +837,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         
         ## maturity
         ML50 <- 34 ## Rojas 2006 Gulf of Nicoya
+        ML95 <- 40
     }
     
     ## sensitivities
