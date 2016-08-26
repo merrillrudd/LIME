@@ -7,7 +7,7 @@
 generateData(modpath, modname, itervec, spatial, Fdynamics, Rdynamics,
   LType = 1, plotML = FALSE, plotLF_compare = FALSE, plotLF = FALSE,
   selex = "asymptotic", write = TRUE, lh_list, data_avail_list,
-  param_adjust = FALSE, val = FALSE)
+  param_adjust = FALSE, val = FALSE, rewrite = TRUE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}

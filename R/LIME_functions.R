@@ -1596,7 +1596,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE){
+generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE, rewrite=TRUE){
 
   lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, stop("No match to life history number")))))
   lh_choose <- lh_list[[lh_num]]
@@ -1607,10 +1607,9 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 
   for(iter in itervec){
 
-    if(write==TRUE){
-      iterpath <- file.path(modpath, iter)
-      dir.create(iterpath, showWarnings=FALSE)  
-    }
+    iterpath <- file.path(modpath, iter)
+    if(write==TRUE) dir.create(iterpath, showWarnings=FALSE) 
+    if(file.exists(iterpath, "True.rds") & rewrite==FALSE) next
 
     ## simulated data with no spatial structure in growth
     DataList <- with(c(lh_choose, data_avail_list), SimData_LB(Nyears=Nyears, AgeMax=AgeMax, 
