@@ -1592,11 +1592,11 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 #' @param data_avail_list list of other model settings
 #' @param param_adjust vector of names of parameters to adjust true value, default FALSE to include no parameter
 #' @param val vector of values aligning with names in param_adjust to adjust value to, default FALSE to include no parameter
-#' @param rewrite defaults to TRUE, which will re-run OM and observation model. FALSE will skip if it's already written in directory.
+#' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE, rewrite=TRUE){
+generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE, rewrite){
 
     lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, stop("No match to life history number"))))))
   lh_choose <- lh_list[[lh_num]]
@@ -1612,7 +1612,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
     if(rewrite==FALSE){
       if(file.exists(iterpath, "True.rds")) next
     }
-    
+
     ## simulated data with no spatial structure in growth
     DataList <- with(c(lh_choose, data_avail_list), SimData_LB(Nyears=Nyears, AgeMax=AgeMax, 
       M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
