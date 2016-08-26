@@ -802,7 +802,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         vbk <- 0.21
         linf <- 64.58
         t0 <- -0.01
-        CVlen <- 0.2
+        CVlen <- 0.1
         lwa <- 0.0245
         lwb <- 2.790
             
@@ -812,6 +812,12 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## recruitment
         R0 <- 1
         h <- 1
+
+        ## fishing mortality
+        Fequil <- 0.25
+        Frate <- 0.2
+        F1 <- 0.2
+        Fmax <- 1
 
         ## index
         qcoef <- 1e-2
