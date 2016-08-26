@@ -1592,7 +1592,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 #' @param data_avail_list list of other model settings
 #' @param param_adjust vector of names of parameters to adjust true value, default FALSE to include no parameter
 #' @param val vector of values aligning with names in param_adjust to adjust value to, default FALSE to include no parameter
-
+#' @param rewrite defaults to TRUE, which will re-run OM and observation model. FALSE will skip if it's already written in directory.
 
 #' @return print how many iterations were written into the model directory
 #' @export
