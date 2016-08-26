@@ -21,3 +21,5 @@ Imports:
 LinkingTo: TMB, RcppEigen, Rcpp
 Suggests: TMBhelper
 RoxygenNote: 5.0.1
+LazyData: true
+
