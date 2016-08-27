@@ -802,7 +802,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         vbk <- 0.21
         linf <- 64.58
         t0 <- -0.01
-        CVlen <- 0.1
+        CVlen <- 0.2
         lwa <- 0.0245
         lwb <- 2.790
             
