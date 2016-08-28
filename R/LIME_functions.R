@@ -1744,6 +1744,14 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
    
     DataList_out <- DataList
 
+    Inputs <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=lh_choose$linf, vbk=lh_choose$vbk, t0=lh_choose$t0, M=lh_choose$M, AgeMax=lh_choose$AgeMax, lbhighs=lh_choose$highs, lbmids=lh_choose$mids, Mat_a=lh_choose$Mat_a, lwa=lh_choose$lwa, lwb=lh_choose$lwb, log_sigma_C=log(lh_choose$SigmaC), log_sigma_I=log(0.001), log_CV_L=log(0.001), F1=DataList$F_t[1], SigmaR=lh_choose$SigmaR, qcoef=lh_choose$qcoef, R0=1, S50=lh_choose$S50, model="Rich_LC", RecDev_biasadj=rep(0,Nyears), Fpen=1, Dpen=0, Dprior=c(0,0), SigRpen=1, SigRprior=c(lh_choose$SigmaR, 0.2), obs_per_yr=rep(1000,Nyears), SigmaF=lh_choose$SigmaF, RecType=0, FType=0, LType=1, h=lh_choose$h, SelexTypeDesc="asymptotic", est_sigma="log_sigma_R", REML=FALSE, site=1, estimate_same=FALSE, start_f=0)
+    ParList <- Inputs$Parameters
+    obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
+    Derived <- Calc_derived_quants(obj)
+
+    DataList_out$MSY <- Derived$MSY
+    DataList_out$Fmsy <- Derived$Fmsy
+
       if(write==TRUE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
       if(write==FALSE) return(DataList_out)
       rm(DataList)
