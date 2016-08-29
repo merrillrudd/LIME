@@ -211,7 +211,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
                 }
                 if(grepl("LBSPR", modpath_vec[m])){
                     if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))==1) Rep <- readRDS(file.path(modpath_vec[m], iter, "LBSPR_results.rds"))
-                    if(file.exists(file.path(modpath_vec[m], iter, "non_convergence.rds"))){
+                    if(file.exists(file.path(modpath_vec[m], iter, "non_convergence.txt"))){
                         converge[iter,m] <- 1
                         next
                     }
