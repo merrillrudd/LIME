@@ -410,7 +410,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages))) # Selectivity at age
+            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
             S_a[1] <- 1e-20
             Syoung <- NA
             Sold <- NA
@@ -604,7 +604,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages)) ) # Selectivity at age
+            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1])) ) # Selectivity at age
             Syoung <- NA
             Sold <- NA
         }
