@@ -492,7 +492,18 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        Mat_a <- 1 / (1 + exp(Amat - ages))
+        Mat_l <- 1 / (1 + exp(ML50 - mids))
+        Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
+        names(Mat_l) <- Mat_ages
+        Mat_a <- rep(NA, (AgeMax+1))
+        for(a in 1:(AgeMax+1)){
+            if(a==1) Mat_a[a] <- 1e-20
+            if(a>1){
+                fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+                if(length(fill)==1) Mat_a[a] <- fill
+                if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+            }
+        }
 
         ## selectivity 
         if(selex=="asymptotic"){
