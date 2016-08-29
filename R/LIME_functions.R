@@ -203,13 +203,18 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
                 ## report file
                 if(grepl("LBSPR", modpath_vec[m])==FALSE){
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))) Rep <- readRDS(file.path(modpath_vec[m], iter, "Report.rds"))
+                    if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))){
+                        converge[iter,m] <- 1
+                        next
+                    } 
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))==FALSE) next
-                    if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))) converge[iter,m] <- 1
                 }
                 if(grepl("LBSPR", modpath_vec[m])){
                     if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))==1) Rep <- readRDS(file.path(modpath_vec[m], iter, "LBSPR_results.rds"))
-                    if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))>1 & timeseries==FALSE) Rep <- readRDS(file.path(modpath_vec[m], iter, paste0("LBSPR_results_", yr, ".rds")))
-                    if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))>1 & timeseries==TRUE) Rep <- sapply(1:yr, function(x) readRDS(file.path(modpath_vec[m], iter, paste0("LBSPR_results_", x, ".rds"))))
+                    if(file.exists(file.path(modpath_vec[m], iter, "non_convergence.rds"))){
+                        converge[iter,m] <- 1
+                        next
+                    }
                 }   
 
                 ## estimates of SPR
