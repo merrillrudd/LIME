@@ -527,6 +527,90 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
     }
 
+    ## Namibian hake
+    if(species=="HAKE"){
+        ## growth
+        vbk <- 0.2
+        linf <- 100
+        t0 <- -0.01
+        CVlen <- 0.2
+        lwa <- 5e-06
+        lwb <- 3
+
+        ## recruitment
+        R0 <- 1
+        h <- 1
+
+        ## index
+        qcoef <- 1e-2
+
+        ## variation terms
+        SigmaF <- 0.3
+        SigmaC <- 0.2
+        SigmaI <- 0.2
+        SigmaR <- 0.6
+
+        ## bins
+        binwidth <- 1
+
+        ## selectivity
+        ML50 <- 20.2
+        S50 <- 2
+        SL50 <- round(t0-log(1-(2/linf))/vbk)
+
+        ## fishing mortality
+        F1 <- 0.25
+
+        ## derived
+        M <- 0.15
+
+        ## sensitivities
+        if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
+        if("vbk" %in% param_adjust) vbk <- val[which(param_adjust=="vbk")]
+        if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
+        if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
+        if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+
+        AgeMax <- round(-log(0.01)/M)
+        ages <- 0:AgeMax
+        Amat <- round(t0-log(1-(ML50/linf))/vbk)
+        A95 <- Amat+1
+        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
+        S95 <- S50+1
+        SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
+
+        mids <- seq((binwidth/2), by=binwidth, length=76) ## max 76 from the data, but set to something at least 1.2* expected Linf
+        highs <- mids + (binwidth/2)
+        lows <- mids - (binwidth)/2
+
+        ## growth at age
+        L_a <- linf*(1-exp(-vbk*(ages - t0)))
+        W_a <- lwa*L_a^lwb  
+
+        ## maturity
+        Mat_a <- 1 / (1 + exp(Amat - ages)) 
+
+        ## selectivity 
+        if(selex=="asymptotic"){
+            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages)) ) # Selectivity at age
+            Syoung <- NA
+            Sold <- NA
+        }
+        if(selex=="dome"){
+            S_a_calc <- rep(NA, length(ages))
+            Syoung <- 0.8
+            Sold <- 8
+            A <- sqrt(2/pi)/(Syoung + Sold)
+            for(a in 1:length(ages)){
+                if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
+                if(a > S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Sold^2))
+            }
+            S_a_calc[1] <- 1e-20
+            S_a <- S_a_calc/max(S_a_calc)
+        }
+
+    }
 
 
     ## output list
