@@ -349,7 +349,13 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         h <- 1
 
         ## index
-        qcoef <- 1e-5
+        qcoef <- 1e-2 #1e-5
+
+        ## fishing mortality
+        Fequil <- 0.25
+        Frate <- 0.2
+        F1 <- 0.2
+        Fmax <- 1
 
         ## variation terms
         SigmaF <- 0.3
@@ -446,6 +452,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## index
         qcoef <- 1e-2
+
+        ## fishing mortality
+        Fequil <- 0.25
+        Frate <- 0.2
+        F1 <- 0.2
+        Fmax <- 1
 
         ## variation terms
         SigmaF <- 0.3
@@ -555,6 +567,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         ## index
         qcoef <- 1e-2
 
+        ## fishing mortality
+        Fequil <- 0.25
+        Frate <- 0.2
+        F1 <- 0.2
+        Fmax <- 1
+
         ## variation terms
         SigmaF <- 0.3
         SigmaC <- 0.2
@@ -659,7 +677,11 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
     Outs$ML50 <- ML50
     Outs$ML95 <- ML95
     Outs$Mat_a <- Mat_a
-
+    Outs$Fequil <- Fequil
+    Outs$Frate <- Frate
+    Outs$F1 <- F1
+    Outs$Fmax <- Fmax
+    
     return(Outs)
 
 }
