@@ -435,7 +435,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         ## growth
         vbk <- 0.87
         linf <- 36.2
-        t0 <- -0.2
+        t0 <- -0.01
         CVlen <- 0.1
         lwa <- 0.05970
         lwb <- 2.754
@@ -461,7 +461,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         SL50 <- 11.3
 
         ## fishing mortality
-        F1 <- 2
+        F1 <- 1
 
         ## derived
         M <- 1.6*vbk
@@ -492,7 +492,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        Mat_a <- 1 / (1 + exp(Amat - ages)) 
+        Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
 
         ## selectivity 
         if(selex=="asymptotic"){
@@ -589,7 +589,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        Mat_a <- 1 / (1 + exp(Amat - ages)) 
+        Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
 
         ## selectivity 
         if(selex=="asymptotic"){
