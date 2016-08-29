@@ -1693,7 +1693,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 #' @export
 generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, param_adjust=FALSE, val=FALSE, rewrite){
 
-    lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, stop("No match to life history number"))))))
+    lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, ifelse(grepl("CRSNAP", modpath), "CRSNAP", ifelse(grepl("SIGSUT", modpath), "SIGSUT", ifelse(grepl("HAKE", modpath), "HAKE", stop("No match to life history number")))))))))
   lh_choose <- lh_list[[lh_num]]
   if(param_adjust[1]!=FALSE) lh_choose[param_adjust] <- val
   
@@ -2092,7 +2092,7 @@ plotResults <- function(Data, Report, Sdreport, Derived_quants, flag_convergence
 runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE, input_data=NULL){
 
   if(simulation==TRUE){
-    lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, stop("No match to life history number"))))))
+    lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, ifelse(grepl("CRSNAP", modpath), "CRSNAP", ifelse(grepl("SIGSUT", modpath), "SIGSUT", ifelse(grepl("HAKE", modpath), "HAKE", stop("No match to life history number")))))))))
     lh_choose <- lh_list[[lh_num]]
   }
   if(simulation==FALSE){
