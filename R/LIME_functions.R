@@ -391,6 +391,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+        if("R0" %in% param_adjust) R9 <- val[which(param_adjust=="R0")]
 
 
         ## derived
@@ -490,6 +491,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+        if("R0" %in% param_adjust) R9 <- val[which(param_adjust=="R0")]
 
         AgeMax <- round(-log(0.01)/M)
         ages <- 0:AgeMax
@@ -605,6 +607,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
+        if("R0" %in% param_adjust) R9 <- val[which(param_adjust=="R0")]
 
         AgeMax <- round(-log(0.01)/M)
         ages <- 0:AgeMax
