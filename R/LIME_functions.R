@@ -422,13 +422,11 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
                     if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
                 }
             }
-        }
             if(start_ages!=0){
                 fill <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
                 if(length(fill)==1) Mat_a[a] <- fill
                 if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
             }
-
         }
 
         ## selectivity 
@@ -536,13 +534,11 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
                     if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
                 }
             }
-        }
             if(start_ages!=0){
                 fill <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
                 if(length(fill)==1) Mat_a[a] <- fill
                 if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
             }
-
         }
 
         ## selectivity 
