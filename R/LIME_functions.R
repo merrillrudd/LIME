@@ -332,7 +332,7 @@ Check_Identifiable2 = function( obj ){
 #' 
 #' @return List, a tagged list of life history/starting value information
 #' @export
-choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
+choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_ages=0){
 
     ## Costa Rican spotted rose snapper
     if(species=="CRSNAP"){
@@ -397,7 +397,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         highs <- mids + (binwidth/2)
         lows <- mids - (binwidth)/2
         
-        ages <- 0:AgeMax
+        ages <- start_ages:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
@@ -412,20 +412,29 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         Mat_l <- 1 / (1 + exp(ML50 - mids))
         Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
         names(Mat_l) <- Mat_ages
-        Mat_a <- rep(NA, (AgeMax+1))
-        for(a in 1:(AgeMax+1)){
-            if(a==1) Mat_a[a] <- 1e-20
-            if(a>1){
-                fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+        Mat_a <- rep(NA, length(ages))
+        for(a in 1:length(ages)){
+            if(start_ages==0){
+                if(a==1) Mat_a[a] <- 1e-20
+                if(a>1){
+                    fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+                    if(length(fill)==1) Mat_a[a] <- fill
+                    if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+                }
+            }
+        }
+            if(start_ages!=0){
+                fill <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
                 if(length(fill)==1) Mat_a[a] <- fill
                 if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
             }
+
         }
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
-            S_a[1] <- 1e-20
+            if(start_ages==0) S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
+            if(start_ages!=0) S_a <- 1/(1+exp(S50-ages))
             Syoung <- NA
             Sold <- NA
         }
@@ -497,7 +506,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
 
         AgeMax <- round(-log(0.01)/M)
-        ages <- 0:AgeMax
+        ages <- start_ages:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
@@ -513,18 +522,27 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         L_a <- linf*(1-exp(-vbk*(ages - t0)))
         W_a <- lwa*L_a^lwb  
 
-        ## maturity
+       ## maturity
         Mat_l <- 1 / (1 + exp(ML50 - mids))
         Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
         names(Mat_l) <- Mat_ages
-        Mat_a <- rep(NA, (AgeMax+1))
-        for(a in 1:(AgeMax+1)){
-            if(a==1) Mat_a[a] <- 1e-20
-            if(a>1){
-                fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+        Mat_a <- rep(NA, length(ages))
+        for(a in 1:length(ages)){
+            if(start_ages==0){
+                if(a==1) Mat_a[a] <- 1e-20
+                if(a>1){
+                    fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+                    if(length(fill)==1) Mat_a[a] <- fill
+                    if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+                }
+            }
+        }
+            if(start_ages!=0){
+                fill <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
                 if(length(fill)==1) Mat_a[a] <- fill
                 if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
             }
+
         }
 
         ## selectivity 
@@ -532,13 +550,21 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
             S_l <- 1/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50)))
             S_ages <- round(t0-log(1-(mids/linf))/vbk)
             names(S_l) <- S_ages
-            S_a <- rep(NA, (AgeMax+1))
-            for(a in 1:(AgeMax+1)){
-                if(a==1) S_a[a] <- 1e-20
-                if(a>1){
-                    fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
+            S_a <- rep(NA, length(ages))
+            for(a in 1:length(ages)){
+                if(start_ages==0){
+                    if(a==1) S_a[a] <- 1e-20
+                    if(a>1){
+                        fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
+                        if(length(fill)==1) S_a[a] <- fill
+                        if(length(fill)==0) S_a[a] <- S_a[a-1]
+                    }
+                }
+                if(start_ages!=0){
+                    fill <- S_l[which(names(S_l)==a)][length(S_l[which(names(S_l)==a)])]
                     if(length(fill)==1) S_a[a] <- fill
                     if(length(fill)==0) S_a[a] <- S_a[a-1]
+
                 }
             }
             # S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
@@ -614,7 +640,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
 
         AgeMax <- round(-log(0.01)/M)
-        ages <- 0:AgeMax
+        ages <- start_ages:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
@@ -630,11 +656,13 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
+        if(start_ages==0) Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
+        if(start_ages!=0) Mat_a <- 1/(1+exp(Amat - ages))
 
         ## selectivity 
         if(selex=="asymptotic"){
-            S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1])) ) # Selectivity at age
+            if(start_ages==0) S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
+            if(start_ages!=0) S_a <- 1/(1+exp(S50-ages))
             Syoung <- NA
             Sold <- NA
         }
