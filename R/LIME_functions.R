@@ -161,8 +161,8 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
         }
 
         ## ignore recruits
-        SB0 <- sum(Na0[-1]*Mat_a[-1]*W_a[-1])
-        SBf <- sum(Naf[-1]*Mat_a[-1]*W_a[-1])
+        SB0 <- sum(Na0*Mat_a*W_a)
+        SBf <- sum(Naf*Mat_a*W_a)
 
         ## automatically returns SPR
         SPR <- SBf/SB0
