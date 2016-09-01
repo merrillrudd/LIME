@@ -396,7 +396,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
         mids <- seq((binwidth/2), linf*1.5, by=binwidth) # from 120 cm
         highs <- mids + (binwidth/2)
         lows <- mids - (binwidth)/2
-        
+
         ages <- 0:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
@@ -1807,7 +1807,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 
     if(plotLF==TRUE){
       ## length frequency in the last year at each site
-      par(mfrow=c(4,4), mar=c(0,0,0,0), omi=c(1,1,1,1))
+      par(mfrow=c(5,5), mar=c(0,0,0,0), omi=c(1,1,1,1))
       barplot(DataList$LF[nrow(DataList$LF),]/sum(DataList$LF[nrow(DataList$LF),]), axes=F, xlim=c(0,45), ylim=c(0,0.2), col="tomato")
       mtext(side=3, "no spatial process", font=2, line=-3, cex=2)
       axis(2, at=pretty(c(0,0.2)))      
