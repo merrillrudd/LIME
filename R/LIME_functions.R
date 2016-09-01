@@ -377,9 +377,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
         ## length bins
         binwidth <- 1
-        mids <- seq((binwidth/2), linf*1.5, by=binwidth) # from 120 cm
-        highs <- mids + (binwidth/2)
-        lows <- mids - (binwidth)/2
 
         ## fishing mortality
         F1 <- 0.34  
@@ -396,6 +393,10 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE){
 
 
         ## derived
+        mids <- seq((binwidth/2), linf*1.5, by=binwidth) # from 120 cm
+        highs <- mids + (binwidth/2)
+        lows <- mids - (binwidth)/2
+        
         ages <- 0:AgeMax
         Amat <- round(t0-log(1-(ML50/linf))/vbk)
         A95 <- Amat+1
