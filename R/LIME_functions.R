@@ -2430,7 +2430,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ## Data objects
     ##########################
     SB_t <- F_t <- R_t <- rep(NA, tyears)                               
-    Cn_at <- N_at <- matrix(NA, nrow=AgeMax+1, ncol=tyears)
+    Cn_at <- N_at <- matrix(NA, nrow=length(L_a), ncol=tyears)
 
     #####################################
     ## Fishing and recruitment dynamics
