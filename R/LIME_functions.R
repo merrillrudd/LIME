@@ -1784,7 +1784,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
       if(write==TRUE) saveRDS(spatial_sim, file.path(iterpath, "spatial_sim.rds"))  
 
       ## life history - truth with spatial structure - varies with each iteration
-      lh_spatial <- lapply(1:nrow(spatial_sim), function(x) choose_lh_list(species=lh_num, param_adjust=c("linf","ML50","binwidth"), val=c(spatial_sim[x,"linf_i"], lh_choose$ML50*(spatial_sim[x,"linf_i"]/lh_choose$linf), lh_choose$binwidth), selex="asymptotic")) 
+      lh_spatial <- lapply(1:nrow(spatial_sim), function(x) choose_lh_list(species=lh_num, param_adjust=c("linf","ML50","binwidth"), val=c(spatial_sim[x,"linf_i"], lh_choose$ML50*(spatial_sim[x,"linf_i"]/lh_choose$linf), lh_choose$binwidth), selex="asymptotic", start_ages=ifelse(lh_choose$AgeMax < length(lh_choose$S_a), 0, 1))) 
 
 
       ## simulated data with spatial structure in growth
