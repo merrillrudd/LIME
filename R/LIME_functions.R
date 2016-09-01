@@ -345,8 +345,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         lwa <- 0.0245
         lwb <- 2.790
             
-        ## mortality
-        M <- 0.43 ## based on vbk
         AgeMax <- 23
 
         ## recruitment
@@ -391,6 +389,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
 
+        ## mortality
+        M <- 1.65*vbk ## based on vbk
 
         ## derived
         mids <- seq((binwidth/2), linf*1.5, by=binwidth) # from 120 cm
