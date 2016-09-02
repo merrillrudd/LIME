@@ -1908,6 +1908,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
     DataList_out$MSY <- Derived$MSY
     DataList_out$Fmsy <- Derived$Fmsy
     DataList_out$SBBmsy <- Derived$SBBmsy
+    DataList_out$SBmsy <- Derived$SBmsy
 
       if(write==TRUE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
       if(write==FALSE) return(DataList_out)
