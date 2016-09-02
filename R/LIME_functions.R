@@ -124,7 +124,7 @@ Calc_derived_quants = function( Obj ){
   SB0 = rev(Report_0$SB_t)[1]
 
   # Return
-  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t/TBmsy, "SBBmsy"=SB_t/SBmsy)
+  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t/TBmsy, "SBBmsy"=Report$SB_t/SBmsy)
   return( Return )
 }
 
