@@ -2545,7 +2545,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         Cn_at[,y] <- N_at[,y] * (1-exp(-M-F_t[y]*S_a)) * (F_t[y]*S_a)/(M+F_t[y]*S_a)
     }
     Cn_t <- colSums(Cn_at)
-    Cw_t <- colSums(Cn_at %*% W_a)
+    Cw_t <- colSums(Cn_at * W_a)
     N_t <- colSums(N_at[-1,])
     D_t <- SB_t/SB0
 
