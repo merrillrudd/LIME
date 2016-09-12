@@ -1793,7 +1793,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
           SigmaF=SigmaF, Fdynamics=Fdynamics, Rdynamics=Rdynamics,
           R0=R0, Fmax=Fmax, CVlen=CVlen, mids=mids, highs=highs,
           lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, Amat=Amat,
-          comp_sample=comp_sample, SigmaR=SigmaR, Nyears_comp=Nyears_comp,
+          comp_sample=comp_sample/nrow(spatial_sim), SigmaR=SigmaR, Nyears_comp=Nyears_comp,
           alt_yrs=FALSE, sample=FALSE, nburn=20, seed=iter, modname=modname)))  
       SPR_site <- sapply(1:length(DataList_site), function(x) DataList_site[[x]]$SPR_t)
       RelAbund_site <- sapply(1:length(DataList_site), function(x) DataList_site[[x]]$D_t[length(DataList_site[[x]]$D_t)])
@@ -1897,9 +1897,19 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
     }
    
     DataList_out <- DataList
-    DataList_out$LF <- DataList$LF[,1:length(lh_choose$mids)]
+    if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh_choose$mids)]))
+    if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh_choose$mids)])
+    rownames(DataList_out$LF) <- rownames(DataList$LF)
 
-    Inputs <- FormatInput_LB(Nyears=Nyears, DataList=DataList_out, linf=lh_choose$linf, vbk=lh_choose$vbk, t0=lh_choose$t0, M=lh_choose$M, AgeMax=lh_choose$AgeMax, lbhighs=lh_choose$highs, lbmids=lh_choose$mids, Mat_a=lh_choose$Mat_a, lwa=lh_choose$lwa, lwb=lh_choose$lwb, log_sigma_C=log(lh_choose$SigmaC), log_sigma_I=log(0.001), log_CV_L=log(0.001), F1=DataList$F_t[1], SigmaR=lh_choose$SigmaR, qcoef=lh_choose$qcoef, R0=mean(DataList_out$R_t), S50=lh_choose$S50, model="Rich_LC", RecDev_biasadj=rep(0,Nyears), Fpen=1, Dpen=0, Dprior=c(0,0), SigRpen=1, SigRprior=c(lh_choose$SigmaR, 0.2), obs_per_yr=rep(1000,Nyears), SigmaF=lh_choose$SigmaF, RecType=0, FType=0, LType=1, h=lh_choose$h, SelexTypeDesc="asymptotic", est_sigma="log_sigma_R", REML=FALSE, site=1, estimate_same=FALSE, start_f=0)
+    ## project the truth forward
+    DataList_proj <- with(c(lh_choose, data_avail_list), SimData_LB(Nyears=Nyears, AgeMax=AgeMax, 
+      M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
+      SigmaF=SigmaF, Fdynamics=Fdynamics, Rdynamics=Rdynamics, 
+      R0=R0, Fmax=Fmax, CVlen=CVlen, mids=mids, highs=highs, 
+      lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, Amat=Amat, 
+      comp_sample=comp_sample, SigmaR=SigmaR, Nyears_comp=Nyears, 
+      alt_yrs=FALSE, sample=FALSE, nburn=20, seed=iter, modname=modname)) 
+    Inputs <- FormatInput_LB(Nyears=Nyears, DataList=DataList_proj, linf=lh_choose$linf, vbk=lh_choose$vbk, t0=lh_choose$t0, M=lh_choose$M, AgeMax=lh_choose$AgeMax, lbhighs=lh_choose$highs, lbmids=lh_choose$mids, Mat_a=lh_choose$Mat_a, lwa=lh_choose$lwa, lwb=lh_choose$lwb, log_sigma_C=log(lh_choose$SigmaC), log_sigma_I=log(0.001), log_CV_L=log(0.001), F1=DataList$F_t[1], SigmaR=lh_choose$SigmaR, qcoef=lh_choose$qcoef, R0=mean(DataList_out$R_t), S50=lh_choose$S50, model="Rich_LC", RecDev_biasadj=rep(0,Nyears), Fpen=1, Dpen=0, Dprior=c(0,0), SigRpen=1, SigRprior=c(lh_choose$SigmaR, 0.2), obs_per_yr=rep(1000,Nyears), SigmaF=lh_choose$SigmaF, RecType=0, FType=0, LType=1, h=lh_choose$h, SelexTypeDesc="asymptotic", est_sigma="log_sigma_R", REML=FALSE, site=1, estimate_same=FALSE, start_f=0)
     ParList <- Inputs$Parameters
     obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
     Derived <- Calc_derived_quants(obj)
