@@ -585,7 +585,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
     ## Namibian hake
     if(species=="HAKE"){
         ## growth
-        vbk <- 0.2
+        vbk <- 0.14
         linf <- 100
         t0 <- -0.01
         CVlen <- 0.2
@@ -615,7 +615,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         binwidth <- 1
 
         ## selectivity
-        ML50 <- 20.2
+        ML50 <- 29.5
         S50 <- 2
         SL50 <- round(t0-log(1-(2/linf))/vbk)
 
