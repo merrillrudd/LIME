@@ -77,11 +77,12 @@ aic <- calc_AIC(modpath_vec=alldirs)
 ## ---------------- Figures ---------------------------
 #######################################################################
 
-fig_dir <- file.path(crsnap_dir, "figs")
+## figure directory setup
+fig_dir <- file.path(res_dir, "figs")
 dir.create(fig_dir, showWarnings=FALSE)
 
-## chosen model
-dd <- 1 #previously 3
+## results of chosen model
+dd <- 1 
 choose_dir <- alldirs[dd]
 	Inputs <- readRDS(file.path(choose_dir, "Inputs2.rds"))
 	Report <- readRDS(file.path(choose_dir, "Report.rds"))
@@ -89,6 +90,8 @@ choose_dir <- alldirs[dd]
 	Quants <- readRDS(file.path(choose_dir, "Derived_quants.rds"))
 	flag <- ifelse(file.exists(file.path(choose_dir, "NAs_final_gradient.txt"))|file.exists(file.path(choose_dir, "high_final_gradient.txt")), TRUE, FALSE)
 
+	## save=FALSE displays plot
+	## save=TRUE saves into figure directory
 	LIME_fits(Inputs, Report, Sdreport, data, save=TRUE)
 
 ### length composition model fits
