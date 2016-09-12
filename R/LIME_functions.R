@@ -438,8 +438,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         }
         if(selex=="dome"){
             S_a_calc <- rep(NA, length(ages))
-            Syoung <- 3
-            Sold <- 15
+            Syoung <- S50
+            Sold <- ceiling(mean(c(AgeMax,Syoung)))
             A <- sqrt(2/pi)/(Syoung + Sold)
             for(a in 1:length(ages)){
                 if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
@@ -569,8 +569,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         }
         if(selex=="dome"){
             S_a_calc <- rep(NA, length(ages))
-            Syoung <- 0.8
-            Sold <- 8
+            Syoung <- S50
+            Sold <- ceiling(mean(c(AgeMax,Syoung)))
             A <- sqrt(2/pi)/(Syoung + Sold)
             for(a in 1:length(ages)){
                 if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
@@ -664,8 +664,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         }
         if(selex=="dome"){
             S_a_calc <- rep(NA, length(ages))
-            Syoung <- 0.8
-            Sold <- 8
+            Syoung <- S50
+            Sold <- ceiling(mean(c(AgeMax,Syoung)))
             A <- sqrt(2/pi)/(Syoung + Sold)
             for(a in 1:length(ages)){
                 if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
