@@ -6,3 +6,6 @@ Length-based Integrated Mixed Effects stock assessment method for data-limited f
 - Can fit to more years of length composition data and/or catch and/or an abundance index time series, if available.
 - Estimates spawning potential ratio reference points (and MSY-based reference points if there is information on scale, e.g. catch data)
 
+
+Manuscript in preparation by Merrill Rudd and Jim Thorson. Contact Merrill with questions (mbrudd@uw.edu).
+
