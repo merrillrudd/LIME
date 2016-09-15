@@ -2278,7 +2278,7 @@ for(iter in itervec){
         ## Run optimizer
         opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
         jnll <- obj$report()$jnll   
-        if(all(is.na(opt))==FALSE){
+        if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
           opt[["final_gradient"]] = obj$gr( opt$par ) 
           opt_save <- opt
           obj_save <- obj
