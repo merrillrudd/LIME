@@ -2325,11 +2325,13 @@ for(iter in itervec){
                 jnll <- obj$report()$jnll
               }
             }
-              if(all(is.na(opt))==FALSE & jnll<=jnll_save){
-                opt[["final_gradient"]] = obj$gr( opt$par )       
-                opt_save <- opt
-                obj_save <- obj
-                jnll_save <- jnll
+              if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
+                if(jnll<=jnll_save){
+                    opt[["final_gradient"]] = obj$gr( opt$par )       
+                    opt_save <- opt
+                    obj_save <- obj
+                    jnll_save <- jnll
+                }
               }
             if(abs(min(opt_save[["final_gradient"]]))<=0.01) break
           }
