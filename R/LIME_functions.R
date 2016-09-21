@@ -2298,7 +2298,7 @@ for(iter in itervec){
                   control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10)), error=function(e) NA)
                 jnll <- obj$report()$jnll
             }
-            if(all(is.na(opt))==FALSE){
+            if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
               opt[["final_gradient"]] = obj$gr( opt$par )       
               opt_save <- opt
               obj_save <- obj
@@ -2326,11 +2326,19 @@ for(iter in itervec){
               }
             }
               if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
-                if(jnll<=jnll_save){
+                if(is.null(jnll_save)){
                     opt[["final_gradient"]] = obj$gr( opt$par )       
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
+                }
+                if(is.null(jnll_save)==FALSE){
+                    if(jnll<=jnll_save){
+                        opt[["final_gradient"]] = obj$gr( opt$par )       
+                        opt_save <- opt
+                        obj_save <- obj
+                        jnll_save <- jnll
+                    }
                 }
               }
             if(abs(min(opt_save[["final_gradient"]]))<=0.01) break
