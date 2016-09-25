@@ -2204,8 +2204,7 @@ for(iter in itervec){
       val <- FALSE
     }
     if(is.null(sensitivity_inputs)==FALSE){
-      param_set <- c("M", "linf", "vbk", "CVlen", "SigmaR")
-      param_set_input <- paste0("sens_", param_set)
+      param_set_input <- names(sens_params_list)
       param <- param_set[which(sapply(1:length(param_set), function(x) grepl(param_set_input[x], modpath)))]
       val_index <- ifelse(grepl("Low", modpath), 1, ifelse(grepl("High", modpath), 2, stop("Not set up for specified level of sensitivity")))
       if(simulation==TRUE) val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_num])
