@@ -2170,6 +2170,10 @@ runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigm
 
   if(simulation==TRUE){
     lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, ifelse(grepl("CRSNAP", modpath), "CRSNAP", ifelse(grepl("SIGSUT", modpath), "SIGSUT", ifelse(grepl("HAKE", modpath), "HAKE", stop("No match to life history number")))))))))
+    if(lh_num=="CRSNAP") lh_vec_num <- 1
+    if(lh_num=="SIGSUT") lh_vec_num <- 2
+    if(lh_num=="HAKE") lh_vec_num <- 3
+    if(is.numeric(lh_num)) lh_vec_num <- lh_num
     lh_choose <- lh_list[[lh_num]]
   }
   if(simulation==FALSE){
@@ -2204,10 +2208,10 @@ for(iter in itervec){
       val <- FALSE
     }
     if(is.null(sensitivity_inputs)==FALSE){
-      param_set_input <- names(sens_params_list)
-      param <- param_set[which(sapply(1:length(param_set), function(x) grepl(param_set_input[x], modpath)))]
+      param_set <- names(sens_params_list)
+      param <- param_set[which(sapply(1:length(param_set), function(x) grepl(param_set[x], modpath)))]
       val_index <- ifelse(grepl("Low", modpath), 1, ifelse(grepl("High", modpath), 2, stop("Not set up for specified level of sensitivity")))
-      if(simulation==TRUE) val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_num])
+      if(simulation==TRUE) val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_vec_num])
       if(simulation==FALSE) val <- as.numeric(sensitivity_inputs[[param]][val_index])
     }
     if(simulation==TRUE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
