@@ -205,7 +205,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))) Rep <- readRDS(file.path(modpath_vec[m], iter, "Report.rds"))
                     if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))){
                         converge[iter,m] <- 1
-                        # next
+                        next
                     } 
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))==FALSE) next
                 }
@@ -213,7 +213,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
                     if(length(which(grepl("LBSPR", list.files(file.path(modpath_vec[m], iter)))))==1) Rep <- readRDS(file.path(modpath_vec[m], iter, "LBSPR_results.rds"))
                     if(file.exists(file.path(modpath_vec[m], iter, "non_convergence.txt"))){
                         converge[iter,m] <- 1
-                        # next
+                        next
                     }
                 }   
 
@@ -2192,6 +2192,11 @@ for(iter in itervec){
       # if(any(grepl("LBSPR_results", list.files(path=iterpath)))) next
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
+    }
+
+    if(rewrite==TRUE){
+      if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) unlink(file.path(iterpath, "NAs_final_gradient.txt"), TRUE)
+      if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) unlink(file.path(iterpath, "high_final_gradient.txt"), TRUE)
     }
 
     if(simulation==TRUE){
