@@ -360,7 +360,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## variation terms
         SigmaF <- 0.3
@@ -472,7 +472,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## variation terms
         SigmaF <- 0.3
@@ -603,7 +603,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## variation terms
         SigmaF <- 0.3
@@ -791,7 +791,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## index
         qcoef <- 1e-2
@@ -836,7 +836,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## index
         qcoef <- 1e-2
@@ -881,7 +881,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## index
         qcoef <- 1e-2
@@ -926,7 +926,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## index
         qcoef <- 1e-2
@@ -970,7 +970,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.2
-        Fmax <- 1
+        Fmax <- 0.9
 
         ## index
         qcoef <- 1e-2
@@ -2474,11 +2474,11 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ## Fishing and recruitment dynamics
     #####################################   
 
-    if(Fdynamics=="Ramp") Framp_t <- c(rep(0.01, nburn), "rampup"=seq(F1, Fmax, length=floor(Nyears/2)), 
+    if(Fdynamics=="Ramp") Framp_t <- c(rep(F1, nburn), "rampup"=seq(F1, Fmax, length=floor(Nyears/2)), 
         "peak"=rep(Fmax, floor((Nyears-floor(Nyears/2))/2)), 
         "managed"=rep(Fmax/3, Nyears-floor(Nyears/2)-floor((Nyears-floor(Nyears/2))/2)))
-    if(Fdynamics=="Constant") Fconstant_t <- c(rep(0.01, nburn), rep(Fequil, Nyears))
-    if(Fdynamics=="Increasing") Finc_t <- c(rep(0.01, nburn), seq(0.01, Fmax, length=Nyears))
+    if(Fdynamics=="Constant") Fconstant_t <- c(rep(F1, nburn), rep(Fequil, Nyears))
+    if(Fdynamics=="Increasing") Finc_t <- c(rep(F1, nburn), seq(F1, Fmax, length=Nyears))
 
     if(Rdynamics=="Pulsed") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)),
         "pulse_down"=rep(R0/3, floor(Nyears/3)), "pulse_up"=rep(R0, Nyears-floor(Nyears/3)))
@@ -2488,7 +2488,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ##########################
     ## Initialization
     ##########################
-    if(Fdynamics=="Endogenous") F_t[1] <- 0.01
+    if(Fdynamics=="Endogenous") F_t[1] <- F1
     if(Fdynamics=="Ramp") F_t[1] <- Framp_t[1]
     if(Fdynamics=="Constant") F_t[1] <- Fconstant_t[1]
     if(Fdynamics=="Increasing") F_t[1] <- Finc_t[1]
