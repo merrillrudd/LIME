@@ -615,7 +615,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         binwidth <- 1
 
         ## selectivity
-        ML50 <- 29.5
+        ML50 <- 70
         S50 <- 2
         SL50 <- round(t0-log(1-(2/linf))/vbk)
 
