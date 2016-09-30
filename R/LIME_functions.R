@@ -2467,7 +2467,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ##########################
     ## Data objects
     ##########################
-    SB_t <- F_t <- R_t <- rep(NA, tyears)                               
+    TB_t <- VB_t <- SB_t <- F_t <- R_t <- rep(NA, tyears)                               
     Cn_at <- N_at <- matrix(NA, nrow=length(L_a), ncol=tyears)
 
     #####################################
@@ -2509,7 +2509,9 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         }
 
     }
-    SB_t[1] <- sum(N_at[,1] * W_a * S_a)
+    VB_t[1] <- sum(N_at[,1] * W_a * S_a)
+    TB_t[1] <- sum(N_at[,1] * W_a)
+    SB_t[1] <- sum(N_at[,1] * W_a * Mat_a)
     Cn_at[,1] <- N_at[,1] * (1-exp(-M - F_t[1]*S_a)) * (F_t[1]*S_a)/(M+F_t[1]*S_a)
 
     ##########################
@@ -2571,6 +2573,9 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         }
         ## spawning biomass
         SB_t[y] <- sum((N_at[,y] * W_a * Mat_a)[-1])
+        VB_t[y] <- sum(N_at[,y] * W_a * S_a)
+        TB_t[y] <- sum(N_at[,y] * W_a)
+
         ## catch
         Cn_at[,y] <- N_at[,y] * (1-exp(-M-F_t[y]*S_a)) * (F_t[y]*S_a)/(M+F_t[y]*S_a)
     }
@@ -2584,10 +2589,10 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         C_t <- Cw_t*sample
     }
     if(sample==FALSE){
-        C_t <- Cn_t
+        # C_t <- Cn_t
         C_t <- Cw_t
     }
-    CPUE_t <- qcoef * SB_t * exp(EffDev)
+    CPUE_t <- qcoef * TB_t * exp(EffDev)
 
     ## age to length comp
     LFinfo <- AgeToLengthComp(L_a=L_a, CVlen=CVlen, highs=highs, lows=lows, tyears=tyears, N_at=N_at, S_a=S_a, comp_sample=rep(comp_sample, tyears))
@@ -2621,6 +2626,8 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     R_tout <- R_t[-c(1:nburn)]
     N_tout <- N_t[-c(1:nburn)]
     SB_tout <- SB_t[-c(1:nburn)]
+    TB_tout <- TB_t[-c(1:nburn)]
+    VB_tout <- VB_t[-c(1:nburn)]
     D_tout <- D_t[-c(1:nburn)]
     F_tout <- F_t[-c(1:nburn)]
     L_tout <- L_t[-c(1:nburn)]
@@ -2654,7 +2661,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         "LF"=LFout, "SigmaR"=SigmaR, "R_t"=R_tout, "N_t"=N_tout, "SB_t"=SB_tout, "D_t"=D_tout, "F_t"=F_tout, 
         "L_t"=L_tout, "N_at"=N_atout, "Amat"=Amat, "Mat_a"=Mat_a, "SB0"=SB0, "Nyears"=Nyears, "L_a"=L_a,
         "W_a"=W_a, "AgeMax"=AgeMax, "M"=M, "S_a"=S_a, "plb"=plb, "plba"=plba, "page"=page, "R0"=R0, 
-        "SPR"=SPR, "SPR_t"=SPR_t,
+        "SPR"=SPR, "SPR_t"=SPR_t, "VB_t"=VB_tout, "TB_t"=TB_tout,
         "ML_t"=ML_t, "nlbins"=length(mids))
 
     return(DataList)
