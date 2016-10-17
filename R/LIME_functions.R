@@ -359,7 +359,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
         Fmax <- 0.9
 
         ## variation terms
@@ -487,9 +486,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## selectivity
         ML50 <- 20.2
         SL50 <- 11.3
-
-        ## fishing mortality
-        F1 <- 1
 
         ## derived
         M <- 1.49
@@ -620,9 +616,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ML50 <- 70
         S50 <- 2
         SL50 <- round(t0-log(1-(2/linf))/vbk)
-
-        ## fishing mortality
-        F1 <- 0.25
 
         ## derived
         M <- 0.15
@@ -2493,9 +2486,9 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ## Initialization
     ##########################
     if(Fdynamics=="Endogenous") F_t[1] <- F1
-    if(Fdynamics=="Ramp") F_t[1] <- Framp_t[1]
-    if(Fdynamics=="Constant") F_t[1] <- Fconstant_t[1]
-    if(Fdynamics=="Increasing") F_t[1] <- Finc_t[1]
+    if(Fdynamics=="Ramp") F_t[1] <- F1
+    if(Fdynamics=="Constant") F_t[1] <- Fequil
+    if(Fdynamics=="Increasing") F_t[1] <- F1
     if(Fdynamics=="None") F_t[1] <- 0
 
     R_t[1] <- R0
@@ -2534,7 +2527,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     for(y in 2:tyears){
         ## fishing effort and recruitment, not dependent on age structure
         if(Fdynamics=="Endogenous"){
-            if(y <= nburn) F_t[y] <- 0.01
+            if(y <= nburn) F_t[y] <- F1
             if(y > nburn) F_t[y] <- F_t[y-1]*(SB_t[y-1]/(Fequil*SB0))^Frate * exp(FishDev[y])
         }
         if(Fdynamics=="Ramp"){
@@ -2559,7 +2552,6 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             R_t[y] <- Rpulse_t[y] * exp(RecDev[y])
         }
         if(Rdynamics=="BH"){
-            h <- 0.7
             R_t[y] <- (4 * h * R0 * SB_t[y-1] / ( SB0*(1-h) + SB_t[y-1]*(5*h-1))) * exp(RecDev[y])
         }
         
