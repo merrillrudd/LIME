@@ -357,9 +357,9 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         qcoef <- 1e-2 #1e-5
 
         ## fishing mortality
-        Fequil <- 0.25
+        Fequil <- 0.34
         Frate <- 0.2
-        Fmax <- 0.9
+        Fmax <- 0.8
 
         ## variation terms
         SigmaF <- 0.3
@@ -471,8 +471,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## variation terms
         SigmaF <- 0.3
@@ -600,8 +600,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## variation terms
         SigmaF <- 0.3
@@ -711,7 +711,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
     Outs$Mat_a <- Mat_a
     Outs$Fequil <- Fequil
     Outs$Frate <- Frate
-    Outs$F1 <- F1
     Outs$Fmax <- Fmax
 
     return(Outs)
@@ -786,8 +785,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## index
         qcoef <- 1e-2
@@ -831,8 +830,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## index
         qcoef <- 1e-2
@@ -876,8 +875,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## index
         qcoef <- 1e-2
@@ -921,8 +920,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## index
         qcoef <- 1e-2
@@ -965,8 +964,8 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         ## fishing mortality
         Fequil <- 0.25
         Frate <- 0.2
-        F1 <- 0.2
-        Fmax <- 0.9
+        F1 <- 0.05
+        Fmax <- 0.8
 
         ## index
         qcoef <- 1e-2
