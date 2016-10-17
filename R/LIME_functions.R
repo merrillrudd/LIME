@@ -387,6 +387,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("SigmaF" %in% param_adjust) SigmaF <- val[which(param_adjust=="SigmaF")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
@@ -499,6 +500,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("SigmaF" %in% param_adjust) SigmaF <- val[which(param_adjust=="SigmaF")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
@@ -631,6 +633,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
         if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
         if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+        if("SigmaF" %in% param_adjust) SigmaF <- val[which(param_adjust=="SigmaF")]
         if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
@@ -688,6 +691,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
     Outs$SigmaC <- SigmaC
     Outs$SigmaI <- SigmaI
     Outs$SigmaR <- SigmaR ## starting value only, will be estimated
+    Outs$SigmaF <- SigmaF
     Outs$R0 <- R0
     Outs$lwa <- lwa
     Outs$lwb <- lwb
@@ -699,7 +703,6 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
     Outs$Sold <- Sold
     Outs$h <- h
     Outs$qcoef <- qcoef
-    Outs$SigmaF <- SigmaF
     Outs$M <- M
     Outs$F1 <- F1
     Outs$AgeMax <- AgeMax
@@ -999,6 +1002,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
     if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
     if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
+    if("SigmaF" %in% param_adjust) SigmaF <- val[which(param_adjust=="SigmaF")]
     if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
 
     ## derived
@@ -1787,7 +1791,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
       if(write==TRUE) saveRDS(spatial_sim, file.path(iterpath, "spatial_sim.rds"))  
 
       ## life history - truth with spatial structure - varies with each iteration
-      lh_spatial <- lapply(1:nrow(spatial_sim), function(x) choose_lh_list(species=lh_num, param_adjust=c("linf","ML50","binwidth","SigmaR"), val=c(spatial_sim[x,"linf_i"], lh_choose$ML50*(spatial_sim[x,"linf_i"]/lh_choose$linf), lh_choose$binwidth, lh_choose$SigmaR), selex="asymptotic", start_ages=ifelse(lh_choose$AgeMax < length(lh_choose$S_a), 0, 1))) 
+      lh_spatial <- lapply(1:nrow(spatial_sim), function(x) choose_lh_list(species=lh_num, param_adjust=c("linf","ML50","binwidth","SigmaR","SigmaF"), val=c(spatial_sim[x,"linf_i"], lh_choose$ML50*(spatial_sim[x,"linf_i"]/lh_choose$linf), lh_choose$binwidth, lh_choose$SigmaR, lh_choose$SigmaF), selex="asymptotic", start_ages=ifelse(lh_choose$AgeMax < length(lh_choose$S_a), 0, 1))) 
 
 
       ## simulated data with spatial structure in growth
