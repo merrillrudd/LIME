@@ -2551,7 +2551,9 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             R_t[y] <- Rpulse_t[y] * exp(RecDev[y])
         }
         if(Rdynamics=="BH"){
-            R_t[y] <- (4 * h * R0 * SB_t[y-1] / ( SB0*(1-h) + SB_t[y-1]*(5*h-1))) * exp(RecDev[y])
+            if(h==1) h_use <- 0.7
+            if(h!=1) h_use <- h
+            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1]*(5*h_use-1))) * exp(RecDev[y])
         }
         
         ## age-structured dynamics
