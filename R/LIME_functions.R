@@ -359,7 +359,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## fishing mortality
         Fequil <- 0.34
         Frate <- 0.2
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## variation terms
         SigmaF <- 0.3
@@ -472,7 +472,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## variation terms
         SigmaF <- 0.3
@@ -601,7 +601,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## variation terms
         SigmaF <- 0.3
@@ -786,7 +786,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## index
         qcoef <- 1e-2
@@ -831,7 +831,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## index
         qcoef <- 1e-2
@@ -876,7 +876,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## index
         qcoef <- 1e-2
@@ -921,7 +921,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## index
         qcoef <- 1e-2
@@ -965,7 +965,7 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.8
+        Fmax <- 0.7
 
         ## index
         qcoef <- 1e-2
