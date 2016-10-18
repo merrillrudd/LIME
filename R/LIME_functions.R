@@ -378,7 +378,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         binwidth <- 1
 
         ## fishing mortality
-        F1 <- 0.34  
+        F1 <- 0.05  ## change to 0.34 in real assessment
 
         ## sensitivities
         if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
