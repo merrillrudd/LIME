@@ -1746,12 +1746,14 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, rewrite, param_adjust, val){
+generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamics, LType=1, plotML=FALSE, plotLF_compare=FALSE, plotLF=FALSE, selex="asymptotic", write=TRUE, lh_list, data_avail_list, rewrite, param_adjust=NULL, val=NULL){
 
     lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, ifelse(grepl("CRSNAP", modpath), "CRSNAP", ifelse(grepl("SIGSUT", modpath), "SIGSUT", ifelse(grepl("HAKE", modpath), "HAKE", stop("No match to life history number")))))))))
   lh_choose <- lh_list[[lh_num]]
-  for(pp in 1:length(param_adjust)){
-  	lh_choose[[param_adjust[pp]]] <- val[pp]
+  if(is.null(param_adjust)==FALSE){
+      for(pp in 1:length(param_adjust)){
+        lh_choose[[param_adjust[pp]]] <- val[pp]
+      }    
   }
   
   Nyears_comp <- data_avail_list$Nyears_comp
