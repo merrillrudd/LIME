@@ -1009,6 +1009,7 @@ formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, ind
     DataList$Nyears <- length(model_years)
     DataList$Nyears_comp <- nrow(LF)
     DataList$obs_per_year <- obs_per_year
+    return(DataList)
 }
 
 
