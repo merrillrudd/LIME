@@ -978,18 +978,18 @@ formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, ind
 
     names(obs_per_year) <- lfreq_years
 
+    I_t <- index
     if(is.null(index)==FALSE){
-        I_t <- index
         names(I_t) <- index_years
     }
 
+    C_t <- catch
     if(is.null(catch)==FALSE){
-        C_t <- catch
         names(C_t) <- catch_years
     }
 
+    ML_t <- meanlen
     if(is.null(meanlen)==FALSE){
-        ML_t <- meanlen
         names(ML_t) <- meanlen_years        
     }
 
@@ -1005,7 +1005,7 @@ formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, ind
     DataList$years_i <- years_i
     DataList$years_t <- model_years
     DataList$lbins <- lbins
-    DataList$ML_t <- meanlen
+    DataList$ML_t <- ML_t
     DataList$Nyears <- length(model_years)
     DataList$Nyears_comp <- nrow(LF)
     DataList$obs_per_year <- obs_per_year
