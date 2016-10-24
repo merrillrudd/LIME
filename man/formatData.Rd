@@ -32,7 +32,7 @@ formatData(lfreq, lfreq_years, lbins, obs_per_year, index = NULL,
 \item{model_years}{number of years to be modeled - must be at least the continuous years for which data is available. can be longer. must be specified}
 }
 \value{
-List, a tagged list of data to input into TMB model
+List, a tagged list of data for input into model
 }
 \description{
 \code{formatData} Arguments specify the data and assumed values required for LIME, to get everything in one list

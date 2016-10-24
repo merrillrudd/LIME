@@ -963,10 +963,9 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
 #' @param meanlen_years vector of years for mean length data, if available instead of length composition data. default=NULL
 #' @param model_years number of years to be modeled - must be at least the continuous years for which data is available. can be longer. must be specified
 
-#' @return List, a tagged list of data to input into TMB model
+#' @return List, a tagged list of data for input into model
 #' @details required output: I_t: index with each element named by year 1-x, C_t: catch with each element named 1-x, LF: length frequency with years 1-x labeled on the rows and length bin labeled on the columns, LFprop: proportions in each length bin, same dimensions as LF, years: actual years of data, years_i: index years 1-x, lbins: length bins, ML_t: mean length with each element named year 1-x, Nyears: number of years, Nyears_comp: number of years o f length composition data, obs_per_yr: effective sample size of length composition annually
 #' @export
-
 formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, index_years=NULL, catch=NULL, catch_years=NULL, meanlen=NULL, meanlen_years=NULL, model_years){
 
     LF <- lfreq
@@ -990,7 +989,8 @@ formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, ind
     }
 
     if(is.null(meanlen)==FALSE){
-        names(meanlen) <- meanlen_years        
+        ML_t <- meanlen
+        names(ML_t) <- meanlen_years        
     }
 
     years_o <- unique(c(lfreq_years, index_years, catch_years, meanlen_years))[order(unique(c(lfreq_years, index_years, catch_years, meanlen_years)))]
@@ -1005,7 +1005,7 @@ formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, ind
     DataList$years_i <- years_i
     DataList$years_t <- model_years
     DataList$lbins <- lbins
-    DataList$meanlen <- meanlen
+    DataList$ML_t <- meanlen
     DataList$Nyears <- length(model_years)
     DataList$Nyears_comp <- nrow(LF)
     DataList$obs_per_year <- obs_per_year
