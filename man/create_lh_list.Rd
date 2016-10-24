@@ -7,7 +7,7 @@
 create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
   maturity_input = "length", binwidth = 1, t0 = -0.01, CVlen = 0.2,
   SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3, R0 = 1,
-  h = 1, qcoef = 1e-05, M = NULL, F1 = 0, Fequil = 0.25,
+  h = 1, qcoef = 1e-05, M = NULL, F1 = 0.2, Fequil = 0.25,
   Frate = 0.2, Fmax = 0.7, start_ages = 0)
 }
 \arguments{
@@ -49,7 +49,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 
 \item{M}{value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)}
 
-\item{F1}{starting value for initial fishing mortality (default = 0, will be estimated)}
+\item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
 
 \item{Fequil}{equilibrium fishing mortality rate (used for simulation; default=0.25)}
 
