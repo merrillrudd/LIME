@@ -11,9 +11,9 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
   Frate = 0.2, Fmax = 0.7, start_ages = 0)
 }
 \arguments{
-\item{vbk}{von Bertalanffy k; Brody growth coefficient}
+\item{vbk}{von Bertalanffy k Brody growth coefficient}
 
-\item{linf}{von Bertalanffy Linf; asymptotic length}
+\item{linf}{von Bertalanffy Linf asymptotic length}
 
 \item{lwa}{length-weight scaling parameter}
 
@@ -23,9 +23,9 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 
 \item{M50}{age or length at 50 percent maturity}
 
-\item{selex_input}{specify whether argument S50 is an "age" or a "length" (default length)}
+\item{selex_input}{specify whether argument S50 is an age or a length (default length)}
 
-\item{maturity_input}{specify whether argument M50 is an "age" or a "length" (default length)}
+\item{maturity_input}{specify whether argument M50 is an age or a length (default length)}
 
 \item{binwidth}{width of length bins (default = 1)}
 
