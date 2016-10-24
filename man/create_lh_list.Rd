@@ -19,9 +19,9 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 
 \item{lwb}{length-weight allometric parameter}
 
-\item{S50}{starting value for age or length at 50% selectivity (will be estimated)}
+\item{S50}{starting value for age or length at 50 percent selectivity (will be estimated)}
 
-\item{M50}{age or length at 50% maturity}
+\item{M50}{age or length at 50 percent maturity}
 
 \item{selex_input}{specify whether argument S50 is an "age" or a "length" (default length)}
 

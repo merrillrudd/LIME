@@ -754,14 +754,14 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
 #'
 #' \code{create_lh_list} Creates list of life history information
 #'
-#' @param vbk von Bertalanffy k; Brody growth coefficient
-#' @param linf von Bertalanffy Linf; asymptotic length
+#' @param vbk von Bertalanffy k Brody growth coefficient
+#' @param linf von Bertalanffy Linf asymptotic length
 #' @param lwa length-weight scaling parameter
 #' @param lwb length-weight allometric parameter
 #' @param S50 starting value for age or length at 50 percent selectivity (will be estimated)
 #' @param M50 age or length at 50 percent maturity
-#' @param selex_input specify whether argument S50 is an "age" or a "length" (default length)
-#' @param maturity_input specify whether argument M50 is an "age" or a "length" (default length)
+#' @param selex_input specify whether argument S50 is an age or a length (default length)
+#' @param maturity_input specify whether argument M50 is an age or a length (default length)
 #' @param binwidth width of length bins (default = 1)
 #' @param t0 theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin
 #' @param CVlen CV of the growth curve (default = 0.2)
