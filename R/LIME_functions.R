@@ -357,7 +357,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         qcoef <- 1e-2 #1e-5
 
         ## fishing mortality
-        Fequil <- 0.34
+        Fequil <- 0.25 #0.34 rate from previous studies
         Frate <- 0.2
         Fmax <- 0.7
 
@@ -398,8 +398,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         lows <- mids - (binwidth)/2
         
         ages <- start_ages:AgeMax
-        Amat <- round(t0-log(1-(ML50/linf))/vbk)
-        A95 <- Amat+1
+        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        A95 <- M50+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
         SL50 <- round(linf*(1-exp(-vbk*(S50-t0))))
         SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
@@ -503,8 +503,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         AgeMax <- round(-log(0.01)/M)
         ages <- start_ages:AgeMax
-        Amat <- round(t0-log(1-(ML50/linf))/vbk)
-        A95 <- Amat+1
+        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        A95 <- M50+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
         S50 <- ceiling(t0-log(1-(SL50/linf))/vbk)
         S95 <- S50+1
@@ -633,8 +633,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         AgeMax <- round(-log(0.01)/M)
         ages <- start_ages:AgeMax
-        Amat <- round(t0-log(1-(ML50/linf))/vbk)
-        A95 <- Amat+1
+        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        A95 <- M50+1
         ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
         S95 <- S50+1
         SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
@@ -648,8 +648,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         W_a <- lwa*L_a^lwb  
 
         ## maturity
-        if(start_ages==0) Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
-        if(start_ages!=0) Mat_a <- 1/(1+exp(Amat - ages))
+        if(start_ages==0) Mat_a <- c(1e-20, 1 / (1 + exp(M50 - ages[-1])))
+        if(start_ages!=0) Mat_a <- 1/(1+exp(M50 - ages))
 
         ## selectivity 
         if(selex=="asymptotic"){
@@ -705,7 +705,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
     Outs$S_a <- S_a
     Outs$L_a <- L_a
     Outs$W_a <- W_a
-    Outs$Amat <- Amat
+    Outs$M50 <- M50
     Outs$ML50 <- ML50
     Outs$ML95 <- ML95
     Outs$Mat_a <- Mat_a
@@ -750,316 +750,101 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
     return(dat_input)
 }
 
-#' Create hypothetical life histories for simulation model
+#' Create new life history list
 #'
-#' \code{create_lh_list} Specifies 4 distinct life history types for simulation testing
+#' \code{create_lh_list} Creates list of life history information
 #'
-#' @param lh choose from different life histories, 1-4
-#' @param param_adjust possibility of adjusting true parameter values - names of parameters, default=FALSE
-#' @param val possibility of adjusting true parameter values - values for parameter names in "param_adjust" (must specify val if param_adjust is specified), default=FALSE
-#' @param selex "asymptotic" selectivity or "dome"-shaped selectivity as the true selectivity in the operating model
-#' @param nlbins specified number of length bins so that all life histories match (useful in simulation study)
-
+#' @param vbk von Bertalanffy k; Brody growth coefficient
+#' @param linf von Bertalanffy Linf; asymptotic length
+#' @param lwa length-weight scaling parameter
+#' @param lwb length-weight allometric parameter
+#' @param S50 starting value for age or length at 50% selectivity (will be estimated)
+#' @param M50 age or length at 50% maturity
+#' @param selex_input specify whether argument S50 is an "age" or a "length" (default length)
+#' @param maturity_input specify whether argument M50 is an "age" or a "length" (default length)
+#' @param binwidth width of length bins (default = 1)
+#' @param t0 theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin
+#' @param CVlen CV of the growth curve (default = 0.2)
+#' @param SigmaC standard deviation - observation error of catch data (default = 0.2)
+#' @param SigmaI standard deviation - observation error of index data (default = 0.2)
+#' @param SigmaR standard deviation - process error for recruitment time series (default = 0.6 -- starting value, will be estimated)
+#' @param SigmaF standard deviation - process error for fishing mortality time series (default = 0.3)
+#' @param R0 equilibrium recruitment (default = 1); when no information on scale is available, will estimate relative deviations around equilibrium 1
+#' @param h steepness parameter (default = 1)
+#' @param qcoef starting value for catchability coefficient (when index data is available, default = 1e-5)
+#' @param M value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)
+#' @param F1 starting value for initial fishing mortality (default = 0, will be estimated)
+#' @param Fequil equilibrium fishing mortality rate (used for simulation; default=0.25)
+#' @param Frate parameter used to simulate fishing moratality time series (default=0.2)
+#' @param Fmax maximum F used in simulation (default=0.7)
+#' @param start_ages age to start (usually either 0 or 1; default = 0)
 #' @return List, a tagged list of life history traits
-#' @details Life histories used from Hordyk et al. 2015 ICES Journal of Marine Science, simulation test of LB-SPR method
 #' @export
-create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
-
-    ## sand sole P. melanostictus
-    if(lh==1){
-        ## growth
-        vbk <- 0.79
-        linf <- 37.6
-        t0 <- -0.01
-        CVlen <- 0.1
-        lwa <- 0.00912
-        lwb <- 3.09
-
-        ## natural mortality
-        M <- 0.42
-
-        ## recruitment
-        R0 <- 1
-        h <- 1
-
-        ## fishing mortality
-        Fequil <- 0.25
-        Frate <- 0.2
-        F1 <- 0.05
-        Fmax <- 0.7
-
-        ## index
-        qcoef <- 1e-2
-
-        ## deviations
-        SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
-        SigmaR <- 0.6
-        
-
-        ## bins
-        binwidth <- 1
-        
-        ## selectivity
-        SL50 <- 24.0
-        SL95 <- 26.0
-
-        ## maturity
-        ML50 <- 29.0
-        ML95 <- 32.0
-    }
-
-    ## Puget Sound rockfish (S. emphaeus)
-    if(lh==2){
-        ## growth
-        vbk <- 0.535
-        linf <- 17.0
-        t0 <- -0.01
-        CVlen <- 0.1
-        lwa <- 0.01259
-        lwb <- 3.08
-
-        ## natural mortality
-        M <- 0.44
-
-        ## recruitment
-        R0 <- 1
-        h <- 1
-
-        ## fishing mortality
-        Fequil <- 0.25
-        Frate <- 0.2
-        F1 <- 0.05
-        Fmax <- 0.7
-
-        ## index
-        qcoef <- 1e-2
-
-        ## deviations
-        SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
-        SigmaR <- 0.6
-        
-
-        ## bins
-        binwidth <- 1
-        
-        ## selectivity
-        SL50 <- 9.4
-        SL95 <- 10.8
-
-        ## maturity
-        ML50 <- 12.1
-        ML95 <- 17.0
-    }
-
-    ## yellowtail flathead (P. endrachtensis)
-    if(lh==3){
-        ## growth
-        vbk <- 0.41
-        linf <- 53.0
-        t0 <- -0.01
-        CVlen <- 0.1
-        lwa <- 0.00490
-        lwb <- 3.06
-
-        ## natural mortality
-        M <- 0.63
-
-        ## recruitment
-        R0 <- 1
-        h <- 1
-
-        ## fishing mortality
-        Fequil <- 0.25
-        Frate <- 0.2
-        F1 <- 0.05
-        Fmax <- 0.7
-
-        ## index
-        qcoef <- 1e-2
-
-        ## deviations
-        SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
-        SigmaR <- 0.6
-        
-
-        ## bins
-        binwidth <- 1
-        
-        ## selectivity
-        SL50 <- 22.0
-        SL95 <- 26.0
-
-        ## maturity
-        ML50 <- 25.9
-        ML95 <- 34.4
-    }
-
-    ## Pacific saury (C. saira)
-    if(lh==4){
-        ## growth
-        vbk <- 0.41
-        linf <- 34.2
-        t0 <- -0.01
-        CVlen <- 0.1
-        lwa <- 0.00240
-        lwb <- 3.15
-
-        ## natural mortality
-        M <- 1.25
-
-        ## recruitment
-        R0 <- 1
-        h <- 1
-
-        ## fishing mortality
-        Fequil <- 0.25
-        Frate <- 0.2
-        F1 <- 0.05
-        Fmax <- 0.7
-
-        ## index
-        qcoef <- 1e-2
-
-        ## deviations
-        SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
-        SigmaR <- 0.6
-        
-
-        ## bins
-        binwidth <- 1
-        
-        ## selectivity
-        SL50 <- 13.0
-        SL95 <- 14.5
-
-        ## maturity
-        ML50 <- 19.4
-        ML95 <- 20.4
-    }
-
-    if(lh==5){
-      ## growth - from Bystrom thesis
-        vbk <- 0.21
-        linf <- 64.58
-        t0 <- -0.01
-        CVlen <- 0.2
-        lwa <- 0.0245
-        lwb <- 2.790
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.2, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0, Fequil=0.25, Frate=0.2, Fmax=0.7, start_ages=0){
             
-        ## mortality
-        M <- 0.43 ## based on vbk
+    ## mortality
+    if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
+    AgeMax <- round(-log(0.01)/M)
+    ages <- start_ages:AgeMax
 
-        ## recruitment
-        R0 <- 1
-        h <- 1
+    if(selex_input=="length"){
+        SL50 <- S50
+        S50 <- round(t0-log(1-(SL50/linf))/vbk)
 
-        ## fishing mortality
-        Fequil <- 0.25
-        Frate <- 0.2
-        F1 <- 0.05
-        Fmax <- 0.7
+    }
+    if(selex_input=="age"){
+        SL50 <- round(linf*(1-exp(-vbk*(S50-t0))))
+    }
 
-        ## index
-        qcoef <- 1e-2
-
-        ## variation terms
-        SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
-        SigmaR <- 0.6
-
-        ## bins
-        binwidth <- 1
-
-        ## selectivity
-        SL50 <- 30.0
-        SL95 <- 39.1
-        
-        ## maturity
-        ML50 <- 34 ## Rojas 2006 Gulf of Nicoya
-        ML95 <- 40
+    if(maturity_input=="length"){
+        ML50 <- M50
+        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+    }
+    if(maturity_input=="age"){
+        ML50 <- round(linf*(1-exp(-vbk*(M50-t0))))
     }
     
-    ## sensitivities
-    if("linf" %in% param_adjust) linf <- val[which(param_adjust=="linf")]
-    if("vbk" %in% param_adjust) vbk <- val[which(param_adjust=="vbk")]
-    if("M" %in% param_adjust) M <- val[which(param_adjust=="M")]
-    if("CVlen" %in% param_adjust) CVlen <- val[which(param_adjust=="CVlen")]
-    if("SigmaR" %in% param_adjust) SigmaR <- val[which(param_adjust=="SigmaR")]
-    if("SigmaF" %in% param_adjust) SigmaF <- val[which(param_adjust=="SigmaF")]
-    if("ML50" %in% param_adjust) ML50 <- val[which(param_adjust=="ML50")]
-
-    ## derived
-    AgeMax <- round(-log(0.01)/M)
-    ages <- 0:AgeMax
-    Amat <- round(t0-log(1-(ML50/linf))/vbk)
-    A95 <- Amat+1
-    S50 <- round(t0-log(1-(SL50/linf))/vbk)
-    S95 <- round(t0-log(1-(SL95/linf))/vbk)
-    if(S50==S95) S95 <- S50 + 1
-
-    mids <- seq((binwidth/2), nlbins, by=binwidth)
+    ## length bins
+    mids <- seq((binwidth/2), linf*1.5, by=binwidth) 
     highs <- mids + (binwidth/2)
     lows <- mids - (binwidth)/2
 
     ## growth at age
     L_a <- linf*(1-exp(-vbk*(ages - t0)))
-    W_a <- lwa*L_a^lwb
+    W_a <- lwa*L_a^lwb  
 
     ## maturity
-    Mat_l <- 1 / (1 + exp(ML50 - mids))
-    Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
-    names(Mat_l) <- Mat_ages
-    Mat_a <- rep(NA, (AgeMax+1))
-    for(a in 1:(AgeMax+1)){
-        if(a==1) Mat_a[a] <- 1e-20
-        if(a>1){
-            fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
-            if(length(fill)==1) Mat_a[a] <- fill
-            if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
-        }
+    if(maturity_input=="length"){
+        Mat_l <- 1 / (1 + exp(ML50 - mids))
+        Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
+        names(Mat_l) <- Mat_ages
+        Mat_a <- rep(NA, length(ages))
+        for(a in 1:length(ages)){
+            if(start_ages==0){
+                if(a==1) Mat_a[a] <- 1e-20
+                if(a>1){
+                    fill <- Mat_l[which(names(Mat_l)==(a-1))][length(Mat_l[which(names(Mat_l)==(a-1))])]
+                    if(length(fill)==1) Mat_a[a] <- fill
+                    if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+                }
+            }
+            if(start_ages!=0){
+                fill <- Mat_l[which(names(Mat_l)==a)][length(Mat_l[which(names(Mat_l)==a)])]
+                if(length(fill)==1) Mat_a[a] <- fill
+                if(length(fill)==0) Mat_a[a] <- Mat_a[a-1]
+            }
+        }       
     }
-    # Mat_a <- c(1e-20, 1 / (1 + exp(Amat - ages[-1])))
+    if(maturity_input=="age"){
+        Mat_a <- rep(NA, length(ages))
+        if(start_ages==0) Mat_a <- c(1e-20, 1/(1+exp(M50 - ages[-1])))
+        if(start_ages!=0) Mat_a <- 1/(1+exp(M50 - ages))
+    }
 
     ## selectivity 
-    if(selex=="asymptotic"){
-        S_l <- 1 / (1 + exp(SL50 - mids))
-        S_ages <- round(t0-log(1-(mids/linf))/vbk)
-        names(S_l) <- S_ages
-        S_a <- rep(NA, (AgeMax+1))
-        for(a in 1:(AgeMax+1)){
-            if(a==1) S_a[a] <- 1e-20
-            if(a>1){
-                fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
-                if(length(fill)==1) S_a[a] <- fill
-                if(length(fill)==0) S_a[a] <- S_a[a-1]
-            }
-        }
-        # S_a <- c(1e-20, 1/(1+exp(-log(19)*(ages[-1]-S50)/(S95-S50)))) # Selectivity at age
-        Syoung <- NA
-        Sold <- NA
-    }
-    if(selex=="dome"){
-        S_a_calc <- rep(NA, length(ages))
-        Syoung <- S50
-        Sold <- max(c(S50+1),AgeMax*0.75)
-        A <- sqrt(2/pi)/(Syoung + Sold)
-        for(a in 1:length(ages)){
-            if(a==1) S_a_calc[a] <- 1e-20
-            if(a <= S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Syoung^2))
-            if(a > S95) S_a_calc[a] <- A*exp(-((ages[a] - S95)^2)/(2*Sold^2))
-        }
-        S_a <- S_a_calc/max(S_a_calc)
-    }
-
+    if(start_ages==0) S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
+    if(start_ages!=0) S_a <- 1/(1+exp(S50-ages))
+        
     ## output list
     Outs <- NULL
     Outs$vbk <- vbk
@@ -1069,24 +854,16 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     Outs$CVlen <- CVlen
     Outs$SigmaC <- SigmaC
     Outs$SigmaI <- SigmaI
-    Outs$SigmaR <- SigmaR
+    Outs$SigmaR <- SigmaR 
+    Outs$SigmaF <- SigmaF
     Outs$R0 <- R0
     Outs$lwa <- lwa
     Outs$lwb <- lwb
     Outs$S50 <- S50
-    Outs$S95 <- S95
-    Outs$SL50 <- SL50
-    Outs$SL95 <- SL95
-    Outs$Syoung <- Syoung
-    Outs$Sold <- Sold
     Outs$h <- h
-    Outs$Fequil <- Fequil
-    Outs$Frate <- Frate
-    Outs$F1 <- F1
     Outs$qcoef <- qcoef
-    Outs$Fmax <- Fmax
-    Outs$SigmaF <- SigmaF
     Outs$M <- M
+    Outs$F1 <- F1
     Outs$AgeMax <- AgeMax
     Outs$mids <- mids
     Outs$highs <- highs
@@ -1094,13 +871,12 @@ create_lh_list <- function(lh, param_adjust=FALSE, val=FALSE, selex, nlbins=50){
     Outs$S_a <- S_a
     Outs$L_a <- L_a
     Outs$W_a <- W_a
-    Outs$Amat <- Amat
-    Outs$ML50 <- ML50
-    Outs$ML95 <- ML95
+    Outs$M50 <- M50
     Outs$Mat_a <- Mat_a
-
+    Outs$Fequil <- Fequil
+    Outs$Frate <- Frate
+    Outs$Fmax <- Fmax
     return(Outs)
-
 }
 
 #' Settings for simulation testing of data availability scenarios
@@ -1772,7 +1548,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
       M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
       SigmaF=SigmaF, Fdynamics=Fdynamics, Rdynamics=Rdynamics, 
       R0=R0, Fmax=Fmax, CVlen=CVlen, mids=mids, highs=highs, 
-      lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, Amat=Amat, 
+      lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, M50=M50, 
       comp_sample=comp_sample, SigmaR=SigmaR, Nyears_comp=Nyears_comp, 
       alt_yrs=FALSE, sample=FALSE, nburn=20, seed=iter, modname=modname)) 
 
@@ -1793,7 +1569,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
           M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
           SigmaF=SigmaF, Fdynamics=Fdynamics, Rdynamics=Rdynamics,
           R0=R0, Fmax=Fmax, CVlen=CVlen, mids=mids, highs=highs,
-          lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, Amat=Amat,
+          lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, M50=M50,
           comp_sample=comp_sample/nrow(spatial_sim), SigmaR=SigmaR, Nyears_comp=Nyears_comp,
           alt_yrs=FALSE, sample=FALSE, nburn=20, seed=iter, modname=modname)))  
       SPR_site <- sapply(1:length(DataList_site), function(x) DataList_site[[x]]$SPR_t)
@@ -1907,7 +1683,7 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
       M=M, F1=F1, h=h, S_a=S_a, qcoef=qcoef, Frate=Frate, Fequil=Fequil, 
       SigmaF=SigmaF, Fdynamics=Fdynamics, Rdynamics=Rdynamics, 
       R0=R0, Fmax=Fmax, CVlen=CVlen, mids=mids, highs=highs, 
-      lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, Amat=Amat, 
+      lows=lows, W_a=W_a, L_a=L_a, Mat_a=Mat_a, M50=M50, 
       comp_sample=comp_sample, SigmaR=SigmaR, Nyears_comp=Nyears, 
       alt_yrs=FALSE, sample=FALSE, nburn=20, seed=iter, modname=modname)) 
     Inputs <- FormatInput_LB(Nyears=Nyears, DataList=DataList_proj, linf=lh_choose$linf, vbk=lh_choose$vbk, t0=lh_choose$t0, M=lh_choose$M, AgeMax=lh_choose$AgeMax, lbhighs=lh_choose$highs, lbmids=lh_choose$mids, Mat_a=lh_choose$Mat_a, lwa=lh_choose$lwa, lwb=lh_choose$lwb, log_sigma_C=log(lh_choose$SigmaC), log_sigma_I=log(0.001), log_CV_L=log(0.001), F1=DataList$F_t[1], SigmaR=lh_choose$SigmaR, qcoef=lh_choose$qcoef, R0=mean(DataList_out$R_t), S50=lh_choose$S50, model="Rich_LC", RecDev_biasadj=rep(0,Nyears), Fpen=1, Dpen=0, Dprior=c(0,0), SigRpen=1, SigRprior=c(lh_choose$SigmaR, 0.2), obs_per_yr=rep(1000,Nyears), SigmaF=lh_choose$SigmaF, RecType=0, FType=0, LType=1, h=lh_choose$h, SelexTypeDesc="asymptotic", est_sigma="log_sigma_R", REML=FALSE, site=1, estimate_same=FALSE, start_f=0)
@@ -2425,7 +2201,7 @@ return(paste0(max(itervec), " iterates run in ", modpath))
 #' @param linf asymptotic length
 #' @param vbk Brody growth coefficient
 #' @param Mat_a maturity at age
-#' @param Amat Age at 50 percent maturity
+#' @param M50 Age at 50 percent maturity
 #' @param comp_sample number of indiviuals sampled for lenght composition
 #' @param Nyears_comp number of years of length composition data
 #' @param alt_yrs only some years sampled for data? TRUE or FALSE (default FALSE)
@@ -2439,7 +2215,7 @@ return(paste0(max(itervec), " iterates run in ", modpath))
 #' @export
 SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     Frate, Fequil, SigmaF, Fdynamics, Rdynamics, R0, Fmax, CVlen, mids, highs, lows,
-    W_a, L_a, linf, vbk, Mat_a, Amat, comp_sample, Nyears_comp, alt_yrs=FALSE, sample=FALSE,
+    W_a, L_a, linf, vbk, Mat_a, M50, comp_sample, Nyears_comp, alt_yrs=FALSE, sample=FALSE,
     nburn, seed, modname){
 
     ## SB_t = spawning biomass over time
@@ -2658,7 +2434,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 
     DataList <- list("I_t"=CPUE_tout, "C_t"=C_tout, "DataScenario"=modname,
         "LF"=LFout, "SigmaR"=SigmaR, "R_t"=R_tout, "N_t"=N_tout, "SB_t"=SB_tout, "D_t"=D_tout, "F_t"=F_tout, 
-        "L_t"=L_tout, "N_at"=N_atout, "Amat"=Amat, "Mat_a"=Mat_a, "SB0"=SB0, "Nyears"=Nyears, "L_a"=L_a,
+        "L_t"=L_tout, "N_at"=N_atout, "M50"=M50, "Mat_a"=Mat_a, "SB0"=SB0, "Nyears"=Nyears, "L_a"=L_a,
         "W_a"=W_a, "AgeMax"=AgeMax, "M"=M, "S_a"=S_a, "plb"=plb, "plba"=plba, "page"=page, "R0"=R0, 
         "SPR"=SPR, "SPR_t"=SPR_t, "VB_t"=VB_tout, "TB_t"=TB_tout,
         "ML_t"=ML_t, "nlbins"=length(mids))
