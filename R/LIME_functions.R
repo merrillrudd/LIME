@@ -969,28 +969,28 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
 formatData <- function(lfreq, lfreq_years, lbins,  obs_per_year, index=NULL, index_years=NULL, catch=NULL, catch_years=NULL, meanlen=NULL, meanlen_years=NULL, model_years){
 
     LF <- lfreq
-    rownames(LF) <- lfreq_years
+    rownames(LF) <- which(model_years %in% lfreq_years)
     colnames(LF) <- lbins
 
     LFprop <- LF/rowSums(LF)
-    rownames(LFprop) <- lfreq_years
+    rownames(LFprop) <- which(model_years %in% lfreq_years)
     colnames(LFprop) <- lbins
 
-    names(obs_per_year) <- lfreq_years
+    names(obs_per_year) <- which(model_years %in% lfreq_years)
 
     I_t <- index
     if(is.null(index)==FALSE){
-        names(I_t) <- index_years
+        names(I_t) <- which(model_years %in% index_years)
     }
 
     C_t <- catch
     if(is.null(catch)==FALSE){
-        names(C_t) <- catch_years
+        names(C_t) <- which(model_years %in% catch_years)
     }
 
     ML_t <- meanlen
     if(is.null(meanlen)==FALSE){
-        names(ML_t) <- meanlen_years        
+        names(ML_t) <- which(model_years %in% meanlen_years)        
     }
 
     years_o <- unique(c(lfreq_years, index_years, catch_years, meanlen_years))[order(unique(c(lfreq_years, index_years, catch_years, meanlen_years)))]
