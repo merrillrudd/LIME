@@ -6,8 +6,8 @@
 \usage{
 generateData(modpath, modname, itervec, spatial, Fdynamics, Rdynamics,
   LType = 1, plotML = FALSE, plotLF_compare = FALSE, plotLF = FALSE,
-  selex = "asymptotic", write = TRUE, lh_list, data_avail_list,
-  param_adjust = FALSE, val = FALSE, rewrite = TRUE)
+  selex = "asymptotic", write = TRUE, lh_list, data_avail_list, rewrite,
+  param_adjust = NULL, val = NULL)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -38,11 +38,11 @@ generateData(modpath, modname, itervec, spatial, Fdynamics, Rdynamics,
 
 \item{data_avail_list}{list of other model settings}
 
+\item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
+
 \item{param_adjust}{vector of names of parameters to adjust true value, default FALSE to include no parameter}
 
 \item{val}{vector of values aligning with names in param_adjust to adjust value to, default FALSE to include no parameter}
-
-\item{rewrite}{defaults to TRUE, which will re-run OM and observation model. FALSE will skip if it's already written in directory.}
 }
 \value{
 print how many iterations were written into the model directory

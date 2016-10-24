@@ -6,7 +6,7 @@
 \usage{
 SimData_LB(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef, Frate, Fequil, SigmaF,
   Fdynamics, Rdynamics, R0, Fmax, CVlen, mids, highs, lows, W_a, L_a, linf, vbk,
-  Mat_a, Amat, comp_sample, Nyears_comp, alt_yrs = FALSE, sample = FALSE,
+  Mat_a, M50, comp_sample, Nyears_comp, alt_yrs = FALSE, sample = FALSE,
   nburn, seed, modname)
 }
 \arguments{
@@ -58,7 +58,7 @@ SimData_LB(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef, Frate, Fequil, SigmaF,
 
 \item{Mat_a}{maturity at age}
 
-\item{Amat}{Age at 50 percent maturity}
+\item{M50}{Age at 50 percent maturity}
 
 \item{comp_sample}{number of indiviuals sampled for lenght composition}
 

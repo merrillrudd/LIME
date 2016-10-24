@@ -2513,11 +2513,11 @@ calc_AIC <- function(modpath_vec){
 #'
 #' \code{LIME_fits} create figure of LIME model fits for several population parameters
 #'
-#' @param Inputs 
-#' @param Report
-#' @param Sdreport
-#' @param obsData
-#' @param save
+#' @param Inputs list of inputs for model run
+#' @param Report report file from model run
+#' @param Sdreport sdreport file from model run
+#' @param obsData observed data
+#' @param save TRUE if you want to save the figure to directory, FALSE if you want to view figure
 
 #' @return figure of LIME model fits for several population parameters
 #' @export

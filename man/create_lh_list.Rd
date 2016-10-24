@@ -2,28 +2,67 @@
 % Please edit documentation in R/LIME_functions.R
 \name{create_lh_list}
 \alias{create_lh_list}
-\title{Create hypothetical life histories for simulation model}
+\title{Create new life history list}
 \usage{
-create_lh_list(lh, param_adjust = FALSE, val = FALSE, selex, nlbins = 50)
+create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
+  maturity_input = "length", binwidth = 1, t0 = -0.01, CVlen = 0.2,
+  SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3, R0 = 1,
+  h = 1, qcoef = 1e-05, M = NULL, F1 = 0, Fequil = 0.25,
+  Frate = 0.2, Fmax = 0.7, start_ages = 0)
 }
 \arguments{
-\item{lh}{choose from different life histories, 1-4}
+\item{vbk}{von Bertalanffy k; Brody growth coefficient}
 
-\item{param_adjust}{possibility of adjusting true parameter values - names of parameters, default=FALSE}
+\item{linf}{von Bertalanffy Linf; asymptotic length}
 
-\item{val}{possibility of adjusting true parameter values - values for parameter names in "param_adjust" (must specify val if param_adjust is specified), default=FALSE}
+\item{lwa}{length-weight scaling parameter}
 
-\item{selex}{"asymptotic" selectivity or "dome"-shaped selectivity as the true selectivity in the operating model}
+\item{lwb}{length-weight allometric parameter}
 
-\item{nlbins}{specified number of length bins so that all life histories match (useful in simulation study)}
+\item{S50}{starting value for age or length at 50% selectivity (will be estimated)}
+
+\item{M50}{age or length at 50% maturity}
+
+\item{selex_input}{specify whether argument S50 is an "age" or a "length" (default length)}
+
+\item{maturity_input}{specify whether argument M50 is an "age" or a "length" (default length)}
+
+\item{binwidth}{width of length bins (default = 1)}
+
+\item{t0}{theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin}
+
+\item{CVlen}{CV of the growth curve (default = 0.2)}
+
+\item{SigmaC}{standard deviation - observation error of catch data (default = 0.2)}
+
+\item{SigmaI}{standard deviation - observation error of index data (default = 0.2)}
+
+\item{SigmaR}{standard deviation - process error for recruitment time series (default = 0.6 -- starting value, will be estimated)}
+
+\item{SigmaF}{standard deviation - process error for fishing mortality time series (default = 0.3)}
+
+\item{R0}{equilibrium recruitment (default = 1); when no information on scale is available, will estimate relative deviations around equilibrium 1}
+
+\item{h}{steepness parameter (default = 1)}
+
+\item{qcoef}{starting value for catchability coefficient (when index data is available, default = 1e-5)}
+
+\item{M}{value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)}
+
+\item{F1}{starting value for initial fishing mortality (default = 0, will be estimated)}
+
+\item{Fequil}{equilibrium fishing mortality rate (used for simulation; default=0.25)}
+
+\item{Frate}{parameter used to simulate fishing moratality time series (default=0.2)}
+
+\item{Fmax}{maximum F used in simulation (default=0.7)}
+
+\item{start_ages}{age to start (usually either 0 or 1; default = 0)}
 }
 \value{
 List, a tagged list of life history traits
 }
 \description{
-\code{create_lh_list} Specifies 4 distinct life history types for simulation testing
-}
-\details{
-Life histories used from Hordyk et al. 2015 ICES Journal of Marine Science, simulation test of LB-SPR method
+\code{create_lh_list} Creates list of life history information
 }
 
