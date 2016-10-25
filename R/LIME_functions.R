@@ -2083,7 +2083,10 @@ for(iter in itervec){
     if(simulation==TRUE) obs_per_yr <- inits$obs_per_yr
     if(simulation==FALSE) obs_per_yr <- input_data$obs_per_year
 
-    if(simulation==FALSE) DataList <- inits
+    if(simulation==FALSE){
+        DataList <- inits
+        saveRDS(DataList, file.path(iterpath, "obsData.rds"))
+    }
 
   if(grepl("LBSPR", modpath)==FALSE){
     
