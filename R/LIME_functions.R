@@ -754,11 +754,12 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
             dat_input$LFprop <- dat_input$LFprop[,1:max(dat_input$highs)]
         }
         if(obs_lb >= max(dat_input$highs)){
-            dat_input$LF <- dat_input$LF[,1:(obs_lb+5)]
-            dat_input$LFprop <- dat_input$LFprop[,1:(obs_lb+5)]
-            dat_input$highs <- c(dat_input$highs,(max(dat_input$highs)+1):(obs_lb+5))
-            dat_input$mids <- c(dat_input$mids, ((max(dat_input$highs)+1)-dat_input$binwidth/2):((obs_lb+5)-dat_input$binwidth/2))
-            dat_input$lows <- c(dat_input$lows, ((max(dat_input$highs)+1)-dat_input$binwidth):((obs_lb+5)-dat_input$binwidth))
+            index <- min((obs_lb+5), ncol(dat_input$LF))
+            dat_input$LF <- dat_input$LF[,1:index]
+            dat_input$LFprop <- dat_input$LFprop[,1:index]
+            dat_input$highs <- c(dat_input$highs,(max(dat_input$highs)+1):index)
+            dat_input$mids <- c(dat_input$mids, ((max(dat_input$highs)+1)-dat_input$binwidth/2):(index-dat_input$binwidth/2))
+            dat_input$lows <- c(dat_input$lows, ((max(dat_input$highs)+1)-dat_input$binwidth):(index-dat_input$binwidth))
         }
 
     return(dat_input)
