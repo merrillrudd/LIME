@@ -2152,7 +2152,7 @@ for(iter in itervec){
 
 
         ## loop to try to get opt to run
-          for(i in 1:10){
+          for(i in 1:5){
             if(all(is.na(opt))){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
