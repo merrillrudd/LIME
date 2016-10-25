@@ -2139,7 +2139,7 @@ for(iter in itervec){
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
         Upr[match("log50", names(obj$par))] = log(inits$AgeMax)
-        Upr[which(names(obj$par)=="log_F_t_input")] = log(5)
+        Upr[which(names(obj$par)=="log_F_t_input")] = log(10)
         Upr[match("log_F_sd", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
 
