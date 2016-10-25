@@ -754,9 +754,9 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
             dat_input$LFprop <- dat_input$LFprop[,1:max(dat_input$highs)]
         }
         if(obs_lb > max(dat_input$highs)){
-            dat_input$highs <- c(dat_input$highs,seq((max(dat_input$highs)+binwidth/2), obs_lb, by=binwidth))
-            dat_input$mids <- c(dat_input$mids, seq(((max(dat_input$highs)+binwidth/2)-dat_input$binwidth/2), obs_lb, by=binwidth))
-            dat_input$lows <- c(dat_input$lows, seq(((max(dat_input$highs)+binwidth/2)-dat_input$binwidth), obs_lb, by=binwidth))
+            dat_input$highs <- c(dat_input$highs,seq((max(dat_input$highs)+dat_input$binwidth/2), obs_lb, by=dat_input$binwidth))
+            dat_input$mids <- c(dat_input$mids, seq(((max(dat_input$highs)+dat_input$binwidth/2)-dat_input$dat_input$binwidth/2), obs_lb, by=dat_input$binwidth))
+            dat_input$lows <- c(dat_input$lows, seq(((max(dat_input$highs)+dat_input$binwidth/2)-dat_input$dat_input$binwidth), obs_lb, by=dat_input$binwidth))
         }
 
     return(dat_input)
