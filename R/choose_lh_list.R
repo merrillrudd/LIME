@@ -4,6 +4,9 @@
 #'
 #' @param species species code name
 #' @param selex "asymptotic"= assume asymptotic selectivity, "dome"= assume dome-shaped selectivity
+#' @param param_adjust vector of parameter names to be adjusted, programmed to include linf, vbk, M, CVlen, SigmaR, SigmaF, ML50, R0, and binwidth, default=FALSE for none adjusted
+#' @param val vector of values to adjust in the order the parameter names are given in "param_adjust", default=FALSE
+#' @param start_ages default=0 to start at age=0, can also start at age=1
 #' 
 #' @return List, a tagged list of life history/starting value information
 #' @export

@@ -11,6 +11,12 @@ choose_lh_list(species, selex, param_adjust = FALSE, val = FALSE,
 \item{species}{species code name}
 
 \item{selex}{"asymptotic"= assume asymptotic selectivity, "dome"= assume dome-shaped selectivity}
+
+\item{param_adjust}{vector of parameter names to be adjusted, programmed to include linf, vbk, M, CVlen, SigmaR, SigmaF, ML50, R0, and binwidth, default=FALSE for none adjusted}
+
+\item{val}{vector of values to adjust in the order the parameter names are given in "param_adjust", default=FALSE}
+
+\item{start_ages}{default=0 to start at age=0, can also start at age=1}
 }
 \value{
 List, a tagged list of life history/starting value information
