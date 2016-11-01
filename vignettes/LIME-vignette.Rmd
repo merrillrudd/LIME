@@ -1,0 +1,27 @@
+---
+title: "LIME example: Costa Rican snapper"
+author: "Merrill Rudd"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+## Summary
+The `LIME` package was developed to provide an estimate of stock status given the minimum requirements of (a) at least 1 year of length composition and (b) assumptions about biological parameters. The `LIME` package stands out from other length-based assessment methods in its estimation of annual fishing mortality and recruitment as a random effect, explicitly acknowledging process and observation error. Other methods overlook variation in the recruitment and/or fishing mortality processes. Another advantage of `LIME` is the integration of multiple years of length composition data, an abundance index, and/or catch time series, if available. 
+
+The example in this vignette comes from the Costa Rican spotted snapper fishery. The data provided here is already massaged into the proper format. Please contact Merrill Rudd (merrillrudd@gmail.com) before using or distributing this dataset. 
+
+## Installing and loading the package
+
+Install the R package from github using devtools:
+```{r install_packages, message=FALSE}
+devtools::install_github("merrillrudd/LIME")
+```
+
+Then load the library:
+```{r load_packages, message=FALSE}
+library(LIME)
+```
+
+## Example dataset
+
+An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years. These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
