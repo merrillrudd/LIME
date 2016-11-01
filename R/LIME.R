@@ -1,0 +1,7 @@
+#' LIME: A package for implementing the length-based integrated mixed effects (LIME) method
+#'
+#' @description LIME is a stock assessment method that fits to at least 1 year of length compostion data from the catch, with other inputs being assumptions about biological parameters. The LIME method can fit to multiple years of length composition data, a catch time series, and/or an abundance index, if available. The LIME method estimates time-varying fishing mortality and recruitment using a mixed effects approach. The LIME method was developed a) to move away from equilibrium assumptions of other length-based methods, and b) as a possible approach in capacity-limited situations where length measurements are reliable but either catch and/or an abundance index are not available.
+#' @author Merrill Rudd (merrillrudd@gmail.com)
+#' @docType package
+#' @name LIME
+NULL
