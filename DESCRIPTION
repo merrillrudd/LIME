@@ -1,7 +1,7 @@
 Package: LIME
 Type: Package
 Title: Length-based Integrated Mixed Effects (LIME) assessment method
-Version: 0.1.0
+Version: 0.1
 Date: 2016-11-1
 Authors@R: person("Merrill", "Rudd", email="merrillrudd@gmail.com", role=c("aut", "cre"))
 Description: A flexible stock assessment method for fisheries with developing
