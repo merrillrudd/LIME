@@ -2,15 +2,22 @@
 title: "LIME example: Costa Rican snapper"
 author: "Merrill Rudd"
 date: '`r Sys.Date()`'
-output: html_document
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
 ---
 
-## Summary
+# Summary
 The `LIME` package was developed to provide an estimate of stock status given the minimum requirements of (a) at least 1 year of length composition and (b) assumptions about biological parameters. The `LIME` package stands out from other length-based assessment methods in its estimation of annual fishing mortality and recruitment as a random effect, explicitly acknowledging process and observation error. Other methods overlook variation in the recruitment and/or fishing mortality processes. Another advantage of `LIME` is the integration of multiple years of length composition data, an abundance index, and/or catch time series, if available. 
+
+This vignette covers the steps in running the LIME method using an example. 
 
 The example in this vignette comes from the Costa Rican spotted snapper fishery. The data provided here is already massaged into the proper format. Please contact Merrill Rudd (merrillrudd@gmail.com) before using or distributing this dataset. 
 
-## Installing and loading the package
+
+
+# Installing and loading the package
 
 Install the R package from github using devtools:
 ```{r install_packages, message=FALSE}
@@ -22,10 +29,31 @@ Then load the library:
 library(LIME)
 ```
 
-## Example dataset
+# Example dataset
 
-An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years. These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
-```{r}
-head(snapper)
+An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years (1997-2005). These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
+
+```{r explore_data, echo=FALSE}
+par(mfrow=c(3,3), mar=c(0,0,0,0), omi=c(1,1,0.7,0.2))
+for(i in 1:nrow(snapper$LF)){
+  barplot(snapper$LF[i,], xlab="", ylab="", xaxs="i", yaxs="i", col="black", xaxt="n", yaxt="n", xlim=c(0,ncol(snapper$LF)), ylim=c(0,max(snapper$LF)*1.2))
+  if(i %in% c(1,4,7)) axis(2, at=pretty(c(0,max(snapper$LF))), las=2, cex.axis=1.2)
+  if(i %in% c(7,8,9)) axis(1, at=pretty(c(0,ncol(snapper$LF))), cex.axis=1.2)
+  text(x=8, y=(max(snapper$LF)), snapper$years[i], cex=1.2)
+  box()
+}
+mtext("Length bin (cm)", side=1, line=3, cex=1.2, outer=TRUE)
+mtext("Proportion of catch", side=2, line=4, cex=1.2, outer=TRUE)
+mtext("Length composition from catch samples", side=3, line=1, cex=1.2, font=2, outer=TRUE)
 ```
 
+# Running the LIME method
+## Specify life history information
+
+## Compile input data
+
+## Run model
+
+## Check results
+
+## Run sensitivity analyses

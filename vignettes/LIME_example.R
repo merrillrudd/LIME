@@ -17,8 +17,10 @@ library(TMBhelper)
 dir <- file.path("C:\\Git_Projects\\LIME\\example")
 
 ## Costa Rican spotted rose snapper (Lutjanus guttatus)
-lh <- choose_lh_list(species="CRSNAP", selex="asymptotic", param_adjust=c("CVlen"), val=c(0.1))
-data <- readRDS(file.path(dir, "example_data_input.rds"))
+lh <- create_lh_list(vbk=0.21, linf=64.58, lwa=0.0245, lwb=2.79, S50=30, selex_input="length", M50=34, maturity_input="length", binwidth=1, CVlen=0.1)
+# snapper <- c(lh, snapper)
+# save(snapper, file="C:\\Git_Projects\\LIME\\data\\snapper_example_data.rda")
+
 
 #######################################################################
 ## ---------------- Model settings and directories ------------------
