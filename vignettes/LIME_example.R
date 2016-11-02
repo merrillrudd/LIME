@@ -21,13 +21,16 @@ lh <- create_lh_list(vbk=0.21, linf=64.58, lwa=0.0245, lwb=2.79, S50=30, selex_i
 # snapper <- c(lh, snapper)
 # save(snapper, file="C:\\Git_Projects\\LIME\\data\\snapper_example_data.rda")
 
+data <- snapper
+data_new <- list(LF=data$LF, years=data$years, obs_per_year=data$obs_per_year)
 
 #######################################################################
 ## ---------------- Model settings and directories ------------------
 #######################################################################
 
 ## data availability scenarios (can also set up for "Catch_LC" when both catch and length comp are available -- just need to make sure the data type is in the name -- with Index, Catch, and LC being the options)
-avail_set <- c("Index_LC", "LC")
+# avail_set <- c("Index_LC", "LC")
+avail_set <- "LC"
 
 ## estimate variances -- always estimating Recruitment variation (log_sigma_R), but could add on other variance parameters (match variance names exactly ** update manual) -- in this case could estimate the CV for the growth curve 
 ## these tags are used in the directory names and what they mean can be specified when model is run

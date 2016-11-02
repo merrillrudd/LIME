@@ -39,7 +39,7 @@ for(i in 1:nrow(snapper$LF)){
   barplot(snapper$LF[i,], xlab="", ylab="", xaxs="i", yaxs="i", col="black", xaxt="n", yaxt="n", xlim=c(0,ncol(snapper$LF)), ylim=c(0,max(snapper$LF)*1.2))
   if(i %in% c(1,4,7)) axis(2, at=pretty(c(0,max(snapper$LF))), las=2, cex.axis=1.2)
   if(i %in% c(7,8,9)) axis(1, at=pretty(c(0,ncol(snapper$LF))), cex.axis=1.2)
-  text(x=8, y=(max(snapper$LF)), snapper$years[i], cex=1.2)
+  text(x=8, y=(max(snapper$LF)), rownames(snapper$LF)[i], cex=1.2)
   box()
 }
 mtext("Length bin (cm)", side=1, line=3, cex=1.2, outer=TRUE)
@@ -50,7 +50,60 @@ mtext("Length composition from catch samples", side=3, line=1, cex=1.2, font=2, 
 # Running the LIME method
 ## Specify life history information
 
+Use the function `create_lh_list` to specify life history information for the stock you are assessing. The required inputs include: 
+
+ * *vbk* -- von Bertalanffy growth 
+ 
+ * *linf* -- von Bertlanffy asymptotic length 
+ 
+ * *lwa* -- length-weight scaling parameter 
+ 
+ * *lwb* -- length-weight allometric parameter 
+ 
+ * *S50* -- starting value for age or length at 50% selectivity (will be estimated in model)
+ 
+ * *selex_input* -- specify whether *S50* is "age" or "length" 
+ 
+ * *M50* -- age or length at 50% maturity 
+ 
+ * *maturity_input* -- specify whether *M50* is "age" or "length" 
+ 
+
+You can also specify the naturality mortality rate (_M_), steepness (_h_), coefficient of variation around the growth curve (_CVlen_), and other values (including observation and process error) if some information is known. Otherwise, default values are specified for these parameters. See the help file `?create_lh_list` for default values of other life history parameters and the relationships used to derive life history information.
+
+```{r create_lh, warning=FALSE}
+lh <- create_lh_list(vbk=0.21, linf=64.58, lwa=0.0245, lwb=2.79, S50=30, selex_input="length", M50=34, maturity_input="length", binwidth=1, CVlen=0.1)
+```
+```{r plot_lh, echo=FALSE}
+par(mfrow=c(1,2), mar=c(8,5,1,4))
+plot(lh$L_a, xlab="Age", ylab="Length (cm)", xlim=c(1,length(lh$L_a)), ylim=c(0,max(lh$L_a)*1.1), xaxs="i", yaxs="i", type="l", lwd=4, col="black")
+par(new=TRUE)
+plot(lh$W_a, xlab="", ylab="", xaxs="i", xlim=c(1,length(lh$L_a)), ylim=c(0, max(lh$W_a)*1.1), yaxs="i", xaxt="n", yaxt="n", type="l", lwd=4, lty=2, col="blue")
+legend("bottomright", legend=c("Length", "Weight"), col=c("black", "blue"), lwd=4, lty=c(1,2))
+axis(4, at=pretty(c(0, max(lh$W_a)*1.1)), col="blue", col.axis="blue")
+mtext(side=4, "Weight (g)", col="blue", line=3)
+
+plot(lh$Mat_a, xlab="Age", ylab="Proportion mature", col="forestgreen", type="l", lwd=4, xaxs="i", yaxs="i", ylim=c(0,1.1))
+```
+
+
 ## Compile input data
+
+In this example, the data is already included in the `snapper` object in the proper format along with the life history information. 
+
+To start from scratch with your own dataset, you will need a tagged list with:
+
+* `years` -- a vector of years that you want to model. This can be in years (e.g. 2001-2010) or an index of years (1-10). It can also extend backward longer than the data available (e.g. 10 years before the first year of data).
+```{r}
+snapper$years
+```
+
+* *LF* -- a matrix with the observed length frequency (i.e. composition), with the length bins along the columns and the years along the rows. The columns should be named with the upper length bin (e.g. 1-77 for 1 cm length bins). The rows should be named with the index of the year from which the data is collected out of the years for which you want to run the model. In the snapper example, we have data from years 11-19, because we are modeling 10 years prior to the first year of data (1-19 total representing 1987-2005, for which we have data from 1997-2005).
+```{r}
+snapper$LF
+```
+
+
 
 ## Run model
 
