@@ -75,7 +75,7 @@ for(iter in itervec){
       if(simulation==TRUE) val <- as.numeric(sensitivity_inputs[[param]][val_index, lh_vec_num])
       if(simulation==FALSE) val <- as.numeric(sensitivity_inputs[[param]][val_index])
     }
-    if(simulation==TRUE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=data_avail[[modname]], param=param, val=val)
+    if(simulation==TRUE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=c(data_avail[[modname]],DataList), param=param, val=val)
     if(simulation==FALSE) inits <- create_inputs(lh_list=lh_choose, data_avail_list=input_data, param=param, val=val) 
     Nyears <- inits$Nyears 
 
