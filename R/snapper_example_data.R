@@ -1,0 +1,20 @@
+#' Example data from Costa Rican spotted rose snapper.
+#'
+#' A dataset containing the length composition, biological information, and abundance index for Costa Rican spotted rose snapper.
+#'
+#' @format A list with 10 items:
+#' \describe{
+#'   \item{I_t}{vector of abundance index over time, with names indicating the year in the time series that they come from}
+#'   \item{LF}{matrix with the proportion of the catch in each length bin (columsn) in each year (rows) with the upper limit of each bin naming the columns and the year of the length composition naming the rows}
+#' 	 \item{LFprop}{the same as LF in this case, but indicating that it is possible to specify the length composition LF in counts and the LFprop in proportions}
+#'   \item{years}{a vector of the total years to model; e.g. 1997-2015}
+#'   \item{years_i}{a vector of the total years to model, as an index; e.g. 1-19}
+#'   \item{lbins}{a vector with the upper limit of each length bin}
+#'   \item{ML_t}{a vector with the mean length in each year where length information is available, with the vector names the years as an index}
+#'   \item{Nyears}{an integer of the total number of years to model}
+#'   \item{Nyears_comp}{an integer of the total number of years where length data is available}
+#'   \item{obs_per_year}{vector of the effective sample size of length measurements in each year}
+#'   ...
+#' }
+#' @source {Conservation International}
+"snapper"
