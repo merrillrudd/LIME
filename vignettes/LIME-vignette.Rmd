@@ -26,7 +26,6 @@ library(LIME)
 
 An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years. These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
 ```{r}
-snapper <- data("snapper_example_data.rda")
 head(snapper)
 ```
 

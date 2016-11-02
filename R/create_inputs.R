@@ -29,18 +29,22 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
         dat_input$log_CV_L <- log(dat_input$CVlen)
 
         ## make sure length bins from life history and observed data match
-        obs_lb <- as.numeric(names(which(rev(colSums(dat_input$LF))>0)[1]))
-        if(obs_lb <= max(dat_input$highs)){
-            dat_input$LF <- dat_input$LF[,1:max(dat_input$highs)]
-            dat_input$LFprop <- dat_input$LFprop[,1:max(dat_input$highs)]
+        if(ncol(dat_input$LF)!=length(dat_input$highs)){
+          if(is.null(colnames(dat_input$LF))==FALSE) obs_lb <- as.numeric(names(which(rev(colSums(dat_input$LF))>0)[1]))
+          if(is.null(colnames(dat_input$LF))) obs_lb <- max(seq(1,length=ncol(dat_input$LF), by=dat_input$binwidth))
+            if(obs_lb <= max(dat_input$highs)){
+                dat_input$LF <- dat_input$LF[,1:max(dat_input$highs)]
+                dat_input$LFprop <- dat_input$LFprop[,1:max(dat_input$highs)]
+            }
+            if(obs_lb > max(dat_input$highs)){
+                dat_input$LF <- dat_input$LF[,1:obs_lb]
+                dat_input$LFprop <- dat_input$LFprop[,1:obs_lb]
+                dat_input$highs <- c(dat_input$highs,seq(from=(max(dat_input$highs)+dat_input$binwidth), to=obs_lb, by=dat_input$binwidth))
+                dat_input$mids <- c(dat_input$mids, seq(from=(max(dat_input$mids)+dat_input$binwidth), to=obs_lb, by=dat_input$binwidth))
+                dat_input$lows <- c(dat_input$lows, seq(from=(max(dat_input$lows)+dat_input$binwidth), to=(obs_lb-dat_input$binwidth), by=dat_input$binwidth))
+            }
         }
-        if(obs_lb > max(dat_input$highs)){
-            dat_input$LF <- dat_input$LF[,1:obs_lb]
-            dat_input$LFprop <- dat_input$LFprop[,1:obs_lb]
-            dat_input$highs <- c(dat_input$highs,seq(from=(max(dat_input$highs)+dat_input$binwidth), to=obs_lb, by=dat_input$binwidth))
-            dat_input$mids <- c(dat_input$mids, seq(from=(max(dat_input$mids)+dat_input$binwidth), to=obs_lb, by=dat_input$binwidth))
-            dat_input$lows <- c(dat_input$lows, seq(from=(max(dat_input$lows)+dat_input$binwidth), to=(obs_lb-dat_input$binwidth), by=dat_input$binwidth))
-        }
+
 
     return(dat_input)
 }
