@@ -52,6 +52,8 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
             }
         }
 
+        if(is.null(dat_input$Nyears)) dat_input$Nyears <- length(dat_input$years)
+
 
     return(dat_input)
 }
