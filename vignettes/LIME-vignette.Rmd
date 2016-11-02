@@ -31,7 +31,7 @@ library(LIME)
 
 # Example dataset
 
-An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years (1997-2005). These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
+An example dataset for the LIME method is the Costa Rican spotted rose snapper. PRETOMA, a Costa Rica-based NGO, has been conducting surveys in of the snapper population in the Gulf of Nicoya for nine years (2007-2015). These surveys took length measurements from the catch, either on board vessels or at the dock. There is also a CPUE index based on the onboard observations of the soak time for the longlines/gillnets, and the number of hooks per longline and mesh size of gillnet, respectively. Since the majority of the catch was from longline gear, we only used the longline information for the CPUE time series. The length composition each year, however, was weighted based on the catch per gear, so as to use all of the length measurement information but not need to estimate two selectivity curves. The surveys, however, do not adequately account for the total catch from this fishery, therefore only the length composition over time, abundance index, and biological information are available for the stock assessment.
 
 ```{r explore_data, echo=FALSE}
 par(mfrow=c(3,3), mar=c(0,0,0,0), omi=c(1,1,0.7,0.2))
@@ -39,7 +39,7 @@ for(i in 1:nrow(snapper$LF)){
   barplot(snapper$LF[i,], xlab="", ylab="", xaxs="i", yaxs="i", col="black", xaxt="n", yaxt="n", xlim=c(0,ncol(snapper$LF)), ylim=c(0,max(snapper$LF)*1.2))
   if(i %in% c(1,4,7)) axis(2, at=pretty(c(0,max(snapper$LF))), las=2, cex.axis=1.2)
   if(i %in% c(7,8,9)) axis(1, at=pretty(c(0,ncol(snapper$LF))), cex.axis=1.2)
-  text(x=8, y=(max(snapper$LF)), rownames(snapper$LF)[i], cex=1.2)
+  text(x=8, y=(max(snapper$LF)), snapper$years[as.numeric(rownames(snapper$LF)[i])], cex=1.2)
   box()
 }
 mtext("Length bin (cm)", side=1, line=3, cex=1.2, outer=TRUE)
@@ -48,7 +48,8 @@ mtext("Length composition from catch samples", side=3, line=1, cex=1.2, font=2, 
 ```
 
 # Running the LIME method
-## Specify life history information
+## Compile inputs
+### Life history and starting values
 
 Use the function `create_lh_list` to specify life history information for the stock you are assessing. The required inputs include: 
 
@@ -86,27 +87,114 @@ mtext(side=4, "Weight (g)", col="blue", line=3)
 plot(lh$Mat_a, xlab="Age", ylab="Proportion mature", col="forestgreen", type="l", lwd=4, xaxs="i", yaxs="i", ylim=c(0,1.1))
 ```
 
-
-## Compile input data
+### Observed data
 
 In this example, the data is already included in the `snapper` object in the proper format along with the life history information. 
 
 To start from scratch with your own dataset, you will need a tagged list with:
 
-* `years` -- a vector of years that you want to model. This can be in years (e.g. 2001-2010) or an index of years (1-10). It can also extend backward longer than the data available (e.g. 10 years before the first year of data).
+* `years` -- a vector of total years that you want to model. This can be in years (e.g. 2001-2010) or an index of years (1-10). It can also extend backward longer than the data available (e.g. 10 years before the first year of data).
 ```{r}
-snapper$years
+input_data <- list()
+input_data$years <- snapper$years
+input_data$years
 ```
 
-* *LF* -- a matrix with the observed length frequency (i.e. composition), with the length bins along the columns and the years along the rows. The columns should be named with the upper length bin (e.g. 1-77 for 1 cm length bins). The rows should be named with the index of the year from which the data is collected out of the years for which you want to run the model. In the snapper example, we have data from years 11-19, because we are modeling 10 years prior to the first year of data (1-19 total representing 1987-2005, for which we have data from 1997-2005).
+* `LF` -- a matrix with the observed length frequency (i.e. composition), with the length bins along the columns and the years along the rows. The columns should be named with the upper length bin (e.g. 1-50 for 1 cm length bins). The rows should be named with the index of the year from which the data is collected out of the years for which you want to run the model. In the snapper example, we have data from years 11-19, because we are modeling 10 years prior to the first year of data (1-19 total representing 1987-2005, for which we have data from 2007-2015).
 ```{r}
-snapper$LF
+input_data$LF <- snapper$LF
+input_data$LF[,1:20]
 ```
 
+If there is only one year of length composition data available, the data should still be in the same matrix format with column and row names in the same structure as with multiple years. Note that the data may need to be manipulated to have length bins along the columns and the year on the rows.
+```{r}
+## alternate data setup - 1 year of length composition data
+LF1 <- t(as.matrix(snapper$LF[nrow(snapper$LF),]))
+rownames(LF1) <- rownames(snapper$LF)[nrow(snapper$LF)]
+#input_data$LF <- LF1
+LF1
+```
+
+
+Other input options include: 
+
+* `I_t` -- a vector with abundance index each year, named with the index representing the year from which it came (e.g. index from some years but not all when modeling years 1-19). The following example is the abundance index derived from the snapper dataset. Note that an abundance index is not available in year 15 so that year is skipped in the vector. 
+```{r}
+input_data$I_t <- snapper$I_t
+input_data$I_t
+```
+
+
+* `C_t` -- a vector of catch data each year, named with the index representing the year from which it came (e.g. catch data from years 10-19 when modeling years 1-19).
+The following example demonstrates a hypothetical catch of 50 units each year for years 10-19. Note that the catch data does not have to be available every year, and so the year labels would skip the years where the data are missing.
+
+```{r}
+#input_data$C_t <- C_t
+C_t <- rep(50, length(10:19))
+names(C_t) <- 10:19
+C_t
+```
+
+### Combine to input list
+
+Use the function `create_inputs` to make one list that includes the life history information and observed data inputs. 
+
+The `param` and `val` arguments can be used to make last-minute adjustments to the input values. For example, if you want to try running the model with a steepness `h` fixed below 1, you would specify `param="h"` and `val=0.7` (for example). You can also add a concatenated string of parameter names and values if you want to adjust several values at the same time, for example `param=c("h", "CVlen")` and `val=c(0.7, 0.05)`. The `param` names must match the names of the outputs from `create_lh_list` and `input_data`.
+
+```{r}
+inits <- create_inputs(lh_list=lh, data_avail_list=input_data, param=FALSE, val=FALSE)
+names(inits)
+```
+
+Your named list `inits` is now ready to plug in assumed values, starting values for parameters to be estimated, and data time series to fit the model. 
 
 
 ## Run model
+You will use the `runModel` function to run the LIME method. The arguments for applying the LIME method to real data (as opposed to simulation) are:
+
+* `modpath` -- the path to the directory to save results
+
+* `est_sigma` -- which variances to estimate? The analyst can specify a concatenated vector of variance parameter names to estimate. Because this is a mixed effects model, the model should at least estimate the recruitment process error, `log_sigma_R`. Another helpful variance to estimate is the CV for the growth curve, called `log_CV_L`. The analyst could also specify `log_sigma_I`, `log_sigma_C`, and/or `log_F_sd` as the observation errors for the abundance index, catch, or process error on the fishing mortality, respectively. 
+
+* `data_avail` -- this is just a double-check that the model is only fitting to the data types specified by the user. If you don't have catch or an abundance index, they can be left out of the tagged list `input_data`, but a double-check is to tell the model here what data types you have. If a combination of data types are available, these should be separated by an underscore (e.g. "Index_LC"). The options are:
+  + Index
+  + Catch
+  + LC
+
+* `lh_list` -- the list of life history and starting values created above (lh)
+
+* `input_data` -- the tagged list of observed data and years, created above (input_data)
+
+* `rewrite` -- if you are running a bunch of models and don't want to re-run the models that already have output in their directory, flag `rewrite=TRUE`. If you want to re-run models that may already have output in the directory, tag `rewrite=FALSE`. This argument will not affect the runs if the model has never been run before. 
+
+* `start_f` -- This indicates the first year to estimate fishing mortality. The default is 0 to estimate fishing mortality in all years. If start_f is increased to 10 when the total number of years is 20, this will estimate fishing mortality in years 11-20 and set fishing mortality from years 1-10 as the same value estimated in year 11. 
+
+* `simulation` -- set to FALSE if doing an assessment on real data. set to TRUE if using simulated data.
+  + `itervec` -- set to NULL if this is not a simulation study. Vector of iterations when using simulated data (e.g. 1:100 will run 100 iterations, 50:100 if adding to 1:50 iterations already run)
+  
+```{r, eval=FALSE}
+run <- runModel(modpath=<path>, est_sigma="log_sigma_R", data_avail="LC", lh_list=lh, input_data=input_data, rewrite=TRUE, start_f=0, simulation=FALSE, itervec=NULL)
+```
+
 
 ## Check results
 
+Do your results make sense? Check out the tagged list of outputs saved in `Report.rds` and the standard errors in `Sdreport.rds` saved in the results directory. Compare the output from different models (e.g. estimating or fixing `CVlen`).
+
+Files saved in output directory:
+
+* `obsData.rds` -- observed data
+
+* `Inputs1.rds` and `Inputs2.rds` -- inputs into TMB. Check that these look right. The `Inputs2.rds` are the most recent inputs after an initial run that estimated the standard error for the recruitment deviation used to develop the bias adjustment term.
+
+* `Report.rds` -- tagged list of outputs from the population model.
+
+* `Sdreport.rds` -- standard deviations for a select list of estimated and derived parameters from the population model.
+
+* `Derived_quants.rds` -- list of derived quantities such as MSY and SPR-based reference points. 
+
+* `df.csv` -- this shows the final gradient and estimated values for each parameter. Check that the final gradients are less than 0.01. If the model did not converge, there will be a text file called `high_final_gradient.txt` to flag the non-convergence.
+
 ## Run sensitivity analyses
+
+Run your analysis with a series of alternate values for the inputs in `create_lh_list` that have uncertainty. For example, you may have assumed natural mortality `M` was approximately 1.5*vbk, the default relationship. Try running the model with a series of possible values for `M`. Create a likelihood profile for each to determine if there is a better fit to the data given the alternate value. 
