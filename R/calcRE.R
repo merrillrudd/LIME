@@ -27,7 +27,7 @@ calcRE <- function(modpath_vec, itervec, value, yr, timeseries=FALSE){
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))) Rep <- readRDS(file.path(modpath_vec[m], iter, "Report.rds"))
                     if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))){
                         converge[iter,m] <- 1
-                        next
+                        # next
                     } 
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))==FALSE) next
                 }
