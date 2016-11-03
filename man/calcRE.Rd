@@ -4,7 +4,8 @@
 \alias{calcRE}
 \title{Calculate relative error}
 \usage{
-calcRE(modpath_vec, itervec, value, yr, timeseries = FALSE)
+calcRE(modpath_vec, itervec, value, yr, plot_nonconverge = FALSE,
+  timeseries = FALSE)
 }
 \arguments{
 \item{modpath_vec}{vector of directories to search for saved true and estimated population parameters}
@@ -14,6 +15,8 @@ calcRE(modpath_vec, itervec, value, yr, timeseries = FALSE)
 \item{value}{options: "SPR" or "FFref" (FFref is defined as F/F40)}
 
 \item{yr}{if timeseries==FALSE, specify the year for which to take the relative error}
+
+\item{plot_nonconverge}{should the nonconverged parameter values be plotted? default FALSE}
 
 \item{timeseries}{default: timeseries=FALSE, if timeseries=TRUE, takes the relative error for all years up to the specified year using the 'yr' argument}
 }

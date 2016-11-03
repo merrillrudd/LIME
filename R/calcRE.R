@@ -6,12 +6,13 @@
 #' @param itervec vector of iterations to check for results
 #' @param value options: "SPR" or "FFref" (FFref is defined as F/F40)
 #' @param yr if timeseries==FALSE, specify the year for which to take the relative error
+#' @param plot_nonconverge should the nonconverged parameter values be plotted? default FALSE
 #' @param timeseries default: timeseries=FALSE, if timeseries=TRUE, takes the relative error for all years up to the specified year using the 'yr' argument
 
 #' @return list with Relative Error, Squared Error, Estimation Error, and vector flagging convergence issues
 #' @details Only set up to run with a simulation study where there are multiple iterations of the model runs. 
 #' @export
-calcRE <- function(modpath_vec, itervec, value, yr, timeseries=FALSE){
+calcRE <- function(modpath_vec, itervec, value, yr, plot_nonconverge=FALSE, timeseries=FALSE){
         if(timeseries==FALSE){
             RE <- SQerr <- EE <- matrix(NA, nrow=length(itervec), ncol=length(modpath_vec))
             converge <- matrix(0, nrow=length(itervec), ncol=length(modpath_vec))
@@ -27,7 +28,7 @@ calcRE <- function(modpath_vec, itervec, value, yr, timeseries=FALSE){
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))) Rep <- readRDS(file.path(modpath_vec[m], iter, "Report.rds"))
                     if(file.exists(file.path(modpath_vec[m], iter, "NAs_final_gradient.txt")) | file.exists(file.path(modpath_vec[m], iter, "high_final_gradient.txt"))){
                         converge[iter,m] <- 1
-                        # next
+                        if(plot_nonconverge==FALSE) next
                     } 
                     if(file.exists(file.path(modpath_vec[m], iter, "Report.rds"))==FALSE) next
                 }
