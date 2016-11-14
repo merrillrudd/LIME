@@ -19,7 +19,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         vbk <- 0.21
         linf <- 64.58
         t0 <- -0.01
-        CVlen <- 0.2
+        CVlen <- 0.1
         lwa <- 0.0245
         lwb <- 2.790
             
@@ -41,8 +41,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         ## variation terms
         SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
+        SigmaC <- 0.1
+        SigmaI <- 0.1
         SigmaR <- 0.6
 
         ## selectivity
@@ -154,8 +154,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         ## variation terms
         SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
+        SigmaC <- 0.1
+        SigmaI <- 0.1
         SigmaR <- 0.6
 
         ## bins
@@ -264,7 +264,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         vbk <- 0.14
         linf <- 100
         t0 <- -0.01
-        CVlen <- 0.2
+        CVlen <- 0.1
         lwa <- 5e-06
         lwb <- 3
 
@@ -283,8 +283,8 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         ## variation terms
         SigmaF <- 0.3
-        SigmaC <- 0.2
-        SigmaI <- 0.2
+        SigmaC <- 0.1
+        SigmaI <- 0.1
         SigmaR <- 0.6
 
         ## bins
