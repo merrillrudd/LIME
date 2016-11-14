@@ -108,6 +108,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$lwa <- lwa
     Outs$lwb <- lwb
     Outs$S50 <- S50
+    Outs$SL50 <- SL50
     Outs$h <- h
     Outs$qcoef <- qcoef
     Outs$M <- M
@@ -120,6 +121,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$L_a <- L_a
     Outs$W_a <- W_a
     Outs$M50 <- M50
+    Outs$ML50 <- ML50
     Outs$Mat_a <- Mat_a
     Outs$Fequil <- Fequil
     Outs$Frate <- Frate
