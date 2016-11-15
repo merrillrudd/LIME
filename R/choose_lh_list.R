@@ -40,7 +40,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fmax <- 0.7
 
         ## variation terms
-        SigmaF <- 0.3
+        SigmaF <- 0.2
         SigmaC <- 0.1
         SigmaI <- 0.1
         SigmaR <- 0.6
@@ -153,7 +153,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fmax <- 0.7
 
         ## variation terms
-        SigmaF <- 0.3
+        SigmaF <- 0.2
         SigmaC <- 0.1
         SigmaI <- 0.1
         SigmaR <- 0.6
@@ -282,7 +282,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fmax <- 0.7
 
         ## variation terms
-        SigmaF <- 0.3
+        SigmaF <- 0.2
         SigmaC <- 0.1
         SigmaI <- 0.1
         SigmaR <- 0.6
