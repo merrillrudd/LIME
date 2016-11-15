@@ -16,6 +16,7 @@ data_avail_settings <- function(avail_set, ESS, simulation=TRUE){
         settings <- list()
         Nyears <- 20
         if("Rich_LC" %in% avail_set){
+            Nyears <- 50
             settings$Rich_LC <- list(Nyears=Nyears, comp_sample=1000, obs_per_yr=rep(ESS,Nyears), Nyears_comp=Nyears, alt_yrs=FALSE, sample=FALSE)
         }
         if("Moderate_LC" %in% avail_set){
