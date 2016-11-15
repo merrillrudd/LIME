@@ -106,6 +106,7 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
+  Type pAgeMax = AgeMax - Type(1);
 
   // Transform vectors
   vector<Type> F_t(n_t);
@@ -168,8 +169,8 @@ Type objective_function<Type>::operator() ()
   for(int a=0;a<AgeMax;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
-    if(a>=1 & a<(AgeMax-1)) N_ta(0,a) = N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1));
-    if(a==(AgeMax-1)) N_ta(0,a) = (N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1)))/(1-exp(-M-F_t(0)*S_a(a)));
+    if(a>=1 & a<pAgeMax) N_ta(0,a) = N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1));
+    if(a==pAgeMax) N_ta(0,a) = (N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1)))/(1-exp(-M-F_t(0)*S_a(a)));
 
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a)*Mat_a(a)*W_a(a);
@@ -201,8 +202,8 @@ Type objective_function<Type>::operator() ()
       
       // Population abundance
       if(t>=1 & a==0) N_ta(t,a) = R_t(t);
-      if(t>=1 & a>=1 & a<(AgeMax-1)) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
-      if(t>=1 & a==(AgeMax-1)) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
+      if(t>=1 & a>=1 & a<pAgeMax) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
+      if(t>=1 & a==pAgeMax) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
@@ -298,11 +299,11 @@ Type objective_function<Type>::operator() ()
         Na0(t,a) = 1;
         Naf(t,a) = 1;
       }
-      if(a>0 & a<(AgeMax-1)){
+      if(a>0 & a<pAgeMax){
         Na0(t,a) = Na0(t,a-1)*exp(-M);
         Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
       }
-      if(a==(AgeMax-1)){
+      if(a==pAgeMax){
         Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
         Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t)))/(1-exp(-M-S_a(a-1)*F_t(t)));
       }
