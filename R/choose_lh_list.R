@@ -37,12 +37,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## fishing mortality
         Fequil <- 0.25 #0.34 rate from previous studies
         Frate <- 0.2
-        Fmax <- 0.7
+        Fmax <- 0.5
 
         ## variation terms
         SigmaF <- 0.2
-        SigmaC <- 0.1
-        SigmaI <- 0.1
+        SigmaC <- 0.2
+        SigmaI <- 0.2
         SigmaR <- 0.6
 
         ## selectivity
@@ -150,12 +150,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.7
+        Fmax <- 0.5
 
         ## variation terms
         SigmaF <- 0.2
-        SigmaC <- 0.1
-        SigmaI <- 0.1
+        SigmaC <- 0.2
+        SigmaI <- 0.2
         SigmaR <- 0.6
 
         ## bins
@@ -279,12 +279,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         Fequil <- 0.25
         Frate <- 0.2
         F1 <- 0.05
-        Fmax <- 0.7
+        Fmax <- 0.5
 
         ## variation terms
         SigmaF <- 0.2
-        SigmaC <- 0.1
-        SigmaI <- 0.1
+        SigmaC <- 0.2
+        SigmaI <- 0.2
         SigmaR <- 0.6
 
         ## bins
