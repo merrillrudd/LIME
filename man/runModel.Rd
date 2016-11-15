@@ -5,9 +5,8 @@
 \title{run LIME model - simulation mode}
 \usage{
 runModel(modpath, itervec, estimate_same = FALSE, REML = FALSE, est_sigma,
-  biascorrect = TRUE, data_avail, lh_list, sensitivity_inputs = NULL,
-  sensitivity_ESS = NULL, rewrite, start_f, simulation = TRUE,
-  input_data = NULL)
+  data_avail, lh_list, sensitivity_inputs = NULL, sensitivity_ESS = NULL,
+  rewrite, start_f, simulation = TRUE, input_data = NULL)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -19,8 +18,6 @@ runModel(modpath, itervec, estimate_same = FALSE, REML = FALSE, est_sigma,
 \item{REML}{default off (FALSE)}
 
 \item{est_sigma}{which variance parameters to estimate, match parameter names}
-
-\item{biascorrect}{bias correction for recruitment deviatiosn on (TRUE) or off (FALSE)}
 
 \item{data_avail}{other settings for data availability}
 
