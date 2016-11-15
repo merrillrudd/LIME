@@ -70,7 +70,7 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(SigRprior);
 
     // bias adjustment
-    DATA_VECTOR(RecDev_biasadj); 
+    // DATA_VECTOR(RecDev_biasadj); 
 
 
   // ======== Parameters =================================
@@ -159,13 +159,15 @@ Type objective_function<Type>::operator() ()
   vector<Type> C_t_hat(n_t);
   vector<Type> Cw_t_hat(n_t);
 
-  // initialize
-  R_t(0) = exp(beta) * exp(Nu_input(0) - RecDev_biasadj(0)*pow(sigma_R,2)/Type(2));
+  // initialize first year
+  R_t(0) = exp(beta) * exp(Nu_input(0) - pow(sigma_R,2)/Type(2)); //RecDev_biasadj(0)*pow(sigma_R,2)/Type(2));
 
   N_t(0) = 0;
   SB_t(0) = 0;
   C_t_hat(0) = 0;
   Cw_t_hat(0) = 0;
+
+  // first year age structure
   for(int a=0;a<AgeMax;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
@@ -179,44 +181,44 @@ Type objective_function<Type>::operator() ()
     Cn_ta(0,a) = N_ta(0,a) * (Type(1.0)-exp(-M-F_t(0)*S_a(a))) * (F_t(0)*S_a(a))/(M+F_t(0)*S_a(a));
 
     //Annual values
-    if(a>0) N_t(0) += N_ta(0,a);
-    if(a>0) SB_t(0) += SB_ta(0,a);
+    N_t(0) += N_ta(0,a);
+    SB_t(0) += SB_ta(0,a);
     C_t_hat(0) += Cn_ta(0,a);
     Cw_t_hat(0) += Cn_ta(0,a)*W_a(a);
   }
 
+
   // Project forward in time
   for(int t=1;t<n_t;t++){
-    // Recruitment
-      // single global mean recruitment
-    // if(RecType==2) R_t(t) = exp(beta) * exp(Nu_input(t) - RecDev_biasadj(t)*pow(sigma_R,2)/Type(2));
-      // Beverton-Holt
-    R_t(t) = ((4*h*exp(beta)*SB_t(t-1)) / (SB0*(1-h)+SB_t(t-1)*(5*h-1))) * exp(Nu_input(t) - RecDev_biasadj(t)*pow(sigma_R,2)/Type(2));
-    
+
     // Age-structured dynamics
     N_t(t) = 0;
     SB_t(t) = 0;
     C_t_hat(t) = 0;
     Cw_t_hat(t) = 0;
-    for(int a=0;a<AgeMax;a++){
-      
-      // Population abundance
-      if(t>=1 & a==0) N_ta(t,a) = R_t(t);
-      if(t>=1 & a>=1 & a<pAgeMax) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
-      if(t>=1 & a==pAgeMax) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
 
-      // Spawning biomass
-      SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
-      
-      // Catch
-      Cn_ta(t,a) = N_ta(t,a) * (Type(1.0)-exp(-M-F_t(t)*S_a(a))) * (F_t(t)*S_a(a))/(M+F_t(t)*S_a(a));
+    for(int a=1;a<AgeMax;a++){
+        // Population abundance
+        if(a<pAgeMax) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
+        if(a==pAgeMax) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
+        
+        // Spawning biomass
+        SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
 
-      //Annual values
-      if(a>0) N_t(t) += N_ta(t,a);
-      if(a>0) SB_t(t) += SB_ta(t,a);
-      C_t_hat(t) += Cn_ta(t,a);
-      Cw_t_hat(t) += Cn_ta(t,a)*W_a(a);
+        // Catch
+        Cn_ta(t,a) = N_ta(t,a) * (Type(1.0)-exp(-M-F_t(t)*S_a(a))) * (F_t(t)*S_a(a))/(M+F_t(t)*S_a(a));
+
+        //Annual values
+        N_t(t) += N_ta(t,a);
+        SB_t(t) += SB_ta(t,a);
+        C_t_hat(t) += Cn_ta(t,a);
+        Cw_t_hat(t) += Cn_ta(t,a)*W_a(a);
+
     }
+
+    R_t(t) = ((4*h*exp(beta)*SB_t(t)) / (SB0*(1-h)+SB_t(t)*(5*h-1))) * exp(Nu_input(t) - pow(sigma_R,2)/Type(2));//RecDev_biasadj(t)*pow(sigma_R,2)/Type(2));
+    N_ta(t,0) = R_t(t);
+ 
   }
 
   // ========== Length composition ================================
