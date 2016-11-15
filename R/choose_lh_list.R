@@ -179,7 +179,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
 
-        AgeMax <- round(-log(0.01)/M)
+        AgeMax <- ceiling(-log(0.01)/M)
         ages <- start_ages:AgeMax
         M50 <- ceiling(t0-log(1-(ML50/linf))/vbk)
         A95 <- M50+1
@@ -309,13 +309,13 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         if("R0" %in% param_adjust) R0 <- val[which(param_adjust=="R0")]
         if("binwidth" %in% param_adjust) binwidth <- val[which(param_adjust=="binwidth")]
 
-        AgeMax <- round(-log(0.01)/M)
+        AgeMax <- ceiling(-log(0.01)/M)
         ages <- start_ages:AgeMax
-        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        M50 <- ceiling(t0-log(1-(ML50/linf))/vbk)
         A95 <- M50+1
-        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
+        ML95 <- ceiling(linf*(1-exp(-vbk*(A95-t0))))
         S95 <- S50+1
-        SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
+        SL95 <- ceiling(linf*(1-exp(-vbk*(S95-t0))))
 
         mids <- seq(from=(binwidth/2), to=linf*1.5, by=binwidth) 
         highs <- mids + (binwidth/2)
