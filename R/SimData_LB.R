@@ -107,7 +107,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             R_t <- Rpulse_t * exp(RecDev)
         }
         if(Rdynamics=="BH"){
-            R_t[1] <- R0
+            R_t[1] <- R0 * exp(RecDev[1])
         }
 
     ## year 1
@@ -150,6 +150,14 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 
         ## age-structured dynamics
         for(a in 1:length(L_a)){
+            if(Rdynamics=="BH"){
+                if(h==1) h_use <- 0.7
+                if(h!=1) h_use <- h
+                R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1]*(5*h_use-1))) * exp(RecDev[y])
+            }
+            if(a==1){
+                N_at[a,y] <- R_t[y]
+            }
             if(a>1 & a<length(L_a)){
                 N_at[a,y] <- N_at[a-1,y-1]*exp(-M-F_t[y-1]*S_a[a-1])
             }
@@ -165,15 +173,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             ## catch
             Cn_at[,y] <- N_at[,y] * (1-exp(-M-F_t[y]*S_a)) * (F_t[y]*S_a)/(M+F_t[y]*S_a)
 
-            if(Rdynamics=="BH"){
-                if(h==1) h_use <- 0.7
-                if(h!=1) h_use <- h
-                R_t[y] <- (4 * h_use * R0 * SB_t[y] / ( SB0*(1-h_use) + SB_t[y]*(5*h_use-1))) * exp(RecDev[y])
-            }
 
-            if(a==1){
-                N_at[a,y] <- R_t[y]
-            }
         }
     }
     Cn_t <- colSums(Cn_at)
