@@ -209,6 +209,25 @@ generateData <- function(modpath, modname, itervec, spatial, Fdynamics, Rdynamic
 
 }
 
+png(file.path(modpath, "True_vals.png"), height=8, width=15, res=200, units="in")
+par(mfrow=c(3,1))
+plot(x=1, y=1, type="n", xlim=1:Nyears, ylim=c(0,5), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
+for(ii in 1:length(iterpath)){
+    true <- readRDS(file.path(modpath, ii, "True.rds"))  
+    lines(true$F_t, col="blue")
+}
+plot(x=1, y=1, type="n", xlim=1:Nyears, ylim=c(0,3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
+for(ii in 1:length(iterpath)){
+    true <- readRDS(file.path(modpath, ii, "True.rds"))  
+    lines(true$R_t/max(true$R_t), col="blue")
+}
+plot(x=1, y=1, type="n", xlim=1:Nyears, ylim=c(0,1.3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
+for(ii in 1:length(iterpath)){
+    true <- readRDS(file.path(modpath, ii, "True.rds"))  
+    lines(true$D_t, col="blue")
+}
+dev.off()
+
   if(write==TRUE) return(paste0(length(itervec), " iterates of data generated in ", modpath))
 
 }
