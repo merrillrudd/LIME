@@ -124,7 +124,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     for(a in 2:length(W_a)){
         Na0[a] <- R0 * exp(-M*(a-1))
     }
-    SB0 <- sum(Na0[-1]*Mat_a[-1]*W_a[-1])
+    SB0 <- sum(Na0*Mat_a*W_a)
 
     for(y in 2:tyears){
         ## fishing effort and recruitment, not dependent on age structure
@@ -172,7 +172,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             }
         }
         ## spawning biomass
-        SB_t[y] <- sum((N_at[,y] * W_a * Mat_a)[-1])
+        SB_t[y] <- sum((N_at[,y] * W_a * Mat_a))
         VB_t[y] <- sum(N_at[,y] * W_a * S_a)
         TB_t[y] <- sum(N_at[,y] * W_a)
 
