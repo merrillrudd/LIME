@@ -71,7 +71,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
 
         ## derived
-        mids <- seq((binwidth/2), linf*1.5, by=binwidth) # from 120 cm
+        mids <- seq(from=(binwidth/2), to=linf*1.5, by=binwidth) 
         highs <- mids + (binwidth/2)
         lows <- mids - (binwidth)/2
         
@@ -188,7 +188,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         S95 <- S50+1
         SL95 <- ceiling(linf*(1-exp(-vbk*(S95-t0))))
 
-        mids <- seq((binwidth/2), by=binwidth, length=76) ## max 76 from the data, but set to something at least 1.2* expected Linf
+        mids <- seq(from=(binwidth/2), to=linf*1.5, by=binwidth) 
         highs <- mids + (binwidth/2)
         lows <- mids - (binwidth)/2
 
@@ -317,7 +317,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         S95 <- S50+1
         SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
 
-        mids <- seq((binwidth/2), by=binwidth, length=76) ## max 76 from the data, but set to something at least 1.2* expected Linf
+        mids <- seq(from=(binwidth/2), to=linf*1.5, by=binwidth) 
         highs <- mids + (binwidth/2)
         lows <- mids - (binwidth)/2
 
