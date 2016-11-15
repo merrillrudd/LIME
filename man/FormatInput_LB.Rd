@@ -6,9 +6,9 @@
 \usage{
 FormatInput_LB(Nyears, DataList, linf, vbk, t0, M, AgeMax, lbhighs, lbmids,
   Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, qcoef, R0,
-  S50, model, RecDev_biasadj, site, Fpen, Dpen, Dprior, SigRpen, SigRprior,
-  obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML,
-  estimate_same, start_f)
+  S50, model, site, Fpen, Dpen, Dprior, SigRpen, SigRprior, obs_per_yr, SigmaF,
+  RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML, estimate_same,
+  start_f)
 }
 \arguments{
 \item{Nyears}{total number of years to model}
@@ -52,8 +52,6 @@ FormatInput_LB(Nyears, DataList, linf, vbk, t0, M, AgeMax, lbhighs, lbmids,
 \item{S50}{starting value from input list}
 
 \item{model}{data type availability}
-
-\item{RecDev_biasadj}{starting values for rec devs}
 
 \item{site}{artifact of development: how many sites to estimate values?}
 
