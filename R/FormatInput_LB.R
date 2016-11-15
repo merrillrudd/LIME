@@ -23,7 +23,6 @@
 #' @param R0 starting value from input list
 #' @param S50 starting value from input list
 #' @param model data type availability
-#' @param RecDev_biasadj starting values for rec devs
 #' @param site artifact of development: how many sites to estimate values?
 #' @param Fpen penalty on fishing mortality 0= off, 1=on
 #' @param Dpen penalty on terminal depletion 0= off, 1=on
@@ -46,7 +45,7 @@
 #' @export
 FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
     lbhighs, lbmids, Mat_a, lwa, lwb, log_sigma_C, log_sigma_I, log_CV_L, F1, SigmaR, 
-    qcoef, R0, S50, model, RecDev_biasadj, site,
+    qcoef, R0, S50, model, site,
     Fpen, Dpen, Dprior, SigRpen, SigRprior, obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML, estimate_same, start_f){
 
         # if(length(Mat_a)==AgeMax) Mat_a <- c(1e-20, Mat_a)
@@ -68,8 +67,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=DataList$LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## same as above but fit to mean length data instead of length composition data
@@ -89,8 +87,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=rowMeans(DataList$LF), LF=as.matrix(0),
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## index and length composition data
@@ -120,8 +117,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
         ## index only
         if(grepl("Index", model) & grepl("LC", model) & grepl("LC0", model)){
@@ -143,8 +139,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## index and mean length data
@@ -174,8 +169,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=rowMeans(LF), LF=as.matrix(0),
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## catch and length composition data
@@ -205,8 +199,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## catch only
@@ -229,8 +222,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
 
@@ -261,8 +253,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=rowMeans(LF), LF=as.matrix(0),
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## length composition data only 
@@ -292,8 +283,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
                 ML_t=as.vector(0), LF=LF,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=lbhighs, lbmids=lbmids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, 
-                RecDev_biasadj=RecDev_biasadj)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
         ## set input parameters - regardless of data availability        
