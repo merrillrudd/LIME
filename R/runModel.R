@@ -85,8 +85,6 @@ for(iter in itervec){
         DataList <- inits
         saveRDS(DataList, file.path(iterpath, "obsData.rds"))
     }
-
-  if(grepl("LBSPR", modpath)==FALSE){
     
     # if(biascorrect==FALSE) vec <- 1
     # if(biascorrect==TRUE) vec <- 1:2
@@ -255,7 +253,6 @@ for(iter in itervec){
         rm(obj_save)
   }
 
-}
 
 return(paste0(max(itervec), " iterates run in ", modpath))
 
