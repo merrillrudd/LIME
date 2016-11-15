@@ -121,16 +121,16 @@ Type objective_function<Type>::operator() ()
 
 
   // ========= Convert inputs  =============================
-  vector<Type> L_a(AgeMax+1);
-  vector<Type> W_a(AgeMax+1);
-  for(int a=0;a<=AgeMax;a++){
+  vector<Type> L_a(AgeMax);
+  vector<Type> W_a(AgeMax);
+  for(int a=0;a<AgeMax;a++){
     L_a(a) = linf*(1-exp(-vbk*(a - t0)));
     W_a(a) = lwa*pow(L_a(a), lwb);
   }
 
-  vector<Type> S_a(AgeMax+1);
-  S_a(0) = 1e-20;
-  for(int a=1;a<=AgeMax;a++){
+  vector<Type> S_a(AgeMax);
+  // S_a(0) = 1e-20;
+  for(int a=0;a<AgeMax;a++){
     S_a(a) = 1 / (1 + exp(S50 - a));
   }
   
@@ -143,16 +143,16 @@ Type objective_function<Type>::operator() ()
 
   // ============ equilibrium spawning biomass ===============
   Type SB0 = 0;
-  for(int a=1;a<=AgeMax;a++){
+  for(int a=0;a<AgeMax;a++){
     SB0 += exp(beta) * exp(-M*Type(a)) * W_a(a) * Mat_a(a);
   }
   
   // ============ Project dynamics ===========================
 
   vector<Type> R_t(n_t);
-  matrix<Type> N_ta(n_t,AgeMax+1);
-  matrix<Type> SB_ta(n_t,AgeMax+1);
-  matrix<Type> Cn_ta(n_t,AgeMax+1);
+  matrix<Type> N_ta(n_t,AgeMax);
+  matrix<Type> SB_ta(n_t,AgeMax);
+  matrix<Type> Cn_ta(n_t,AgeMax);
   vector<Type> N_t(n_t);
   vector<Type> SB_t(n_t);
   vector<Type> C_t_hat(n_t);
@@ -165,11 +165,11 @@ Type objective_function<Type>::operator() ()
   SB_t(0) = 0;
   C_t_hat(0) = 0;
   Cw_t_hat(0) = 0;
-  for(int a=0;a<=AgeMax;a++){
+  for(int a=0;a<AgeMax;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
-    if(a>=1 & a<AgeMax) N_ta(0,a) = N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1));
-    if(a==AgeMax) N_ta(0,a) = (N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1)))/(1-exp(-M-F_t(0)*S_a(a)));
+    if(a>=1 & a<(AgeMax-1)) N_ta(0,a) = N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1));
+    if(a==(AgeMax-1)) N_ta(0,a) = (N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1)))/(1-exp(-M-F_t(0)*S_a(a)));
 
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a)*Mat_a(a)*W_a(a);
@@ -197,12 +197,12 @@ Type objective_function<Type>::operator() ()
     SB_t(t) = 0;
     C_t_hat(t) = 0;
     Cw_t_hat(t) = 0;
-    for(int a=0;a<=AgeMax;a++){
+    for(int a=0;a<AgeMax;a++){
       
       // Population abundance
       if(t>=1 & a==0) N_ta(t,a) = R_t(t);
-      if(t>=1 & a>=1 & a<AgeMax) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
-      if(t>=1 & a==AgeMax) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
+      if(t>=1 & a>=1 & a<(AgeMax-1)) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
+      if(t>=1 & a==(AgeMax-1)) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
@@ -221,9 +221,9 @@ Type objective_function<Type>::operator() ()
   // ========== Length composition ================================
 
   /////probability of being in a length bin given age
-  matrix<Type> plba(AgeMax+1,n_lb);
+  matrix<Type> plba(AgeMax,n_lb);
   Type sum_sublast = 0;
-  for(int a=0;a<=AgeMax;a++){
+  for(int a=0;a<AgeMax;a++){
     for(int l=0;l<n_lb;l++){
       if(l==0){
         plba(a,l) = pnorm(lbhighs(l), L_a(a), L_a(a)*CV_L);
@@ -241,9 +241,9 @@ Type objective_function<Type>::operator() ()
   }
 
   // probability of being harvested at an age
-  matrix<Type> page(n_t,AgeMax+1);
+  matrix<Type> page(n_t,AgeMax);
   for(int t=0;t<n_t;t++){
-    for(int a=0;a<=AgeMax;a++){
+    for(int a=0;a<AgeMax;a++){
       page(t,a) = (N_ta(t,a)*S_a(a))/(N_t(t));
     }
   }
@@ -272,7 +272,7 @@ Type objective_function<Type>::operator() ()
   Type temp = 0;
   Type temp2 = 0;
   for(int t=0;t<n_t;t++){
-    for(int a=0;a<=AgeMax;a++){
+    for(int a=0;a<AgeMax;a++){
       temp2 += N_ta(t,a)*S_a(a);
     }
     Vul_pop(t) = temp2;
@@ -285,24 +285,24 @@ Type objective_function<Type>::operator() ()
   }
 
   // ========= spawning potential ratio ==============================
-  matrix<Type> Na0(n_t,AgeMax+1);
-  matrix<Type> Naf(n_t,AgeMax+1);
+  matrix<Type> Na0(n_t,AgeMax);
+  matrix<Type> Naf(n_t,AgeMax);
   vector<Type> SB0_t(n_t);
   vector<Type> SBf_t(n_t);
   SB0_t.setZero();
   SBf_t.setZero();
   vector<Type> SPR_t(n_t);
   for(int t=0;t<n_t;t++){
-    for(int a=0;a<=AgeMax;a++){
+    for(int a=0;a<AgeMax;a++){
       if(a==0){
         Na0(t,a) = 1;
         Naf(t,a) = 1;
       }
-      if(a>0 & a<AgeMax){
+      if(a>0 & a<(AgeMax-1)){
         Na0(t,a) = Na0(t,a-1)*exp(-M);
         Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
       }
-      if(a==AgeMax){
+      if(a==(AgeMax-1)){
         Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
         Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t)))/(1-exp(-M-S_a(a-1)*F_t(t)));
       }
