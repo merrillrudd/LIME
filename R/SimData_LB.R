@@ -78,22 +78,37 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         "managed"=rep(Fmax/3, Nyears-floor(Nyears/2)-floor((Nyears-floor(Nyears/2))/2)))
     if(Fdynamics=="Constant") Fconstant_t <- c(rep(F1, nburn), rep(Fequil, Nyears))
     if(Fdynamics=="Increasing") Finc_t <- c(rep(F1, nburn), seq(F1, Fmax, length=Nyears))
+    if(Fdynamics=="None") F_t <- rep(0, tyears)
 
     if(Rdynamics=="Pulsed") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)),
         "pulse_down"=rep(R0/3, floor(Nyears/3)), "pulse_up"=rep(R0, Nyears-floor(Nyears/3)))
     if(Rdynamics=="Pulsed_up") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)), "pulse_up"=rep(R0*3, floor(Nyears/3)), "pulse_down"=rep(R0, Nyears-floor(Nyears/3)))
     if(Rdynamics=="Constant") Rconstant_t <- rep(R0, tyears)
 
-    ##########################
-    ## Initialization
-    ##########################
-    if(Fdynamics=="Endogenous") F_t[1] <- F1
-    if(Fdynamics=="Ramp") F_t[1] <- F1
-    if(Fdynamics=="Constant") F_t[1] <- Fequil
-    if(Fdynamics=="Increasing") F_t[1] <- F1
-    if(Fdynamics=="None") F_t[1] <- 0
-
-    R_t[1] <- R0
+        if(Fdynamics=="Ramp"){
+            F_t <- Framp_t * exp(FishDev)
+        }
+        if(Fdynamics=="Constant"){
+            F_t <- Fconstant_t * exp(FishDev)
+        }
+        if(Fdynamics=="Increasing"){
+            F_t <- Finc_t * exp(FishDev)
+        }
+        if(Fdynamics=="Endogenous"){
+            F_t[1] <- F1
+        }
+        if(Rdynamics=="Constant"){
+            R_t <- Rconstant_t * exp(RecDev)
+        }
+        if(Rdynamics=="Pulsed"){
+            R_t <- Rpulse_t * exp(RecDev)
+        }
+        if(Rdynamics=="Pulsed_up"){
+            R_t <- Rpulse_t * exp(RecDev)
+        }
+        if(Rdynamics=="BH"){
+            R_t[1] <- R0
+        }
 
     ## year 1
     for(a in 1:length(L_a)){
@@ -132,52 +147,34 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
             if(y <= nburn) F_t[y] <- F1
             if(y > nburn) F_t[y] <- F_t[y-1]*(SB_t[y-1]/(Fequil*SB0))^Frate * exp(FishDev[y])
         }
-        if(Fdynamics=="Ramp"){
-            F_t[y] <- Framp_t[y] * exp(FishDev[y])
-        }
-        if(Fdynamics=="Constant"){
-            F_t[y] <- Fconstant_t[y] * exp(FishDev[y])
-        }
-        if(Fdynamics=="Increasing"){
-            F_t[y] <- Finc_t[y] * exp(FishDev[y])
-        }
-        if(Fdynamics=="None"){
-            F_t[y] <- 0
-        }
-        if(Rdynamics=="Constant"){
-            R_t[y] <- Rconstant_t[y] * exp(RecDev[y])
-        }
-        if(Rdynamics=="Pulsed"){
-            R_t[y] <- Rpulse_t[y] * exp(RecDev[y])
-        }
-        if(Rdynamics=="Pulsed_up"){
-            R_t[y] <- Rpulse_t[y] * exp(RecDev[y])
-        }
-        if(Rdynamics=="BH"){
-            if(h==1) h_use <- 0.7
-            if(h!=1) h_use <- h
-            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1]*(5*h_use-1))) * exp(RecDev[y])
-        }
-        
+
         ## age-structured dynamics
         for(a in 1:length(L_a)){
-            if(a==1){
-                N_at[a,y] <- R_t[y]
-            }
             if(a>1 & a<length(L_a)){
                 N_at[a,y] <- N_at[a-1,y-1]*exp(-M-F_t[y-1]*S_a[a-1])
             }
             if(a==length(L_a)){
                 N_at[a,y] <- (N_at[a-1,y-1] + N_at[a,y-1])*exp(-M-F_t[y-1]*S_a[a-1])
             }
-        }
-        ## spawning biomass
-        SB_t[y] <- sum((N_at[,y] * W_a * Mat_a))
-        VB_t[y] <- sum(N_at[,y] * W_a * S_a)
-        TB_t[y] <- sum(N_at[,y] * W_a)
 
-        ## catch
-        Cn_at[,y] <- N_at[,y] * (1-exp(-M-F_t[y]*S_a)) * (F_t[y]*S_a)/(M+F_t[y]*S_a)
+            ## spawning biomass
+            SB_t[y] <- sum((N_at[,y] * W_a * Mat_a))
+            VB_t[y] <- sum(N_at[,y] * W_a * S_a)
+            TB_t[y] <- sum(N_at[,y] * W_a)
+
+            ## catch
+            Cn_at[,y] <- N_at[,y] * (1-exp(-M-F_t[y]*S_a)) * (F_t[y]*S_a)/(M+F_t[y]*S_a)
+
+            if(Rdynamics=="BH"){
+                if(h==1) h_use <- 0.7
+                if(h!=1) h_use <- h
+                R_t[y] <- (4 * h_use * R0 * SB_t[y] / ( SB0*(1-h_use) + SB_t[y]*(5*h_use-1))) * exp(RecDev[y])
+            }
+
+            if(a==1){
+                N_at[a,y] <- R_t[y]
+            }
+        }
     }
     Cn_t <- colSums(Cn_at)
     Cw_t <- colSums(Cn_at * W_a)
