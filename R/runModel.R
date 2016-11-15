@@ -6,7 +6,6 @@
 #' @param itervec number of iterations of data to generate
 #' @param data_avail other settings for data availability
 #' @param est_sigma which variance parameters to estimate, match parameter names
-#' @param biascorrect bias correction for recruitment deviatiosn on (TRUE) or off (FALSE)
 #' @param sensitivity_inputs (in development) named list (parameters) with matrix of 2 rows (low, high) and # of columns for 'life histories' (artifact of testing multiple life histories in the simulation, would only have 1 column for an assessment)
 #' @param sensitivity_ESS (in development) will do sensitivity analysis for effective sample size of length composition
 #' @param REML default off (FALSE)
@@ -22,7 +21,7 @@
 #' 
 #' @details need to adjust to run with real data
 #' @export
-runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, biascorrect=TRUE, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE, input_data=NULL){
+runModel <- function(modpath, itervec, estimate_same=FALSE, REML=FALSE, est_sigma, data_avail, lh_list, sensitivity_inputs=NULL, sensitivity_ESS=NULL, rewrite, start_f, simulation=TRUE, input_data=NULL){
 
   if(simulation==TRUE){
     lh_num <- ifelse(grepl("LH1", modpath), 1, ifelse(grepl("LH2", modpath), 2, ifelse(grepl("LH3", modpath), 3, ifelse(grepl("LH4", modpath), 4, ifelse(grepl("LH5", modpath), 5, ifelse(grepl("CRSNAP", modpath), "CRSNAP", ifelse(grepl("SIGSUT", modpath), "SIGSUT", ifelse(grepl("HAKE", modpath), "HAKE", stop("No match to life history number")))))))))
@@ -89,13 +88,13 @@ for(iter in itervec){
 
   if(grepl("LBSPR", modpath)==FALSE){
     
-    if(biascorrect==FALSE) vec <- 1
-    if(biascorrect==TRUE) vec <- 1:2
+    # if(biascorrect==FALSE) vec <- 1
+    # if(biascorrect==TRUE) vec <- 1:2
     Sdreport <- NA
     ParList <- NA  
     df <- NULL
 
-    for(bb in vec){
+    # for(bb in vec){
       if(all(is.na(Sdreport))) RecDev_biasadj <- rep(0, Nyears)
       if(all(is.na(Sdreport))==FALSE){
           SD <- summary(Sdreport)
@@ -103,24 +102,26 @@ for(iter in itervec){
       }
       if(all(is.na(RecDev_biasadj))) RecDev_biasadj <- rep(0, Nyears)
       TmbList <- FormatInput_LB(Nyears=Nyears, DataList=DataList, linf=inits$linf, vbk=inits$vbk, t0=inits$t0, M=inits$M, AgeMax=inits$AgeMax, lbhighs=inits$highs, lbmids=inits$mids, Mat_a=inits$Mat_a, lwa=inits$lwa, lwb=inits$lwb, log_sigma_C=inits$log_sigma_C, log_sigma_I=inits$log_sigma_I, log_CV_L=inits$log_CV_L, F1=inits$F1, SigmaR=inits$SigmaR, qcoef=inits$qcoef, R0=inits$R0, S50=inits$S50, model=as.character(modname), RecDev_biasadj=RecDev_biasadj,SigmaF=inits$SigmaF, Fpen=1, Dpen=0, Dprior=c(0.8, 0.2), SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), obs_per_yr=obs_per_yr, RecType=0, FType=0, LType=1, h=inits$h, SelexTypeDesc="asymptotic", est_sigma=est_sigma, REML=REML, site=1, estimate_same=FALSE, start_f=start_f)
-      if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.rds")) 
-      if(bb==2) saveRDS(TmbList, file.path(iterpath, "Inputs2.rds"))  
+      saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
+
+      # if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.rds")) 
+      # if(bb==2) saveRDS(TmbList, file.path(iterpath, "Inputs2.rds"))  
 
       # dyn.load(paste0(run_exe, "\\", dynlib(version)))     
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
       ## create objects to save best results
-      if(bb==1){
+      # if(bb==1){
         obj_save <- NULL
         jnll <- NULL
         opt_save <- NULL
         opt_save[["final_gradient"]] <- NA
-      }
+      # }
 
       ## first run
       obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-        # if(bb==1) check_id <- Check_Identifiable2(obj)[[4]]
+        # if(bb==1) check_id <- Check_Identifiable(obj)[[4]]
         # fix_f <- grep("Bad", check_id[which(check_id[,"Param"]=="log_F_t_input"),3])      
         # good_f <- c(1:Nyears)[which(1:Nyears %in% fix_f == FALSE)] 
         # TmbList$Map[["log_F_t_input"]] = 1:length(TmbList$Parameters[["log_F_t_input"]])
@@ -130,6 +131,8 @@ for(iter in itervec){
         #   TmbList$Data$fix_f <- fix_f
         #   TmbList$Data$fill_f <- good_f[length(good_f)]
         # }
+      # if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.1.rds"))
+      # obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
 
 
       ## Settings
@@ -137,10 +140,11 @@ for(iter in itervec){
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
-        Upr[match("log50", names(obj$par))] = log(inits$AgeMax)
+        Upr[match("logS50", names(obj$par))] = log(inits$AgeMax)
         Upr[which(names(obj$par)=="log_F_t_input")] = log(10)
         Upr[match("log_F_sd", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
+        Lwr[match("logS50", names(obj$par))] = log(1)
 
         ## Run optimizer
         opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
@@ -179,7 +183,7 @@ for(iter in itervec){
         if(all(is.na(opt_save))==FALSE){  
 
           ## check convergence -- don't let it become NA after it has had a high final gradient
-          for(i in 1:5){
+          for(i in 1:2){
             if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
                if(abs(min(opt_save[["final_gradient"]]))>0.01){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
@@ -215,28 +219,30 @@ for(iter in itervec){
 
 
         ## write error message in directory if opt wouldn't run
-        if(bb==length(vec)){
+        # if(bb==length(vec)){
           if(all(is.null(opt_save))) write("NAs final gradient", file.path(iterpath, "NAs_final_gradient.txt"))
           if(all(is.null(opt_save)==FALSE)) if(abs(min(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
-        }
+        # }
 
         ParList <- obj_save$env$parList( x=obj_save$par, par=obj_save$env$last.par.best )
         
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
-        if(bb==length(vec)) saveRDS(Report, file.path(iterpath, "Report.rds"))  
+        # if(bb==length(vec)) saveRDS(Report, file.path(iterpath, "Report.rds"))  
+        saveRDS(Report, file.path(iterpath, "Report.rds"))  
 
-        Sdreport = tryCatch( sdreport(obj_save), error=function(x) NA )
-        if(bb==length(vec)) saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
+        Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
+        # if(bb==length(vec)) saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
+        saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
 
-        if(bb==length(vec)){
+
+        # if(bb==length(vec)){
           Derived = Calc_derived_quants( Obj=obj_save )
-          if(bb==length(vec)) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
-        }
-  
+          # if(bb==length(vec)) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
+          saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
 
-        # dyn.unload( paste0(run_exe,"\\", dynlib(version)) )  
-    } 
+        # }
+      # } 
         if(iter==1) write.csv(df, file.path(modpath, "df.csv"))  
 
         rm(Report)
