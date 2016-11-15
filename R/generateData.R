@@ -216,12 +216,12 @@ for(ii in 1:length(itervec)){
     true <- readRDS(file.path(modpath, ii, "True.rds"))  
     lines(true$F_t, col="blue")
 }
-plot(x=1, y=1, type="n", xlim=1:Nyears, ylim=c(0,3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
+plot(x=1, y=1, type="n", xlim=c(1,Nyears), ylim=c(0,3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
 for(ii in 1:length(itervec)){
     true <- readRDS(file.path(modpath, ii, "True.rds"))  
     lines(true$R_t/max(true$R_t), col="blue")
 }
-plot(x=1, y=1, type="n", xlim=1:Nyears, ylim=c(0,1.3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
+plot(x=1, y=1, type="n", xlim=c(1,Nyears), ylim=c(0,1.3), xaxt="n", yaxt="n", xaxs="i", yaxs="i", ann=F)
 for(ii in 1:length(itervec)){
     true <- readRDS(file.path(modpath, ii, "True.rds"))  
     lines(true$D_t, col="blue")
