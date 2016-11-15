@@ -185,12 +185,12 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     D_t <- SB_t/SB0
 
     if(sample!=FALSE){
-        # C_t <- Cn_t*sample
-        C_t <- Cw_t*sample
+        C_t <- Cn_t*sample
+        Cw_t <- Cw_t*sample
     }
     if(sample==FALSE){
-        # C_t <- Cn_t
-        C_t <- Cw_t
+        C_t <- Cn_t
+        Cw_t <- Cw_t
     }
     CPUE_t <- qcoef * TB_t * exp(EffDev)
 
@@ -218,7 +218,8 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 
     CPUE_tout <- CPUE_t[-c(1:nburn)]
     C_tout <- C_t[-c(1:nburn)]
-            names(C_tout) <- names(CPUE_tout) <- 1:Nyears
+    Cw_tout <- Cw_t[-c(1:nburn)]
+            names(C_tout) <- names(Cw_tout) <- names(CPUE_tout) <- 1:Nyears
 
     LFout <- LF[-c(1:nburn),]
         rownames(LFout) <- 1:Nyears
@@ -239,6 +240,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         yr_vec <- rev(yrs[which(index==1)])
 
         C_tout <- C_tout[which(names(C_tout) %in% yr_vec)]
+        Cw_tout <- Cw_tout[which(names(Cw_tout) %in% yr_vec)]
         CPUE_tout <- CPUE_tout[which(names(CPUE_tout) %in% yr_vec)]
         LFout <- LFout[which(rownames(LFout) %in% yr_vec),]
     }
@@ -257,7 +259,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     if(Nyears_comp>1) ML_t <- sapply(1:nrow(LFout), function(x) sum(LFout[x,]*lbins)/sum(LFout[x,]))
     if(Nyears_comp==1) ML_t <- sum(LFout*lbins)/sum(LFout)
 
-    DataList <- list("I_t"=CPUE_tout, "C_t"=C_tout, "DataScenario"=modname,
+    DataList <- list("I_t"=CPUE_tout, "C_t"=C_tout, "Cw_t"=Cw_tout, "DataScenario"=modname,
         "LF"=LFout, "SigmaR"=SigmaR, "R_t"=R_tout, "N_t"=N_tout, "SB_t"=SB_tout, "D_t"=D_tout, "F_t"=F_tout, 
         "L_t"=L_tout, "N_at"=N_atout, "M50"=M50, "Mat_a"=Mat_a, "SB0"=SB0, "Nyears"=Nyears, "L_a"=L_a,
         "W_a"=W_a, "AgeMax"=AgeMax, "M"=M, "S_a"=S_a, "plb"=plb, "plba"=plba, "page"=page, "R0"=R0, 
