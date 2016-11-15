@@ -49,7 +49,7 @@ FormatInput_LB <- function(Nyears, DataList, linf, vbk, t0, M, AgeMax,
     qcoef, R0, S50, model, RecDev_biasadj, site,
     Fpen, Dpen, Dprior, SigRpen, SigRprior, obs_per_yr, SigmaF, RecType, FType, LType, h, SelexTypeDesc, est_sigma, REML, estimate_same, start_f){
 
-        if(length(Mat_a)==AgeMax) Mat_a <- c(1e-20, Mat_a)
+        # if(length(Mat_a)==AgeMax) Mat_a <- c(1e-20, Mat_a)
         ## Rich, Moderate, and Sample names include catch, index, and length comp data - just vary in the sampling and ESS of composition data
         ## fit to length composition data
         if((grepl("Rich",model) | grepl("Moderate", model) | grepl("Sample", model)) & grepl("LC", model)){
