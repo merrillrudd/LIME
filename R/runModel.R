@@ -119,7 +119,7 @@ for(iter in itervec){
 
       ## first run
       obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-        # if(bb==1) check_id <- Check_Identifiable(obj)[[4]]
+        # check_id <- Check_Identifiable(obj)[[4]]
         # fix_f <- grep("Bad", check_id[which(check_id[,"Param"]=="log_F_t_input"),3])      
         # good_f <- c(1:Nyears)[which(1:Nyears %in% fix_f == FALSE)] 
         # TmbList$Map[["log_F_t_input"]] = 1:length(TmbList$Parameters[["log_F_t_input"]])
