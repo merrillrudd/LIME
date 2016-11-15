@@ -76,11 +76,11 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         lows <- mids - (binwidth)/2
         
         ages <- start_ages:AgeMax
-        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        M50 <- ceiling(t0-log(1-(ML50/linf))/vbk)
         A95 <- M50+1
-        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
-        SL50 <- round(linf*(1-exp(-vbk*(S50-t0))))
-        SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
+        ML95 <- ceiling(linf*(1-exp(-vbk*(A95-t0))))
+        SL50 <- ceiling(linf*(1-exp(-vbk*(S50-t0))))
+        SL95 <- ceiling(linf*(1-exp(-vbk*(S95-t0))))
 
         ## growth at age
         L_a <- linf*(1-exp(-vbk*(ages - t0)))
@@ -181,12 +181,12 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
 
         AgeMax <- round(-log(0.01)/M)
         ages <- start_ages:AgeMax
-        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        M50 <- ceiling(t0-log(1-(ML50/linf))/vbk)
         A95 <- M50+1
-        ML95 <- round(linf*(1-exp(-vbk*(A95-t0))))
+        ML95 <- ceiling(linf*(1-exp(-vbk*(A95-t0))))
         S50 <- ceiling(t0-log(1-(SL50/linf))/vbk)
         S95 <- S50+1
-        SL95 <- round(linf*(1-exp(-vbk*(S95-t0))))
+        SL95 <- ceiling(linf*(1-exp(-vbk*(S95-t0))))
 
         mids <- seq((binwidth/2), by=binwidth, length=76) ## max 76 from the data, but set to something at least 1.2* expected Linf
         highs <- mids + (binwidth/2)
@@ -293,7 +293,7 @@ choose_lh_list <- function(species, selex, param_adjust=FALSE, val=FALSE, start_
         ## selectivity
         ML50 <- 47.4
         S50 <- 2
-        SL50 <- round(t0-log(1-(2/linf))/vbk)
+        SL50 <- ceiling(t0-log(1-(2/linf))/vbk)
 
         ## derived
         M <- 0.15
