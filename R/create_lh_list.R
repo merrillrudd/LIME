@@ -28,7 +28,7 @@
 #' @param start_ages age to start (usually either 0 or 1; default = 0)
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.25, Frate=0.2, Fmax=0.7, start_ages=0){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.2, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=NULL, Fmax=NULL, start_ages=0){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
