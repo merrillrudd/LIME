@@ -2,15 +2,15 @@
 #'
 #' \code{create_inputs} Gets list of parameter inputs into the proper format
 #'
-#' @param param parameter name to adjust (sensitivity analysis)
-#' @param val value of parameter name to adjust (sensitivity analysis)
+#' @param param parameter name to adjust (sensitivity analysis), default=FALSE
+#' @param val value of parameter name to adjust (sensitivity analysis), default=FALSE
 #' @param lh_list tagged list of life history/starting value information
 #' @param data_avail_list artifact from sensitivity analysis, adjusts some information on sample size, years, etc. for different data-availability scenarios
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Specifically used to merge life history information with other model settings; flexibility to change parameter inputs for sensitivity analysis without changing the baseline life history information that was used to generate data in a simulation study, or carefully compiled for real=life application
 #' @export
-create_inputs <- function(param, val, lh_list, data_avail_list){
+create_inputs <- function(param=FALSE, val=FALSE, lh_list, data_avail_list){
     
         ## copy life history
         dat_input <- c(lh_list, data_avail_list)
@@ -51,6 +51,10 @@ create_inputs <- function(param, val, lh_list, data_avail_list){
                 dat_input$lows <- dat_input$highs - dat_input$binwidth
             }
         }
+
+        years_i <- seq_along(dat_input$years)
+        years_o <- which(dat_input$years %in% rownames(dat_input$LF))
+        rownames(dat_input$LF) <- years_o
 
         if(is.null(dat_input$Nyears)) dat_input$Nyears <- length(dat_input$years)
 
