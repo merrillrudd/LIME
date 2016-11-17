@@ -189,7 +189,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
         C_t <- Cn_t
         Cw_t <- Cw_t
     }
-    CPUE_t <- qcoef * TB_t * exp(EffDev)
+    I_t <- qcoef * TB_t * exp(EffDev)
 
     ## age to length comp
     LFinfo <- AgeToLengthComp(L_a=L_a, CVlen=CVlen, highs=highs, lows=lows, tyears=tyears, N_at=N_at, S_a=S_a, comp_sample=rep(comp_sample, tyears))
@@ -213,10 +213,10 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     ## cut out burn-in
     ########################################################
 
-    CPUE_tout <- CPUE_t[-c(1:nburn)]
+    I_tout <- I_t[-c(1:nburn)]
     C_tout <- C_t[-c(1:nburn)]
     Cw_tout <- Cw_t[-c(1:nburn)]
-            names(C_tout) <- names(Cw_tout) <- names(CPUE_tout) <- 1:Nyears
+            names(C_tout) <- names(Cw_tout) <- names(I_tout) <- 1:Nyears
 
     LFout <- LF[-c(1:nburn),]
         rownames(LFout) <- 1:Nyears
@@ -238,7 +238,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
 
         C_tout <- C_tout[which(names(C_tout) %in% yr_vec)]
         Cw_tout <- Cw_tout[which(names(Cw_tout) %in% yr_vec)]
-        CPUE_tout <- CPUE_tout[which(names(CPUE_tout) %in% yr_vec)]
+        I_tout <- I_tout[which(names(I_tout) %in% yr_vec)]
         LFout <- LFout[which(rownames(LFout) %in% yr_vec),]
     }
         LFindex <- (Nyears-Nyears_comp+1):Nyears
@@ -256,7 +256,7 @@ SimData_LB <- function(Nyears, AgeMax, SigmaR, M, F1, S_a, h, qcoef,
     if(Nyears_comp>1) ML_t <- sapply(1:nrow(LFout), function(x) sum(LFout[x,]*lbins)/sum(LFout[x,]))
     if(Nyears_comp==1) ML_t <- sum(LFout*lbins)/sum(LFout)
 
-    DataList <- list("I_t"=CPUE_tout, "C_t"=C_tout, "Cw_t"=Cw_tout, "DataScenario"=modname,
+    DataList <- list("I_t"=I_tout, "C_t"=C_tout, "Cw_t"=Cw_tout, "DataScenario"=modname,
         "LF"=LFout, "SigmaR"=SigmaR, "R_t"=R_tout, "N_t"=N_tout, "SB_t"=SB_tout, "D_t"=D_tout, "F_t"=F_tout, 
         "L_t"=L_tout, "N_at"=N_atout, "M50"=M50, "Mat_a"=Mat_a, "SB0"=SB0, "Nyears"=Nyears, "L_a"=L_a,
         "W_a"=W_a, "AgeMax"=AgeMax, "M"=M, "S_a"=S_a, "plb"=plb, "plba"=plba, "page"=page, "R0"=R0, 
