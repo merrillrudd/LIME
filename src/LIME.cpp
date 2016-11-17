@@ -140,8 +140,10 @@ Type objective_function<Type>::operator() ()
 
   // ============ equilibrium spawning biomass ===============
   Type SB0 = 0;
+  Type TB0 = 0;
   for(int a=1;a<=AgeMax;a++){
     SB0 += exp(beta) * exp(-M*Type(a)) * W_a(a) * Mat_a(a);
+    TB0 += exp(beta) * exp(-M*Type(a)) * W_a(a);
   }
   
   // ============ Project dynamics ===========================
@@ -149,9 +151,11 @@ Type objective_function<Type>::operator() ()
   vector<Type> R_t(n_t);
   matrix<Type> N_ta(n_t,AgeMax+1);
   matrix<Type> SB_ta(n_t,AgeMax+1);
+  matrix<Type> TB_ta(n_t,AgeMax+1);
   matrix<Type> Cn_ta(n_t,AgeMax+1);
   vector<Type> N_t(n_t);
   vector<Type> SB_t(n_t);
+  vector<Type> TB_t(n_t);
   vector<Type> C_t_hat(n_t);
   vector<Type> Cw_t_hat(n_t);
 
@@ -160,6 +164,7 @@ Type objective_function<Type>::operator() ()
 
   N_t(0) = 0;
   SB_t(0) = 0;
+  TB_t(0) = 0;
   C_t_hat(0) = 0;
   Cw_t_hat(0) = 0;
   for(int a=0;a<=AgeMax;a++){
@@ -171,12 +176,16 @@ Type objective_function<Type>::operator() ()
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a)*Mat_a(a)*W_a(a);
 
+    // Total biomass
+    TB_ta(0,a) = N_ta(0,a)*W_a(a);
+
     // Catch
     Cn_ta(0,a) = N_ta(0,a) * (Type(1.0)-exp(-M-F_t(0)*S_a(a))) * (F_t(0)*S_a(a))/(M+F_t(0)*S_a(a));
 
     //Annual values
     if(a>0) N_t(0) += N_ta(0,a);
-    if(a>0) SB_t(0) += SB_ta(0,a);
+    SB_t(0) += SB_ta(0,a);
+    TB_t(0) += TB_ta(0,a);
     C_t_hat(0) += Cn_ta(0,a);
     Cw_t_hat(0) += Cn_ta(0,a)*W_a(a);
   }
@@ -192,6 +201,7 @@ Type objective_function<Type>::operator() ()
     // Age-structured dynamics
     N_t(t) = 0;
     SB_t(t) = 0;
+    TB_t(t) = 0;
     C_t_hat(t) = 0;
     Cw_t_hat(t) = 0;
     for(int a=0;a<=AgeMax;a++){
@@ -203,13 +213,18 @@ Type objective_function<Type>::operator() ()
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
+
+
+      // Total biomass
+      TB_ta(t,a) = N_ta(t,a)*W_a(a);
       
       // Catch
       Cn_ta(t,a) = N_ta(t,a) * (Type(1.0)-exp(-M-F_t(t)*S_a(a))) * (F_t(t)*S_a(a))/(M+F_t(t)*S_a(a));
 
       //Annual values
       if(a>0) N_t(t) += N_ta(t,a);
-      if(a>0) SB_t(t) += SB_ta(t,a);
+      SB_t(t) += SB_ta(t,a);
+      TB_t(t) += TB_ta(t,a);
       C_t_hat(t) += Cn_ta(t,a);
       Cw_t_hat(t) += Cn_ta(t,a)*W_a(a);
     }
@@ -337,7 +352,7 @@ Type objective_function<Type>::operator() ()
 
   vector<Type> I_t_hat(n_t);
   for(int t=0;t<n_t;t++){
-      I_t_hat(t) = q_I*SB_t(t);
+      I_t_hat(t) = q_I*TB_t(t);
   }
 
   // relative
@@ -417,17 +432,20 @@ Type objective_function<Type>::operator() ()
   // Likelihood contributions from site-aggregated observations
     vector<Type> N_t_hat(n_t);
     vector<Type> SB_t_hat(n_t);
+    vector<Type> TB_t_hat(n_t);
     vector<Type> R_t_hat(n_t);
     vector<Type> Depl(n_t);
     for(int t=0;t<n_t;t++){
        N_t_hat(t) = N_t(t);
        R_t_hat(t) = R_t(t);
        SB_t_hat(t) = SB_t(t);
+       TB_t_hat(t) = TB_t(t);
        Depl(t) = SB_t_hat(t)/SB0;
     }
 
     vector<Type> lN_t(n_t);
     vector<Type> lSB_t(n_t);
+    vector<Type> lTB_t(n_t);
     vector<Type> lR_t(n_t);
     vector<Type> lF_t(n_t);
     vector<Type> lC_t(n_t);
@@ -436,6 +454,7 @@ Type objective_function<Type>::operator() ()
     for(t=0;t<n_t;t++){
       lN_t(t) = log(N_t_hat(t));
       lSB_t(t) = log(SB_t_hat(t));
+      lTB_t(t) = log(TB_t_hat(t));
       lR_t(t) = log(R_t_hat(t));
       lF_t(t) = log(F_t(t));
       lC_t(t) = log(C_t_hat(t));
@@ -468,6 +487,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lI_t );
   ADREPORT( L_t_hat );
   ADREPORT( lSB_t );
+  ADREPORT( lTB_t );
   ADREPORT( lF_t );
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
@@ -503,6 +523,7 @@ Type objective_function<Type>::operator() ()
   REPORT( Cw_t_hat );
   // REPORT( C_t_hat_rel );
   REPORT( SB_t_hat );
+  REPORT( TB_t_hat );
   REPORT( SB0 );
   REPORT(Depl);
   REPORT(N_ta);

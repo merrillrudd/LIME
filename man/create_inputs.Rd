@@ -4,12 +4,12 @@
 \alias{create_inputs}
 \title{Create input parameters for TMB model}
 \usage{
-create_inputs(param, val, lh_list, data_avail_list)
+create_inputs(param = FALSE, val = FALSE, lh_list, data_avail_list)
 }
 \arguments{
-\item{param}{parameter name to adjust (sensitivity analysis)}
+\item{param}{parameter name to adjust (sensitivity analysis), default=FALSE}
 
-\item{val}{value of parameter name to adjust (sensitivity analysis)}
+\item{val}{value of parameter name to adjust (sensitivity analysis), default=FALSE}
 
 \item{lh_list}{tagged list of life history/starting value information}
 
