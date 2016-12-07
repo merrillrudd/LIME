@@ -22,7 +22,9 @@
 #' @export
 run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE){
 
-      # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))     
+      # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
+
+  if(simulation==FALSE) iter <- 1     
 
 for(iter in 1:length(itervec)){
     if(simulation==TRUE) iterpath <- file.path(modpath, iter)
