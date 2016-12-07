@@ -33,22 +33,19 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(n_i); // number of years of index data available
     DATA_INTEGER(n_lc); // number of years of length composition data
     DATA_INTEGER(n_ml); // number of years of mean length data
-    DATA_INTEGER(start_f); // year to start estimating fishing mortality
+    DATA_VECTOR(fix_f); // year to start estimating fishing mortality
     DATA_VECTOR(T_yrs); // vector of years of all data types
     DATA_VECTOR(C_yrs); // vector of years of catch data available
     DATA_VECTOR(I_yrs); // vector of years of index data available
     DATA_VECTOR(LC_yrs); // vector of years of length comp data
     DATA_VECTOR(ML_yrs); // vector of years of mean length data available
     DATA_VECTOR(obs_per_yr); // number of independent observation times annually, likely between 1 and C_t
-    DATA_INTEGER(RecType); //0==global median recruitment, 1==Beverton-Holt stock recruit curve, 2==single value
 
     // Data in likelihood
     DATA_VECTOR(I_t); // CPUE for each year
     DATA_VECTOR(C_t); // catch each year
     DATA_VECTOR(ML_t); // mean length each year
     DATA_MATRIX(LF); // length composition
-    DATA_INTEGER(rel_c); // relative catch, 0=no, 1=yes
-    DATA_INTEGER(rel_i); // relative index, 0=no, 1=yes
 
 
     // Known values
@@ -72,7 +69,7 @@ Type objective_function<Type>::operator() ()
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
-    PARAMETER(log_F_sd); // SD of F
+    PARAMETER(log_sigma_F); // SD of F
     PARAMETER_VECTOR(log_F_t_input);  // F(t)
     PARAMETER(log_q_I); // catachability associated with index
     PARAMETER(beta);
@@ -90,14 +87,14 @@ Type objective_function<Type>::operator() ()
   // ============ Global values ============================
 
   using namespace density;
-  int a,t,lc,c,i,ml;
+  int f,a,t,lc,c,i,ml;
   Type jnll=0;
   vector<Type> jnll_comp(7);
   jnll_comp.setZero();
 
   // ======= Transform parameters =========================
   Type q_I = exp(log_q_I);
-  Type F_sd = exp(log_F_sd);
+  Type sigma_F = exp(log_sigma_F);
   Type sigma_R = exp(log_sigma_R);
   Type sigma_C = exp(log_sigma_C);
   Type sigma_I = exp(log_sigma_I);
@@ -106,14 +103,21 @@ Type objective_function<Type>::operator() ()
 
   // Transform vectors
   vector<Type> F_t(n_t);
-  Type F_equil = exp(log_F_t_input(start_f));
-  for(int t=0;t<start_f;t++){
-    if(RecType!=2) F_t(t) = exp(log_F_t_input(start_f));
-    if(RecType==2) F_t(t) = F_equil;
+  Type F_equil;
+  F_equil = exp(log_F_t_input(0));
+  for(int t=0;t<n_t;t++){
+    F_t(t) = exp(log_F_t_input(t));
   }
-  for(int t=start_f;t<n_t;t++){
-    if(RecType!=2) F_t(t) = exp(log_F_t_input(t));
-    if(RecType==2) F_t(t) = F_equil;    
+
+  Type n_fixf; 
+  if(fix_f(0)==0) n_fixf = 0;
+  if(fix_f(0)>0){
+    n_fixf = fix_f.size();
+    for(int t=1;t<n_t;t++){
+      for(int f=0;f<n_fixf;f++){
+        if(T_yrs(t)==fix_f(f)) F_t(t) = F_t(t-1);
+      }
+    }
   }
 
 
@@ -130,7 +134,7 @@ Type objective_function<Type>::operator() ()
   for(int a=1;a<=AgeMax;a++){
     S_a(a) = 1 / (1 + exp(S50 - a));
   }
-  
+
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
@@ -158,29 +162,34 @@ Type objective_function<Type>::operator() ()
   vector<Type> TB_t(n_t);
   vector<Type> C_t_hat(n_t);
   vector<Type> Cw_t_hat(n_t);
+  R_t.setZero();
+  N_ta.setZero();
+  SB_ta.setZero();
+  TB_ta.setZero();
+  Cn_ta.setZero();
+  N_t.setZero();
+  SB_t.setZero();
+  TB_t.setZero();
+  C_t_hat.setZero();
+  Cw_t_hat.setZero();
 
   // initialize
   R_t(0) = exp(beta) * exp(Nu_input(0) - pow(sigma_R,2)/Type(2));
 
-  N_t(0) = 0;
-  SB_t(0) = 0;
-  TB_t(0) = 0;
-  C_t_hat(0) = 0;
-  Cw_t_hat(0) = 0;
   for(int a=0;a<=AgeMax;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
-    if(a>=1 & a<AgeMax) N_ta(0,a) = N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1));
-    if(a==AgeMax) N_ta(0,a) = (N_ta(0,a-1)*exp(-M-F_t(0)*S_a(a-1)))/(1-exp(-M-F_t(0)*S_a(a)));
+    if(a>=1 & a<AgeMax) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_t(0) * S_a(a-1));
+    if(a==AgeMax) N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_t(0) * S_a(a))) / (1 - exp(-M - F_t(0) * S_a(a)));
 
     // Spawning biomass
-    SB_ta(0,a) = N_ta(0,a)*Mat_a(a)*W_a(a);
+    SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a);
 
     // Total biomass
-    TB_ta(0,a) = N_ta(0,a)*W_a(a);
+    TB_ta(0,a) = N_ta(0,a) * W_a(a);
 
     // Catch
-    Cn_ta(0,a) = N_ta(0,a) * (Type(1.0)-exp(-M-F_t(0)*S_a(a))) * (F_t(0)*S_a(a))/(M+F_t(0)*S_a(a));
+    Cn_ta(0,a) = N_ta(0,a) * (Type(1.0) - exp(-M - F_t(0) * S_a(a))) * (F_t(0) * S_a(a))/(M + F_t(0) * S_a(a));
 
     //Annual values
     if(a>0) N_t(0) += N_ta(0,a);
@@ -193,23 +202,15 @@ Type objective_function<Type>::operator() ()
   // Project forward in time
   for(int t=1;t<n_t;t++){
     // Recruitment
-      // single global mean recruitment
-    // if(RecType==2) R_t(t) = exp(beta) * exp(Nu_input(t) - RecDev_biasadj(t)*pow(sigma_R,2)/Type(2));
-      // Beverton-Holt
-    R_t(t) = ((4*h*exp(beta)*SB_t(t-1)) / (SB0*(1-h)+SB_t(t-1)*(5*h-1))) * exp(Nu_input(t) - pow(sigma_R,2)/Type(2));
+    R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(t) - pow(sigma_R,2)/Type(2));
     
     // Age-structured dynamics
-    N_t(t) = 0;
-    SB_t(t) = 0;
-    TB_t(t) = 0;
-    C_t_hat(t) = 0;
-    Cw_t_hat(t) = 0;
     for(int a=0;a<=AgeMax;a++){
       
       // Population abundance
       if(t>=1 & a==0) N_ta(t,a) = R_t(t);
-      if(t>=1 & a>=1 & a<AgeMax) N_ta(t,a) = N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1));
-      if(t>=1 & a==AgeMax) N_ta(t,a) = (N_ta(t-1,a-1)*exp(-M-F_t(t-1)*S_a(a-1))) + (N_ta(t-1,a)*exp(-M-F_t(t-1)*S_a(a)));
+      if(t>=1 & a>=1 & a<AgeMax) N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1));
+      if(t>=1 & a==AgeMax) N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1))) + (N_ta(t-1,a) * exp(-M - F_t(t-1) * S_a(a)));
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
@@ -219,7 +220,7 @@ Type objective_function<Type>::operator() ()
       TB_ta(t,a) = N_ta(t,a)*W_a(a);
       
       // Catch
-      Cn_ta(t,a) = N_ta(t,a) * (Type(1.0)-exp(-M-F_t(t)*S_a(a))) * (F_t(t)*S_a(a))/(M+F_t(t)*S_a(a));
+      Cn_ta(t,a) = N_ta(t,a) * (Type(1.0) - exp(-M - F_t(t) * S_a(a))) * (F_t(t)*S_a(a)) / (M + F_t(t) * S_a(a));
 
       //Annual values
       if(a>0) N_t(t) += N_ta(t,a);
@@ -296,14 +297,15 @@ Type objective_function<Type>::operator() ()
     temp = 0;
   }
 
-  // ========= spawning potential ratio ==============================
+  // // ========= spawning potential ratio ==============================
   matrix<Type> Na0(n_t,AgeMax+1);
   matrix<Type> Naf(n_t,AgeMax+1);
   vector<Type> SB0_t(n_t);
   vector<Type> SBf_t(n_t);
+  vector<Type> SPR_t(n_t);
   SB0_t.setZero();
   SBf_t.setZero();
-  vector<Type> SPR_t(n_t);
+  SPR_t.setZero();
   for(int t=0;t<n_t;t++){
     for(int a=0;a<=AgeMax;a++){
       if(a==0){
@@ -316,7 +318,7 @@ Type objective_function<Type>::operator() ()
       }
       if(a==AgeMax){
         Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t)))/(1-exp(-M-S_a(a-1)*F_t(t)));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a)*F_t(t)))/(1-exp(-M-S_a(a)*F_t(t)));
       }
       if(a>0){
         SB0_t(t) += Na0(t,a)*Mat_a(a)*W_a(a);
@@ -355,17 +357,6 @@ Type objective_function<Type>::operator() ()
       I_t_hat(t) = q_I*TB_t(t);
   }
 
-  // relative
-  // vector<Type> I_t_hat_rel(n_t);
-  // vector<Type> C_t_hat_rel(n_t);
-  // Type I_last = I_t_hat(n_t-1);
-  // Type C_last = C_t_hat(n_t-1); 
-  // for(int t=0;t<n_t;t++){
-  //     I_t_hat_rel(t) = I_t_hat(t)/I_last;
-  //     C_t_hat_rel(t) = C_t_hat(t)/C_last;
-  // }
-
-
 
   vector<Type> log_pI_t(n_t);
   log_pI_t.setZero();
@@ -375,16 +366,11 @@ Type objective_function<Type>::operator() ()
       for(int i=0;i<n_i;i++){
         if(I_yrs(i)==T_yrs(t)){
           // probability of index at that sample
-          if(rel_i==0) log_pI_t(t) += dnorm( I_t(i), I_t_hat(t), sigma_I, true);
-          // if(rel_i==1) log_pI_t(t) += dnorm( I_t(i), I_t_hat_rel(t), I_t_hat_rel(t)*CV_c, true);
-          if(rel_i==2){
-            log_pI_t(t) += dnorm( I_t(i), I_t_hat(t), sigma_I, true);
-            // log_pI_t(t) += dnorm( I_t(i), I_t_hat_rel(t), I_t_hat_rel(t)*CV_c, true);
+          log_pI_t(t) += dlognorm( I_t(i), log(I_t_hat(t)), sigma_I, true);
           }
         }
       }
     }
-  }
 
   vector<Type> log_pC_t(n_t);
   log_pC_t.setZero();
@@ -394,16 +380,12 @@ Type objective_function<Type>::operator() ()
       for(int c=0;c<n_c;c++){
         if(C_yrs(c)==T_yrs(t)){
           // probability of index at that sample
-          if(rel_c==0) log_pC_t(t) += dnorm( C_t(c), C_t_hat(t), sigma_C, true);
-          // if(rel_c==1) log_pC_t(t) += dnorm( C_t(c), C_t_hat_rel(t), CV_c, true);
-          if(rel_c==2){
-            log_pC_t(t) += dnorm( C_t(c), C_t_hat(t), sigma_C, true);
-            // log_pC_t(t) += dnorm( C_t(c), C_t_hat_rel(t), CV_c, true);
+          log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
           }
         }
       }
     }
-  }
+
 
 
   vector<Type> log_pML_t(n_t);
@@ -434,13 +416,13 @@ Type objective_function<Type>::operator() ()
     vector<Type> SB_t_hat(n_t);
     vector<Type> TB_t_hat(n_t);
     vector<Type> R_t_hat(n_t);
-    vector<Type> Depl(n_t);
+    vector<Type> D_t(n_t);
     for(int t=0;t<n_t;t++){
        N_t_hat(t) = N_t(t);
        R_t_hat(t) = R_t(t);
        SB_t_hat(t) = SB_t(t);
        TB_t_hat(t) = TB_t(t);
-       Depl(t) = SB_t_hat(t)/SB0;
+       D_t(t) = SB_t_hat(t)/SB_t_hat(0);
     }
 
     vector<Type> lN_t(n_t);
@@ -459,15 +441,19 @@ Type objective_function<Type>::operator() ()
       lF_t(t) = log(F_t(t));
       lC_t(t) = log(C_t_hat(t));
       lI_t(t) = log(I_t_hat(t));
-      lD_t(t) = log(Depl(t));
+      lD_t(t) = log(D_t(t));
     }
 
 
   // F
     jnll_comp(5) = 0;
+    Type n_estf;
+    n_estf = n_t - n_fixf;
     if(Fpen==1){
-      jnll_comp(5) -= dnorm(F_t(start_f), F_equil, F_sd, true);
-      for(int t=(start_f+1);t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), F_sd, true);
+      if(fix_f(0)==0){
+        // jnll_comp(5) -= dnorm(F_t(0), F_equil, sigma_F, true);
+        for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
+      }
     }
 
     // // SigmaR
@@ -495,7 +481,7 @@ Type objective_function<Type>::operator() ()
   // Parameters
   REPORT( F_equil );
   REPORT( q_I );
-  REPORT( F_sd );
+  REPORT( sigma_F );
   REPORT( beta );
   REPORT( sigma_R );
   REPORT( log_sigma_R );
@@ -505,6 +491,8 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_I );
   REPORT( CV_L );
   REPORT( SPR_t );
+  REPORT( SB0_t );
+  REPORT( SBf_t );
 
   // Random effects
   REPORT( Nu_input );
@@ -517,15 +505,13 @@ Type objective_function<Type>::operator() ()
   // Predicted quantities
   REPORT( L_t_hat );
   REPORT( I_t_hat );
-  // REPORT( I_t_hat_rel );
   // Derived quantities
   REPORT( C_t_hat );
   REPORT( Cw_t_hat );
-  // REPORT( C_t_hat_rel );
   REPORT( SB_t_hat );
   REPORT( TB_t_hat );
   REPORT( SB0 );
-  REPORT(Depl);
+  REPORT(D_t);
   REPORT(N_ta);
   REPORT(Cn_ta);
   REPORT(plba);
@@ -536,6 +522,9 @@ Type objective_function<Type>::operator() ()
   REPORT(Mat_a);
   REPORT(AgeMax);
   REPORT(M);
+  REPORT(fix_f);
+  REPORT(n_fixf);
+  REPORT(n_estf);
     // Likelihoods
   REPORT(log_pC_t);
   REPORT(log_pI_t);
