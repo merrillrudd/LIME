@@ -42,7 +42,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ## Data objects
     ##########################
     TB_t <- VB_t <- SB_t <- F_t <- R_t <- rep(NA, tyears)                               
-    Cn_at <- N_at <- matrix(NA, nrow=length(L_a), ncol=tyears)
+    Cn_at <- N_at <- N_at0 <- matrix(NA, nrow=length(L_a), ncol=tyears)
 
     #####################################
     ## Fishing and recruitment dynamics
@@ -89,12 +89,15 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     for(a in 1:length(L_a)){
         if(a==1){
             N_at[a,1] <- R_t[1]
+            N_at0[a,1] <- R_t[1]
         }
         if(a>1 & a<length(L_a)){
             N_at[a,1] <- N_at[a-1,1] * exp(-M - F_t[1] * S_a[a-1])
+            N_at0[a,1] <- N_at0[a-1,1] * exp(-M)
         }
         if(a==length(L_a)){
             N_at[a,1] <- (N_at[a-1,1] * exp(-M - F_t[1] * S_a[a])) / (1-exp(-M - F_t[1] * S_a[a]))
+            N_at0[a,1] <- (N_at0[a-1,1] * exp(-M))/(1-exp(-M))
         }
 
     }
@@ -106,15 +109,15 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ##########################
     ## Projection
     ##########################
-    Na0 <- rep(NA, length(W_a))
-        if(Rdynamics=="Pulsed"){
-            R0 <- median(Rpulse_t[-c(1:nburn)])
-        }
-    Na0[1] <- R0
-    for(a in 2:length(W_a)){
-        Na0[a] <- R0 * exp(-M*(a-1))
-    }
-    SB0 <- sum(Na0*Mat_a*W_a)
+    # Na0 <- rep(NA, length(W_a))
+    #     if(Rdynamics=="Pulsed"){
+    #         R0 <- median(Rpulse_t[-c(1:nburn)])
+    #     }
+    # Na0[1] <- R0
+    # for(a in 2:length(W_a)){
+    #     Na0[a] <- R0 * exp(-M*(a-1))
+    # }
+    SB0 <- sum(N_at0[,1]*Mat_a*W_a)
 
     for(y in 2:tyears){
         ## fishing effort and recruitment, not dependent on age structure
@@ -133,12 +136,15 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
 
             if(a==1){
                 N_at[a,y] <- R_t[y]
+                N_at0[a,y] <- R_t[y]
             }
             if(a>1 & a<length(L_a)){
                 N_at[a,y] <- N_at[a-1,y-1] * exp(-M - F_t[y-1] * S_a[a-1])
+                N_at0[a,y] <- N_at0[a-1,y-1] * exp(-M)
             }
             if(a==length(L_a)){
                 N_at[a,y] <- (N_at[a-1,y-1] * exp(-M - F_t[y-1] * S_a[a-1])) + (N_at[a,y-1] * exp(-M - F_t[y-1] * S_a[a]))
+                N_at0[a,y] <- (N_at0[a-1,y-1] * exp(-M)) + (N_at0[a,y-1] * exp(-M))
             }
 
             ## spawning biomass
@@ -163,11 +169,13 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ## age to length comp
     obs_per_year <- rep(comp_sample, tyears)
     LFinfo <- AgeToLengthComp(lh=lh, tyears=tyears, N_at=N_at, comp_sample=obs_per_year)
+    LF0info <- AgeToLengthComp(lh=lh, tyears=tyears, N_at=N_at0, comp_sample=obs_per_year)
 
     plba <- LFinfo$plba
     plb <- LFinfo$plb
     page <- LFinfo$page
     LF <- LFinfo$LF
+    LF0 <- LF0info$LF
 
     ########################################################
     ## Expected mean length in catch 
@@ -190,6 +198,8 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
 
     LFout <- LF[-c(1:nburn),]
         rownames(LFout) <- 1:Nyears
+    LF0out <- LF0[-c(1:nburn),]
+        rownames(LF0out) <- 1:Nyears
 
     R_tout <- R_t[-c(1:nburn)]
     N_tout <- N_t[-c(1:nburn)]
@@ -200,13 +210,19 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     F_tout <- F_t[-c(1:nburn)]
     ML_tout <- ML_t[-c(1:nburn)]
     N_atout <- N_at[,-c(1:nburn)]
+    N_at0out <- N_at0[,-c(1:nburn)]
 
         LFindex <- (Nyears-Nyears_comp+1):Nyears
         LFout <- LFout[LFindex,]
         if(is.vector(LFout)==FALSE) colnames(LFout) <- highs
+        if(is.vector(LF0out)==FALSE) colnames(LF0out) <- highs
         if(is.vector(LFout)){
             LFout <- t(as.matrix(LFout))
             rownames(LFout) <- (Nyears-Nyears_comp+1):Nyears
+        }
+        if(is.vector(LF0out)){
+            LF0out <- t(as.matrix(LF0out))
+            rownames(LF0out) <- (Nyears-Nyears_comp+1):Nyears
         }
 
     ## static SPR
@@ -219,6 +235,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$Cw_t <- Cw_tout
     lh$DataScenario <- modname
     lh$LF <- LFout
+    lh$LF0 <- LF0out
     lh$R_t <- R_tout
     lh$N_t <- N_tout
     lh$SB_t <- SB_tout
@@ -226,6 +243,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$F_t <- F_tout
     lh$ML_t <- ML_tout
     lh$N_at <- N_atout
+    lh$N_at0 <- N_at0out
     lh$plb <- plb
     lh$plba <- plba
     lh$page <- page
