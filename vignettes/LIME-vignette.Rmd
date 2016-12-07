@@ -115,6 +115,14 @@ rownames(LF1) <- rownames(snapper$LF)[nrow(snapper$LF)]
 LF1
 ```
 
+The effective sample size of observations should also be included. 50 length measurements from the same day, or the same boat, are likely autocorrelated and do not contribute the same amount of information as measurements from 50 days, for example. Using the multinomial likelihood distribution, the effective sample size must be designated. The effective sample size could be estimated in future versions of LIME. In this case, I chose to use the number of days that the fishery was sampled.
+
+```{r}
+## specify effective sample size of length measurements
+input_data$obs_per_year <- snapper$obs_per_year
+input_data$obs_per_year
+```
+
 
 Other input options include: 
 
@@ -142,7 +150,7 @@ Use the function `create_inputs` to make one list that includes the life history
 The `param` and `val` arguments can be used to make last-minute adjustments to the input values. For example, if you want to try running the model with a steepness `h` fixed below 1, you would specify `param="h"` and `val=0.7` (for example). You can also add a concatenated string of parameter names and values if you want to adjust several values at the same time, for example `param=c("h", "CVlen")` and `val=c(0.7, 0.05)`. The `param` names must match the names of the outputs from `create_lh_list` and `input_data`.
 
 ```{r}
-inits <- create_inputs(lh_list=lh, data_avail_list=input_data, param=FALSE, val=FALSE)
+inits <- create_inputs(lh=lh, input_data=input_data, param=FALSE, val=FALSE)
 names(inits)
 ```
 
@@ -150,30 +158,27 @@ Your named list `inits` is now ready to plug in assumed values, starting values 
 
 
 ## Run model
-You will use the `runModel` function to run the LIME method. The arguments for applying the LIME method to real data (as opposed to simulation) are:
+You will use the `run_LIME` function to run the LIME method. The arguments for applying the LIME method to real data (as opposed to simulation) are:
 
 * `modpath` -- the path to the directory to save results
 
-* `est_sigma` -- which variances to estimate? The analyst can specify a concatenated vector of variance parameter names to estimate. Because this is a mixed effects model, the model should at least estimate the recruitment process error, `log_sigma_R`. Another helpful variance to estimate is the CV for the growth curve, called `log_CV_L`. The analyst could also specify `log_sigma_I`, `log_sigma_C`, and/or `log_F_sd` as the observation errors for the abundance index, catch, or process error on the fishing mortality, respectively. 
-
-* `data_avail` -- this is just a double-check that the model is only fitting to the data types specified by the user. If you don't have catch or an abundance index, they can be left out of the tagged list `input_data`, but a double-check is to tell the model here what data types you have. If a combination of data types are available, these should be separated by an underscore (e.g. "Index_LC"). The options are:
-  + Index
-  + Catch
-  + LC
-
-* `lh_list` -- the list of life history and starting values created above (lh)
+* `lh` -- the list of life history and starting values created above from `create_lh_list`
 
 * `input_data` -- the tagged list of observed data and years, created above (input_data)
 
+* `est_sigma` -- which variances to estimate? The analyst can specify a concatenated vector of variance parameter names to estimate. Because this is a mixed effects model, the model should at least estimate the recruitment process error, `log_sigma_R`. Another helpful variance to estimate is the CV for the growth curve, called `log_CV_L`. The analyst could also specify `log_sigma_I`, `log_sigma_C`, and/or `log_sigma_F` as the observation errors for the abundance index, catch, or process error on the fishing mortality, respectively. 
+
+* `data_avail` -- types of data included, must at least include LC (length composition). May also include Catch or Index separated by underscore, if an abundance index and/or catch data are available. For example, `LC`, `Catch_LC`, `Index_Catch_LC`. 
+
 * `rewrite` -- if you are running a bunch of models and don't want to re-run the models that already have output in their directory, flag `rewrite=TRUE`. If you want to re-run models that may already have output in the directory, tag `rewrite=FALSE`. This argument will not affect the runs if the model has never been run before. 
 
-* `start_f` -- This indicates the first year to estimate fishing mortality. The default is 0 to estimate fishing mortality in all years. If start_f is increased to 10 when the total number of years is 20, this will estimate fishing mortality in years 11-20 and set fishing mortality from years 1-10 as the same value estimated in year 11. 
+* `fix_f` -- year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years. 
 
 * `simulation` -- set to FALSE if doing an assessment on real data. set to TRUE if using simulated data.
   + `itervec` -- set to NULL if this is not a simulation study. Vector of iterations when using simulated data (e.g. 1:100 will run 100 iterations, 50:100 if adding to 1:50 iterations already run)
   
 ```{r, eval=FALSE}
-run <- runModel(modpath=<path>, est_sigma="log_sigma_R", data_avail="LC", lh_list=lh, input_data=input_data, rewrite=TRUE, start_f=0, simulation=FALSE, itervec=NULL)
+run <- run_LIME(modpath=<path>, lh=lh, input_data=input_data, est_sigma="log_sigma_R", data_avail="LC", rewrite=TRUE, fix_f=0, simulation=FALSE, itervec=NULL)
 ```
 
 
