@@ -178,7 +178,7 @@ You will use the `run_LIME` function to run the LIME method. The arguments for a
   + `itervec` -- set to NULL if this is not a simulation study. Vector of iterations when using simulated data (e.g. 1:100 will run 100 iterations, 50:100 if adding to 1:50 iterations already run)
   
 ```{r, eval=FALSE}
-run <- run_LIME(modpath=<path>, lh=lh, input_data=input_data, est_sigma="log_sigma_R", data_avail="LC", rewrite=TRUE, fix_f=0, simulation=FALSE, itervec=NULL)
+run <- run_LIME(modpath=<path>, lh=lh, input_data=input_data, est_sigma=c("log_sigma_R","log_CV_L"), data_avail="LC", rewrite=TRUE, fix_f=0, simulation=FALSE, itervec=NULL)
 ```
 
 
