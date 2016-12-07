@@ -5,7 +5,6 @@
 #' @param modpath model directory
 #' @param lh list of life history information, from create_lh_list
 #' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
-#' @param est_sigma which variance parameters to estimate, match parameter names
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
