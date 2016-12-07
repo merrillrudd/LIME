@@ -6,13 +6,13 @@
 #' @param linf von Bertalanffy Linf asymptotic length
 #' @param lwa length-weight scaling parameter
 #' @param lwb length-weight allometric parameter
-#' @param S50 starting value for age or length at 50 percent selectivity (will be estimated)
+#' @param S50 starting value for age or length at 50 percent selectivity (will be estimated in LIME method)
 #' @param M50 age or length at 50 percent maturity
 #' @param selex_input specify whether argument S50 is an age or a length (default length)
 #' @param maturity_input specify whether argument M50 is an age or a length (default length)
 #' @param binwidth width of length bins (default = 1)
 #' @param t0 theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin
-#' @param CVlen CV of the growth curve (default = 0.2)
+#' @param CVlen CV of the growth curve (default = 0.1)
 #' @param SigmaC standard deviation - observation error of catch data (default = 0.2)
 #' @param SigmaI standard deviation - observation error of index data (default = 0.2)
 #' @param SigmaR standard deviation - process error for recruitment time series (default = 0.6 -- starting value, will be estimated)
@@ -22,34 +22,34 @@
 #' @param qcoef starting value for catchability coefficient (when index data is available, default = 1e-5)
 #' @param M value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)
 #' @param F1 starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error. 
-#' @param Fequil equilibrium fishing mortality rate (used for simulation; default=0.25)
-#' @param Frate parameter used to simulate fishing moratality time series (default=0.2)
-#' @param Fmax maximum F used in simulation (default=0.7)
-#' @param start_ages age to start (usually either 0 or 1; default = 0)
+#' @param Fequil equilibrium fishing mortality rate (used for simulation; default=0.2)
+#' @param Frate parameter used to simulate fishing moratality time series (default=NULL)
+#' @param Fmax maximum F used in simulation (default=NULL)
+#' @param start_ages age to start (either 0 or 1; default = 0)
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.2, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=NULL, Fmax=NULL, start_ages=0){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=NULL, Fmax=NULL, start_ages=0){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
-    AgeMax <- round(-log(0.01)/M)
+    AgeMax <- ceiling(-log(0.01)/M)
     ages <- start_ages:AgeMax
 
     if(selex_input=="length"){
         SL50 <- S50
-        S50 <- round(t0-log(1-(SL50/linf))/vbk)
+        S50 <- ceiling(t0-log(1-(SL50/linf))/vbk)
 
     }
     if(selex_input=="age"){
-        SL50 <- round(linf*(1-exp(-vbk*(S50-t0))))
+        SL50 <- ceiling(linf*(1-exp(-vbk*(S50-t0))))
     }
 
     if(maturity_input=="length"){
         ML50 <- M50
-        M50 <- round(t0-log(1-(ML50/linf))/vbk)
+        M50 <- ceiling(t0-log(1-(ML50/linf))/vbk)
     }
     if(maturity_input=="age"){
-        ML50 <- round(linf*(1-exp(-vbk*(M50-t0))))
+        ML50 <- ceiling(linf*(1-exp(-vbk*(M50-t0))))
     }
     
     ## length bins
@@ -64,7 +64,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     ## maturity
     if(maturity_input=="length"){
         Mat_l <- 1 / (1 + exp(ML50 - mids))
-        Mat_ages <- round(t0-log(1-(mids/linf))/vbk)
+        Mat_ages <- ceiling(t0-log(1-(mids/linf))/vbk)
         names(Mat_l) <- Mat_ages
         Mat_a <- rep(NA, length(ages))
         for(a in 1:length(ages)){

@@ -2,19 +2,16 @@
 #'
 #' \code{AgeToLengthComp} Converts vulnerable numbers at age to length composition of catch
 #'
-#' @param L_a vector, growth curve: predicted length at each age
-#' @param CVlen coefficient of variation for growth curve
-#' @param highs vector of upper end of length bins
-#' @param lows vector of lower end of length bins
+#' @param lh list of life history attributes, output of create_lh_list
 #' @param tyears number of years of data
 #' @param N_at matrix of numbers in the population at each age over time
-#' @param S_a vector of selectivity at age
 #' @param comp_sample vector of number of individuals sampled each year (set as 1 for proportions)
 #'
 #' @return data frame - number of individuals in each length bin in each year
 #' @export
-AgeToLengthComp <- function(L_a, CVlen, highs, lows, tyears, N_at, S_a, comp_sample){
+AgeToLengthComp <- function(lh, tyears, N_at, comp_sample){
 
+    with(lh,{
 	################################################
 	## Probability being in a length bin given age
 	################################################
@@ -51,6 +48,8 @@ AgeToLengthComp <- function(L_a, CVlen, highs, lows, tyears, N_at, S_a, comp_sam
     Outs$plb <- plb
     Outs$page <- page
     Outs$LF <- LF
-
     return(Outs)
+})
+
+    
 }

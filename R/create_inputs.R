@@ -4,27 +4,27 @@
 #'
 #' @param param parameter name to adjust (sensitivity analysis), default=FALSE
 #' @param val value of parameter name to adjust (sensitivity analysis), default=FALSE
-#' @param lh_list tagged list of life history/starting value information
-#' @param data_avail_list artifact from sensitivity analysis, adjusts some information on sample size, years, etc. for different data-availability scenarios
+#' @param lh tagged list of life history/starting value information
+#' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Specifically used to merge life history information with other model settings; flexibility to change parameter inputs for sensitivity analysis without changing the baseline life history information that was used to generate data in a simulation study, or carefully compiled for real=life application
 #' @export
-create_inputs <- function(param=FALSE, val=FALSE, lh_list, data_avail_list){
+create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
     
         ## copy life history
-        dat_input <- c(lh_list, data_avail_list)
-
-        ## have the log ready in the input file for some variance parameterss
-        dat_input$log_sigma_C <- log(lh_list$SigmaC)
-        dat_input$log_sigma_I <- log(lh_list$SigmaI)
+        dat_input <- c(lh, input_data)
 
         ## change input values for sensitivity analysis
-        if(param!=FALSE){
+        if(param[1]!=FALSE){
             for(pp in 1:length(param)){
                 dat_input[[param[pp]]] <- val[which(param==param[pp])]
             }
         }
+
+        ## have the log ready in the input file for some variance parameterss
+        dat_input$log_sigma_C <- log(dat_input$SigmaC)
+        dat_input$log_sigma_I <- log(dat_input$SigmaI)
         
         dat_input$log_CV_L <- log(dat_input$CVlen)
 

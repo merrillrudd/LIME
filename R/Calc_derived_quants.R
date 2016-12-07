@@ -1,12 +1,12 @@
 #' Calculate biological reference points
 #'
-#' \code{Calc_derived_quants} calculates derived quanties for status or productivity
+#' \code{calc_derived_quants} calculates derived quanties for status or productivity
 #'
 #' @param Obj, the fitted TMB object
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @export
-Calc_derived_quants = function( Obj ){
+calc_derived_quants = function( Obj ){
   # Extract elements
   Data = Obj$env$data
   ParHat = Obj$env$parList()
@@ -56,7 +56,7 @@ Calc_derived_quants = function( Obj ){
   }
 
   # Calculate Fmsy
-  Fmsy = optimize( f=Yield_Fn, interval=c(0,3), maximum=TRUE)$maximum
+  Fmsy = optimize( f=Yield_Fn, interval=c(0,5), maximum=TRUE)$maximum
   Report_msy = Yield_Fn( Fmean=Fmsy, Return_type="Report" )
   Report_0 = Yield_Fn( Fmean=0, Return_type="Report" )
   TBmsy = rev(as.vector(Report$W_a %*% t(Report_msy$N_ta)))[1]
@@ -66,7 +66,7 @@ Calc_derived_quants = function( Obj ){
   SB0 = rev(Report_0$SB_t)[1]
 
   # Return
-  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t/TBmsy, "SBBmsy"=Report$SB_t/SBmsy)
+  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "FFmsy"=Report$F_t[length(Report$F_t)]/Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t[length(TB_t)]/TBmsy, "SBBmsy"=Report$SB_t[length(Report$SB_t)]/SBmsy)
   return( Return )
 }
 

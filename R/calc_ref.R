@@ -25,7 +25,7 @@ calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
             }
             if(a==length(W_a)){
                 Na0[a] <- (Na0[a-1]*exp(-M))/(1-exp(-M))
-                Naf[a] <- (Naf[a-1]*exp(-M-F*S_a[a-1]))/(1-exp(-M-F*S_a[a-1]))
+                Naf[a] <- (Naf[a-1]*exp(-M-F*S_a[a]))/(1-exp(-M-F*S_a[a]))
             }
         }
 
