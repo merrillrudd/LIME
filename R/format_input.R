@@ -15,7 +15,7 @@
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, fix_f, f_startval, fix_param){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, fix_f, f_startval, fix_param=FALSE){
 
     with(input, {
         ## data-rich model
