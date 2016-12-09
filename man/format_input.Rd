@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
-  fix_f, f_startval)
+  fix_f, f_startval, fix_param)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -25,6 +25,8 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
 \item{fix_f}{year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.}
 
 \item{f_startval}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
+
+\item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map

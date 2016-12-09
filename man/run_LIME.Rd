@@ -6,7 +6,8 @@
 \usage{
 run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
   itervec = NULL, REML = FALSE, rewrite, fix_f, simulation = TRUE,
-  param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE)
+  param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
+  fix_param = FALSE)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -36,6 +37,8 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 \item{val_adjust}{number or vector of numbers for corresponding parameter value changes}
 
 \item{f_true}{default=FALSE will make starting logF values =0; change to true and will use true values from simulation}
+
+\item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
 }
 \value{
 prints how many iterations were run in model directory
