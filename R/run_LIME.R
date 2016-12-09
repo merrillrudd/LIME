@@ -16,12 +16,13 @@
 #' @param param_adjust character or vector of parameter names to change input values
 #' @param val_adjust number or vector of numbers for corresponding parameter value changes
 #' @param f_true default=FALSE will make starting logF values =0; change to true and will use true values from simulation
+#' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
