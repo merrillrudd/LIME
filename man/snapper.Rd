@@ -4,7 +4,7 @@
 \name{snapper}
 \alias{snapper}
 \title{Example data from Costa Rican spotted rose snapper.}
-\format{An object of class \code{list} of length 39.}
+\format{An object of class \code{list} of length 36.}
 \source{
 {Conservation International}
 }
