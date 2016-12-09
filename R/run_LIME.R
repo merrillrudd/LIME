@@ -3,6 +3,7 @@
 #' \code{run_LIME} run length-based integrated mixed-effects model with generated data
 #'
 #' @param modpath model directory
+#' @param write default=TRUE, write to modpath; if FALSE, return output as list
 #' @param lh list of life history information, from create_lh_list
 #' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
@@ -20,33 +21,35 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
   if(simulation==FALSE) iter <- 1     
 
 for(iter in 1:length(itervec)){
-    if(simulation==TRUE) iterpath <- file.path(modpath, iter)
-    if(simulation==FALSE) iterpath <- modpath
+    if(simulation==TRUE & write==TRUE) iterpath <- file.path(modpath, iter)
+    if(simulation==FALSE & write==TRUE) iterpath <- modpath
+    if(simulation==FALSE & write==FALSE) iterpath <- NULL
 
-    if(rewrite==FALSE){
+    if(rewrite==FALSE & write==TRUE){
       if(file.exists(file.path(iterpath, "Derived_quants.rds"))) next
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
     }
 
-    if(rewrite==TRUE){
+    if(rewrite==TRUE & write==TRUE){
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) unlink(file.path(iterpath, "NAs_final_gradient.txt"), TRUE)
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) unlink(file.path(iterpath, "high_final_gradient.txt"), TRUE)
     }
 
-    if(simulation==TRUE){
+    if(simulation==TRUE & write==TRUE){
       sim <- readRDS(file.path(iterpath, "True.rds"))
       if(f_true==TRUE) f_inits <- sim$F_t
       if(f_true==FALSE) f_inits <- NULL
       input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=sim$C_t, "obs_per_year"=sim$obs_per_year, "F_t"=f_inits)
     }
+    if(simulation==TRUE & write==FALSE) stop("must write generated data to directory")
 
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh, input_data=input_data, param=param_adjust, val=val_adjust)
@@ -62,10 +65,12 @@ for(iter in 1:length(itervec)){
     if(f_true==FALSE) Fpen <- 1
     if(inits$SigmaR > 0.05) SigRpen <- 0
     if(inits$SigmaR <= 0.05) SigRpen <- 1
+    if(write==FALSE) output <- NULL
 
       TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t)
 
-      saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
+      if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
+      if(write==FALSE) output$Inputs <- TmbList
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
@@ -176,17 +181,22 @@ for(iter in 1:length(itervec)){
 
 
         ## write error message in directory if opt wouldn't run
-          if(all(is.null(opt_save))) write("NAs final gradient", file.path(iterpath, "NAs_final_gradient.txt"))
-          if(all(is.null(opt_save)==FALSE)) if(abs(min(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
+          if(write==FALSE) output$issue <- NULL
+          if(all(is.null(opt_save)) & write==TRUE) write("NAs final gradient", file.path(iterpath, "NAs_final_gradient.txt"))
+          if(all(is.null(opt_save)) & write==FALSE) output$issue <- c(output$issue, "NAs_final_gradient")
+          if(all(is.null(opt_save)==FALSE) & write==TRUE) if(abs(min(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
+          if(all(is.null(opt_save)==FALSE & write==FALSE)) if(abs(min(opt_save[["final_gradient"]]))>0.01) output$issue <- c(output$issue, "high_final_gradient")
 
         ParList <- obj_save$env$parList( x=obj_save$par, par=obj_save$env$last.par.best )
         
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
-        saveRDS(Report, file.path(iterpath, "Report.rds"))  
+        if(write==TRUE) saveRDS(Report, file.path(iterpath, "Report.rds"))  
+        if(write==FALSE) output$Report <- Report
 
         Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
-        saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
+        if(write==TRUE) saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
+        if(write==FALSE) output$Sdreport <- Sdreport
 
 
 
@@ -200,9 +210,11 @@ for(iter in 1:length(itervec)){
 
 
           Derived = calc_derived_quants( Obj=obj_save )
-          saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
+          if(write==TRUE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
+          if(write==FALSE) output$Derived <- Derived
 
-        if(iter==1) write.csv(df, file.path(modpath, "df.csv"))  
+        if(iter==1 & write==TRUE) write.csv(df, file.path(modpath, "df.csv"))  
+        if(iter==1 & write==FALSE) output$df <- df
 
         rm(Report)
         rm(Sdreport)
@@ -215,6 +227,7 @@ for(iter in 1:length(itervec)){
   }
 
 
-return(paste0(max(itervec), " iterates run in ", modpath))
+if(write==TRUE) return(paste0(max(itervec), " iterates run in ", modpath))
+if(write==FALSE) return(output)
 
 }
