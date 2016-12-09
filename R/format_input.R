@@ -266,7 +266,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                    Map[["beta"]] <- factor(Map[["beta"]])
                 }
 
-            if(all(fix_param)!=FALSE){
+            if(all(fix_param!=FALSE)){
                 for(i in 1:length(fix_param)){
                     Map[[fix_param[i]]] <- NA
                     Map[[fix_param[i]]] <- factor(Map[[fix_param[i]]])
