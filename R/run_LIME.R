@@ -68,7 +68,7 @@ for(iter in 1:length(itervec)){
     if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(write==FALSE) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param)
 
       if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(write==FALSE) output$Inputs <- TmbList
