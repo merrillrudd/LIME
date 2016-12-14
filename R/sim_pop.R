@@ -33,10 +33,23 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ## Random variables
     ##########################
     set.seed(seed)
-    RecDev <- rnorm(tyears, mean=0, sd=SigmaR)
-    FishDev <- rnorm(tyears, mean=0, sd=SigmaF)
-    IndexDev <- rnorm(tyears, mean=0, sd=SigmaI)
-    CatchDev <- rnorm(tyears, mean=0, sd=SigmaC)
+    ## recruitment deviations
+    RecDev <- rnorm(tyears, mean=-(SigmaR^2)/2, sd=SigmaR)
+    ## autocorrelated recruitment deviations
+    RecDev_AR <- rep(NA, length(RecDev))
+    RecDev_AR[1] <- RecDev[1]
+    for(t in 2:length(RecDev)){
+        RecDev_AR[t] <- RecDev_AR[t-1]*rho + sqrt(1-rho^2)*RecDev[t]
+    }
+
+    ## fishing mortality deviations
+    FishDev <- rnorm(tyears, mean=-(SigmaF^2)/2, sd=SigmaF)
+
+    ## abundance index observation error
+    IndexDev <- rnorm(tyears, mean=-(SigmaI^2)/2, sd=SigmaI)
+
+    ## catch observation error
+    CatchDev <- rnorm(tyears, mean=-(SigmaC^2)/2, sd=SigmaC)
 
     ##########################
     ## Data objects
@@ -58,31 +71,34 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     if(Rdynamics=="Pulsed") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)),
         "pulse_down"=rep(R0/3, floor(Nyears/3)), "pulse_up"=rep(R0, Nyears-floor(Nyears/3)))
     if(Rdynamics=="Pulsed_up") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)), "pulse_up"=rep(R0*3, floor(Nyears/3)), "pulse_down"=rep(R0, Nyears-floor(Nyears/3)))
-    if(Rdynamics=="Constant") Rconstant_t <- rep(R0, tyears)
+    if(Rdynamics=="Constant" | Rdynamics="AR") Rconstant_t <- rep(R0, tyears)
 
         if(Fdynamics=="Ramp"){
-            F_t <- Framp_t * exp(FishDev - (SigmaF^2)/2)
+            F_t <- Framp_t * exp(FishDev)
         }
         if(Fdynamics=="Constant"){
-            F_t <- Fconstant_t * exp(FishDev - (SigmaF^2)/2)
+            F_t <- Fconstant_t * exp(FishDev)
         }
         if(Fdynamics=="Increasing"){
-            F_t <- Finc_t * exp(FishDev - (SigmaF^2)/2)
+            F_t <- Finc_t * exp(FishDev)
         }
         if(Fdynamics=="Endogenous"){
             F_t[1] <- F1
         }
         if(Rdynamics=="Constant"){
-            R_t <- Rconstant_t * exp(RecDev - (SigmaR^2)/2)
+            R_t <- Rconstant_t * exp(RecDev)
+        }
+        if(Rdynamics=="AR"){
+            R_t <- Rconstant_t * exp(RecDev_AR)
         }
         if(Rdynamics=="Pulsed"){
-            R_t <- Rpulse_t * exp(RecDev - (SigmaR^2)/2)
+            R_t <- Rpulse_t * exp(RecDev)
         }
         if(Rdynamics=="Pulsed_up"){
-            R_t <- Rpulse_t * exp(RecDev - (SigmaR^2)/2)
+            R_t <- Rpulse_t * exp(RecDev)
         }
         if(Rdynamics=="BH"){
-            R_t[1] <- R0 * exp(RecDev[1] - (SigmaR^2)/2)
+            R_t[1] <- R0 * exp(RecDev[1])
         }
 
     ## year 1
@@ -123,12 +139,12 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
         ## fishing effort and recruitment, not dependent on age structure
         if(Fdynamics=="Endogenous"){
             if(y <= nburn) F_t[y] <- F1
-            if(y > nburn) F_t[y] <- F_t[y-1]*(SB_t[y-1]/(Fequil*SB0))^Frate * exp(FishDev[y] - (SigmaF^2)/2)
+            if(y > nburn) F_t[y] <- F_t[y-1]*(SB_t[y-1]/(Fequil*SB0))^Frate * exp(FishDev[y])
         }
         if(Rdynamics=="BH"){
             if(h==1) h_use <- 0.7
             if(h!=1) h_use <- h
-            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1] * (5*h_use-1))) * exp(RecDev[y] - (SigmaR^2)/2)
+            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1] * (5*h_use-1))) * exp(RecDev[y])
         }
 
         ## age-structured dynamics
