@@ -71,7 +71,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     if(Rdynamics=="Pulsed") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)),
         "pulse_down"=rep(R0/3, floor(Nyears/3)), "pulse_up"=rep(R0, Nyears-floor(Nyears/3)))
     if(Rdynamics=="Pulsed_up") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)), "pulse_up"=rep(R0*3, floor(Nyears/3)), "pulse_down"=rep(R0, Nyears-floor(Nyears/3)))
-    if(Rdynamics=="Constant" | Rdynamics="AR") Rconstant_t <- rep(R0, tyears)
+    if(Rdynamics=="Constant" | Rdynamics=="AR") Rconstant_t <- rep(R0, tyears)
 
         if(Fdynamics=="Ramp"){
             F_t <- Framp_t * exp(FishDev)
