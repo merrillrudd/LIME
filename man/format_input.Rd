@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
-  fix_f, f_startval, fix_param)
+  fix_f, f_startval, fix_param = FALSE)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
