@@ -271,6 +271,9 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$Nyears <- Nyears
     lh$years <- 1:Nyears
     lh$obs_per_year <- obs_per_year
+    if(Rdynamics!="AR") lh$RecDev <- RecDev
+    if(Rdynamics=="AR") lh$RecDev <- RecDev_AR
+    lh$FishDev <- FishDev
 
     return(lh)
 
