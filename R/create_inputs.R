@@ -52,7 +52,7 @@ create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
             }
         }
 
-        LF <- dat_input$LF
+        LF <- input_data$LF
 
         years_i <- seq_along(dat_input$years)
         years_o <- which(dat_input$years %in% rownames(LF))
