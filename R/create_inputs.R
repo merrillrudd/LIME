@@ -52,10 +52,10 @@ create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
             }
         }
 
-        LF <- input_data$LF
+        LF <- dat_input$LF
 
         years_i <- seq_along(dat_input$years)
-        years_o <- which(dat_input$years %in% rownames(LF))
+        years_o <- which(dat_input$years %in% as.numeric(rownames(LF)))
         years_oi <- which(years_i %in% rownames(LF))
         if(length(years_oi)>0) years_name <- years_oi
         if(length(years_o)>0) years_name <- years_o
