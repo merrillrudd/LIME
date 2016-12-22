@@ -26,7 +26,8 @@ run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail,
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
-  if(simulation==FALSE) iter <- 1     
+  if(simulation==FALSE) itervec <- 1 
+  if(simulation==TRUE & is.null(itervec)) stop("Must specify number of iterations for simulation")    
 
 for(iter in 1:length(itervec)){
     if(simulation==TRUE & write==TRUE) iterpath <- file.path(modpath, iter)
