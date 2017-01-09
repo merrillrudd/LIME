@@ -89,6 +89,10 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
         if(start_ages==0) Mat_a <- c(1e-20, 1/(1+exp(M50 - ages[-1])))
         if(start_ages!=0) Mat_a <- 1/(1+exp(M50 - ages))
     }
+    id_L95 <- which(round(Mat_a, 2) %in% seq(from=0.92,to=1.00,by=0.01))[1]
+    ML95 <- L_a[id_L95]
+    M95 <- ceiling(t0-log(1-(ML95/linf))/vbk)
+
 
     ## selectivity 
     if(start_ages==0) S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
@@ -127,7 +131,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$L_a <- L_a
     Outs$W_a <- W_a
     Outs$M50 <- M50
+    Outs$M95 <- M95
     Outs$ML50 <- ML50
+    Outs$ML95 <- ML95
     Outs$Mat_a <- Mat_a
     Outs$Fequil <- Fequil
     Outs$Frate <- Frate
