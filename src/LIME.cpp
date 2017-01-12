@@ -44,6 +44,7 @@ Type objective_function<Type>::operator() ()
     // Data in likelihood
     DATA_VECTOR(I_t); // CPUE for each year
     DATA_VECTOR(C_t); // catch each year
+    DATA_INTEGER(C_opt); // if C_opt=0, no catch data, if C_opt=1, numbers, if C_opt=2, biomass
     DATA_VECTOR(ML_t); // mean length each year
     DATA_MATRIX(LF); // length composition
 
@@ -380,7 +381,8 @@ Type objective_function<Type>::operator() ()
       for(int c=0;c<n_c;c++){
         if(C_yrs(c)==T_yrs(t)){
           // probability of index at that sample
-          log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
+          if(C_opt==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
+          if(C_opt==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
           }
         }
       }
