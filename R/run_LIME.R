@@ -10,20 +10,21 @@
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
 #' @param REML default off (FALSE)
-#' @param rewrite if results already exist in the directory, should we rewrite them? TRUE or FALSE
-#' @param fix_f year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
+#' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
+#' @param fix_f year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. default=0 (estimate all years).
 #' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)
 #' @param param_adjust character or vector of parameter names to change input values
 #' @param val_adjust number or vector of numbers for corresponding parameter value changes
 #' @param f_true default=FALSE will make starting logF values =0; change to true and will use true values from simulation
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
+#' @param F_up upper bound of fishing mortality estimate; default=5
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite, fix_f, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=5){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -106,7 +107,7 @@ for(iter in 1:length(itervec)){
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
         Upr[match("logS50", names(obj$par))] = log(inits$AgeMax)
-        Upr[which(names(obj$par)=="log_F_t_input")] = log(20)
+        Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
         Lwr[match("logS50", names(obj$par))] = log(0.1)
