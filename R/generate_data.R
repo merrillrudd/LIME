@@ -5,7 +5,6 @@
 #' @param modpath directory to save generated data
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of iterations of data to generate
-#' @param spatial does asymptotic length vary by spatially? TRUE or FALSE
 #' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param lh list of life history information to feed to population simulation function, output from create_lh_list
@@ -13,10 +12,11 @@
 #' @param Nyears number of years to simulate
 #' @param comp_sample vector with sample sizes of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
+#' @param init_depl default=0.4, can specify a different value or "random" to generate random initial depletions per iteration
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, data_avail, itervec, spatial, Fdynamics, Rdynamics, lh, write=TRUE, Nyears, comp_sample, rewrite){
+generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, write=TRUE, Nyears, comp_sample, rewrite=TRUE, init_depl){
 
     for(iter in itervec){
 
@@ -36,8 +36,14 @@ generate_data <- function(modpath, data_avail, itervec, spatial, Fdynamics, Rdyn
         Nyears_comp <- as.numeric(unlist(strsplit(data_avail, "LBSPR"))[2])
     }
 
+    if(init_depl!="random") init_depl_input <- init_depl
+    if(init_depl=="random"){
+        set.seed(iter+1000)
+        init_depl_input <- runif(1,0.05,1)
+    }
+
     ## simulated data with no spatial structure in growth
-    DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, nburn=50, seed=iter, modname=data_avail)
+    DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
 
     # simulated data with spatial structure
     # if(spatial==TRUE){
