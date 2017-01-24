@@ -36,15 +36,24 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
         Nyears_comp <- as.numeric(unlist(strsplit(data_avail, "LBSPR"))[2])
     }
 
-    if(length(init_depl)==1) init_depl_input <- init_depl
+    ## if level of depletion in first year is specified:
+    if(length(init_depl)==1){
+        init_depl_input <- init_depl
+        ## simulated data with no spatial structure in growth
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
+    }
+    ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
         set.seed(iter+1000)
-        init_depl_input <- runif(1,init_depl[1],init_depl[2])
+        DataList <- NA
+        while(all(is.na(DataList))){
+            init_depl_input <- runif(1,init_depl[1],init_depl[2])
+            ## simulated data with no spatial structure in growth
+            DataList <- tryCatch(sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail), error=function(e) NA)
+        }
+
     }
     if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
-
-    ## simulated data with no spatial structure in growth
-    DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
 
     # simulated data with spatial structure
     # if(spatial==TRUE){
