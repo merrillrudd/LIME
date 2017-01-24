@@ -71,7 +71,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     if(Fdynamics=="Ramp") Framp_t <- c(rep(Finit, nburn), "rampup"=seq(Finit, Fmax, length=floor(Nyears/2)), 
         "peak"=rep(Fmax, floor((Nyears-floor(Nyears/2))/2)), 
         "managed"=rep(Fmax/2, Nyears-floor(Nyears/2)-floor((Nyears-floor(Nyears/2))/2)))
-    if(Fdynamics=="Constant") Fconstant_t <- c(rep(Finit, nburn), rep(Fequil, Nyears))
+    if(Fdynamics=="Constant") Fconstant_t <- rep(Finit, tyears)
     if(Fdynamics=="Increasing") Finc_t <- c(rep(Finit, nburn), seq(Finit, Fmax, length=Nyears))
     if(Fdynamics=="Decreasing") Fdec_t <- c(rep(Finit, nburn), seq(Finit, 0, length=Nyears))
     if(Fdynamics=="None") F_t <- rep(0, tyears)
