@@ -28,7 +28,7 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
 
-\item{init_depl}{default=0.4, can specify a different value or "random" to generate random initial depletions per iteration}
+\item{init_depl}{default=0.4, can specify a different value or 2 values that indicate range from which to choose them}
 }
 \value{
 print how many iterations were written into the model directory
