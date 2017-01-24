@@ -12,7 +12,7 @@
 #' @param Nyears number of years to simulate
 #' @param comp_sample vector with sample sizes of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
-#' @param init_depl default=0.4, can specify a different value or "random" to generate random initial depletions per iteration
+#' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
 
 #' @return print how many iterations were written into the model directory
 #' @export
@@ -36,11 +36,12 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
         Nyears_comp <- as.numeric(unlist(strsplit(data_avail, "LBSPR"))[2])
     }
 
-    if(init_depl!="random") init_depl_input <- init_depl
-    if(init_depl=="random"){
+    if(length(init_depl)==1) init_depl_input <- init_depl
+    if(length(init_depl)==2){
         set.seed(iter+1000)
-        init_depl_input <- runif(1,0.05,1)
+        init_depl_input <- runif(1,init_depl[1],init_depl[2])
     }
+    if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
     ## simulated data with no spatial structure in growth
     DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
