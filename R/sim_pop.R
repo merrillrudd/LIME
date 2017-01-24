@@ -8,13 +8,14 @@
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample vector with sample sizes of length composition data annually
+#' @param init_depl initial depletion; if FALSE, will use F1 from lh list
 #' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series
 #' @param modname save model name for true dynamics in named list output
 
 #' @return named list of attributes of true population/data
 #' @export
-sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, nburn, seed, modname){
+sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl, nburn, seed, modname){
 
     ## SB_t = spawning biomass over time
     ## F_t = fishing mortality over time
@@ -54,19 +55,27 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ##########################
     ## Data objects
     ##########################
-    TB_t <- VB_t <- SB_t <- F_t <- R_t <- rep(NA, tyears)                               
+    TB_t <- VB_t <- SB_t <- F_t <- R_t <- D_t <- rep(NA, tyears)                               
     Cn_at <- N_at <- N_at0 <- matrix(NA, nrow=length(L_a), ncol=tyears)
 
     #####################################
     ## Fishing and recruitment dynamics
     #####################################   
+    ## reference points
+    F40 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.4)$root, error=function(e) NA)
+    if(init_depl==FALSE) Finit <- F1
+    if(init_depl!=FALSE) Finit <- tryCatch(uniroot(calc_ref, lower=0, upper=200, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=init_depl)$root, error=function(e) NA)
+    if(is.na(Finit)) stop("F corresponding to initial depletion does not exist")
+    Fmax <- tryCatch(uniroot(calc_ref, lower=0, upper=200, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.2)$root, error=function(e) NA)
 
-    if(Fdynamics=="Ramp") Framp_t <- c(rep(F1, nburn), "rampup"=seq(F1, Fmax, length=floor(Nyears/2)), 
+    if(Fdynamics=="Ramp") Framp_t <- c(rep(Finit, nburn), "rampup"=seq(Finit, Fmax, length=floor(Nyears/2)), 
         "peak"=rep(Fmax, floor((Nyears-floor(Nyears/2))/2)), 
-        "managed"=rep(Fmax/3, Nyears-floor(Nyears/2)-floor((Nyears-floor(Nyears/2))/2)))
-    if(Fdynamics=="Constant") Fconstant_t <- c(rep(F1, nburn), rep(Fequil, Nyears))
-    if(Fdynamics=="Increasing") Finc_t <- c(rep(F1, nburn), seq(F1, Fmax, length=Nyears))
+        "managed"=rep(Fmax/2, Nyears-floor(Nyears/2)-floor((Nyears-floor(Nyears/2))/2)))
+    if(Fdynamics=="Constant") Fconstant_t <- c(rep(Finit, nburn), rep(Fequil, Nyears))
+    if(Fdynamics=="Increasing") Finc_t <- c(rep(Finit, nburn), seq(Finit, Fmax, length=Nyears))
+    if(Fdynamics=="Decreasing") Fdec_t <- c(rep(Finit, nburn), seq(Finit, 0, length=Nyears))
     if(Fdynamics=="None") F_t <- rep(0, tyears)
+    if(Fdynamics=="4010") F_t <- rep(NA, tyears)
 
     if(Rdynamics=="Pulsed") Rpulse_t <- c(rep(R0, nburn), "initial"=rep(R0, floor(Nyears/3)),
         "pulse_down"=rep(R0/3, floor(Nyears/3)), "pulse_up"=rep(R0, Nyears-(2*floor(Nyears/3))))
@@ -82,8 +91,14 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
         if(Fdynamics=="Increasing"){
             F_t <- Finc_t * exp(FishDev)
         }
+        if(Fdynamics=="Decreasing"){
+            F_t <- Fdec_t * exp(FishDev)
+        }
         if(Fdynamics=="Endogenous"){
-            F_t[1] <- F1
+            F_t[1] <- Finit
+        }
+        if(Fdynamics=="4010"){
+            F_t[1] <- Finit
         }
         if(Rdynamics=="Constant"){
             R_t <- Rconstant_t * exp(RecDev)
@@ -125,21 +140,32 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ##########################
     ## Projection
     ##########################
-    # Na0 <- rep(NA, length(W_a))
-    #     if(Rdynamics=="Pulsed"){
-    #         R0 <- median(Rpulse_t[-c(1:nburn)])
-    #     }
-    # Na0[1] <- R0
-    # for(a in 2:length(W_a)){
-    #     Na0[a] <- R0 * exp(-M*(a-1))
-    # }
     SB0 <- sum(N_at0[,1]*Mat_a*W_a)
+    D_t[1] <- SB_t[1]/SB0
+
+    # D_t <- seq(0,1,length=tyears)
+    # F_t <- rep(NA, tyears)
+    # F_t[1] <- 0
+    # for(t in 2:tyears){
+    #             if(D_t[t-1] < 0.10) F_t[t] <- 0
+    #             if(D_t[t-1] >= 0.40) F_t[t] <- F40 * exp(FishDev[t])
+    #             if(D_t[t-1] >= 0.10 & D_t[t-1] < 0.40) F_t[t] <- ((F40/0.3)*D_t[t-1] - ((0.10*F40)/0.30)) * exp(FishDev[t])
+    # }
 
     for(y in 2:tyears){
         ## fishing effort and recruitment, not dependent on age structure
         if(Fdynamics=="Endogenous"){
-            if(y <= nburn) F_t[y] <- F1
+            if(y <= nburn) F_t[y] <- Finit
             if(y > nburn) F_t[y] <- F_t[y-1]*(SB_t[y-1]/(Fequil*SB0))^Frate * exp(FishDev[y])
+        }
+        if(Fdynamics=="4010"){
+            if(y <= nburn) F_t[y] <- Finit
+            if(y > nburn){
+                if(D_t[y-1] < 0.10) F_t[y] <- 0
+                # if(D_t[y-1] >= 0.40) F_t[y] <- F40 * exp(FishDev[y])
+                # if(D_t[y-1] >= 0.10 & D_t[y-1] < 0.40) F_t[y] <- ((F40/0.3)*D_t[y-1] - ((0.10*F40)/0.30)) * exp(FishDev[y])
+                if(D_t[y-1] >= 0.10) F_t[y] <- ((F40/0.3)*D_t[y-1] - ((0.10*F40)/0.30)) * exp(FishDev[y])
+            }
         }
         if(Rdynamics=="BH"){
             if(h==1) h_use <- 0.7
@@ -170,6 +196,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
 
             ## catch
             Cn_at[,y] <- N_at[,y] * (1 - exp(-M - F_t[y] * S_a)) * (F_t[y] * S_a)/ (M + F_t[y] * S_a)
+            D_t <- SB_t/SB0
 
 
         }
@@ -177,7 +204,6 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     Cn_t <- colSums(Cn_at)
     Cw_t <- colSums(Cn_at * W_a)
     N_t <- colSums(N_at[-1,])
-    D_t <- SB_t/SB0
 
     I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
     C_t <- Cn_t #* exp(CatchDev - (SigmaC^2)/2)
