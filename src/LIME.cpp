@@ -61,6 +61,7 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(Mat_a); // maturity
     DATA_SCALAR(lwa);
     DATA_SCALAR(lwb);
+    DATA_INTEGER(Sel0); //if 1, selectivity at age 0 fish is very small 1e-20, if 0, selectivity of age 0 fish can be greater than 1e-20
 
     // penalties
     DATA_INTEGER(Fpen);
@@ -131,10 +132,18 @@ Type objective_function<Type>::operator() ()
   }
 
   vector<Type> S_a(AgeMax+1);
-  S_a(0) = 1e-20;
-  for(int a=1;a<=AgeMax;a++){
-    S_a(a) = 1 / (1 + exp(S50 - a));
+  if(Sel0==1){
+    S_a(0) = 1e-20;
+    for(int a=1;a<=AgeMax;a++){
+      S_a(a) = 1 / (1 + exp(S50 - a));
+    }    
   }
+  if(Sel0==0){
+    for(int a=0;a<=AgeMax;a++){
+      S_a(a) = 1 / (1 + exp(S50 - a));
+    }      
+  }
+
 
 
   // ============ Probability of random effects =============
