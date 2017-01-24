@@ -347,7 +347,7 @@ Type objective_function<Type>::operator() ()
           dat1 = LF.row(lc);
           dat = obs_per_yr(t)*(dat1/dat1.sum());
           prob = plb.row(t);
-          log_pL_t(t) += dmultinom(dat, prob, true);
+          log_pL_t(t) += dmultinom(dat, prob, true); // check log
         }
       }
     }
