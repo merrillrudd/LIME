@@ -4,8 +4,8 @@
 \alias{generate_data}
 \title{Generate data for simulation testing}
 \usage{
-generate_data(modpath, data_avail, itervec, spatial, Fdynamics, Rdynamics, lh,
-  write = TRUE, Nyears, comp_sample, rewrite)
+generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
+  write = TRUE, Nyears, comp_sample, rewrite = TRUE, init_depl)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -13,8 +13,6 @@ generate_data(modpath, data_avail, itervec, spatial, Fdynamics, Rdynamics, lh,
 \item{data_avail}{types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.}
 
 \item{itervec}{number of iterations of data to generate}
-
-\item{spatial}{does asymptotic length vary by spatially? TRUE or FALSE}
 
 \item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None}
 
@@ -29,6 +27,8 @@ generate_data(modpath, data_avail, itervec, spatial, Fdynamics, Rdynamics, lh,
 \item{comp_sample}{vector with sample sizes of length composition data each year}
 
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
+
+\item{init_depl}{default=0.4, can specify a different value or "random" to generate random initial depletions per iteration}
 }
 \value{
 print how many iterations were written into the model directory
