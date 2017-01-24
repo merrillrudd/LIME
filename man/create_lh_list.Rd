@@ -8,7 +8,8 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
   maturity_input = "length", binwidth = 1, t0 = -0.01, CVlen = 0.1,
   SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3, R0 = 1,
   h = 1, qcoef = 1e-05, M = NULL, F1 = 0.2, Fequil = 0.2,
-  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0)
+  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, Mat0 = TRUE,
+  Sel0 = TRUE)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -60,6 +61,10 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 \item{start_ages}{age to start (either 0 or 1; default = 0)}
 
 \item{rho}{first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)}
+
+\item{Mat0}{default=TRUE, maturity at age zero fixed to 1e-20, if FALSE, will calculate based on logistic curve}
+
+\item{Sel0}{default=TRUE, selectivity at age zero fixed to 1e-20, if FALSE, will calculate based on logistic curve}
 }
 \value{
 List, a tagged list of life history traits

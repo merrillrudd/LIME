@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
-  fix_f, f_startval, fix_param = FALSE, C_opt = 0)
+  fix_f, f_startval, fix_param = FALSE, C_opt = 0, Sel0)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -29,6 +29,8 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
 \item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
 
 \item{C_opt}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
+
+\item{Sel0}{input 1 means selectivity at age 0 fish is restrained to 1e-20; value of 0 means selectivity at age-0 fish can be larger following logistic curve}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map

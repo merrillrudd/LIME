@@ -9,11 +9,7 @@ Description: A flexible stock assessment method for fisheries with developing
 License: GPL-2
 Depends:
     TMB,
-    devtools,
-    RandomFields,
-    methods
-Imports:
-    TMBhelper
+    devtools
 LinkingTo: TMB, RcppEigen, Rcpp
 RoxygenNote: 5.0.1
 LazyData: true
