@@ -44,12 +44,16 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
-        set.seed(iter+1000)
         DataList <- NA
+        add <- 0
         while(all(is.na(DataList))){
+            seed_init <- iter + 1000 + add
+            set.seed(seed_init)
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
             DataList <- tryCatch(sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail), error=function(e) NA)
+            if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
+            if(all(is.na(DataList))) add <- add + 1000
         }
 
     }
