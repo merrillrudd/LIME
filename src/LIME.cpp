@@ -47,6 +47,7 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(C_opt); // if C_opt=0, no catch data, if C_opt=1, numbers, if C_opt=2, biomass
     DATA_VECTOR(ML_t); // mean length each year
     DATA_MATRIX(LF); // length composition
+    DATA_INTEGER(LFdist); // distribution for length composition; 0=multinomial (and requires obs_per_year), 1=dirichlet-multinomial
 
 
     // Known values
@@ -80,6 +81,7 @@ Type objective_function<Type>::operator() ()
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp
+    PARAMETER(theta); // dirichlet-multinomial parameter
 
 
     // Random effects
@@ -89,7 +91,7 @@ Type objective_function<Type>::operator() ()
   // ============ Global values ============================
 
   using namespace density;
-  int f,a,t,lc,c,i,ml;
+  int f,a,t,lc,c,i,ml,ll;
   Type jnll=0;
   vector<Type> jnll_comp(7);
   jnll_comp.setZero();
@@ -349,18 +351,34 @@ Type objective_function<Type>::operator() ()
     vector<Type> dat(n_lb);
     vector<Type> dat1(n_lb);
     vector<Type> prob(n_lb);
+    Type n_samp = LF.sum();
+    Type sum1 = 0;
+    Type sum2 = 0;
+    Type neff = 0;
     for(int t=0;t<n_t;t++){
       log_pL_t(t) = 0;
       for(int lc=0;lc<n_lc;lc++){
         if(LC_yrs(lc)==T_yrs(t)){
           dat1 = LF.row(lc);
-          dat = obs_per_yr(t)*(dat1/dat1.sum());
           prob = plb.row(t);
-          log_pL_t(t) += dmultinom(dat, prob, true); // check log
+          if(LFdist==0){
+            dat = obs_per_yr(t)*(dat1/dat1.sum()); 
+            log_pL_t(t) += dmultinom(dat, prob, true); // check log
+          }
+          if(LFdist==1){
+            dat = (dat1/dat1.sum());
+            for(int ll=0;ll<n_lb;ll++){
+              sum1 += lgamma(n_samp*dat(ll) + 1)
+              sum2 += lgamma(n_samp*dat(ll) + theta*n_samp*dat(ll)) - lgamma(theta*n_samp*prob(ll));
+            }
+            log_pL_t(t) += lgamma(n_samp + 1) - sum1 + lgamma(theta*n_samp) - lgamma(nsamp + theta*nsamp) + sum2;
+          }
         }
       }
     }
   }
+
+  if(LFdist==1) neff = (1+theta*n_samp)/(1+theta);
 
   vector<Type> I_t_hat(n_t);
   for(int t=0;t<n_t;t++){
@@ -540,6 +558,8 @@ Type objective_function<Type>::operator() ()
   REPORT(log_pC_t);
   REPORT(log_pI_t);
   REPORT(log_pL_t);
+  REPORT(neff);
+  REPORT(n_samp);
   REPORT(log_pML_t);
   REPORT(sigrp);
   REPORT(jnll_comp);
