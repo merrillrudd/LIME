@@ -14,10 +14,11 @@
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param Sel0 input 1 means selectivity at age 0 fish is restrained to 1e-20; value of 0 means selectivity at age-0 fish can be larger following logistic curve
+#' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, fix_f, f_startval, fix_param=FALSE, C_opt=0, Sel0){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, fix_f, f_startval, fix_param=FALSE, C_opt=0, Sel0, LFdist){
 
     with(input, {
         ## data-rich model
@@ -33,7 +34,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0),
                 obs_per_yr=obs_per_year,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -52,7 +53,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.numeric(rownames(LF)),
                 obs_per_yr=obs_per_year,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0),
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -81,7 +82,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0), 
                 obs_per_yr=obs_per_year,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -110,7 +111,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=ML_yrs,
                 obs_per_yr=obs_per_year,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0),
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -139,7 +140,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0), 
                 obs_per_yr=obs_per_year,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -169,7 +170,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=ML_yrs,
                 obs_per_yr=obs_per_year,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0),
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
@@ -198,7 +199,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0),
                 obs_per_yr=obs_per_year,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)
@@ -206,7 +207,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
         ## set input parameters - regardless of data availability 
         if(all(is.null(f_startval))) f_startval <- rep(1, Nyears)
-        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(S50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L,Nu_input=rep(0,Nyears))
+        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(S50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, theta=log(1), Nu_input=rep(0,Nyears))
 
         ## turn off parameter estimation - depends on data availability
             Map = list()
@@ -273,6 +274,11 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                     Map[[fix_param[i]]] <- NA
                     Map[[fix_param[i]]] <- factor(Map[[fix_param[i]]])
                 }
+            }
+
+            if(LFdist==0){
+                Map[["theta"]] <- NA
+                Map[["theta"]] <- factor(Map[["theta"]])
             }
 
         if(length(Map)==0) Map <- NULL

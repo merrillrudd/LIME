@@ -347,14 +347,14 @@ Type objective_function<Type>::operator() ()
   // Likelihood contribution from observations
   vector<Type> log_pL_t(n_t);
   log_pL_t.setZero();
+  Type neff = 0;
+  Type n_samp = LF.sum();
   if(n_lc>0){
     vector<Type> dat(n_lb);
     vector<Type> dat1(n_lb);
     vector<Type> prob(n_lb);
-    Type n_samp = LF.sum();
     Type sum1 = 0;
     Type sum2 = 0;
-    Type neff = 0;
     for(int t=0;t<n_t;t++){
       log_pL_t(t) = 0;
       for(int lc=0;lc<n_lc;lc++){
@@ -371,7 +371,7 @@ Type objective_function<Type>::operator() ()
               sum1 += lgamma(n_samp*dat(ll) + 1)
               sum2 += lgamma(n_samp*dat(ll) + theta*n_samp*dat(ll)) - lgamma(theta*n_samp*prob(ll));
             }
-            log_pL_t(t) += lgamma(n_samp + 1) - sum1 + lgamma(theta*n_samp) - lgamma(nsamp + theta*nsamp) + sum2;
+            log_pL_t(t) += lgamma(n_samp + 1) - sum1 + lgamma(theta*n_samp) - lgamma(n_samp + theta*n_samp) + sum2;
           }
         }
       }

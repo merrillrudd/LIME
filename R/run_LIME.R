@@ -20,12 +20,13 @@
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
 #' @param F_up upper bound of fishing mortality estimate; default=5
 #' @param Sel0 default=1, restrains selectivity at age-0 fish at 1e-20; option=0 allows selectivity at age-0 to follow logistic curve
+#' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, Sel0=1){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, Sel0=1, LFdist=0){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -72,7 +73,7 @@ for(iter in 1:length(itervec)){
     if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(write==FALSE) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, Sel0=Sel0)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, Sel0=Sel0, LFdist=LFdist)
 
       if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(write==FALSE) output$Inputs <- TmbList
