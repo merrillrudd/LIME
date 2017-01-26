@@ -25,8 +25,12 @@ copy_sim <- function(fromdir, fromcombos, todir, itervec, rewrite){
 			if(grepl("LBSPR",data_avail[sdir])) avail <- as.numeric(strsplit(data_avail[sdir],"LBSPR")[[1]][2])
 			index <- (nrow(lc)-avail+1):nrow(lc)
 			lc_new <- lc[index,]		
+			if(length(index)==1) lc_new <- t(as.matrix(lc_new))
+				rownames(lc_new) <- nrow(lc)
 
 			lc0_new <- file$LF0[index,]		
+			if(length(index)==1) lc0_new <- t(as.matrix(lc0_new))
+				rownames(lc0_new) <- nrow(lc)
 
 			obs_per_year <- rep(0,file$Nyears)
 			obs_per_year[index] <- file$obs_per_year[index]		
