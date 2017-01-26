@@ -368,7 +368,7 @@ Type objective_function<Type>::operator() ()
           if(LFdist==1){
             dat = (dat1/dat1.sum());
             for(int ll=0;ll<n_lb;ll++){
-              sum1 += lgamma(n_samp*dat(ll) + 1)
+              sum1 += lgamma(n_samp*dat(ll) + 1);
               sum2 += lgamma(n_samp*dat(ll) + theta*n_samp*dat(ll)) - lgamma(theta*n_samp*prob(ll));
             }
             log_pL_t(t) += lgamma(n_samp + 1) - sum1 + lgamma(theta*n_samp) - lgamma(n_samp + theta*n_samp) + sum2;
