@@ -560,6 +560,7 @@ Type objective_function<Type>::operator() ()
   REPORT(log_pL_t);
   REPORT(neff);
   REPORT(n_samp);
+  REPORT(theta);
   REPORT(log_pML_t);
   REPORT(sigrp);
   REPORT(jnll_comp);
