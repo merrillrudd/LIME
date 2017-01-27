@@ -223,6 +223,8 @@ for(iter in 1:length(itervec)){
           if(write==TRUE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
           if(write==FALSE) output$Derived <- Derived
 
+        if(write==TRUE) saveRDS(df, file.path(iterpath, "check_convergence.rds"))
+
         if(iter==1 & write==TRUE) write.csv(df, file.path(modpath, "df.csv"))  
         if(iter==1 & write==FALSE) output$df <- df
 
