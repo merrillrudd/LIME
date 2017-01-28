@@ -53,7 +53,10 @@ for(iter in 1:length(itervec)){
       sim <- readRDS(file.path(iterpath, "True.rds"))
       if(f_true==TRUE) f_inits <- sim$F_t
       if(f_true==FALSE) f_inits <- NULL
-      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=sim$C_t, "obs_per_year"=sim$obs_per_year, "F_t"=f_inits)
+      if(C_opt==0) C_t_input <- NULL
+      if(C_opt==1) C_t_input <- sim$C_t
+      if(C_opt==2) C_t_input <- sim$Cw_t
+      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=C_t_input, "obs_per_year"=sim$obs_per_year, "F_t"=f_inits)
     }
     if(simulation==TRUE & write==FALSE) stop("must write generated data to directory")
 
