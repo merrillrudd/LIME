@@ -349,12 +349,15 @@ Type objective_function<Type>::operator() ()
   log_pL_t.setZero();
   Type neff = 0;
   Type n_samp = LF.sum();
-  if(n_lc>0){
     vector<Type> dat(n_lb);
     vector<Type> dat1(n_lb);
     vector<Type> prob(n_lb);
+    Type dmt1 = lgamma(n_samp + 1);
+    Type dmt2 = lgamma(theta * n_samp);
+    Type dmt3 = lgamma(n_samp + theta*n_samp);
     Type sum1 = 0;
     Type sum2 = 0;
+  if(n_lc>0){
     for(int t=0;t<n_t;t++){
       log_pL_t(t) = 0;
       for(int lc=0;lc<n_lc;lc++){
@@ -368,10 +371,10 @@ Type objective_function<Type>::operator() ()
           if(LFdist==1){
             dat = (dat1/dat1.sum());
             for(int ll=0;ll<n_lb;ll++){
-              sum1 += lgamma(dat1(ll)*dat(ll) + 1);
-              sum2 += lgamma(dat1(ll)*dat(ll) + theta*dat1(ll)*dat(ll)) - lgamma(theta*dat1(ll)*prob(ll));
+              sum1 += lgamma(n_samp*dat(ll)+1);
+              sum2 += lgamma(n_samp*dat(ll) + theta*n_samp*prob(ll)) - lgamma(theta*n_samp*prob(ll));
             }
-            log_pL_t(t) += lgamma(dat1.sum() + 1) - sum1 + lgamma(theta*dat1.sum()) - lgamma(dat1.sum() + theta*dat1.sum()) + sum2;
+            log_pL_t(t) += (dmt1 - sum1) + (dmt2 - dmt3) + sum2;
           }
         }
       }

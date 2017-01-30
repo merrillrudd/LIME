@@ -67,6 +67,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     if(init_depl!=FALSE) Finit <- tryCatch(uniroot(calc_ref, lower=0, upper=200, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=init_depl)$root, error=function(e) NA)
     if(is.na(Finit)) stop("F corresponding to initial depletion does not exist")
     Fmax <- tryCatch(uniroot(calc_ref, lower=0, upper=200, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.2)$root, error=function(e) NA)
+    if(is.na(Fmax)) Fmax <- 3
 
     if(Fdynamics=="Ramp") Framp_t <- c(rep(Finit, nburn), "rampup"=seq(Finit, Fmax, length=floor(Nyears/2)), 
         "peak"=rep(Fmax, floor((Nyears-floor(Nyears/2))/2)), 
