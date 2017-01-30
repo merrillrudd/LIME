@@ -7,7 +7,7 @@
 #' @param todir list of possible directories to copy the data to. the function will filter and copy to the appropriate directories with the same sample size, life history, fishing mortality, and recruitment dynamics
 #' @param itervec iterations of simulated data
 #' @param rewrite if TRUE will overwrite the files, if FALSE will not overwrite the files if one already exists.
-
+#' @param res_dir name for results directory to search for file (e.g. "equil" or "base" where specific models are written)
 #' @return saves files in new directory
 #' @export
 copy_sim <- function(fromdir, fromcombos, todir, itervec, rewrite, res_dir){

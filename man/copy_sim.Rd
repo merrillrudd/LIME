@@ -4,7 +4,7 @@
 \alias{copy_sim}
 \title{Copy simulated data from one data availability scenario to another}
 \usage{
-copy_sim(fromdir, fromcombos, todir, itervec, rewrite)
+copy_sim(fromdir, fromcombos, todir, itervec, rewrite, res_dir)
 }
 \arguments{
 \item{fromdir}{single directory from which to copy data}
@@ -16,6 +16,8 @@ copy_sim(fromdir, fromcombos, todir, itervec, rewrite)
 \item{itervec}{iterations of simulated data}
 
 \item{rewrite}{if TRUE will overwrite the files, if FALSE will not overwrite the files if one already exists.}
+
+\item{res_dir}{name for results directory to search for file (e.g. "equil" or "base" where specific models are written)}
 }
 \value{
 saves files in new directory
