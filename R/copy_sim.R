@@ -10,10 +10,10 @@
 
 #' @return saves files in new directory
 #' @export
-copy_sim <- function(fromdir, fromcombos, todir, itervec, rewrite){
+copy_sim <- function(fromdir, fromcombos, todir, itervec, rewrite, res_dir){
 
 	subto <- todir[grepl(fromcombos$ESS,todir) & grepl(fromcombos$LH,todir) & grepl(fromcombos$Fdyn,todir) & grepl(fromcombos$Rdyn,todir)]
-	data_avail <- sapply(1:length(subto), function(x) strsplit(strsplit(subto[x],"equil/")[[1]][2],"/")[[1]][1])
+	data_avail <- sapply(1:length(subto), function(x) strsplit(strsplit(subto[x], paste0(res_dir, "/"))[[1]][2],"/")[[1]][1])
 
 	for(sdir in 1:length(subto)){
 		for(iter in itervec){
