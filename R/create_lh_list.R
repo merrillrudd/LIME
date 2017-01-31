@@ -29,9 +29,10 @@
 #' @param rho first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)
 #' @param Mat0 default=TRUE, maturity at age zero fixed to 1e-20, if FALSE, will calculate based on logistic curve
 #' @param Sel0 default=TRUE, selectivity at age zero fixed to 1e-20, if FALSE, will calculate based on logistic curve
+#' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, Mat0=TRUE, Sel0=TRUE){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, Mat0=TRUE, Sel0=TRUE, theta=10){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
@@ -144,5 +145,6 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$Frate <- Frate
     Outs$Fmax <- Fmax
     Outs$rho <- rho
+    Outs$theta <- theta
     return(Outs)
 }
