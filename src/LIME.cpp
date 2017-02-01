@@ -91,7 +91,7 @@ Type objective_function<Type>::operator() ()
   // ============ Global values ============================
 
   using namespace density;
-  int f,a,t,lc,c,i,ml,ll;
+  int t,a,lc,c,i,ml,ll,l;
   Type jnll=0;
   vector<Type> jnll_comp(7);
   jnll_comp.setZero();
@@ -348,8 +348,8 @@ Type objective_function<Type>::operator() ()
   vector<Type> log_pL_t(n_t);
   log_pL_t.setZero();
   Type neff = 0;
-    vector<Type> dat(n_lb);
-    vector<Type> dat1(n_lb);
+    vector<Type> LFprob(n_lb);
+    vector<Type> LFraw(n_lb);
     vector<Type> prob(n_lb);
     vector<Type> sum1(n_lc);
     vector<Type> sum2(n_lc);
@@ -360,19 +360,19 @@ Type objective_function<Type>::operator() ()
       log_pL_t(t) = 0;
       for(int lc=0;lc<n_lc;lc++){
         if(LC_yrs(lc)==T_yrs(t)){
-          dat1 = LF.row(lc);
+          LFraw = LF.row(lc);
           prob = plb.row(t);
           if(LFdist==0){
-            dat = obs_per_yr(t)*(dat1/dat1.sum()); 
-            log_pL_t(t) += dmultinom(dat, prob, true); // check log
+            LFprob = obs_per_yr(t)*(LFraw/LFraw.sum()); 
+            log_pL_t(t) += dmultinom(LFprob, prob, true); // check log
           }
           if(LFdist==1){
-            dat = (dat1/dat1.sum());
-            for(int ll=0;ll<n_lb;ll++){
-              sum1(lc) += lgamma(dat1.sum()*dat(ll)+1);
-              sum2(lc) += lgamma(dat1.sum()*dat(ll) + theta*dat1.sum()*prob(ll)) - lgamma(theta*dat1.sum()*prob(ll));
+            LFprob = (LFraw/LFraw.sum());
+            for(int l=0;l<n_lb;l++){
+              sum1(lc) += lgamma(LFraw.sum()*LFprob(l)+1);
+              sum2(lc) += lgamma(LFraw.sum()*LFprob(l) + theta*LFraw.sum()*prob(l)) - lgamma(theta*LFraw.sum()*prob(l));
             }
-            log_pL_t(t) += lgamma(dat1.sum()+1) - sum1(lc) + lgamma(theta*dat1.sum()) - lgamma(dat1.sum()+theta*dat1.sum()) + sum2(lc);
+            log_pL_t(t) += lgamma(LFraw.sum()+1) - sum1(lc) + lgamma(theta*LFraw.sum()) - lgamma(LFraw.sum()+theta*LFraw.sum()) + sum2(lc);
           }
         }
       }

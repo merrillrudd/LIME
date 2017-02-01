@@ -21,12 +21,13 @@
 #' @param F_up upper bound of fishing mortality estimate; default=5
 #' @param Sel0 default=1, restrains selectivity at age-0 fish at 1e-20; option=0 allows selectivity at age-0 to follow logistic curve
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
+#' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, Sel0=1, LFdist=0){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, Sel0=1, LFdist=0, derive_quants=FALSE){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -56,7 +57,9 @@ for(iter in 1:length(itervec)){
       if(C_opt==0) C_t_input <- NULL
       if(C_opt==1) C_t_input <- sim$C_t
       if(C_opt==2) C_t_input <- sim$Cw_t
-      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=C_t_input, "obs_per_year"=sim$obs_per_year, "F_t"=f_inits)
+      if(LFdist==0) obs_input <- sim$obs_per_year
+      if(LFdist==1) obs_input <- rep(0, sim$Nyears)
+      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=C_t_input, "obs_per_year"=obs_input, "F_t"=f_inits)
     }
     if(simulation==TRUE & write==FALSE) stop("must write generated data to directory")
 
@@ -64,8 +67,6 @@ for(iter in 1:length(itervec)){
     inits <- create_inputs(lh=lh, input_data=input_data, param=param_adjust, val=val_adjust)
 
     Nyears <- inits$Nyears 
-
-    obs_per_yr <- inits$obs_per_year
     
     Sdreport <- NA
     ParList <- NA  
@@ -120,6 +121,7 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_CV_L",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
+        Lwr[match("theta", names(obj$par))] = 1e-20
 
         ## Run optimizer
         opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
@@ -221,10 +223,15 @@ for(iter in 1:length(itervec)){
 #   plot(Report$F_t, lwd=2, col="blue", ylim=c(0, max(Report$F_t)*1.5), type="l")
 #   polygon( y=FUN(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),], log=TRUE), x=c(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE), rev(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
 
+      ## can calculate derived quants later if you want
+      if(write==TRUE) saveRDS(obj_save, file.path(iterpath, "TMB_obj.rds"))
+      if(write==FALSE) output$obj <- obj_save
 
+      if(derive_quants==TRUE){
           Derived = calc_derived_quants( Obj=obj_save )
           if(write==TRUE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
           if(write==FALSE) output$Derived <- Derived
+      }
 
         if(write==TRUE) saveRDS(df, file.path(iterpath, "check_convergence.rds"))
 

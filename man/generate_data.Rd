@@ -5,7 +5,8 @@
 \title{Generate data for simulation testing}
 \usage{
 generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
-  write = TRUE, Nyears, comp_sample, rewrite = TRUE, init_depl)
+  write = TRUE, Nyears, comp_sample, rewrite = TRUE, init_depl,
+  derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -29,6 +30,8 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
 
 \item{init_depl}{default=0.4, can specify a different value or 2 values that indicate range from which to choose them}
+
+\item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
 }
 \value{
 print how many iterations were written into the model directory

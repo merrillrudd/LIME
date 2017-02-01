@@ -8,7 +8,7 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
   itervec = NULL, REML = FALSE, rewrite = TRUE, fix_f = 0,
   simulation = TRUE, param_adjust = FALSE, val_adjust = FALSE,
   f_true = FALSE, fix_param = FALSE, C_opt = 0, F_up = 10, Sel0 = 1,
-  LFdist = 0)
+  LFdist = 0, derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -48,6 +48,8 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 \item{Sel0}{default=1, restrains selectivity at age-0 fish at 1e-20; option=0 allows selectivity at age-0 to follow logistic curve}
 
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
+
+\item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
 }
 \value{
 prints how many iterations were run in model directory
