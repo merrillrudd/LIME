@@ -40,7 +40,7 @@ for(iter in 1:length(itervec)){
     if(simulation==FALSE & write==FALSE) iterpath <- NULL
 
     if(rewrite==FALSE & write==TRUE){
-      if(file.exists(file.path(iterpath, "Derived_quants.rds"))) next
+      if(file.exists(file.path(iterpath, "Sdreport.rds"))) next
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
     }
@@ -201,6 +201,8 @@ for(iter in 1:length(itervec)){
           if(all(is.null(opt_save)) & write==FALSE) output$issue <- c(output$issue, "NAs_final_gradient")
           if(all(is.null(opt_save)==FALSE) & write==TRUE) if(abs(min(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
           if(all(is.null(opt_save)==FALSE & write==FALSE)) if(abs(min(opt_save[["final_gradient"]]))>0.01) output$issue <- c(output$issue, "high_final_gradient")
+          if(all(is.na(opt_save)) & write==TRUE) write("model_NA", file.path(iterpath, "model_NA.txt"))
+          if(all(is.na(opt_save)) & write==FALSE) output$issue <- c(output$issue, "model_NA")
 
         ParList <- obj_save$env$parList( x=obj_save$par, par=obj_save$env$last.par.best )
         
