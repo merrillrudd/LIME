@@ -136,7 +136,7 @@ for(iter in 1:length(itervec)){
 
         ## loop to try to get opt to run
           for(i in 1:5){
-            if(all(is.na(opt))){
+            if(all(is.na(opt)) | is.na(jnll)){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
