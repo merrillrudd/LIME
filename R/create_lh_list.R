@@ -10,6 +10,8 @@
 #' @param M50 age or length at 50 percent maturity
 #' @param selex_input specify whether argument S50 is an age or a length (default length)
 #' @param maturity_input specify whether argument M50 is an age or a length (default length)
+#' @param selex_type default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV.
+#' @param dome shape parameter for the right side of full selectivity
 #' @param binwidth width of length bins (default = 1)
 #' @param t0 theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin
 #' @param CVlen CV of the growth curve (default = 0.1)
@@ -32,7 +34,7 @@
 #' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, Mat0=TRUE, Sel0=TRUE, theta=10){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", maturity_input="length", selex_type="logistic", dome=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, Mat0=TRUE, Sel0=TRUE, theta=10){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
@@ -99,12 +101,43 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     ML95 <- L_a[id_L95]
     M95 <- ceiling(t0-log(1-(ML95/linf))/vbk)
 
-
-    ## selectivity 
-    if(start_ages==0 & Sel0==TRUE) S_a <- c(1e-20, 1 / (1 + exp(S50 - ages[-1]))) # Selectivity at age
-    if(start_ages!=0 | Sel0==FALSE) S_a <- 1/(1+exp(S50-ages))
-    id_SL95 <- which(round(S_a, 2) %in% round(seq(from=0.92,to=1.00,by=0.01),2))[1]
-    SL95 <- L_a[id_SL95]
+    ## selectivity
+    if(selex_input=="length"){
+        S_l <- 1 / (1 + exp(SL50 - mids))
+        S_ages <- ceiling(t0-log(1-(mids/linf))/vbk)
+        names(S_l) <- S_ages
+        S_a <- rep(NA, length(ages))
+        for(a in 1:length(ages)){
+            if(start_ages==0){
+                if(a==1 & Sel0==TRUE) S_a[a] <- 1e-20
+                if(a==1 & Sel0==FALSE){
+                    fill <- S_l[which(names(S_l)==a)][length(S_l[which(names(S_l)==a)])]
+                }
+                if(a>1){
+                    fill <- S_l[which(names(S_l)==(a-1))][length(S_l[which(names(S_l)==(a-1))])]
+                    if(length(fill)==1) S_a[a] <- fill
+                    if(length(fill)==0) S_a[a] <- S_a[a-1]
+                }
+            }
+            if(start_ages!=0){
+                fill <- S_l[which(names(S_l)==a)][length(S_l[which(names(S_l)==a)])]
+                if(length(fill)==1) S_a[a] <- fill
+                if(length(fill)==0) S_a[a] <- S_a[a-1]
+            }
+        }       
+    }
+    if(selex_input=="age"){
+        S_a <- rep(NA, length(ages))
+        if(start_ages==0 & Sel0==TRUE) S_a <- c(1e-20, 1/(1+exp(S50 - ages[-1])))
+        if(start_ages!=0 | Sel0==FALSE) S_a <- 1/(1+exp(S50 - ages))
+    }
+    if(selex_type=="dome"){
+            Sfull <- which(round(S_a,1)==1.00)[1]
+            index <- (Sfull+1):length(S_a)
+            S_a[index] <- rev(1/(1+exp(dome - ages[index])))
+    }
+    id_L95 <- which(round(S_a, 2) %in% seq(from=0.92,to=1.00,by=0.01))[1]
+    SL95 <- L_a[id_L95]
     S95 <- ceiling(t0-log(1-(SL95/linf))/vbk)
         
     ## output list
@@ -125,6 +158,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$S95 <- S95
     Outs$SL50 <- SL50
     Outs$SL95 <- SL95
+    Outs$dome <- dome
     Outs$h <- h
     Outs$qcoef <- qcoef
     Outs$M <- M

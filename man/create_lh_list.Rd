@@ -5,11 +5,11 @@
 \title{Create new life history list}
 \usage{
 create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
-  maturity_input = "length", binwidth = 1, t0 = -0.01, CVlen = 0.1,
-  SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3, R0 = 1,
-  h = 1, qcoef = 1e-05, M = NULL, F1 = 0.2, Fequil = 0.2,
-  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, Mat0 = TRUE,
-  Sel0 = TRUE, theta = 10)
+  maturity_input = "length", selex_type = "logistic", dome = NULL,
+  binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2,
+  SigmaR = 0.6, SigmaF = 0.3, R0 = 1, h = 1, qcoef = 1e-05,
+  M = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2, Fmax = 0.7,
+  start_ages = 0, rho = 0, Mat0 = TRUE, Sel0 = TRUE, theta = 10)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -27,6 +27,10 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 \item{selex_input}{specify whether argument S50 is an age or a length (default length)}
 
 \item{maturity_input}{specify whether argument M50 is an age or a length (default length)}
+
+\item{selex_type}{default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV.}
+
+\item{dome}{shape parameter for the right side of full selectivity}
 
 \item{binwidth}{width of length bins (default = 1)}
 
