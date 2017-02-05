@@ -65,12 +65,10 @@ for(iter in 1:length(itervec)){
 
       lh_new <- lh
       if("ML50" %in% param_adjust){
-        Sel0init <- Sel0
-        lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=selex_type, dome=lh$dome, binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=SigmaR, SigmaF=SigmaF, R0=R0,  h=h, qcoef=qcoef, M=M, F1=F1, Fequil=Fequil, Frate=Frate, Fmax=Fmax, start_ages=min(ages), rho=rho, Mat0=Mat0, Sel0=Sel0init, theta=theta))
+        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
       }
       if("M50" %in% param_adjust){
-        Sel0init <- Sel0
-          lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=selex_type, dome=lh$dome, binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=SigmaR, SigmaF=SigmaF, R0=R0,  h=h, qcoef=qcoef, M=M, F1=F1, Fequil=Fequil, Frate=Frate, Fmax=Fmax, start_ages=min(ages), rho=rho, Mat0=Mat0, Sel0=Sel0init, theta=theta))
+          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
       }
 
     ## check that inputs in right format    
