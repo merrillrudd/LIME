@@ -63,6 +63,13 @@ for(iter in 1:length(itervec)){
     }
     if(simulation==TRUE & write==FALSE) stop("must write generated data to directory")
 
+      if("ML50" %in% param_adjust){
+        lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=selex_type, dome=dome, binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=SigmaR, SigmaF=SigmaF, R0=R0,  h=h, qcoef=qcoef, M=M, F1=F1, Fequil=Fequil, Frate=Frate, Fmax=Fmax, start_ages=start_ages, rho=rho, Mat0=Mat0, Sel0=Sel0, theta=theta))
+      }
+      if("M50" %in% param_adjust){
+          lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=selex_type, dome=dome, binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=SigmaR, SigmaF=SigmaF, R0=R0,  h=h, qcoef=qcoef, M=M, F1=F1, Fequil=Fequil, Frate=Frate, Fmax=Fmax, start_ages=start_ages, rho=rho, Mat0=Mat0, Sel0=Sel0, theta=theta))
+      }
+
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh, input_data=input_data, param=param_adjust, val=val_adjust)
 

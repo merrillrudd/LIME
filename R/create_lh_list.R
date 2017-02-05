@@ -159,11 +159,15 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$SL50 <- SL50
     Outs$SL95 <- SL95
     Outs$dome <- dome
+    Outs$selex_type <- selex_type
     Outs$h <- h
     Outs$qcoef <- qcoef
     Outs$M <- M
     Outs$F1 <- F1
     Outs$AgeMax <- AgeMax
+    Outs$ages <- ages
+    Outs$Mat0 <- Mat0
+    Outs$Mat1 <- Mat1
     Outs$mids <- mids
     Outs$highs <- highs
     Outs$lows <- lows
