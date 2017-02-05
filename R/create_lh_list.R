@@ -167,7 +167,6 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
     Outs$AgeMax <- AgeMax
     Outs$ages <- ages
     Outs$Mat0 <- Mat0
-    Outs$Sel0 <- Sel0
     Outs$mids <- mids
     Outs$highs <- highs
     Outs$lows <- lows
