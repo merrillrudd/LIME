@@ -65,10 +65,10 @@ for(iter in 1:length(itervec)){
 
       lh_new <- lh
       if("ML50" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=NULL, theta=lh$theta)
+        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
       }
       if("M50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=NULL, theta=lh$theta)
+          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
       }
 
     ## check that inputs in right format    
