@@ -38,7 +38,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, selex_input="length", 
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
-    AgeMax <- ceiling(-log(0.01)/M)
+    AgeMax <- ceiling(-log(0.0001)/M)
     ages <- start_ages:AgeMax
 
     if(selex_input=="length"){
