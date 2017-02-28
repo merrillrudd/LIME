@@ -133,16 +133,27 @@ Type objective_function<Type>::operator() ()
     W_a(a) = lwa*pow(L_a(a), lwb);
   }
 
+  vector<Type> S_l(n_lb);
+  for(int l=0;l<n_lb;l++){
+    S_l(l) <- 1 / (1 + exp(S50 - lbmids(l)));
+  }
+
   vector<Type> S_a(AgeMax+1);
+  S_a.setZero();
+  Type pi = 3.141593;
   if(Sel0==1){
     S_a(0) = 1e-20;
     for(int a=1;a<=AgeMax;a++){
-      S_a(a) = 1 / (1 + exp(S50 - a));
+      for(int l=0;l<n_lb;l++){
+        S_a(a) += S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(l-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
+      }
     }    
   }
   if(Sel0==0){
     for(int a=0;a<=AgeMax;a++){
-      S_a(a) = 1 / (1 + exp(S50 - a));
+      for(int l=0;l<n_lb;l++){
+        S_a(a) += S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(l-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
+      }
     }      
   }
 
