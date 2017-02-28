@@ -168,7 +168,7 @@ for(iter in 1:length(itervec)){
         if(all(is.na(opt_save))==FALSE){  
 
           ## check convergence -- don't let it become NA after it has had a high final gradient
-          for(i in 1:2){
+          for(i in 1:5){
             if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
                if(abs(min(opt_save[["final_gradient"]]))>0.01){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
