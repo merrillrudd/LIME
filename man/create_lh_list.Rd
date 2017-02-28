@@ -4,12 +4,13 @@
 \alias{create_lh_list}
 \title{Create new life history list}
 \usage{
-create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
-  maturity_input = "length", selex_type = "logistic", dome_sd = NULL,
-  binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2,
-  SigmaR = 0.6, SigmaF = 0.3, R0 = 1, h = 1, qcoef = 1e-05,
-  M = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2, Fmax = 0.7,
-  start_ages = 0, rho = 0, Mat0 = 1, Sel0 = 1, theta = 10)
+create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
+  selex_input = "length", maturity_input = "length",
+  selex_type = "logistic", dome_sd = NULL, binwidth = 1, t0 = -0.01,
+  CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3,
+  R0 = 1, h = 1, qcoef = 1e-05, M = NULL, F1 = 0.2, Fequil = 0.2,
+  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, Mat0 = 1,
+  Sel0 = 1, theta = 10)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -23,6 +24,10 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, selex_input = "length",
 \item{S50}{starting value for age or length at 50 percent selectivity (will be estimated in LIME method)}
 
 \item{M50}{age or length at 50 percent maturity}
+
+\item{S95}{starting value for age or length at 95 percent selectivity}
+
+\item{M95}{age or length at 50 percent maturity}
 
 \item{selex_input}{specify whether argument S50 is an age or a length (default length)}
 
