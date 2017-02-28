@@ -528,6 +528,7 @@ Type objective_function<Type>::operator() ()
   REPORT( log_sigma_R );
   REPORT( S50 );
   REPORT( S_a );
+  REPORT( S_l );
   REPORT( sigma_C );
   REPORT( sigma_I );
   REPORT( CV_L );

@@ -81,11 +81,11 @@ for(iter in 1:length(itervec)){
     df <- NULL
     if(f_true==TRUE) Fpen <- 0
     if(f_true==FALSE) Fpen <- 1
-    if(inits$SigmaR > 0.05) SigRpen <- 0
-    if(inits$SigmaR <= 0.05) SigRpen <- 1
+    # if(inits$SigmaR > 0.05) SigRpen <- 0
+    # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(write==FALSE) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, Sel0=Sel0, LFdist=LFdist)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, Sel0=Sel0, LFdist=LFdist)
 
       if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(write==FALSE) output$Inputs <- TmbList
@@ -124,8 +124,8 @@ for(iter in 1:length(itervec)){
         Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
-        Lwr[match("logS50", names(obj$par))] = log(0.1)
-        Lwr[match("log_sigma_R",names(obj$par))] = log(0.001)
+        # Lwr[match("logS50", names(obj$par))] = log(0.1)
+        # Lwr[match("log_sigma_R",names(obj$par))] = log(0.001)
         Lwr[match("log_CV_L",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
