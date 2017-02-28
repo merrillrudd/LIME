@@ -134,8 +134,9 @@ Type objective_function<Type>::operator() ()
   }
 
   vector<Type> S_l(n_lb);
+  S_l.setZero();
   for(int l=0;l<n_lb;l++){
-    S_l(l) <- 1 / (1 + exp(S50 - lbmids(l)));
+    S_l(l) = 1 / (1 + exp(S50 - lbmids(l)));
   }
 
   vector<Type> S_a(AgeMax+1);
@@ -156,8 +157,6 @@ Type objective_function<Type>::operator() ()
       }
     }      
   }
-
-
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;

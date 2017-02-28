@@ -120,7 +120,7 @@ for(iter in 1:length(itervec)){
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
-        Upr[match("logS50", names(obj$par))] = log(inits$AgeMax)
+        Upr[match("logS50", names(obj$par))] = log(max(inits$highs))
         Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
