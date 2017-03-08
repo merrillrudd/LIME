@@ -272,6 +272,13 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     SPR_t <- sapply(1:length(F_tout), function(x) calc_ref(Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_tout[x]))
     SPR <- SPR_t[length(SPR_t)]
 
+    ## mimic SPR calculation in LB-SPR
+    P <- 0.0001
+    x <- seq(from=0, to=1, length.out=(AgeMax+1)) # relative age vector
+    EL <- (1-P^(x/(M/vbk))) * linf # length at relative age
+    rLens <- EL/linf # relative length
+    SPR_alt <- sum(Mat_a * rowSums(N_atout) * rLens^3)/sum(Mat_a * rowSums(N_at0out) * rLens^3)
+
     ## outputs
     lh$I_t <- I_tout
     lh$C_t <- C_tout
@@ -292,6 +299,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$page <- page
     lh$SPR <- SPR
     lh$SPR_t <- SPR_t
+    lh$SPR_alt <- SPR_alt
     lh$VB_t <- VB_tout
     lh$TB_t <- TB_tout
     lh$nlbins <- length(mids)
