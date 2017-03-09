@@ -47,6 +47,10 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
     mids <- seq((binwidth/2), linf*1.5, by=binwidth) 
     highs <- mids + (binwidth/2)
     lows <- mids - (binwidth)/2
+    if(binwidth!=1){
+        mids2 <- seq(0.5,linf*1.5, by=1)
+        highs2 <- mids + 0.5
+    }
 
     ## growth at age
     L_a <- linf*(1-exp(-vbk*(ages - t0)))
@@ -86,7 +90,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
     
     ## maturity
     if(mat_param==1) Mat_l <- 1 / (1 + exp(ML50 - mids))
+    if(binwidth!=1 & mat_param==1) Mat_l2 <- 1 / (1 + exp(ML50 - mids2))
     if(mat_param==2) Mat_l <- 1 /(1 + exp(-log(19)*(mids-ML50)/(ML95-ML50))) # Maturity at length
+    if(binwidth!=1 & mat_param==2) Mat_l2 <- 1 /(1 + exp(-log(19)*(mids2-ML50)/(ML95-ML50)))
 
     if(maturity_input=="length"){
         Mat_a <- rep(NA, length(ages))
@@ -95,8 +101,8 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
                 Mat_a[a] <- 1e-20
             } else{
                 add <- 0
-                for(l in 1:length(Mat_l)){
-                    add <- add + Mat_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(highs[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
+                for(l in 1:length(Mat_l2)){
+                    add <- add + Mat_l2[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(mids2[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
                 }
                 Mat_a[a] <- add
                 rm(add)
@@ -123,7 +129,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
 
     ## selectivity
     if(sel_param==1) S_l <- 1 / (1 + exp(SL50 - mids))
+    if(binwidth!=1 & sel_param==1) S_l2 <- 1 / (1+exp(SL50 - mids2))
     if(sel_param==2) S_l <- 1 /(1 + exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
+    if(binwidth!=1 & sel_param==2) S_l2 <- 1 /(1 + exp(-log(19)*(mids2-SL50)/(SL95-SL50))) 
 
     if(selex_input=="length"){
         if(selex_type=="dome"){
@@ -137,8 +145,8 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
                 S_a[a] <- 1e-20
             } else{
                 add <- 0
-                for(l in 1:length(S_l)){
-                    add <- add + S_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(highs[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
+                for(l in 1:length(S_l2)){
+                    add <- add + S_l2[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(mids2[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
                 }
                 S_a[a] <- add
                 rm(add)
