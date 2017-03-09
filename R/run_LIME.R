@@ -36,6 +36,7 @@ run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail,
 
 for(iter in 1:length(itervec)){
     if(simulation==TRUE & write==TRUE) iterpath <- file.path(modpath, iter)
+    if(simulation==TRUE & write==FALSE) iterpath <- NULL
     if(simulation==FALSE & write==TRUE) iterpath <- modpath
     if(simulation==FALSE & write==FALSE) iterpath <- NULL
 
@@ -61,8 +62,7 @@ for(iter in 1:length(itervec)){
       if(LFdist==1) obs_input <- rep(0, sim$Nyears)
       input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=C_t_input, "obs_per_year"=obs_input, "F_t"=f_inits)
     }
-    if(simulation==TRUE & write==FALSE) stop("must write generated data to directory")
-
+    
       lh_new <- lh
       if("ML50" %in% param_adjust){
         lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)

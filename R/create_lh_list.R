@@ -96,7 +96,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
             } else{
                 add <- 0
                 for(l in 1:length(Mat_l)){
-                    add <- add + Mat_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(l-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
+                    add <- add + Mat_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(highs[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
                 }
                 Mat_a[a] <- add
                 rm(add)
@@ -138,7 +138,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
             } else{
                 add <- 0
                 for(l in 1:length(S_l)){
-                    add <- add + S_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(l-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
+                    add <- add + S_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(highs[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
                 }
                 S_a[a] <- add
                 rm(add)
