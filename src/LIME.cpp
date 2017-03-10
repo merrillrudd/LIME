@@ -59,6 +59,7 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(AgeMax);
     DATA_VECTOR(lbhighs); // upper length bins
     DATA_VECTOR(lbmids);
+    DATA_INTEGER(binwidth);
     DATA_VECTOR(Mat_a); // maturity
     DATA_SCALAR(lwa);
     DATA_SCALAR(lwb);
@@ -146,14 +147,14 @@ Type objective_function<Type>::operator() ()
     S_a(0) = 1e-20;
     for(int a=1;a<=AgeMax;a++){
       for(int l=0;l<n_lb;l++){
-        S_a(a) += S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(l-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
+        S_a(a) += binwidth*S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(lbmids(l)-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
       }
     }    
   }
   if(Sel0==0){
     for(int a=0;a<=AgeMax;a++){
       for(int l=0;l<n_lb;l++){
-        S_a(a) += S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(l-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
+        S_a(a) += binwidth*S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(lbmids(l)-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
       }
     }      
   }
@@ -536,11 +537,12 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lI_t );
   ADREPORT( L_t_hat );
   ADREPORT( lSB_t );
-  ADREPORT( lTB_t );
   ADREPORT( lF_t );
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
   ADREPORT( SPR_t2 );
+  ADREPORT( S50 );
+  ADREPORT( S_l );
 
   // Parameters
   REPORT( F_equil );
