@@ -23,6 +23,20 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
     with(input, {
         ## data-rich model
         if(grepl("Index",data_avail) & grepl("Catch",data_avail) & grepl("LC",data_avail)){
+            if(is.matrix(LF)){
+                n_lc <- nrow(LF)
+                LC_yrs <- as.numeric(rownames(LF))
+                LF <- as.matrix(LF)
+                if(is.null(input$obs_per_year)) n_inp <- rowSums(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
+            }
+            if(is.vector(LF)){
+                n_lc <- 1
+                LC_yrs <- Nyears
+                LF <- t(as.matrix(LF))
+                if(is.null(input$obs_per_year)) n_inp <- sum(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
+            }   
             Data <- list(n_t=Nyears, n_lb=ncol(LF), 
                 n_c=length(C_t),
                 n_i=length(I_t), 
@@ -32,7 +46,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.numeric(rownames(LF)),
                 ML_yrs=as.vector(0),
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -51,7 +65,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.vector(0),
                 ML_yrs=as.numeric(rownames(LF)),
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -65,12 +79,16 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_lc <- nrow(LF)
                 LC_yrs <- as.numeric(rownames(LF))
                 LF <- as.matrix(LF)
+                if(is.null(input$obs_per_year)) n_inp <- rowSums(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             }
             if(is.vector(LF)){
                 n_lc <- 1
                 LC_yrs <- Nyears
                 LF <- t(as.matrix(LF))
-            }
+                if(is.null(input$obs_per_year)) n_inp <- sum(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
+            }  
             Data <- list(n_t=Nyears, n_lb=ncol(LF), 
                 n_c=0,
                 n_i=length(I_t), 
@@ -80,7 +98,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=LC_yrs,
                 ML_yrs=as.vector(0), 
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -109,7 +127,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.vector(0),
                 ML_yrs=ML_yrs,
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -123,12 +141,16 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_lc <- nrow(LF)
                 LC_yrs <- as.numeric(rownames(LF))
                 LF <- as.matrix(LF)
+                if(is.null(input$obs_per_year)) n_inp <- rowSums(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             }
             if(is.vector(LF)){
                 n_lc <- 1
                 LC_yrs <- Nyears
                 LF <- t(as.matrix(LF))
-            }
+                if(is.null(input$obs_per_year)) n_inp <- sum(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
+            }  
             Data <- list(n_t=Nyears, n_lb=ncol(LF), 
                 n_c=length(C_t),
                 n_i=0, 
@@ -138,7 +160,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.vector(0),
                 LC_yrs=LC_yrs,
                 ML_yrs=as.vector(0), 
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -168,7 +190,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=s.vector(0),
                 LC_yrs=as.vector(0),
                 ML_yrs=ML_yrs,
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
@@ -182,12 +204,16 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_lc <- nrow(LF)
                 LC_yrs <- as.numeric(rownames(LF))
                 LF <- as.matrix(LF)
+                if(is.null(input$obs_per_year)) n_inp <- rowSums(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             }
             if(is.vector(LF)){
                 n_lc <- 1
                 LC_yrs <- Nyears
                 LF <- t(as.matrix(LF))
-            }
+                if(is.null(input$obs_per_year)) n_inp <- sum(LF)
+                if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
+            }  
             Data <- list(n_t=Nyears, n_lb=ncol(LF), 
                 n_c=0,
                 n_i=0, 
@@ -197,7 +223,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_yrs=as.vector(0),
                 LC_yrs=LC_yrs,
                 ML_yrs=as.vector(0),
-                obs_per_yr=obs_per_year,
+                obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
