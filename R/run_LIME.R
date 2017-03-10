@@ -70,7 +70,13 @@ for(iter in 1:length(itervec)){
       if("M50" %in% param_adjust){
           lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
       }
-
+      if("SL50" %in% param_adjust){
+          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="length", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, Sel0=Sel0, theta=lh_new$theta)
+      }
+      if("S50" %in% param_adjust){
+          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="age", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, Sel0=Sel0, theta=lh_new$theta)
+      }
+      
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh_new, input_data=input_data, param=param_adjust, val=val_adjust)
 
