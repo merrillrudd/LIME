@@ -17,4 +17,3 @@ vector of directory paths
 \description{
 \code{model_paths} sets up directory paths for model combinations
 }
-

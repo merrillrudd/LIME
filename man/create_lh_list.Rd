@@ -9,8 +9,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   selex_type = "logistic", dome_sd = NULL, binwidth = 1, t0 = -0.01,
   CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2, SigmaR = 0.6, SigmaF = 0.3,
   R0 = 1, h = 1, qcoef = 1e-05, M = NULL, F1 = 0.2, Fequil = 0.2,
-  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, Mat0 = 1,
-  Sel0 = 1, theta = 10)
+  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, theta = 10)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -71,10 +70,6 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{rho}{first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)}
 
-\item{Mat0}{default=1, maturity at age zero fixed to 1e-20, if 0, will calculate based on logistic curve}
-
-\item{Sel0}{default=1, selectivity at age zero fixed to 1e-20, if 0, will calculate based on logistic curve}
-
 \item{theta}{dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)}
 }
 \value{
@@ -83,4 +78,3 @@ List, a tagged list of life history traits
 \description{
 \code{create_lh_list} Creates list of life history information
 }
-

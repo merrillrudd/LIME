@@ -11,6 +11,5 @@ Depends:
     TMB,
     devtools
 LinkingTo: TMB, RcppEigen, Rcpp
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 LazyData: true
-

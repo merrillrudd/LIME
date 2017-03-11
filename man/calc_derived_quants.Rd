@@ -15,4 +15,3 @@ List, a tagged list of potentially useful benchmarks
 \description{
 \code{calc_derived_quants} calculates derived quanties for status or productivity
 }
-

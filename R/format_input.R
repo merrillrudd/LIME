@@ -9,16 +9,14 @@
 #' @param SigRprior vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param REML FALSE==off, TRUE==on
-#' @param fix_f year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. 0=estimate all years.
 #' @param f_startval default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
-#' @param Sel0 input 1 means selectivity at age 0 fish is restrained to 1e-20; value of 0 means selectivity at age-0 fish can be larger following logistic curve
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, fix_f, f_startval, fix_param=FALSE, C_opt=0, Sel0, LFdist){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, f_startval, fix_param=FALSE, C_opt=0, LFdist){
 
     with(input, {
         ## data-rich model
@@ -41,7 +39,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=length(C_t),
                 n_i=length(I_t), 
                 n_lc=nrow(LF),
-                n_ml=0, fix_f=as.vector(fix_f),
+                n_ml=0,
                 T_yrs=1:Nyears, C_yrs=as.numeric(names(C_t)),
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.numeric(rownames(LF)),
@@ -50,7 +48,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -60,7 +58,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=length(C_t),
                 n_i=length(I_t), 
                 n_lc=0,
-                n_ml=nrow(LF), fix_f=as.vector(fix_f),
+                n_ml=nrow(LF),
                 T_yrs=1:Nyears, C_yrs=as.numeric(names(C_t)),
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.vector(0),
@@ -69,7 +67,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -93,7 +91,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=0,
                 n_i=length(I_t), 
                 n_lc=n_lc,
-                n_ml=0, fix_f=as.vector(fix_f),
+                n_ml=0,
                 T_yrs=1:Nyears, C_yrs=as.vector(0),
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=LC_yrs,
@@ -102,7 +100,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -122,7 +120,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=0,
                 n_i=length(I_t), 
                 n_lc=0,
-                n_ml=n_ml, fix_f=as.vector(fix_f),
+                n_ml=n_ml,
                 T_yrs=1:Nyears, C_yrs=as.vector(0),
                 I_yrs=as.numeric(names(I_t)),
                 LC_yrs=as.vector(0),
@@ -131,7 +129,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -155,7 +153,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=length(C_t),
                 n_i=0, 
                 n_lc=n_lc,
-                n_ml=0, fix_f=as.vector(fix_f),
+                n_ml=0,
                 T_yrs=1:Nyears, C_yrs=as.numeric(names(C_t)),
                 I_yrs=as.vector(0),
                 LC_yrs=LC_yrs,
@@ -164,7 +162,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -185,7 +183,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=length(C_t),
                 n_i=0, 
                 n_lc=0,
-                n_ml=n_ml, fix_f=as.vector(fix_f),
+                n_ml=n_ml,
                 T_yrs=1:Nyears, C_yrs=as.numeric(names(C_t)),
                 I_yrs=s.vector(0),
                 LC_yrs=as.vector(0),
@@ -194,7 +192,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
         }
 
@@ -218,7 +216,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 n_c=0,
                 n_i=0, 
                 n_lc=n_lc,
-                n_ml=0, fix_f=as.vector(fix_f),
+                n_ml=0,
                 T_yrs=1:Nyears, C_yrs=as.vector(0),
                 I_yrs=as.vector(0),
                 LC_yrs=LC_yrs,
@@ -227,7 +225,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb, Sel0=Sel0,
+                binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)
         }       
 
@@ -270,12 +268,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 Map[["log_sigma_R"]] <- NA
                 Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
 
-            }
-
-            if(all(fix_f!=0)){
-                Map[["log_F_t_input"]] = 1:length(Parameters[["log_F_t_input"]])
-                Map[["log_F_t_input"]][fix_f] <- NA
-                Map[["log_F_t_input"]] <- factor(Map[["log_F_t_input"]])   
             }
 
                 if(grepl("Catch",data_avail)==FALSE){        

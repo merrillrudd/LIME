@@ -11,7 +11,6 @@
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
 #' @param REML default off (FALSE)
 #' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
-#' @param fix_f year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. default=0 (estimate all years).
 #' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)
 #' @param param_adjust character or vector of parameter names to change input values
 #' @param val_adjust number or vector of numbers for corresponding parameter value changes
@@ -19,7 +18,6 @@
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
 #' @param F_up upper bound of fishing mortality estimate; default=5
-#' @param Sel0 default=1, restrains selectivity at age-0 fish at 1e-20; option=0 allows selectivity at age-0 to follow logistic curve
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @useDynLib LIME
@@ -27,7 +25,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, fix_f=0, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, Sel0=1, LFdist=0, derive_quants=FALSE){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -65,16 +63,16 @@ for(iter in 1:length(itervec)){
     
       lh_new <- lh
       if("ML50" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
+        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, theta=lh$theta)
       }
       if("M50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, Sel0=Sel0, theta=lh$theta)
+          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$S50, M50=val_adjust, selex_input="age", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, Mat0=lh$Mat0, theta=lh$theta)
       }
       if("SL50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="length", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, Sel0=Sel0, theta=lh_new$theta)
+          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="length", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, theta=lh_new$theta)
       }
       if("S50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="age", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, Sel0=Sel0, theta=lh_new$theta)
+          lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=val_adjust, M50=lh_new$ML50, selex_input="age", maturity_input="length", selex_type=lh_new$selex_type, dome=lh_new$dome, binwidth=lh_new$binwidth, t0=lh_new$t0, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0,  h=lh_new$h, qcoef=lh_new$qcoef, M=lh_new$M, F1=lh_new$F1, Fequil=lh_new$Fequil, Frate=lh_new$Frate, Fmax=lh_new$Fmax, start_ages=min(lh_new$ages), rho=lh_new$rho, Mat0=lh_new$Mat0, theta=lh_new$theta)
       }
       
     ## check that inputs in right format    
@@ -91,7 +89,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(write==FALSE) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, fix_f=fix_f, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, Sel0=Sel0, LFdist=LFdist)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist)
 
       if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(write==FALSE) output$Inputs <- TmbList

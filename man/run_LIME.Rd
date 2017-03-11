@@ -5,10 +5,10 @@
 \title{run LIME model - simulation mode}
 \usage{
 run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
-  itervec = NULL, REML = FALSE, rewrite = TRUE, fix_f = 0,
-  simulation = TRUE, param_adjust = FALSE, val_adjust = FALSE,
-  f_true = FALSE, fix_param = FALSE, C_opt = 0, F_up = 10, Sel0 = 1,
-  LFdist = 0, derive_quants = FALSE)
+  itervec = NULL, REML = FALSE, rewrite = TRUE, simulation = TRUE,
+  param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
+  fix_param = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
+  derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -29,8 +29,6 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 
 \item{rewrite}{default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE}
 
-\item{fix_f}{year (by index, not actual year) to start estimating fishing mortality (e.g. year 11 out of 20 to get estimates for last 10 years); the value of F in this year will be used as the estimate and SE for all previous years. default=0 (estimate all years).}
-
 \item{simulation}{is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)}
 
 \item{param_adjust}{character or vector of parameter names to change input values}
@@ -45,8 +43,6 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 
 \item{F_up}{upper bound of fishing mortality estimate; default=5}
 
-\item{Sel0}{default=1, restrains selectivity at age-0 fish at 1e-20; option=0 allows selectivity at age-0 to follow logistic curve}
-
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
 \item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
@@ -57,4 +53,3 @@ prints how many iterations were run in model directory
 \description{
 \code{run_LIME} run length-based integrated mixed-effects model with generated data
 }
-

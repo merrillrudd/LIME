@@ -33,7 +33,6 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(n_i); // number of years of index data available
     DATA_INTEGER(n_lc); // number of years of length composition data
     DATA_INTEGER(n_ml); // number of years of mean length data
-    DATA_VECTOR(fix_f); // year to start estimating fishing mortality
     DATA_VECTOR(T_yrs); // vector of years of all data types
     DATA_VECTOR(C_yrs); // vector of years of catch data available
     DATA_VECTOR(I_yrs); // vector of years of index data available
@@ -63,7 +62,6 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(Mat_a); // maturity
     DATA_SCALAR(lwa);
     DATA_SCALAR(lwb);
-    DATA_INTEGER(Sel0); //if 1, selectivity at age 0 fish is very small 1e-20, if 0, selectivity of age 0 fish can be greater than 1e-20
 
     // penalties
     DATA_INTEGER(Fpen);
@@ -114,16 +112,16 @@ Type objective_function<Type>::operator() ()
     F_t(t) = exp(log_F_t_input(t));
   }
 
-  Type n_fixf; 
-  if(fix_f(0)==0) n_fixf = 0;
-  if(fix_f(0)>0){
-    n_fixf = fix_f.size();
-    for(int t=1;t<n_t;t++){
-      for(int f=0;f<n_fixf;f++){
-        if(T_yrs(t)==fix_f(f)) F_t(t) = F_t(t-1);
-      }
-    }
-  }
+  // Type n_fixf; 
+  // if(fix_f(0)==0) n_fixf = 0;
+  // if(fix_f(0)>0){
+  //   n_fixf = fix_f.size();
+  //   for(int t=1;t<n_t;t++){
+  //     for(int f=0;f<n_fixf;f++){
+  //       if(T_yrs(t)==fix_f(f)) F_t(t) = F_t(t-1);
+  //     }
+  //   }
+  // }
 
 
   // ========= Convert inputs  =============================
@@ -143,21 +141,11 @@ Type objective_function<Type>::operator() ()
   vector<Type> S_a(AgeMax+1);
   S_a.setZero();
   Type pi = 3.141593;
-  if(Sel0==1){
-    S_a(0) = 1e-20;
-    for(int a=1;a<=AgeMax;a++){
-      for(int l=0;l<n_lb;l++){
-        S_a(a) += binwidth*S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(lbmids(l)-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
-      }
-    }    
-  }
-  if(Sel0==0){
     for(int a=0;a<=AgeMax;a++){
       for(int l=0;l<n_lb;l++){
         S_a(a) += binwidth*S_l(l)*(1/(L_a(a)*CV_L*sqrt(2*pi)))*exp(-pow(lbmids(l)-L_a(a),2)/(2*pow(L_a(a)*CV_L,2)));        
       }
     }      
-  }
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
@@ -511,13 +499,13 @@ Type objective_function<Type>::operator() ()
 
   // F
     jnll_comp(5) = 0;
-    Type n_estf;
-    n_estf = n_t - n_fixf;
+    // Type n_estf;
+    // n_estf = n_t - n_fixf;
     if(Fpen==1){
-      if(fix_f(0)==0){
+      // if(fix_f(0)==0){
         // jnll_comp(5) -= dnorm(F_t(0), F_equil, sigma_F, true);
         for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
-      }
+      // }
     }
 
     // // SigmaR
@@ -594,9 +582,9 @@ Type objective_function<Type>::operator() ()
   REPORT(Mat_a);
   REPORT(AgeMax);
   REPORT(M);
-  REPORT(fix_f);
-  REPORT(n_fixf);
-  REPORT(n_estf);
+  // REPORT(fix_f);
+  // REPORT(n_fixf);
+  // REPORT(n_estf);
     // Likelihoods
   REPORT(log_pC_t);
   REPORT(log_pI_t);

@@ -15,4 +15,3 @@ snapper
 A dataset containing the length composition, biological information, and abundance index for Costa Rican spotted rose snapper.
 }
 \keyword{datasets}
-
