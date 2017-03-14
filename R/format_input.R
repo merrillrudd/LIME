@@ -8,7 +8,6 @@
 #' @param SigRpen penalty on sigmaR, 0=off, 1=on
 #' @param SigRprior vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
-#' @param REML FALSE==off, TRUE==on
 #' @param f_startval default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
@@ -16,7 +15,7 @@
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML, f_startval, fix_param=FALSE, C_opt=0, LFdist){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist){
 
     with(input, {
         ## data-rich model
@@ -231,7 +230,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
         ## set input parameters - regardless of data availability 
         if(all(is.null(f_startval))) f_startval <- rep(1, Nyears)
-        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, theta=theta, Nu_input=rep(0,Nyears))
+        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), logSdelta=log(SL95-SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, theta=theta, Nu_input=rep(0,Nyears))
 
         ## turn off parameter estimation - depends on data availability
             Map = list()
@@ -267,7 +266,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 Map[["log_sigma_I"]] <- factor(Map[["log_sigma_I"]])
                 Map[["log_sigma_R"]] <- NA
                 Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
-
             }
 
                 if(grepl("Catch",data_avail)==FALSE){        
@@ -302,12 +300,12 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
         if(length(Map)==0) Map <- NULL
 
 
-        if(REML==FALSE) Random <- c("Nu_input")
-        if(REML==TRUE){
-            Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
-            Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
-        }
-        if("log_sigma_F" %in% est_sigma) Random <- c(Random, "log_F_t_input")
+        Random <- c("Nu_input")
+        # if(REML==TRUE){
+        #     Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
+        #     Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
+        # }
+        # if("log_sigma_F" %in% est_sigma) Random <- c(Random, "log_F_t_input")
 
 
 

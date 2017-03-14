@@ -4,9 +4,11 @@
 \alias{calc_ref}
 \title{Per recruit calculation and spawning potential ratio}
 \usage{
-calc_ref(Mat_a, W_a, M, S_a, F, ref = FALSE)
+calc_ref(ages, Mat_a, W_a, M, S_a, F, ref = FALSE)
 }
 \arguments{
+\item{ages}{vector of ages}
+
 \item{Mat_a}{from report file / true file for simulation}
 
 \item{W_a}{from report file / true file for simulation}

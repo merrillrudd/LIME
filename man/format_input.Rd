@@ -4,8 +4,8 @@
 \alias{format_input}
 \title{TMB input formatting}
 \usage{
-format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
-  f_startval, fix_param = FALSE, C_opt = 0, LFdist)
+format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
+  fix_param = FALSE, C_opt = 0, LFdist)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -19,8 +19,6 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, REML,
 \item{SigRprior}{vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation}
 
 \item{est_sigma}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
-
-\item{REML}{FALSE==off, TRUE==on}
 
 \item{f_startval}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
 

@@ -2,6 +2,7 @@
 
 export(AgeToLengthComp)
 export(calc_derived_quants)
+export(calc_equil_abund)
 export(calc_ref)
 export(create_inputs)
 export(create_lh_list)

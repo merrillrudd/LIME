@@ -5,7 +5,7 @@
 \title{run LIME model - simulation mode}
 \usage{
 run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
-  itervec = NULL, REML = FALSE, rewrite = TRUE, simulation = TRUE,
+  itervec = NULL, rewrite = TRUE, simulation = TRUE,
   param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
   fix_param = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
   derive_quants = FALSE)
@@ -24,8 +24,6 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 \item{data_avail}{types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.}
 
 \item{itervec}{number of datasets to generate in a simulation study. default=NULL for real stock assessment application.}
-
-\item{REML}{default off (FALSE)}
 
 \item{rewrite}{default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE}
 

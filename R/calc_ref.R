@@ -2,6 +2,7 @@
 #'
 #' \code{calc_ref} Calculates derived spawning potential ratio: lifetime total egg production in fished:unfished states
 #'
+#' @param ages vector of ages
 #' @param Mat_a from report file / true file for simulation
 #' @param W_a from report file / true file for simulation
 #' @param M from report file / true file for simulation
@@ -12,22 +13,12 @@
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
 #' @export
-calc_ref <- function(Mat_a, W_a, M, S_a, F, ref=FALSE){
+calc_ref <- function(ages, Mat_a, W_a, M, S_a, F, ref=FALSE){
 
     ## calculate spawning biomass per recruit in fished and unfished condition
     ## a function of specified level of fishing mortality and ability to estimate selectivity parameters
-        Na0 <- Naf <- rep(NA, length(W_a))
-        Na0[1] <- Naf[1] <- 1
-        for(a in 2:length(W_a)){
-            if(a<length(W_a)){
-                Na0[a] <- Na0[a-1]*exp(-M)
-                Naf[a] <- Naf[a-1]*exp(-M-S_a[a-1]*F)
-            }
-            if(a==length(W_a)){
-                Na0[a] <- (Na0[a-1]*exp(-M))/(1-exp(-M))
-                Naf[a] <- (Naf[a-1]*exp(-M-F*S_a[a]))/(1-exp(-M-F*S_a[a]))
-            }
-        }
+    Na0 <- calc_equil_abund(ages=ages, S_a=S_a, M=M, F=0, R0=1)
+    Naf <- calc_equil_abund(ages=ages, S_a=S_a, M=M, F=F, R0=1)
 
         ## ignore recruits
         SB0 <- sum(Na0*Mat_a*W_a)

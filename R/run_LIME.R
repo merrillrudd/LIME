@@ -9,7 +9,6 @@
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
-#' @param REML default off (FALSE)
 #' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)
 #' @param param_adjust character or vector of parameter names to change input values
@@ -25,7 +24,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, REML=FALSE, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE){
+run_LIME <- function(modpath, write=TRUE, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -89,7 +88,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(write==FALSE) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, REML=REML, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist)
 
       if(write==TRUE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(write==FALSE) output$Inputs <- TmbList

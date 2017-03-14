@@ -68,7 +68,6 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(SigRpen);
     DATA_VECTOR(SigRprior);
 
-
   // ======== Parameters =================================
     // Fixed, estimated parameters
     PARAMETER(log_sigma_F); // SD of F
@@ -76,7 +75,7 @@ Type objective_function<Type>::operator() ()
     PARAMETER(log_q_I); // catachability associated with index
     PARAMETER(beta);
     PARAMETER(log_sigma_R); // magnitude of temporal variation
-    PARAMETER(logS50); // Age at 50% selectivity
+    PARAMETER(logS50); // Length at 50% selectivity
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp

@@ -9,8 +9,8 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   maturity_input = "length", selex_type = "logistic", dome_sd = NULL,
   binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2,
   SigmaR = 0.6, SigmaF = 0.3, R0 = 1, h = 1, qcoef = 1e-05,
-  M = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2, Fmax = 0.7,
-  start_ages = 0, rho = 0, theta = 10)
+  M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2,
+  Fmax = 0.7, start_ages = 0, rho = 0, theta = 10)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -62,6 +62,8 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 \item{qcoef}{starting value for catchability coefficient (when index data is available, default = 1e-5)}
 
 \item{M}{value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)}
+
+\item{AgeMax}{specified value for maximum age}
 
 \item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
 
