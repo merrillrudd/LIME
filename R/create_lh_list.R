@@ -10,6 +10,8 @@
 #' @param M50 age or length at 50 percent maturity
 #' @param S95 starting value for age or length at 95 percent selectivity
 #' @param M95 age or length at 50 percent maturity
+#' @param Sslope slope of logistic curve for length-at-selectivity
+#' @param Mslope slope of logistic curve for length-at-maturity
 #' @param selex_input specify whether argument S50 is an age or a length (default length)
 #' @param maturity_input specify whether argument M50 is an age or a length (default length)
 #' @param selex_type default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV.
@@ -34,7 +36,7 @@
 #' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Sslope=NULL, Mslope=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
@@ -57,8 +59,11 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
     ## maturity and selectivity
     if(is.null(M95)) mat_param <- 1
     if(is.null(M95)==FALSE) mat_param <- 2
+    if(is.null(Mslope)==FALSE) mat_param <- 3
     if(is.null(S95)) sel_param <- 1
     if(is.null(S95)==FALSE) sel_param <- 2
+    if(is.null(Sslope)==FALSE) sel_param <- 3
+
 
     if(selex_input=="length"){
         SL50 <- S50
@@ -97,6 +102,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
         Mat_l <- (1 /(1 + exp(-log(19)*(mids-ML50)/(ML95-ML50)))) # Maturity at length
         # Mat_l2 <- 1 /(1 + exp(-log(19)*(mids2-ML50)/(ML95-ML50)))
     }
+    if(mat_param==3){
+        Mat_l <- (1 /(1 + exp(-((mids-ML50)/Mslope))))
+    }
 
     if(maturity_input=="length"){
         Mat_a <- rep(NA, length(ages))
@@ -133,6 +141,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, se
     if(sel_param==2){
         S_l <- (1 /(1 + exp(-log(19)*(mids-SL50)/(SL95-SL50)))) # Selectivity-at-Length
         # S_l2 <- 1 /(1 + exp(-log(19)*(mids2-SL50)/(SL95-SL50))) 
+    }
+    if(sel_param==3){
+        S_l <- (1 /(1 + exp(-((mids-SL50)/Sslope))))
     }
 
     if(selex_input=="length"){
