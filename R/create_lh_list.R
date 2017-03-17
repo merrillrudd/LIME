@@ -44,7 +44,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
     if(is.null(AgeMax)) AgeMax <- ceiling(-log(0.001)/M)
-    ages <- seq(start_ages, AgeMax+1 - (1/nseasons), by=1:nseasons)
+    ages <- seq(start_ages, to=(AgeMax+1 - (1/nseasons)), by=(1/nseasons))
 
     ## monthly mortality
     M <- M/nseasons
