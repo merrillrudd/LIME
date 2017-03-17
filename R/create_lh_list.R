@@ -35,27 +35,36 @@
 #' @param start_ages age to start (either 0 or 1; default = 0)
 #' @param rho first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)
 #' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
+#' @param nseasons specify number of sub-time periods per year
+#' 
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Sslope=NULL, Mslope=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, AgeMax=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Sslope=NULL, Mslope=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, AgeMax=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10, nseasons){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
     if(is.null(AgeMax)) AgeMax <- ceiling(-log(0.001)/M)
-    ages <- start_ages:AgeMax
+    ages <- seq(start_ages, AgeMax+1 - (1/nseasons), by=1:nseasons)
+
+    ## monthly mortality
+    M <- M/nseasons
 
     ## length bins
     mids <- seq((binwidth/2), linf*1.5, by=binwidth) 
     highs <- mids + (binwidth/2)
     lows <- mids - (binwidth)/2
 
-    # ## 1 cm length bin default
-    #     mids2 <- seq(0.5,linf*1.5, by=1)
-    #     highs2 <- mids + 0.5
 
     ## growth at age
     L_a <- linf*(1-exp(-vbk*(ages - t0)))
     W_a <- lwa*L_a^lwb  
+    W_l <- lwa*mids^lwb
+
+    ##probability of being in a length bin given age
+    lbprobs <- function(mnl,sdl) return(pnorm(highs,mnl,sdl)-pnorm(lows,mnl,sdl))
+    vlprobs <- Vectorize(lbprobs,vectorize.args=c("mnl","sdl"))
+    plba_a <- t(vlprobs(L_a,L_a*CVlen))
+    plba_a <- plba_a/rowSums(plba_a)
 
     ## maturity and selectivity
     if(is.null(M95)) mat_param <- 1
@@ -108,23 +117,15 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
     }
 
     if(maturity_input=="length"){
-        Mat_a <- rep(NA, length(ages))
-        for(a in 1:length(ages)){
-                add <- 0
-                for(l in 1:length(Mat_l)){
-                    add <- add + binwidth*Mat_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(mids[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
-                }
-                Mat_a[a] <- add
-                rm(add)
-        }     
+        Mat_a <- apply(t(plba_a)*Mat_l, 2, sum)
     }
     if(maturity_input=="age"){
         Mat_a <- rep(NA, length(ages))
         if(mat_param==1){
-            if(start_ages!=0) Mat_a <- 1/(1+exp(M50 - ages))
+           Mat_a <- 1/(1+exp(M50 - ages))
         }
         if(mat_param==2){
-            if(start_ages!=0) Mat_a <- 1/(1+exp(-log(19)*(ages-M50)/(M95-M50)))
+           Mat_a <- 1/(1+exp(-log(19)*(ages-M50)/(M95-M50)))
         }
     }
     if(is.null(M95)){
@@ -137,11 +138,9 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
     ## selectivity
     if(sel_param==1){
         S_l <- (1 / (1 + exp(SL50 - mids)))
-        # S_l2 <- 1 / (1+exp(SL50 - mids2))
     }
     if(sel_param==2){
         S_l <- (1 /(1 + exp(-log(19)*(mids-SL50)/(SL95-SL50)))) # Selectivity-at-Length
-        # S_l2 <- 1 /(1 + exp(-log(19)*(mids2-SL50)/(SL95-SL50))) 
     }
     if(sel_param==3){
         S_l <- (1 /(1 + exp(-((mids-SL50)/Sslope))))
@@ -153,24 +152,15 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
             index <- (Sfull+1):length(S_l)
             S_l[index] <- exp((-(index-Sfull)^2)/(2*dome_sd^2))
         }
-        S_a <- rep(NA, length(ages))
-        for(a in 1:length(ages)){
-                add <- 0
-                for(l in 1:length(S_l)){
-                    add <- add + binwidth*S_l[l]*(1/(L_a[a]*CVlen*sqrt(2*pi)))*exp(-(mids[l]-L_a[a])^2/(2*(L_a[a]*CVlen)^2))
-                }
-                S_a[a] <- add
-                rm(add)
-        }
-
+        S_a <- apply(t(plba_a)*S_l, 2, sum)
     }
     if(selex_input=="age"){
         S_a <- rep(NA, length(ages))
         if(sel_param==1){
-            if(start_ages!=0) S_a <- 1/(1+exp(S50 - ages))
+           S_a <- 1/(1+exp(S50 - ages))
         }
         if(sel_param==2){
-            if(start_ages!=0) S_a <- 1/(1+exp(-log(19)*(ages-S50)/(S95-S50)))
+            S_a <- 1/(1+exp(-log(19)*(ages-S50)/(S95-S50)))
         }
         if(selex_type=="dome"){
             Sfull <- which(round(S_a,1)==1.00)[1]
@@ -221,6 +211,7 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
     Outs$S_l <- S_l
     Outs$L_a <- L_a
     Outs$W_a <- W_a
+    Outs$W_l <- W_l
     Outs$M50 <- M50
     Outs$M95 <- M95
     Outs$ML50 <- ML50
@@ -232,5 +223,6 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
     Outs$Fmax <- Fmax
     Outs$rho <- rho
     Outs$theta <- theta
+    Outs$nseasons <- nseasons
     return(Outs)
 }
