@@ -12,10 +12,10 @@
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
-
+#' @param S_l_input input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist, S_l_input){
 
     with(input, {
         ## data-rich model
@@ -48,7 +48,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
         ## same as above but fit to mean length data instead of length composition data
@@ -67,7 +67,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
         ## index and length composition data
@@ -100,7 +100,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
         ## index and mean length data
@@ -129,7 +129,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
         ## catch and length composition data
@@ -162,7 +162,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
 
@@ -192,7 +192,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
         ## length composition data only 
@@ -225,7 +225,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist,
                 linf=linf, vbk=vbk, t0=t0, M=M, h=h, AgeMax=AgeMax, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior)
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)
         }       
 
         ## set input parameters - regardless of data availability 

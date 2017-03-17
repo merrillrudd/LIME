@@ -68,6 +68,9 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(SigRpen);
     DATA_VECTOR(SigRprior);
 
+    // option for fixed time series for selectivity
+    DATA_VECTOR(S_l_input);
+
   // ======== Parameters =================================
     // Fixed, estimated parameters
     PARAMETER(log_sigma_F); // SD of F
@@ -134,7 +137,8 @@ Type objective_function<Type>::operator() ()
   vector<Type> S_l(n_lb);
   S_l.setZero();
   for(int l=0;l<n_lb;l++){
-    S_l(l) = 1 / (1 + exp(S50 - lbmids(l)));
+    if(S_l_input(0)<0) S_l(l) = 1 / (1 + exp(S50 - lbmids(l)));
+    if(S_l_input(0)>=0) S_l(0) = S_l_input(l);
   }
 
   vector<Type> S_a(AgeMax+1);
@@ -541,6 +545,7 @@ Type objective_function<Type>::operator() ()
   REPORT( S50 );
   REPORT( S_a );
   REPORT( S_l );
+  REPORT( S_l_input );
   REPORT( sigma_C );
   REPORT( sigma_I );
   REPORT( CV_L );

@@ -27,7 +27,11 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     ## Initial calcs
     ##########################
 
-    tyears <- nburn+Nyears
+    tyears_only <- nburn+Nyears
+    Nyears_real <- Nyears
+    nburn <- nburn*nseasons
+    Nyears <- Nyears*nseasons
+    tyears <- tyears_only*nseasons
 
 
     ##########################
@@ -102,19 +106,19 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
             F_t[1] <- Finit
         }
         if(Rdynamics=="Constant"){
-            R_t <- Rconstant_t * exp(RecDev)
+            R_t <- Rconstant_t/nseasons * exp(RecDev)
         }
         if(Rdynamics=="AR"){
-            R_t <- Rconstant_t * exp(RecDev_AR)
+            R_t <- Rconstant_t/nseasons * exp(RecDev_AR)
         }
         if(Rdynamics=="Pulsed"){
-            R_t <- Rpulse_t * exp(RecDev)
+            R_t <- Rpulse_t/nseasons * exp(RecDev)
         }
         if(Rdynamics=="Pulsed_up"){
-            R_t <- Rpulse_t * exp(RecDev)
+            R_t <- Rpulse_t/nseasons * exp(RecDev)
         }
         if(Rdynamics=="BH"){
-            R_t[1] <- R0 * exp(RecDev[1])
+            R_t[1] <- R0/nseasons * exp(RecDev[1])
         }
 
     ## year 1
@@ -171,7 +175,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
         if(Rdynamics=="BH"){
             if(h==1) h_use <- 0.7
             if(h!=1) h_use <- h
-            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1] * (5*h_use-1))) * exp(RecDev[y])
+            R_t[y] <- (4 * h_use * R0 * SB_t[y-1] / ( SB0*(1-h_use) + SB_t[y-1] * (5*h_use-1)))/nseasons * exp(RecDev[y])
         }
 
         ## age-structured dynamics
@@ -255,17 +259,20 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     N_atout <- N_at[,-c(1:nburn)]
     N_at0out <- N_at0[,-c(1:nburn)]
 
-        LFindex <- (Nyears-Nyears_comp+1):Nyears
+        # LFindex <- (Nyears-Nyears_comp+1):Nyears
+        LFindex <- rev(seq(Nyears, by=-nseasons, length.out=Nyears_comp))
+        # LFindex <- rev(seq(Nyears-nseasons+1, by=-nseasons, length.out=Nyears_comp))
         LFout <- LFout[LFindex,]
+        LF0out <- LF0out[LFindex,]
         if(is.vector(LFout)==FALSE) colnames(LFout) <- highs
         if(is.vector(LF0out)==FALSE) colnames(LF0out) <- highs
         if(is.vector(LFout)){
             LFout <- t(as.matrix(LFout))
-            rownames(LFout) <- (Nyears-Nyears_comp+1):Nyears
+            rownames(LFout) <- LFindex
         }
         if(is.vector(LF0out)){
             LF0out <- t(as.matrix(LF0out))
-            rownames(LF0out) <- (Nyears-Nyears_comp+1):Nyears
+            rownames(LF0out) <- LFindex
         }
 
     ## static SPR
