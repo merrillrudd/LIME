@@ -82,7 +82,7 @@ Type objective_function<Type>::operator() ()
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp
-    PARAMETER(theta); // dirichlet-multinomial parameter
+    PARAMETER(log_theta); // dirichlet-multinomial parameter
 
 
     // Random effects
@@ -105,6 +105,7 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
+  Type theta = exp(log_theta);
 
   // Transform vectors
   vector<Type> F_t(n_t);
@@ -512,7 +513,6 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lF_t );
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
-  ADREPORT( SPR_t2 );
   ADREPORT( S50 );
   ADREPORT( S_l );
 

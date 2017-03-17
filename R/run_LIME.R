@@ -134,6 +134,7 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_CV_L",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
+        Lwr[match("logS50",names(obj$par))] = log(1)
         Lwr[match("theta", names(obj$par))] = 1e-20
 
         ## Run optimizer
