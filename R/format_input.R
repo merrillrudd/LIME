@@ -230,7 +230,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
         ## set input parameters - regardless of data availability 
         if(all(is.null(f_startval))) f_startval <- rep(1, Nyears)
-        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, log_theta=log(theta), Nu_input=rep(0,Nyears))
+        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, log_theta=rep(log(theta),Data$n_lc), Nu_input=rep(0,Nyears))
 
         ## turn off parameter estimation - depends on data availability
             Map = list()

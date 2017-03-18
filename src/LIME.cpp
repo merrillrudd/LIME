@@ -78,7 +78,7 @@ Type objective_function<Type>::operator() ()
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp
-    PARAMETER(log_theta); // dirichlet-multinomial parameter
+    PARAMETER_VECTOR(log_theta); // dirichlet-multinomial parameter
 
 
     // Random effects
@@ -101,7 +101,10 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
-  Type theta = exp(log_theta);
+  vector<Type> theta(n_lc);
+  for(int l=0;l<n_lc;l++){
+    theta(l) = exp(log_theta(l));
+  }
 
   // Transform vectors
   vector<Type> F_t(n_t);
@@ -334,7 +337,8 @@ Type objective_function<Type>::operator() ()
   // Likelihood contribution from observations
   vector<Type> log_pL_t(n_t);
   log_pL_t.setZero();
-  Type neff = 0;
+  vector<Type> neff(n_lc);
+  neff.setZero();
     vector<Type> LFprob(n_lb);
     vector<Type> LFraw(n_lb);
     vector<Type> prob(n_lb);
@@ -357,16 +361,21 @@ Type objective_function<Type>::operator() ()
             LFprob = (LFraw/LFraw.sum());
             for(int l=0;l<n_lb;l++){
               sum1(lc) += lgamma(LFraw.sum()*LFprob(l)+1);
-              sum2(lc) += lgamma(LFraw.sum()*LFprob(l) + theta*LFraw.sum()*prob(l)) - lgamma(theta*LFraw.sum()*prob(l));
+              sum2(lc) += lgamma(LFraw.sum()*LFprob(l) + theta(lc)*LFraw.sum()*prob(l)) - lgamma(theta(lc)*LFraw.sum()*prob(l));
             }
-            log_pL_t(t) += lgamma(LFraw.sum()+1) - sum1(lc) + lgamma(theta*LFraw.sum()) - lgamma(LFraw.sum()+theta*LFraw.sum()) + sum2(lc);
+            log_pL_t(t) += lgamma(LFraw.sum()+1) - sum1(lc) + lgamma(theta(lc)*LFraw.sum()) - lgamma(LFraw.sum()+theta(lc)*LFraw.sum()) + sum2(lc);
           }
         }
       }
     }
   }
 
-  if(LFdist==1) neff = (1+theta*LF.sum())/(1+theta);
+  if(LFdist==1){
+    for(int lc=0;lc<n_lc;lc++){
+      LFraw = LF.row(lc);
+      neff(lc) = (1+theta(lc)*LFraw.sum())/(1+theta(lc));
+    }
+  }
 
   vector<Type> I_t_hat(n_t);
   for(int t=0;t<n_t;t++){
