@@ -297,6 +297,11 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 Map[["theta"]] <- factor(Map[["theta"]])
             }
 
+            if(S_l_input[1]>=0){
+                Map[["logS50"]] <- NA
+                Map[["logS50"]] <- factor(Map[["logS50"]])
+            }
+
         if(length(Map)==0) Map <- NULL
 
 
