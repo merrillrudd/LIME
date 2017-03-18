@@ -29,6 +29,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
 
     tyears_only <- nburn+Nyears
     Nyears_real <- Nyears
+    nburn_real <- nburn
     nburn <- nburn*nseasons
     Nyears <- Nyears*nseasons
     tyears <- tyears_only*nseasons
@@ -206,15 +207,46 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
 
         }
     }
+
+    ## static SPR
+    SPR_t <- sapply(1:length(F_t), function(x) calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[x]))
+    SPR <- SPR_t[length(SPR_t)]
+
     Cn_t <- colSums(Cn_at)
     Cw_t <- colSums(Cn_at * W_a)
-    N_t <- colSums(N_at[-1,])
+    N_t <- colSums(N_at[-1,which(1:tyears %% nseasons==0)])
+    SB_t <- SB_t[which(1:tyears %% nseasons==0)]
+    D_t <- D_t[which(1:tyears %% nseasons==0)]
+    TB_t <- TB_t[which(1:tyears %% nseasons==0)]
+    VB_t <- VB_t[which(1:tyears %% nseasons==0)]
+    SPR_t <- SPR_t[which(1:tyears %% nseasons==0)]
+
 
     I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
-    C_t <- Cn_t #* exp(CatchDev - (SigmaC^2)/2)
+    C_t <- sapply(1:tyears_only, function(x){
+        if(nseasons==1) time_index <- x
+        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+        sum(Cn_t[time_index])
+    }) #* exp(CatchDev - (SigmaC^2)/2)
+    Cw_t <- sapply(1:tyears_only, function(x){
+        if(nseasons==1) time_index <- x
+        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+        sum(Cw_t[time_index])
+    }) #* exp(CatchDev - (SigmaC^2)/2)
+    F_t <- sapply(1:tyears_only, function(x){
+        if(nseasons==1) time_index <- x
+        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+        sum(F_t[time_index])
+    })
+    R_t <- sapply(1:tyears_only, function(x){
+        if(nseasons==1) time_index <- x
+        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+        sum(R_t[time_index])
+    })
+
 
     ## age to length comp
-    obs_per_year <- rep(comp_sample, tyears)
+    obs_per_year <- rep(comp_sample/nseasons, tyears)
     LFinfo <- AgeToLengthComp(lh=lh, tyears=tyears, N_at=N_at, comp_sample=obs_per_year)
     LF0info <- AgeToLengthComp(lh=lh, tyears=tyears, N_at=N_at0, comp_sample=obs_per_year)
 
@@ -223,6 +255,25 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     page <- LFinfo$page
     LF <- LFinfo$LF
     LF0 <- LF0info$LF
+
+    LF_t <- LF0_t <- matrix(NA, nrow=tyears_only, ncol=ncol(LF))
+    for(y in 1:tyears_only){
+        if(nseasons==1){
+            LF_t[y,] <- LF[y,]
+            LF0_t[y,] <- LF[y,]
+        }
+        if(nseasons>1){
+            time_index <- (1:nseasons)+((y-1)*nseasons)
+            LF_t[y,] <- colSums(LF[time_index,])
+            LF0_t[y,] <- colSums(LF0[time_index,])            
+        }
+    }
+    obs_per_year <- sapply(1:tyears_only, function(x){
+        if(nseasons==1) time_index <- x
+        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+        sum(obs_per_year[time_index])
+    })
+
 
     ########################################################
     ## Expected mean length in catch 
@@ -233,35 +284,33 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
         vul_lengths <- sum(vul_pop*plb[y,]*mids)
         ML_t[y] <- vul_lengths/vul_pop
     }
+    ML_t <- ML_t[which(1:tyears %% nseasons==0)]
 
     ########################################################
     ## cut out burn-in
     ########################################################
 
-    I_tout <- I_t[-c(1:nburn)]
-    C_tout <- C_t[-c(1:nburn)]
-    Cw_tout <- Cw_t[-c(1:nburn)]
-            names(C_tout) <- names(Cw_tout) <- names(I_tout) <- 1:Nyears
+    I_tout <- I_t[-c(1:nburn_real)]
+    C_tout <- C_t[-c(1:nburn_real)]
+    Cw_tout <- Cw_t[-c(1:nburn_real)]
+            names(C_tout) <- names(Cw_tout) <- names(I_tout) <- 1:Nyears_real
 
-    LFout <- LF[-c(1:nburn),]
-        rownames(LFout) <- 1:Nyears
-    LF0out <- LF0[-c(1:nburn),]
-        rownames(LF0out) <- 1:Nyears
+    LFout <- LF_t[-c(1:nburn_real),]
+        rownames(LFout) <- 1:Nyears_real
+    LF0out <- LF0_t[-c(1:nburn_real),]
+        rownames(LF0out) <- 1:Nyears_real
 
-    R_tout <- R_t[-c(1:nburn)]
-    N_tout <- N_t[-c(1:nburn)]
-    SB_tout <- SB_t[-c(1:nburn)]
-    TB_tout <- TB_t[-c(1:nburn)]
-    VB_tout <- VB_t[-c(1:nburn)]
-    D_tout <- D_t[-c(1:nburn)]
-    F_tout <- F_t[-c(1:nburn)]
-    ML_tout <- ML_t[-c(1:nburn)]
-    N_atout <- N_at[,-c(1:nburn)]
-    N_at0out <- N_at0[,-c(1:nburn)]
+    R_tout <- R_t[-c(1:nburn_real)]
+    N_tout <- N_t[-c(1:nburn_real)]
+    SB_tout <- SB_t[-c(1:nburn_real)]
+    TB_tout <- TB_t[-c(1:nburn_real)]
+    VB_tout <- VB_t[-c(1:nburn_real)]
+    D_tout <- D_t[-c(1:nburn_real)]
+    F_tout <- F_t[-c(1:nburn_real)]
+    ML_tout <- ML_t[-c(1:nburn_real)]
+    SPR_tout <- SPR_t[-c(1:nburn_real)]
 
-        # LFindex <- (Nyears-Nyears_comp+1):Nyears
-        LFindex <- rev(seq(Nyears, by=-nseasons, length.out=Nyears_comp))
-        # LFindex <- rev(seq(Nyears-nseasons+1, by=-nseasons, length.out=Nyears_comp))
+        LFindex <- (Nyears_real-Nyears_comp+1):Nyears_real
         LFout <- LFout[LFindex,]
         LF0out <- LF0out[LFindex,]
         if(is.vector(LFout)==FALSE) colnames(LFout) <- highs
@@ -274,10 +323,6 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
             LF0out <- t(as.matrix(LF0out))
             rownames(LF0out) <- LFindex
         }
-
-    ## static SPR
-    SPR_t <- sapply(1:length(F_tout), function(x) calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_tout[x]))
-    SPR <- SPR_t[length(SPR_t)]
 
     ## outputs
     lh$I_t <- I_tout
@@ -292,18 +337,16 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$D_t <- D_tout
     lh$F_t <- F_tout
     lh$ML_t <- ML_tout
-    lh$N_at <- N_atout
-    lh$N_at0 <- N_at0out
     lh$plb <- plb
     lh$plba <- plba
     lh$page <- page
     lh$SPR <- SPR
-    lh$SPR_t <- SPR_t
+    lh$SPR_t <- SPR_tout
     lh$VB_t <- VB_tout
     lh$TB_t <- TB_tout
     lh$nlbins <- length(mids)
-    lh$Nyears <- Nyears
-    lh$years <- 1:Nyears
+    lh$Nyears <- Nyears_real
+    lh$years <- 1:Nyears_real
     lh$obs_per_year <- obs_per_year
     if(Rdynamics!="AR") lh$RecDev <- RecDev
     if(Rdynamics=="AR") lh$RecDev <- RecDev_AR
