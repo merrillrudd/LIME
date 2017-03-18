@@ -139,7 +139,7 @@ Type objective_function<Type>::operator() ()
   S_l.setZero();
   for(int l=0;l<n_lb;l++){
     if(S_l_input(0)<0) S_l(l) = 1 / (1 + exp(S50 - lbmids(l)));
-    if(S_l_input(0)>=0) S_l(0) = S_l_input(l);
+    if(S_l_input(0)>=0) S_l(l) = S_l_input(l);
   }
 
   vector<Type> S_a(n_a);
