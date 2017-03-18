@@ -47,7 +47,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -66,7 +66,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -99,7 +99,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -128,7 +128,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -161,7 +161,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -191,7 +191,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
         }
 
@@ -224,7 +224,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
-                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, lwa=lwa, lwb=lwb,
+                n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)
         }       
 
