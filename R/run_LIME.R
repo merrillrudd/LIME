@@ -135,7 +135,6 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
         Lwr[match("logS50",names(obj$par))] = log(1)
-        Lwr[match("theta", names(obj$par))] = 1e-20
 
         ## Run optimizer
         opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
