@@ -212,6 +212,12 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     SPR_t <- sapply(1:length(F_t), function(x) calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[x]))
     SPR <- SPR_t[length(SPR_t)]
 
+    P <- 0.001     
+    x <- seq(from=0, to=1, length.out=length(L_a)) # relative age vector       
+    EL <- (1-P^(x/(M/vbk))) * linf # length at relative age       
+    rLens <- EL/linf # relative length        
+    SPR_alt <- sum(Mat_a * rowSums(N_at) * rLens^3)/sum(Mat_a * rowSums(N_at0) * rLens^3)       
+
     Cn_t <- colSums(Cn_at)
     Cw_t <- colSums(Cn_at * W_a)
     N_t <- colSums(N_at[-1,which(1:tyears %% nseasons==0)])
@@ -220,7 +226,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     TB_t <- TB_t[which(1:tyears %% nseasons==0)]
     VB_t <- VB_t[which(1:tyears %% nseasons==0)]
     SPR_t <- SPR_t[which(1:tyears %% nseasons==0)]
-
+    SPR_alt <- SPR_alt[which(1:tyears %% nseasons==0)]
 
     I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
     C_t <- sapply(1:tyears_only, function(x){
@@ -309,6 +315,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     F_tout <- F_t[-c(1:nburn_real)]
     ML_tout <- ML_t[-c(1:nburn_real)]
     SPR_tout <- SPR_t[-c(1:nburn_real)]
+    SPR_altout <- SPR_alt[-c(1:nburn_real)]
 
         LFindex <- (Nyears_real-Nyears_comp+1):Nyears_real
         LFout <- LFout[LFindex,]
@@ -342,6 +349,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$page <- page
     lh$SPR <- SPR
     lh$SPR_t <- SPR_tout
+    lh$SPR_alt <- SPR_altout
     lh$VB_t <- VB_tout
     lh$TB_t <- TB_tout
     lh$nlbins <- length(mids)
