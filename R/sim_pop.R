@@ -226,7 +226,6 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     TB_t <- TB_t[which(1:tyears %% nseasons==0)]
     VB_t <- VB_t[which(1:tyears %% nseasons==0)]
     SPR_t <- SPR_t[which(1:tyears %% nseasons==0)]
-    SPR_alt <- SPR_alt[which(1:tyears %% nseasons==0)]
 
     I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
     C_t <- sapply(1:tyears_only, function(x){
@@ -315,7 +314,6 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     F_tout <- F_t[-c(1:nburn_real)]
     ML_tout <- ML_t[-c(1:nburn_real)]
     SPR_tout <- SPR_t[-c(1:nburn_real)]
-    SPR_altout <- SPR_alt[-c(1:nburn_real)]
 
         LFindex <- (Nyears_real-Nyears_comp+1):Nyears_real
         LFout <- LFout[LFindex,]
@@ -349,7 +347,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$page <- page
     lh$SPR <- SPR
     lh$SPR_t <- SPR_tout
-    lh$SPR_alt <- SPR_altout
+    lh$SPR_alt <- SPR_alt
     lh$VB_t <- VB_tout
     lh$TB_t <- TB_tout
     lh$nlbins <- length(mids)
