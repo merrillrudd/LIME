@@ -212,7 +212,7 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     SPR_t <- sapply(1:length(F_t), function(x) calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=F_t[x]))
     SPR <- SPR_t[length(SPR_t)]
 
-    P <- 0.001     
+    P <- 0.01     
     x <- seq(from=0, to=1, length.out=length(L_a)) # relative age vector       
     EL <- (1-P^(x/(M/vbk))) * linf # length at relative age       
     rLens <- EL/linf # relative length        
