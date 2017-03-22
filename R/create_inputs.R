@@ -36,7 +36,8 @@ create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
                 new <- matrix(0, nrow=nrow(dat_input$LF), ncol=length(seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)))
                 rownames(new) <- rownames(dat_input$LF)
                 colnames(new) <- seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)
-                LF_new <- cbind(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)], new)
+                if(nrow(dat_input$LF)==1) LF_new <- cbind(t(as.matrix(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)])), new)
+                if(nrow(dat_input$LF)>1) LF_new <- cbind(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)], new)
                 dat_input$LF <- as.matrix(LF_new)
             }
             if(obs_lb > max(dat_input$highs)){
