@@ -10,7 +10,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2,
   SigmaR = 0.6, SigmaF = 0.3, R0 = 1, h = 1, qcoef = 1e-05,
   M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2,
-  Fmax = 0.7, start_ages = 0, rho = 0, theta = 10)
+  Fmax = 0.7, start_ages = 0, rho = 0, theta = 10, nseasons)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -78,6 +78,8 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 \item{rho}{first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)}
 
 \item{theta}{dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)}
+
+\item{nseasons}{specify number of sub-time periods per year}
 }
 \value{
 List, a tagged list of life history traits

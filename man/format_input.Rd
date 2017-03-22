@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
-  fix_param = FALSE, C_opt = 0, LFdist)
+  fix_param = FALSE, C_opt = 0, LFdist, S_l_input, theta_type)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -27,6 +27,10 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
 \item{C_opt}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
 
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
+
+\item{S_l_input}{input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity}
+
+\item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map

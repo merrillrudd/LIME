@@ -8,7 +8,7 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
   itervec = NULL, rewrite = TRUE, simulation = TRUE,
   param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
   fix_param = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
-  derive_quants = FALSE)
+  derive_quants = FALSE, S_l_input = -1, theta_type = 1)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -44,6 +44,10 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
 \item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
+
+\item{S_l_input}{default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length}
+
+\item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
 }
 \value{
 prints how many iterations were run in model directory

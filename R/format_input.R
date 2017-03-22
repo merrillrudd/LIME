@@ -13,9 +13,10 @@
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @param S_l_input input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity
+#' @param theta_type if 0, estimate annual theta; if 1, estimate single theta for all years of length comp
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist, S_l_input){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist, S_l_input, theta_type){
 
     with(input, {
         ## data-rich model
@@ -45,7 +46,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0),
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -64,7 +65,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.numeric(rownames(LF)),
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -97,7 +98,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0), 
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -126,7 +127,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=ML_yrs,
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -159,7 +160,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0), 
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -189,7 +190,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=ML_yrs,
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
-                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
@@ -222,7 +223,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_yrs=as.vector(0),
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
-                ML_t=as.vector(0), LF=LF, LFdist=LFdist, lbhighs=highs, lbmids=mids,
+                ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)
@@ -230,7 +231,9 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
         ## set input parameters - regardless of data availability 
         if(all(is.null(f_startval))) f_startval <- rep(1, Nyears)
-        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, log_theta=rep(log(theta),Data$n_lc), Nu_input=rep(0,Nyears))
+        if(theta_type==0) input_theta <- rep(log(theta), Data$n_lc)
+        if(theta_type==1) input_theta <- log(theta)
+        Parameters <- list(log_sigma_F=log(SigmaF), log_F_t_input=log(f_startval),log_q_I=log(qcoef), beta=log(R0), log_sigma_R=log(SigmaR), logS50=log(SL50), log_sigma_C=log_sigma_C, log_sigma_I=log_sigma_I, log_CV_L=log_CV_L, log_theta=input_theta, Nu_input=rep(0,Nyears))
 
         ## turn off parameter estimation - depends on data availability
             Map = list()

@@ -47,6 +47,7 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(ML_t); // mean length each year
     DATA_MATRIX(LF); // length composition
     DATA_INTEGER(LFdist); // distribution for length composition; 0=multinomial (and requires obs_per_year), 1=dirichlet-multinomial
+    DATA_INTEGER(theta_type); //0= annual theta, 1=single theta
     DATA_VECTOR(lbhighs); // upper length bins
     DATA_VECTOR(lbmids);
     DATA_INTEGER(binwidth);
@@ -102,9 +103,17 @@ Type objective_function<Type>::operator() ()
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
   vector<Type> theta(n_lc);
-  for(int l=0;l<n_lc;l++){
-    theta(l) = exp(log_theta(l));
+  if(theta_type==0){
+    for(int l=0;l<n_lc;l++){
+      theta(l) = exp(log_theta(l));
+    }
   }
+  if(theta_type==1){
+    for(int l=0;l<n_lc;l++){
+      theta(l) = exp(log_theta(0));
+    }
+  }
+
 
   // Transform vectors
   vector<Type> F_t(n_t);
