@@ -151,7 +151,7 @@ for(iter in 1:length(itervec)){
 
         ## loop to try to get opt to run
           for(i in 1:5){
-            if(all(is.na(opt)) | is.na(jnll)){
+            if(all(is.na(opt)) | is.na(jnll) | all(is.na(opt_save[["final_gradient"]]))){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
@@ -177,7 +177,7 @@ for(iter in 1:length(itervec)){
           ## check convergence -- don't let it become NA after it has had a high final gradient
           for(i in 1:5){
             if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
-               if(abs(max(opt_save[["final_gradient"]]))>0.01){
+               if(max(abs(opt_save[["final_gradient"]]))>0.01){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
@@ -204,7 +204,7 @@ for(iter in 1:length(itervec)){
                     }
                 }
               }
-            if(abs(max(opt_save[["final_gradient"]]))<=0.01) break
+            if(max(abs(opt_save[["final_gradient"]]))<=0.01) break
           }
         }
         if(all(is.na(opt_save))==FALSE)  df <- data.frame(opt_save$final_gradient, names(obj_save$par), opt_save$par, exp(opt_save$par))
@@ -214,8 +214,8 @@ for(iter in 1:length(itervec)){
           if(write==FALSE) output$issue <- NULL
           if(all(is.null(opt_save)) & write==TRUE) write("NAs final gradient", file.path(iterpath, "NAs_final_gradient.txt"))
           if(all(is.null(opt_save)) & write==FALSE) output$issue <- c(output$issue, "NAs_final_gradient")
-          if(all(is.null(opt_save)==FALSE) & write==TRUE) if(abs(max(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
-          if(all(is.null(opt_save)==FALSE & write==FALSE)) if(abs(max(opt_save[["final_gradient"]]))>0.01) output$issue <- c(output$issue, "high_final_gradient")
+          if(all(is.null(opt_save)==FALSE) & write==TRUE) if(max(abs(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
+          if(all(is.null(opt_save)==FALSE & write==FALSE)) if(max(abs(opt_save[["final_gradient"]]))>0.01) output$issue <- c(output$issue, "high_final_gradient")
           if(all(is.na(opt_save)) & write==TRUE) write("model_NA", file.path(iterpath, "model_NA.txt"))
           if(all(is.na(opt_save)) & write==FALSE) output$issue <- c(output$issue, "model_NA")
 
