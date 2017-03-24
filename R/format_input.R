@@ -307,10 +307,16 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 Map[["logS50"]] <- factor(Map[["logS50"]])
             }
 
+            if(randomR==FALSE){
+                Map[["log_sigma_R"]] <- NA
+                Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
+            }
+
         if(length(Map)==0) Map <- NULL
 
 
-        Random <- c("Nu_input")
+        if(randomR==TRUE) Random <- c("Nu_input")
+        if(randomR==FALSE) Random <- NULL
         # if(REML==TRUE){
         #     Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
         #     Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
