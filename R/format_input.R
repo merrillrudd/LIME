@@ -310,6 +310,9 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
             if(randomR==FALSE){
                 Map[["log_sigma_R"]] <- NA
                 Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
+
+                Map[["Nu_input"]] <- NA
+                Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
             }
 
         if(length(Map)==0) Map <- NULL
