@@ -8,7 +8,7 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
   itervec = NULL, rewrite = TRUE, simulation = TRUE,
   param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
   fix_param = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
-  derive_quants = FALSE, S_l_input = -1, theta_type = 1)
+  derive_quants = FALSE, S_l_input = -1, theta_type = 0, randomR = TRUE)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -48,6 +48,8 @@ run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
 \item{S_l_input}{default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length}
 
 \item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
+
+\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
 }
 \value{
 prints how many iterations were run in model directory

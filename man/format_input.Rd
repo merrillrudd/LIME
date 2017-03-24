@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
-  fix_param = FALSE, C_opt = 0, LFdist, S_l_input, theta_type)
+  fix_param = FALSE, C_opt = 0, LFdist, S_l_input, theta_type, randomR)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -31,6 +31,8 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
 \item{S_l_input}{input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity}
 
 \item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
+
+\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map
