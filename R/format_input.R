@@ -311,7 +311,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 Map[["log_sigma_R"]] <- NA
                 Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
 
-                Map[["Nu_input"]] <- NA
+                Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
                 Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
             }
 
