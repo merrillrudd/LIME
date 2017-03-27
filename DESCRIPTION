@@ -9,7 +9,9 @@ Description: A flexible stock assessment method for fisheries with developing
 License: GPL-2
 Depends:
     TMB,
-    devtools
+    devtools,
+    Rcpp,
+    RcppEigen
 LinkingTo: TMB, RcppEigen, Rcpp
 RoxygenNote: 6.0.1
 LazyData: true
