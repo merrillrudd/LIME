@@ -89,7 +89,6 @@ Type objective_function<Type>::operator() ()
   // ============ Global values ============================
 
   using namespace density;
-  int t,a,lc,c,i,ml,ll,l;
   Type jnll=0;
   vector<Type> jnll_comp(7);
   jnll_comp.setZero();
@@ -103,6 +102,7 @@ Type objective_function<Type>::operator() ()
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
   vector<Type> theta(n_lc);
+  int l;
   if(theta_type==0){
     for(int l=0;l<n_lc;l++){
       theta(l) = exp(log_theta(l));
@@ -119,6 +119,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_t(n_t);
   Type F_equil;
   F_equil = exp(log_F_t_input(0));
+  int t;
   for(int t=0;t<n_t;t++){
     F_t(t) = exp(log_F_t_input(t));
   }
@@ -127,6 +128,7 @@ Type objective_function<Type>::operator() ()
   /////probability of being in a length bin given age
   matrix<Type> plba(n_a,n_lb);
   Type sum_sublast = 0;
+  int a;
   for(int a=0;a<n_a;a++){
     for(int l=0;l<n_lb;l++){
       if(l==0){
@@ -355,6 +357,7 @@ Type objective_function<Type>::operator() ()
     vector<Type> sum2(n_lc);
     sum1.setZero();
     sum2.setZero();
+  int lc;
   if(n_lc>0){
     for(int t=0;t<n_t;t++){
       log_pL_t(t) = 0;
@@ -425,6 +428,7 @@ Type objective_function<Type>::operator() ()
 
   vector<Type> log_pML_t(n_t);
   log_pML_t.setZero();
+  int ml;
   if(n_ml>0){
     for(int t=0;t<n_t;t++){
       log_pML_t(t) = 0;
