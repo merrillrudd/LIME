@@ -4,16 +4,14 @@
 \alias{run_LIME}
 \title{run LIME model - simulation mode}
 \usage{
-run_LIME(modpath, write = TRUE, lh, input_data, est_sigma, data_avail,
-  itervec = NULL, rewrite = TRUE, simulation = TRUE,
-  param_adjust = FALSE, val_adjust = FALSE, f_true = FALSE,
-  fix_param = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
-  derive_quants = FALSE, S_l_input = -1, theta_type = 0, randomR = TRUE)
+run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
+  rewrite = TRUE, simulation = TRUE, param_adjust = FALSE,
+  val_adjust = FALSE, f_true = FALSE, fix_param = FALSE, C_opt = 0,
+  F_up = 10, LFdist = 0, derive_quants = FALSE, S_l_input = -1,
+  theta_type = 0, randomR = TRUE)
 }
 \arguments{
 \item{modpath}{model directory}
-
-\item{write}{default=TRUE, write to modpath; if FALSE, return output as list}
 
 \item{lh}{list of life history information, from create_lh_list}
 
