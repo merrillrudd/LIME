@@ -6,40 +6,40 @@
 #' @param linf von Bertalanffy Linf asymptotic length
 #' @param lwa length-weight scaling parameter
 #' @param lwb length-weight allometric parameter
+#' @param M value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)
+#' @param AgeMax option to specify maximum age; default=NULL will calculate as the age at which 1 percent of individuals are left in the unfished condition
+#' @param F1 starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error. 
 #' @param S50 starting value for age or length at 50 percent selectivity (will be estimated in LIME method)
 #' @param M50 age or length at 50 percent maturity
-#' @param S95 starting value for age or length at 95 percent selectivity
-#' @param M95 age or length at 50 percent maturity
-#' @param Sslope slope of logistic curve for length-at-selectivity
-#' @param Mslope slope of logistic curve for length-at-maturity
+#' @param S95 default=NULL for one-parameter logistic model; starting value for age or length at 95 percent selectivity
+#' @param M95 default=NULL for one-parameter logistic model; age or length at 50 percent maturity
+#' @param Sslope default=NULL, option to specify slope of logistic curve for length-at-selectivity
+#' @param Mslope default=NULL option to specify slope of logistic curve for length-at-maturity
 #' @param selex_input specify whether argument S50 is an age or a length (default length)
 #' @param maturity_input specify whether argument M50 is an age or a length (default length)
 #' @param selex_type default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV.
 #' @param dome_sd standard deviation of normal distribution to the right side of the fully selected age/length 
 #' @param binwidth width of length bins (default = 1)
 #' @param t0 theoretical age at length=0 (default = -0.01); avoid fixing to zero due to some issues with the first age/length bin
+#' @param R0 equilibrium recruitment (default = 1); when no information on scale is available, will estimate relative deviations around equilibrium 1
+#' @param h steepness parameter (default = 1)
 #' @param CVlen CV of the growth curve (default = 0.1)
 #' @param SigmaC standard deviation - observation error of catch data (default = 0.2)
 #' @param SigmaI standard deviation - observation error of index data (default = 0.2)
 #' @param SigmaR standard deviation - process error for recruitment time series (default = 0.6 -- starting value, will be estimated)
 #' @param SigmaF standard deviation - process error for fishing mortality time series (default = 0.3)
-#' @param R0 equilibrium recruitment (default = 1); when no information on scale is available, will estimate relative deviations around equilibrium 1
-#' @param h steepness parameter (default = 1)
 #' @param qcoef starting value for catchability coefficient (when index data is available, default = 1e-5)
-#' @param M value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)
-#' @param AgeMax specified value for maximum age
-#' @param F1 starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error. 
 #' @param Fequil equilibrium fishing mortality rate (used for simulation; default=0.2)
 #' @param Frate parameter used to simulate fishing moratality time series (default=NULL)
 #' @param Fmax maximum F used in simulation (default=NULL)
 #' @param start_ages age to start (either 0 or 1; default = 0)
 #' @param rho first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)
 #' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
-#' @param nseasons specify number of sub-time periods per year
+#' @param nseasons specify number of sub-time periods per year; default=1 (instantaneous sampling)
 #' 
 #' @return List, a tagged list of life history traits
 #' @export
-create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Sslope=NULL, Mslope=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, AgeMax=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10, nseasons){
+create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Sslope=NULL, Mslope=NULL, selex_input="length", maturity_input="length", selex_type="logistic", dome_sd=NULL, binwidth=1, t0=-0.01, CVlen=0.1, SigmaC=0.2, SigmaI=0.2, SigmaR=0.6, SigmaF=0.3, R0=1,  h=1, qcoef=1e-5, M=NULL, AgeMax=NULL, F1=0.2, Fequil=0.2, Frate=0.2, Fmax=0.7, start_ages=0, rho=0, theta=10, nseasons=1){
             
     ## mortality
     if(is.null(M)) M <- 1.5*vbk  ## based on vbk if not specified 
