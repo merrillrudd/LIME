@@ -10,7 +10,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.2, SigmaI = 0.2,
   SigmaR = 0.6, SigmaF = 0.3, R0 = 1, h = 1, qcoef = 1e-05,
   M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.2, Frate = 0.2,
-  Fmax = 0.7, start_ages = 0, rho = 0, theta = 10, nseasons)
+  Fmax = 0.7, start_ages = 0, rho = 0, theta = 10, nseasons = 1)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -25,13 +25,13 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{M50}{age or length at 50 percent maturity}
 
-\item{S95}{starting value for age or length at 95 percent selectivity}
+\item{S95}{default=NULL for one-parameter logistic model; starting value for age or length at 95 percent selectivity}
 
-\item{M95}{age or length at 50 percent maturity}
+\item{M95}{default=NULL for one-parameter logistic model; age or length at 50 percent maturity}
 
-\item{Sslope}{slope of logistic curve for length-at-selectivity}
+\item{Sslope}{default=NULL, option to specify slope of logistic curve for length-at-selectivity}
 
-\item{Mslope}{slope of logistic curve for length-at-maturity}
+\item{Mslope}{default=NULL option to specify slope of logistic curve for length-at-maturity}
 
 \item{selex_input}{specify whether argument S50 is an age or a length (default length)}
 
@@ -63,7 +63,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{M}{value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)}
 
-\item{AgeMax}{specified value for maximum age}
+\item{AgeMax}{option to specify maximum age; default=NULL will calculate as the age at which 1 percent of individuals are left in the unfished condition}
 
 \item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
 
@@ -79,7 +79,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{theta}{dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)}
 
-\item{nseasons}{specify number of sub-time periods per year}
+\item{nseasons}{specify number of sub-time periods per year; default=1 (instantaneous sampling)}
 }
 \value{
 List, a tagged list of life history traits
