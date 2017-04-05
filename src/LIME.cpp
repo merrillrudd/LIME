@@ -181,8 +181,9 @@ Type objective_function<Type>::operator() ()
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
-  for(int t=0;t<n_t;t++){
-    jnll_comp(0) -= dnorm(Nu_input(t), Type(0.0), sigma_R, true);
+  int y;
+  for(int y=0;y<n_y;y++){
+    jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
   }
 
   // ============ equilibrium spawning biomass ===============
@@ -245,7 +246,7 @@ Type objective_function<Type>::operator() ()
   // Project forward in time
   for(int t=1;t<n_t;t++){
     // Recruitment
-    R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(t) - pow(sigma_R,2)/Type(2));
+    R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(S_yrs(t)-1) - pow(sigma_R,2)/Type(2));
     
     // Age-structured dynamics
     for(int a=0;a<n_a;a++){
