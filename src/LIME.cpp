@@ -181,7 +181,6 @@ Type objective_function<Type>::operator() ()
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
-  int y;
   for(int y=0;y<n_y;y++){
     jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
   }
