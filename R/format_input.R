@@ -21,6 +21,16 @@
 format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist, S_l_input, theta_type, randomR){
 
     with(input, {
+
+        if(nseasons==1){
+            S_yrs_inp <- 1:Nyears
+        }
+        if(nseasons>1){
+            Nyears2 <- ceiling(Nyears/nseasons)
+            S_yrs_inp_raw <- as.vector(sapply(1:Nyears2, function(x) rep(x, nseasons)))
+            S_yrs_inp <- S_yrs_inp_raw[1:Nyears]
+        }
+
         ## data-rich model
         if(grepl("Index",data_avail) & grepl("Catch",data_avail) & grepl("LC",data_avail)){
             if(is.matrix(LF)){
@@ -51,7 +61,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
         ## same as above but fit to mean length data instead of length composition data
@@ -70,7 +80,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
         ## index and length composition data
@@ -103,7 +113,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
         ## index and mean length data
@@ -132,7 +142,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
         ## catch and length composition data
@@ -165,7 +175,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
 
@@ -195,7 +205,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)       
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)       
         }
 
         ## length composition data only 
@@ -228,7 +238,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
                 binwidth=binwidth, 
                 n_a=length(ages), L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a, 
-                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input)
+                Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons)
         }       
 
         ## set input parameters - regardless of data availability 
