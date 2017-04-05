@@ -68,6 +68,10 @@ Type objective_function<Type>::operator() ()
     // option for fixed time series for selectivity
     DATA_VECTOR(S_l_input);
 
+    // options for multiple time steps within a year
+    DATA_VECTOR(S_yrs); // vector assigning each time step to a larger time step (e.g. months to years)
+    DATA_INTEGER(n_s); //number of seasons within a larger time step
+
   // ======== Parameters =================================
     // Fixed, estimated parameters
     PARAMETER(log_sigma_F); // SD of F
