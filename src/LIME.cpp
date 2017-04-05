@@ -69,7 +69,9 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(S_l_input);
 
     // option for shorter time-step than years
-    DATA_VECTOR(S_yrs); // matching each time step with a year
+    DATA_IVECTOR(S_yrs); // matching each time step with a year
+    DATA_INTEGER(n_s); // number of time steps within a year
+    DATA_INTEGER(n_y); // number of years
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
@@ -119,13 +121,22 @@ Type objective_function<Type>::operator() ()
 
 
   // Transform vectors
-  vector<Type> F_t(n_t);
+  vector<Type> F_t(n_t); //number of total time steps
+  vector<Type> F_y(n_y); //number of years
   Type F_equil;
   F_equil = exp(log_F_t_input(0));
   int t;
-  for(int t=0;t<n_t;t++){
-    F_t(t) = exp(log_F_t_input(t));
+  int y;
+  int tmp; 
+  for(int y=0;y<n_y;y++){
+    F_y(y) = exp(log_F_t_input(y));
   }
+  for(int t=0;t<n_t;t++){
+    tmp = S_yrs(t) - 1;
+    // match fishing mortality in the total number of time steps to the annual parameter F
+    F_t(t) = F_y(tmp)/n_s;
+  }
+
 
   // ========= Convert inputs  =============================
   /////probability of being in a length bin given age
@@ -184,7 +195,7 @@ Type objective_function<Type>::operator() ()
   
   // ============ Project dynamics ===========================
 
-  vector<Type> R_t(n_t);
+  vector<Type> R_t(n_t); // recruitment for each time step
   matrix<Type> N_ta(n_t,n_a);
   matrix<Type> SB_ta(n_t,n_a);
   matrix<Type> TB_ta(n_t,n_a);
@@ -310,30 +321,32 @@ Type objective_function<Type>::operator() ()
   }
 
   // // ========= spawning potential ratio ==============================
-  matrix<Type> Na0(n_t,n_a);
-  matrix<Type> Naf(n_t,n_a);
+  int amax;
+  amax = n_a/n_s;
+  matrix<Type> Na0(n_y,amax);
+  matrix<Type> Naf(n_y,amax);
 
   // SPR
-  vector<Type> SB0_t(n_t);
-  vector<Type> SBf_t(n_t);
-  vector<Type> SPR_t(n_t);
+  vector<Type> SB0_t(n_y);
+  vector<Type> SBf_t(n_y);
+  vector<Type> SPR_t(n_y);
   SB0_t.setZero();
   SBf_t.setZero();
   SPR_t.setZero();
 
-  for(int t=0;t<n_t;t++){
-    for(int a=0;a<n_a;a++){
+  for(int t=0;t<n_y;t++){
+    for(int a=0;a<amax;a++){
       if(a==0){
         Na0(t,a) = 1;
         Naf(t,a) = 1;
       }
-      if(a>0 & a<(n_a-1)){
-        Na0(t,a) = Na0(t,a-1)*exp(-M);
-        Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
+      if(a>0 & a<(amax-1)){
+        Na0(t,a) = Na0(t,a-1)*exp(-M*n_s);
+        Naf(t,a) = Naf(t,a-1)*exp(-M*n_s-S_a(a-1)*F_y(t));
       }
-      if(a==(n_a-1)){
-        Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a)*F_t(t)))/(1-exp(-M-S_a(a)*F_t(t)));
+      if(a==(amax-1)){
+        Na0(t,a) = (Na0(t,a-1)*exp(-M*n_s))/(1-exp(-M*n_s));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M*n_s-S_a(a)*F_y(t)))/(1-exp(-M*n_s-S_a(a)*F_y(t)));
       }
 
       if(a>0){
@@ -344,232 +357,237 @@ Type objective_function<Type>::operator() ()
     SPR_t(t) = SBf_t(t)/SB0_t(t);
   }
 
+  REPORT(F_t);
+  REPORT(log_F_t_input);
+  REPORT(S_yrs);
+  REPORT(R_t);
+  REPORT(Nu_input);
+  REPORT(SPR_t);
+
+  // // ========= Build likelihood ==============================
+
+  // // Likelihood contribution from observations
+  // vector<Type> log_pL_t(n_t);
+  // log_pL_t.setZero();
+  // vector<Type> neff(n_lc);
+  // neff.setZero();
+  //   vector<Type> LFprob(n_lb);
+  //   vector<Type> LFraw(n_lb);
+  //   vector<Type> prob(n_lb);
+  //   vector<Type> sum1(n_lc);
+  //   vector<Type> sum2(n_lc);
+  //   sum1.setZero();
+  //   sum2.setZero();
+  // int lc;
+  // if(n_lc>0){
+  //   for(int t=0;t<n_t;t++){
+  //     log_pL_t(t) = 0;
+  //     for(int lc=0;lc<n_lc;lc++){
+  //       if(LC_yrs(lc)==T_yrs(t)){
+  //         LFraw = LF.row(lc);
+  //         prob = plb.row(t);
+  //         if(LFdist==0){
+  //           LFprob = obs_per_yr(t)*(LFraw/LFraw.sum()); 
+  //           log_pL_t(t) += dmultinom(LFprob, prob, true); // check log
+  //         }
+  //         if(LFdist==1){
+  //           LFprob = (LFraw/LFraw.sum());
+  //           for(int l=0;l<n_lb;l++){
+  //             sum1(lc) += lgamma(LFraw.sum()*LFprob(l)+1);
+  //             sum2(lc) += lgamma(LFraw.sum()*LFprob(l) + theta(lc)*LFraw.sum()*prob(l)) - lgamma(theta(lc)*LFraw.sum()*prob(l));
+  //           }
+  //           log_pL_t(t) += lgamma(LFraw.sum()+1) - sum1(lc) + lgamma(theta(lc)*LFraw.sum()) - lgamma(LFraw.sum()+theta(lc)*LFraw.sum()) + sum2(lc);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
+  // if(LFdist==1){
+  //   for(int lc=0;lc<n_lc;lc++){
+  //     LFraw = LF.row(lc);
+  //     neff(lc) = (1+theta(lc)*LFraw.sum())/(1+theta(lc));
+  //   }
+  // }
+
+  // vector<Type> I_t_hat(n_t);
+  // for(int t=0;t<n_t;t++){
+  //     I_t_hat(t) = q_I*TB_t(t);
+  // }
 
 
-  // ========= Build likelihood ==============================
+  // vector<Type> log_pI_t(n_t);
+  // log_pI_t.setZero();
+  // if(n_i>0){
+  //   for(int t=0;t<n_t;t++){
+  //     log_pI_t(t) = 0;
+  //     for(int i=0;i<n_i;i++){
+  //       if(I_yrs(i)==T_yrs(t)){
+  //         // probability of index at that sample
+  //         log_pI_t(t) += dlognorm( I_t(i), log(I_t_hat(t)), sigma_I, true);
+  //         }
+  //       }
+  //     }
+  //   }
 
-  // Likelihood contribution from observations
-  vector<Type> log_pL_t(n_t);
-  log_pL_t.setZero();
-  vector<Type> neff(n_lc);
-  neff.setZero();
-    vector<Type> LFprob(n_lb);
-    vector<Type> LFraw(n_lb);
-    vector<Type> prob(n_lb);
-    vector<Type> sum1(n_lc);
-    vector<Type> sum2(n_lc);
-    sum1.setZero();
-    sum2.setZero();
-  int lc;
-  if(n_lc>0){
-    for(int t=0;t<n_t;t++){
-      log_pL_t(t) = 0;
-      for(int lc=0;lc<n_lc;lc++){
-        if(LC_yrs(lc)==T_yrs(t)){
-          LFraw = LF.row(lc);
-          prob = plb.row(t);
-          if(LFdist==0){
-            LFprob = obs_per_yr(t)*(LFraw/LFraw.sum()); 
-            log_pL_t(t) += dmultinom(LFprob, prob, true); // check log
-          }
-          if(LFdist==1){
-            LFprob = (LFraw/LFraw.sum());
-            for(int l=0;l<n_lb;l++){
-              sum1(lc) += lgamma(LFraw.sum()*LFprob(l)+1);
-              sum2(lc) += lgamma(LFraw.sum()*LFprob(l) + theta(lc)*LFraw.sum()*prob(l)) - lgamma(theta(lc)*LFraw.sum()*prob(l));
-            }
-            log_pL_t(t) += lgamma(LFraw.sum()+1) - sum1(lc) + lgamma(theta(lc)*LFraw.sum()) - lgamma(LFraw.sum()+theta(lc)*LFraw.sum()) + sum2(lc);
-          }
-        }
-      }
-    }
-  }
-
-  if(LFdist==1){
-    for(int lc=0;lc<n_lc;lc++){
-      LFraw = LF.row(lc);
-      neff(lc) = (1+theta(lc)*LFraw.sum())/(1+theta(lc));
-    }
-  }
-
-  vector<Type> I_t_hat(n_t);
-  for(int t=0;t<n_t;t++){
-      I_t_hat(t) = q_I*TB_t(t);
-  }
-
-
-  vector<Type> log_pI_t(n_t);
-  log_pI_t.setZero();
-  if(n_i>0){
-    for(int t=0;t<n_t;t++){
-      log_pI_t(t) = 0;
-      for(int i=0;i<n_i;i++){
-        if(I_yrs(i)==T_yrs(t)){
-          // probability of index at that sample
-          log_pI_t(t) += dlognorm( I_t(i), log(I_t_hat(t)), sigma_I, true);
-          }
-        }
-      }
-    }
-
-  vector<Type> log_pC_t(n_t);
-  log_pC_t.setZero();
-  if(n_c>0){
-    for(int t=0;t<n_t;t++){  
-      log_pC_t(t) = 0;
-      for(int c=0;c<n_c;c++){
-        if(C_yrs(c)==T_yrs(t)){
-          // probability of index at that sample
-          if(C_opt==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
-          if(C_opt==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
-          }
-        }
-      }
-    }
+  // vector<Type> log_pC_t(n_t);
+  // log_pC_t.setZero();
+  // if(n_c>0){
+  //   for(int t=0;t<n_t;t++){  
+  //     log_pC_t(t) = 0;
+  //     for(int c=0;c<n_c;c++){
+  //       if(C_yrs(c)==T_yrs(t)){
+  //         // probability of index at that sample
+  //         if(C_opt==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
+  //         if(C_opt==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
+  //         }
+  //       }
+  //     }
+  //   }
 
 
 
-  vector<Type> log_pML_t(n_t);
-  log_pML_t.setZero();
-  int ml;
-  if(n_ml>0){
-    for(int t=0;t<n_t;t++){
-      log_pML_t(t) = 0;
-      for(int ml=0;ml<n_ml;ml++){
-         if(ML_yrs(ml)==T_yrs(t)){
-            log_pML_t(t) += dnorm( ML_t(ml), L_t_hat(t), L_t_hat(t)*CV_L, true);
-         }
-      }
-    }
-  }
+  // vector<Type> log_pML_t(n_t);
+  // log_pML_t.setZero();
+  // int ml;
+  // if(n_ml>0){
+  //   for(int t=0;t<n_t;t++){
+  //     log_pML_t(t) = 0;
+  //     for(int ml=0;ml<n_ml;ml++){
+  //        if(ML_yrs(ml)==T_yrs(t)){
+  //           log_pML_t(t) += dnorm( ML_t(ml), L_t_hat(t), L_t_hat(t)*CV_L, true);
+  //        }
+  //     }
+  //   }
+  // }
 
-  jnll_comp(1) = 0;
-  if(n_lc>0) jnll_comp(1) = Type(-1)*sum( log_pL_t );
-  jnll_comp(2) = 0;
-  if(n_ml>0) jnll_comp(2) = Type(-1)*sum( log_pML_t ); 
+  // jnll_comp(1) = 0;
+  // if(n_lc>0) jnll_comp(1) = Type(-1)*sum( log_pL_t );
+  // jnll_comp(2) = 0;
+  // if(n_ml>0) jnll_comp(2) = Type(-1)*sum( log_pML_t ); 
 
-  jnll_comp(3) = 0;
-  if(n_i>0) jnll_comp(3) = Type(-1)*sum( log_pI_t );
-  jnll_comp(4) = 0;
-  if(n_c>0) jnll_comp(4) = Type(-1)*sum( log_pC_t );
+  // jnll_comp(3) = 0;
+  // if(n_i>0) jnll_comp(3) = Type(-1)*sum( log_pI_t );
+  // jnll_comp(4) = 0;
+  // if(n_c>0) jnll_comp(4) = Type(-1)*sum( log_pC_t );
 
-  // Likelihood contributions from site-aggregated observations
-    vector<Type> N_t_hat(n_t);
-    vector<Type> SB_t_hat(n_t);
-    vector<Type> TB_t_hat(n_t);
-    vector<Type> R_t_hat(n_t);
-    vector<Type> D_t(n_t);
-    for(int t=0;t<n_t;t++){
-       N_t_hat(t) = N_t(t);
-       R_t_hat(t) = R_t(t);
-       SB_t_hat(t) = SB_t(t);
-       TB_t_hat(t) = TB_t(t);
-       D_t(t) = SB_t_hat(t)/SB_t_hat(0);
-    }
+  // // Likelihood contributions from site-aggregated observations
+  //   vector<Type> N_t_hat(n_t);
+  //   vector<Type> SB_t_hat(n_t);
+  //   vector<Type> TB_t_hat(n_t);
+  //   vector<Type> R_t_hat(n_t);
+  //   vector<Type> D_t(n_t);
+  //   for(int t=0;t<n_t;t++){
+  //      N_t_hat(t) = N_t(t);
+  //      R_t_hat(t) = R_t(t);
+  //      SB_t_hat(t) = SB_t(t);
+  //      TB_t_hat(t) = TB_t(t);
+  //      D_t(t) = SB_t_hat(t)/SB_t_hat(0);
+  //   }
 
-    vector<Type> lN_t(n_t);
-    vector<Type> lSB_t(n_t);
-    vector<Type> lTB_t(n_t);
-    vector<Type> lR_t(n_t);
-    vector<Type> lF_t(n_t);
-    vector<Type> lC_t(n_t);
-    vector<Type> lI_t(n_t);
-    vector<Type> lD_t(n_t);
-    for(t=0;t<n_t;t++){
-      lN_t(t) = log(N_t_hat(t));
-      lSB_t(t) = log(SB_t_hat(t));
-      lTB_t(t) = log(TB_t_hat(t));
-      lR_t(t) = log(R_t_hat(t));
-      lF_t(t) = log(F_t(t));
-      lC_t(t) = log(C_t_hat(t));
-      lI_t(t) = log(I_t_hat(t));
-      lD_t(t) = log(D_t(t));
-    }
+  //   vector<Type> lN_t(n_t);
+  //   vector<Type> lSB_t(n_t);
+  //   vector<Type> lTB_t(n_t);
+  //   vector<Type> lR_t(n_t);
+  //   vector<Type> lF_t(n_t);
+  //   vector<Type> lC_t(n_t);
+  //   vector<Type> lI_t(n_t);
+  //   vector<Type> lD_t(n_t);
+  //   for(t=0;t<n_t;t++){
+  //     lN_t(t) = log(N_t_hat(t));
+  //     lSB_t(t) = log(SB_t_hat(t));
+  //     lTB_t(t) = log(TB_t_hat(t));
+  //     lR_t(t) = log(R_t_hat(t));
+  //     lF_t(t) = log(F_t(t));
+  //     lC_t(t) = log(C_t_hat(t));
+  //     lI_t(t) = log(I_t_hat(t));
+  //     lD_t(t) = log(D_t(t));
+  //   }
 
 
-  // F
-    jnll_comp(5) = 0;
-    if(Fpen==1){
-        for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
-    }
+  // // F
+  //   jnll_comp(5) = 0;
+  //   if(Fpen==1){
+  //       for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
+  //   }
 
-    // // SigmaR
-    Type sigrp;
-    sigrp = 0;
-    jnll_comp(6) = 0;
-    sigrp = dlognorm(sigma_R, log(SigRprior(0)), SigRprior(1), true);
-    if(SigRpen==1) jnll_comp(6) = Type(-1)*sigrp;
+  //   // // SigmaR
+  //   Type sigrp;
+  //   sigrp = 0;
+  //   jnll_comp(6) = 0;
+  //   sigrp = dlognorm(sigma_R, log(SigRprior(0)), SigRprior(1), true);
+  //   if(SigRpen==1) jnll_comp(6) = Type(-1)*sigrp;
 
-    jnll = sum(jnll_comp);
+  //   jnll = sum(jnll_comp);
 
-  // ============ Reporting section ======================================
+  // // ============ Reporting section ======================================
 
-  ADREPORT( lC_t );
-  ADREPORT( lN_t );
-  ADREPORT( lR_t );
-  ADREPORT( lI_t );
-  ADREPORT( L_t_hat );
-  ADREPORT( lSB_t );
-  ADREPORT( lF_t );
-  ADREPORT( lD_t );
-  ADREPORT( SPR_t );
-  ADREPORT( S50 );
-  ADREPORT( S_l );
+  // ADREPORT( lC_t );
+  // ADREPORT( lN_t );
+  // ADREPORT( lR_t );
+  // ADREPORT( lI_t );
+  // ADREPORT( L_t_hat );
+  // ADREPORT( lSB_t );
+  // ADREPORT( lF_t );
+  // ADREPORT( lD_t );
+  // ADREPORT( SPR_t );
+  // ADREPORT( S50 );
+  // ADREPORT( S_l );
 
-  // Parameters
-  REPORT( F_equil );
-  REPORT( q_I );
-  REPORT( sigma_F );
-  REPORT( beta );
-  REPORT( sigma_R );
-  REPORT( log_sigma_R );
-  REPORT( S50 );
-  REPORT( S_a );
-  REPORT( S_l );
-  REPORT( S_l_input );
-  REPORT( sigma_C );
-  REPORT( sigma_I );
-  REPORT( CV_L );
-  REPORT( SPR_t );
-  REPORT( SB0_t );
-  REPORT( SBf_t );
+  // // Parameters
+  // REPORT( F_equil );
+  // REPORT( q_I );
+  // REPORT( sigma_F );
+  // REPORT( beta );
+  // REPORT( sigma_R );
+  // REPORT( log_sigma_R );
+  // REPORT( S50 );
+  // REPORT( S_a );
+  // REPORT( S_l );
+  // REPORT( S_l_input );
+  // REPORT( sigma_C );
+  // REPORT( sigma_I );
+  // REPORT( CV_L );
+  // REPORT( SPR_t );
+  // REPORT( SB0_t );
+  // REPORT( SBf_t );
 
-  // Random effects
-  REPORT( Nu_input );
+  // // Random effects
+  // REPORT( Nu_input );
 
-   // State variables
-  REPORT( R_t_hat );
-  REPORT( F_t );
-  REPORT( N_t_hat );
+  //  // State variables
+  // REPORT( R_t_hat );
+  // REPORT( F_t );
+  // REPORT( N_t_hat );
 
-  // Predicted quantities
-  REPORT( L_t_hat );
-  REPORT( I_t_hat );
-  // Derived quantities
-  REPORT( C_t_hat );
-  REPORT( Cw_t_hat );
-  REPORT( SB_t_hat );
-  REPORT( TB_t_hat );
-  REPORT( SB0 );
-  REPORT(D_t);
-  REPORT(N_ta);
-  REPORT(Cn_ta);
-  REPORT(plba);
-  REPORT(page);
-  REPORT(plb);
-  REPORT(W_a);
-  REPORT(L_a);
-  REPORT(Mat_a);
-  REPORT(M);
-    // Likelihoods
-  REPORT(log_pC_t);
-  REPORT(log_pI_t);
-  REPORT(log_pL_t);
-  REPORT(neff);
-  REPORT(theta);
-  REPORT(log_pML_t);
-  REPORT(sigrp);
-  REPORT(jnll_comp);
-  REPORT(jnll); 
+  // // Predicted quantities
+  // REPORT( L_t_hat );
+  // REPORT( I_t_hat );
+  // // Derived quantities
+  // REPORT( C_t_hat );
+  // REPORT( Cw_t_hat );
+  // REPORT( SB_t_hat );
+  // REPORT( TB_t_hat );
+  // REPORT( SB0 );
+  // REPORT(D_t);
+  // REPORT(N_ta);
+  // REPORT(Cn_ta);
+  // REPORT(plba);
+  // REPORT(page);
+  // REPORT(plb);
+  // REPORT(W_a);
+  // REPORT(L_a);
+  // REPORT(Mat_a);
+  // REPORT(M);
+  //   // Likelihoods
+  // REPORT(log_pC_t);
+  // REPORT(log_pI_t);
+  // REPORT(log_pL_t);
+  // REPORT(neff);
+  // REPORT(theta);
+  // REPORT(log_pML_t);
+  // REPORT(sigrp);
+  // REPORT(jnll_comp);
+  // REPORT(jnll); 
   return(jnll);
 }
