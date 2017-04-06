@@ -8,6 +8,7 @@
 #' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param lh list of life history information to feed to population simulation function, output from create_lh_list
+#' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length
 #' @param write write generated dataset? default=TRUE. FALSE helpful for plotting.
 #' @param Nyears number of years to simulate
 #' @param comp_sample vector with sample sizes of length composition data each year
@@ -16,7 +17,7 @@
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, write=TRUE, Nyears, comp_sample, rewrite=TRUE, init_depl, derive_quants=FALSE){
+generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, write=TRUE, Nyears, comp_sample, rewrite=TRUE, init_depl, derive_quants=FALSE){
 
     for(iter in itervec){
 
@@ -40,7 +41,7 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
@@ -51,7 +52,7 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
             set.seed(seed_init)
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }

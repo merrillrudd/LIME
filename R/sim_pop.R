@@ -4,6 +4,7 @@
 #'
 #' @param lh list of life history information, from create_lh_list
 #' @param Nyears number of years to simulate
+#' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length
 #' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
@@ -15,7 +16,7 @@
 
 #' @return named list of attributes of true population/data
 #' @export
-sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl, nburn, seed, modname){
+sim_pop <- function(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl, nburn, seed, modname){
 
     ## SB_t = spawning biomass over time
     ## F_t = fishing mortality over time
@@ -261,23 +262,30 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     LF <- LFinfo$LF
     LF0 <- LF0info$LF
 
-    LF_t <- LF0_t <- matrix(NA, nrow=tyears_only, ncol=ncol(LF))
-    for(y in 1:tyears_only){
-        if(nseasons==1){
-            LF_t[y,] <- LF[y,]
-            LF0_t[y,] <- LF[y,]
+    if(pool==TRUE){
+        LF_t <- LF0_t <- matrix(NA, nrow=tyears_only, ncol=ncol(LF))
+        for(y in 1:tyears_only){
+            if(nseasons==1){
+                LF_t[y,] <- LF[y,]
+                LF0_t[y,] <- LF0[y,]
+            }
+            if(nseasons>1){
+                time_index <- (1:nseasons)+((y-1)*nseasons)
+                LF_t[y,] <- colSums(LF[time_index,])
+                LF0_t[y,] <- colSums(LF0[time_index,])            
+            }
         }
-        if(nseasons>1){
-            time_index <- (1:nseasons)+((y-1)*nseasons)
-            LF_t[y,] <- colSums(LF[time_index,])
-            LF0_t[y,] <- colSums(LF0[time_index,])            
-        }
+        obs_per_year <- sapply(1:tyears_only, function(x){
+            if(nseasons==1) time_index <- x
+            if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
+            sum(obs_per_year[time_index])
+        })        
     }
-    obs_per_year <- sapply(1:tyears_only, function(x){
-        if(nseasons==1) time_index <- x
-        if(nseasons > 1) time_index <- (1:nseasons)+((x-1)*nseasons)
-        sum(obs_per_year[time_index])
-    })
+    if(pool==FALSE){
+        LF_t <- LF
+        LF0_t <- LF0
+    }
+
 
 
     ########################################################
@@ -289,22 +297,37 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
         vul_lengths <- sum(vul_pop*plb[y,]*mids)
         ML_t[y] <- vul_lengths/vul_pop
     }
-    ML_t <- ML_t[which(1:tyears %% nseasons==0)]
+    if(pool==TRUE) ML_t <- ML_t[which(1:tyears %% nseasons==0)]
 
     ########################################################
     ## cut out burn-in
     ########################################################
 
+    if(pool==TRUE){
+        LFout <- LF_t[-c(1:nburn_real),]
+            rownames(LFout) <- 1:Nyears_real
+        LF0out <- LF0_t[-c(1:nburn_real),]
+            rownames(LF0out) <- 1:Nyears_real
+
+        ML_tout <- ML_t[-c(1:nburn_real)]
+
+        LFindex <- (Nyears_real-Nyears_comp+1):Nyears_real
+    }
+    if(pool==FALSE){
+        LFout <- LF_t[-c(1:nburn),]
+            rownames(LFout) <- 1:Nyears
+        LF0out <- LF0_t[-c(1:nburn),]
+            rownames(LF0out) <- 1:Nyears
+
+        ML_tout <- ML_t[-c(1:nburn)]
+
+        LFindex <- (Nyears-Nyears_comp*nseasons+1):Nyears
+    }
+
     I_tout <- I_t[-c(1:nburn_real)]
     C_tout <- C_t[-c(1:nburn_real)]
     Cw_tout <- Cw_t[-c(1:nburn_real)]
-            names(C_tout) <- names(Cw_tout) <- names(I_tout) <- 1:Nyears_real
-
-    LFout <- LF_t[-c(1:nburn_real),]
-        rownames(LFout) <- 1:Nyears_real
-    LF0out <- LF0_t[-c(1:nburn_real),]
-        rownames(LF0out) <- 1:Nyears_real
-
+        names(C_tout) <- names(Cw_tout) <- names(I_tout) <- 1:Nyears_real
     R_tout <- R_t[-c(1:nburn_real)]
     N_tout <- N_t[-c(1:nburn_real)]
     SB_tout <- SB_t[-c(1:nburn_real)]
@@ -312,10 +335,8 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     VB_tout <- VB_t[-c(1:nburn_real)]
     D_tout <- D_t[-c(1:nburn_real)]
     F_tout <- F_t[-c(1:nburn_real)]
-    ML_tout <- ML_t[-c(1:nburn_real)]
     SPR_tout <- SPR_t[-c(1:nburn_real)]
 
-        LFindex <- (Nyears_real-Nyears_comp+1):Nyears_real
         LFout <- LFout[LFindex,]
         LF0out <- LF0out[LFindex,]
         if(is.vector(LFout)==FALSE) colnames(LFout) <- highs
@@ -351,8 +372,14 @@ sim_pop <- function(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, 
     lh$VB_t <- VB_tout
     lh$TB_t <- TB_tout
     lh$nlbins <- length(mids)
-    lh$Nyears <- Nyears_real
-    lh$years <- 1:Nyears_real
+    if(pool==TRUE){
+        lh$Nyears <- Nyears_real
+        lh$years <- 1:Nyears_real
+    }
+    if(pool==FALSE){
+        lh$Nyears <- Nyears
+        lh$years <- 1:Nyears        
+    }
     lh$obs_per_year <- obs_per_year
     if(Rdynamics!="AR") lh$RecDev <- RecDev
     if(Rdynamics=="AR") lh$RecDev <- RecDev_AR
