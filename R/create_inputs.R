@@ -32,7 +32,7 @@ create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
         if(ncol(dat_input$LF)!=length(dat_input$highs)){
           if(is.null(colnames(dat_input$LF))==FALSE) obs_lb <- as.numeric(names(which(rev(colSums(dat_input$LF))>0)[1]))
           if(is.null(colnames(dat_input$LF))) obs_lb <- max(seq(dat_input$binwidth,length=ncol(dat_input$LF), by=dat_input$binwidth))
-            if(obs_lb <= max(dat_input$highs)){
+            if(obs_lb < max(dat_input$highs)){
                 new <- matrix(0, nrow=nrow(dat_input$LF), ncol=length(seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)))
                 rownames(new) <- rownames(dat_input$LF)
                 colnames(new) <- seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)
@@ -40,7 +40,7 @@ create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
                 if(nrow(dat_input$LF)>1) LF_new <- cbind(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)], new)
                 dat_input$LF <- as.matrix(LF_new)
             }
-            if(obs_lb > max(dat_input$highs)){
+            if(obs_lb >= max(dat_input$highs)){
                 max_lb <- max(from=seq(dat_input$binwidth, to=ncol(dat_input$LF), by=dat_input$binwidth))
                 test_lb <- max(seq(from=(obs_lb + dat_input$binwidth), length=5, by=dat_input$binwidth))
                 change_lb <- min(test_lb, max_lb)
