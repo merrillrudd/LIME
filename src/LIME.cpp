@@ -54,8 +54,12 @@ Type objective_function<Type>::operator() ()
 
     // Known values
     DATA_INTEGER(n_a);
-    DATA_VECTOR(L_a);
-    DATA_VECTOR(W_a);
+    DATA_VECTOR(ages);
+    DATA_SCALAR(linf);
+    DATA_SCALAR(vbk);
+    DATA_SCALAR(t0);
+    DATA_SCALAR(lwa);
+    DATA_SCALAR(lwb);
     DATA_SCALAR(M);
     DATA_SCALAR(h);
     DATA_VECTOR(Mat_a); // maturity
@@ -106,6 +110,9 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
+  int amax;
+  amax = n_a/n_s;
+
   vector<Type> theta(n_lc);
   int l;
   if(theta_type==0){
@@ -139,10 +146,25 @@ Type objective_function<Type>::operator() ()
 
 
   // ========= Convert inputs  =============================
-  /////probability of being in a length bin given age
+  // length and weight at input age
+  vector<Type> L_a(n_a);
+  vector<Type> W_a(n_a);
+  int a;
+  for(int a=0;a<n_a;a++){
+    L_a(a) = linf*(1-exp(-vbk*(ages(a)-t0)));
+    W_a(a) = lwa*pow(L_a(a), lwb);
+  }
+
+  // length at ANNUAL age
+  vector<Type> L_A(amax);
+  for(int a=0;a<amax;a++){
+    L_A(a) = linf*(1-exp(-vbk*(a-t0)));
+  }
+
+
+  /////probability of being in a length bin given INPUT age
   matrix<Type> plba(n_a,n_lb);
   Type sum_sublast = 0;
-  int a;
   for(int a=0;a<n_a;a++){
     for(int l=0;l<n_lb;l++){
       if(l==0){
@@ -159,6 +181,25 @@ Type objective_function<Type>::operator() ()
     }
     sum_sublast = 0;
   }
+
+  /////probability of being in a length bin given ACTUAL age
+  matrix<Type> plbA(amax,n_lb);
+  for(int a=0;a<amax;a++){
+    for(int l=0;l<n_lb;l++){
+      if(l==0){
+        plbA(a,l) = pnorm(lbhighs(l), L_A(a), L_A(a)*CV_L);
+        sum_sublast += plbA(a,l);
+      }
+      if(l>=1){
+        if(l<(n_lb-1)){
+          plbA(a,l) = pnorm(lbhighs(l), L_A(a), L_A(a)*CV_L) - pnorm(lbhighs(l-1), L_A(a), L_A(a)*CV_L);
+          sum_sublast += plbA(a,l);
+        }
+        if(l==(n_lb-1)) plbA(a,l) = Type(1.0) - sum_sublast;
+      }
+    }
+    sum_sublast = 0;
+  }
  
   vector<Type> S_l(n_lb);
   S_l.setZero();
@@ -167,6 +208,7 @@ Type objective_function<Type>::operator() ()
     if(S_l_input(0)>=0) S_l(l) = S_l_input(l);
   }
 
+  // input age
   vector<Type> S_a(n_a);
   S_a.setZero();
   vector<Type> sub_plba(n_lb);
@@ -177,6 +219,19 @@ Type objective_function<Type>::operator() ()
       S_a(a) += sub_plba(l)*S_l(l);
     }
     sub_plba.setZero();
+  }     
+
+  // actual annual age
+  vector<Type> S_A(amax);
+  S_A.setZero();
+  vector<Type> sub_plbA(n_lb);
+  sub_plbA.setZero();
+  for(int a=0;a<amax;a++){
+    sub_plbA = plbA.row(a);
+    for(int l=0;l<n_lb;l++){
+      S_A(a) += sub_plbA(l)*S_l(l);
+    }
+    sub_plbA.setZero();
   }     
 
   // ============ Probability of random effects =============
@@ -321,8 +376,6 @@ Type objective_function<Type>::operator() ()
   }
 
   // // ========= spawning potential ratio ==============================
-  int amax;
-  amax = n_a/n_s;
   matrix<Type> Na0(n_y,amax);
   matrix<Type> Naf(n_y,amax);
 
@@ -342,11 +395,11 @@ Type objective_function<Type>::operator() ()
       }
       if(a>0 & a<(amax-1)){
         Na0(t,a) = Na0(t,a-1)*exp(-M*n_s);
-        Naf(t,a) = Naf(t,a-1)*exp(-M*n_s-S_a(a-1)*F_y(t));
+        Naf(t,a) = Naf(t,a-1)*exp(-M*n_s-S_A(a-1)*F_y(t));
       }
       if(a==(amax-1)){
         Na0(t,a) = (Na0(t,a-1)*exp(-M*n_s))/(1-exp(-M*n_s));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M*n_s-S_a(a)*F_y(t)))/(1-exp(-M*n_s-S_a(a)*F_y(t)));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M*n_s-S_A(a)*F_y(t)))/(1-exp(-M*n_s-S_A(a)*F_y(t)));
       }
 
       if(a>0){
@@ -533,6 +586,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( SPR_t );
   ADREPORT( S50 );
   ADREPORT( S_l );
+  ADREPORT( S_A );
 
   // Parameters
   REPORT( F_equil );
@@ -543,6 +597,7 @@ Type objective_function<Type>::operator() ()
   REPORT( log_sigma_R );
   REPORT( S50 );
   REPORT( S_a );
+  REPORT( S_A );
   REPORT( S_l );
   REPORT( S_l_input );
   REPORT( sigma_C );
@@ -578,6 +633,7 @@ Type objective_function<Type>::operator() ()
   REPORT(plb);
   REPORT(W_a);
   REPORT(L_a);
+  REPORT(L_A);
   REPORT(Mat_a);
   REPORT(M);
     // Likelihoods
