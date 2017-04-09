@@ -560,7 +560,7 @@ Type objective_function<Type>::operator() ()
   // F
     jnll_comp(5) = 0;
     if(Fpen==1){
-        for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
+        for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
     }
 
     // // SigmaR
