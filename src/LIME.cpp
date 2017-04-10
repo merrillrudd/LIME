@@ -63,6 +63,7 @@ Type objective_function<Type>::operator() ()
     DATA_SCALAR(M);
     DATA_SCALAR(h);
     DATA_VECTOR(Mat_a); // maturity
+    // DATA_SCALAR(ML50);
 
     // penalties
     DATA_INTEGER(Fpen);
@@ -71,6 +72,7 @@ Type objective_function<Type>::operator() ()
 
     // option for fixed time series for selectivity
     DATA_VECTOR(S_l_input);
+    // DATA_VECTOR(M_l_input);
 
     // option for shorter time-step than years
     DATA_IVECTOR(S_yrs); // matching each time step with a year
@@ -157,8 +159,10 @@ Type objective_function<Type>::operator() ()
 
   // length at ANNUAL age
   vector<Type> L_A(amax);
+  vector<Type> W_A(amax);
   for(int a=0;a<amax;a++){
     L_A(a) = linf*(1-exp(-vbk*(a-t0)));
+    W_A(a) = lwa*pow(L_A(a), lwb);
   }
 
 
@@ -201,6 +205,7 @@ Type objective_function<Type>::operator() ()
     sum_sublast = 0;
   }
  
+  //selectivity at length
   vector<Type> S_l(n_lb);
   S_l.setZero();
   for(int l=0;l<n_lb;l++){
@@ -219,7 +224,7 @@ Type objective_function<Type>::operator() ()
       S_a(a) += sub_plba(l)*S_l(l);
     }
     sub_plba.setZero();
-  }     
+  }        
 
   // actual annual age
   vector<Type> S_A(amax);
@@ -232,7 +237,39 @@ Type objective_function<Type>::operator() ()
       S_A(a) += sub_plbA(l)*S_l(l);
     }
     sub_plbA.setZero();
-  }     
+  }  
+
+  // // maturity at length
+  // vector<Type> M_l(n_lb);
+  // M_l.setZero();
+  // for(int l=0;l<n_lb;l++){
+  //   if(M_l_input(0)<0) M_l(l) = 1 / (1 + exp(ML50 - lbmids(l)));
+  //   if(M_l_input(0)>=0) M_l(l) = M_l_input(l);
+  // }
+
+  // // input age
+  // vector<Type> Mat_a(n_a);
+  // Mat_a.setZero();
+  // sub_plba.setZero();
+  // for(int a=0;a<n_a;a++){
+  //   sub_plba = plba.row(a);
+  //   for(int l=0;l<n_lb;l++){
+  //     Mat_a(a) += sub_plba(l)*M_l(l);
+  //   }
+  //   sub_plba.setZero();
+  // }  
+
+  // // actual annual age
+  // vector<Type> Mat_A(amax);
+  // Mat_A.setZero();
+  // sub_plbA.setZero();
+  // for(int a=0;a<amax;a++){
+  //   sub_plbA = plbA.row(a);
+  //   for(int l=0;l<n_lb;l++){
+  //     Mat_A(a) += sub_plbA(l)*M_l(l);
+  //   }
+  //   sub_plbA.setZero();
+  // }    
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
@@ -376,30 +413,30 @@ Type objective_function<Type>::operator() ()
   }
 
   // // ========= spawning potential ratio ==============================
-  matrix<Type> Na0(n_y,amax);
-  matrix<Type> Naf(n_y,amax);
+  matrix<Type> Na0(n_t,n_a);
+  matrix<Type> Naf(n_t,n_a);
 
   // SPR
-  vector<Type> SB0_t(n_y);
-  vector<Type> SBf_t(n_y);
-  vector<Type> SPR_t(n_y);
+  vector<Type> SB0_t(n_t);
+  vector<Type> SBf_t(n_t);
+  vector<Type> SPR_t(n_t);
   SB0_t.setZero();
   SBf_t.setZero();
   SPR_t.setZero();
 
-  for(int t=0;t<n_y;t++){
-    for(int a=0;a<amax;a++){
+  for(int t=0;t<n_t;t++){
+    for(int a=0;a<n_a;a++){
       if(a==0){
         Na0(t,a) = 1;
         Naf(t,a) = 1;
       }
-      if(a>0 & a<(amax-1)){
-        Na0(t,a) = Na0(t,a-1)*exp(-M*n_s);
-        Naf(t,a) = Naf(t,a-1)*exp(-M*n_s-S_A(a-1)*F_y(t));
+      if(a>0 & a<(n_a-1)){
+        Na0(t,a) = Na0(t,a-1)*exp(-M);
+        Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
       }
-      if(a==(amax-1)){
-        Na0(t,a) = (Na0(t,a-1)*exp(-M*n_s))/(1-exp(-M*n_s));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M*n_s-S_A(a)*F_y(t)))/(1-exp(-M*n_s-S_A(a)*F_y(t)));
+      if(a==(n_a-1)){
+        Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M-S_a(a)*F_t(t)))/(1-exp(-M-S_a(a)*F_t(t)));
       }
 
       if(a>0){
