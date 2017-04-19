@@ -93,9 +93,24 @@ for(iter in 1:length(itervec)){
       if("lwb" %in% param_adjust){
             lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=val_adjust[which(param_adjust=="lwb")], S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
       }
+      if("SigmaR" %in% param_adjust){
+        lh_new[["SigmaR"]] <- val_adjust[which(param_adjust=="SigmaR")]
+      }
+      if("SigmaF" %in% param_adjust){
+        lh_new[["SigmaF"]] <- val_adjust[which(param_adjust=="SigmaF")]
+      }
+      if("SigmaC" %in% param_adjust){
+        lh_new[["SigmaC"]] <- val_adjust[which(param_adjust=="SigmaC")]
+      }
+      if("SigmaI" %in% param_adjust){
+        lh_new[["SigmaI"]] <- val_adjust[which(param_adjust=="SigmaI")]
+      }
+      if("CVlen" %in% param_adjust){
+        lh_new[["CVlen"]] <- val_adjust[which(param_adjust=="CVlen")]
+      }
       
     ## check that inputs in right format    
-    inits <- create_inputs(lh=lh_new, input_data=input_data, param=param_adjust, val=val_adjust)
+    inits <- create_inputs(lh=lh_new, input_data=input_data)
 
     Nyears <- inits$Nyears 
     

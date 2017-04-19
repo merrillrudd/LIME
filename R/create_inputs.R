@@ -10,17 +10,10 @@
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Specifically used to merge life history information with other model settings; flexibility to change parameter inputs for sensitivity analysis without changing the baseline life history information that was used to generate data in a simulation study, or carefully compiled for real=life application
 #' @export
-create_inputs <- function(param=FALSE, val=FALSE, lh, input_data){
+create_inputs <- function(lh, input_data){
     
         ## copy life history
         dat_input <- c(lh, input_data)
-
-        ## change input values for sensitivity analysis
-        if(param[1]!=FALSE){
-            for(pp in 1:length(param)){
-                dat_input[[param[pp]]] <- val[which(param==param[pp])]
-            }
-        }
 
         ## have the log ready in the input file for some variance parameterss
         dat_input$log_sigma_C <- log(dat_input$SigmaC)
