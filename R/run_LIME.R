@@ -108,6 +108,7 @@ for(iter in 1:length(itervec)){
       if("CVlen" %in% param_adjust){
         lh_new[["CVlen"]] <- val_adjust[which(param_adjust=="CVlen")]
       }
+      if(any(param_adjust %in% c("CVlen", "SigmaI", "SigmaC", "SigmaF", "SigmaR", "lwb", "lwa", "M", "vbk", "linf", "S50", "SL50", "M50", "ML50") == FALSE)) warning("cannot internally adjust some parameters. create new life history list before entering into LIME model")
       
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh_new, input_data=input_data)
