@@ -124,7 +124,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(is.null(modpath)) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist, S_l_input=S_l_input, theta_type=theta_type, randomR=randomR)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.353), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist, S_l_input=S_l_input, theta_type=theta_type, randomR=randomR)
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList
