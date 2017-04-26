@@ -84,6 +84,7 @@ Type objective_function<Type>::operator() ()
     PARAMETER(beta);
     PARAMETER(log_sigma_R); // magnitude of temporal variation
     PARAMETER(logS50); // Length at 50% selectivity
+    PARAMETER(logSdelta); // log(L95 - L50)
     PARAMETER(log_sigma_C); // log sigma catch
     PARAMETER(log_sigma_I); // log sigma index
     PARAMETER(log_CV_L); // log sigma length comp
@@ -109,6 +110,8 @@ Type objective_function<Type>::operator() ()
   Type sigma_I = exp(log_sigma_I);
   Type CV_L = exp(log_CV_L);
   Type S50 = exp(logS50);
+  Type Sdelta = exp(logSdelta);
+  Type S95 = S50 + Sdelta;
   int amax;
   amax = n_a/n_s;
 
@@ -171,7 +174,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> S_l(n_lb);
   S_l.setZero();
   for(int l=0;l<n_lb;l++){
-    if(S_l_input(0)<0) S_l(l) = 1 / (1 + exp(S50 - lbmids(l)));
+    if(S_l_input(0)<0) S_l(l) = 1 / (1 + exp(-log(Type(19))*(lbmids(l) - S50)/(S95 - S50)));
     if(S_l_input(0)>=0) S_l(l) = S_l_input(l);
   }
 
@@ -540,7 +543,6 @@ Type objective_function<Type>::operator() ()
   ADREPORT( SPR_t );
   ADREPORT( S50 );
   ADREPORT( S_l );
-  ADREPORT( S_A );
 
   // Parameters
   REPORT( F_equil );
@@ -550,8 +552,8 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_R );
   REPORT( log_sigma_R );
   REPORT( S50 );
+  REPORT( S95 );
   REPORT( S_a );
-  REPORT( S_A );
   REPORT( S_l );
   REPORT( S_l_input );
   REPORT( sigma_C );
