@@ -21,6 +21,8 @@
 #' @param S_l_input default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length
 #' @param theta_type if 0, estimate annual theta; if 1, estimate single theta for all years of length comp
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
+#' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
+#' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
 
 
 #' @useDynLib LIME
@@ -28,7 +30,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=0, randomR=TRUE){
+run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=0, randomR=TRUE, Fpen=1, SigRpen=1){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -124,7 +126,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(is.null(modpath)) output <- NULL
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=1, SigRprior=c(inits$SigmaR, 0.353), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist, S_l_input=S_l_input, theta_type=theta_type, randomR=randomR)
+      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.353), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, C_opt=C_opt, LFdist=LFdist, S_l_input=S_l_input, theta_type=theta_type, randomR=randomR)
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList
