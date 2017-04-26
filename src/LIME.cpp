@@ -55,11 +55,8 @@ Type objective_function<Type>::operator() ()
     // Known values
     DATA_INTEGER(n_a);
     DATA_VECTOR(ages);
-    DATA_SCALAR(linf);
-    DATA_SCALAR(vbk);
-    DATA_SCALAR(t0);
-    DATA_SCALAR(lwa);
-    DATA_SCALAR(lwb);
+    DATA_VECTOR(L_a);
+    DATA_VECTOR(W_a);
     DATA_SCALAR(M);
     DATA_SCALAR(h);
     DATA_VECTOR(Mat_a); // maturity
@@ -148,23 +145,6 @@ Type objective_function<Type>::operator() ()
 
 
   // ========= Convert inputs  =============================
-  // length and weight at input age
-  vector<Type> L_a(n_a);
-  vector<Type> W_a(n_a);
-  int a;
-  for(int a=0;a<n_a;a++){
-    L_a(a) = linf*(1-exp(-vbk*(ages(a)-t0)));
-    W_a(a) = lwa*pow(L_a(a), lwb);
-  }
-
-  // length at ANNUAL age
-  vector<Type> L_A(amax);
-  vector<Type> W_A(amax);
-  for(int a=0;a<amax;a++){
-    L_A(a) = linf*(1-exp(-vbk*(a-t0)));
-    W_A(a) = lwa*pow(L_A(a), lwb);
-  }
-
 
   /////probability of being in a length bin given INPUT age
   matrix<Type> plba(n_a,n_lb);
@@ -186,24 +166,6 @@ Type objective_function<Type>::operator() ()
     sum_sublast = 0;
   }
 
-  /////probability of being in a length bin given ACTUAL age
-  matrix<Type> plbA(amax,n_lb);
-  for(int a=0;a<amax;a++){
-    for(int l=0;l<n_lb;l++){
-      if(l==0){
-        plbA(a,l) = pnorm(lbhighs(l), L_A(a), L_A(a)*CV_L);
-        sum_sublast += plbA(a,l);
-      }
-      if(l>=1){
-        if(l<(n_lb-1)){
-          plbA(a,l) = pnorm(lbhighs(l), L_A(a), L_A(a)*CV_L) - pnorm(lbhighs(l-1), L_A(a), L_A(a)*CV_L);
-          sum_sublast += plbA(a,l);
-        }
-        if(l==(n_lb-1)) plbA(a,l) = Type(1.0) - sum_sublast;
-      }
-    }
-    sum_sublast = 0;
-  }
  
   //selectivity at length
   vector<Type> S_l(n_lb);
@@ -224,52 +186,7 @@ Type objective_function<Type>::operator() ()
       S_a(a) += sub_plba(l)*S_l(l);
     }
     sub_plba.setZero();
-  }        
-
-  // actual annual age
-  vector<Type> S_A(amax);
-  S_A.setZero();
-  vector<Type> sub_plbA(n_lb);
-  sub_plbA.setZero();
-  for(int a=0;a<amax;a++){
-    sub_plbA = plbA.row(a);
-    for(int l=0;l<n_lb;l++){
-      S_A(a) += sub_plbA(l)*S_l(l);
-    }
-    sub_plbA.setZero();
-  }  
-
-  // // maturity at length
-  // vector<Type> M_l(n_lb);
-  // M_l.setZero();
-  // for(int l=0;l<n_lb;l++){
-  //   if(M_l_input(0)<0) M_l(l) = 1 / (1 + exp(ML50 - lbmids(l)));
-  //   if(M_l_input(0)>=0) M_l(l) = M_l_input(l);
-  // }
-
-  // // input age
-  // vector<Type> Mat_a(n_a);
-  // Mat_a.setZero();
-  // sub_plba.setZero();
-  // for(int a=0;a<n_a;a++){
-  //   sub_plba = plba.row(a);
-  //   for(int l=0;l<n_lb;l++){
-  //     Mat_a(a) += sub_plba(l)*M_l(l);
-  //   }
-  //   sub_plba.setZero();
-  // }  
-
-  // // actual annual age
-  // vector<Type> Mat_A(amax);
-  // Mat_A.setZero();
-  // sub_plbA.setZero();
-  // for(int a=0;a<amax;a++){
-  //   sub_plbA = plbA.row(a);
-  //   for(int l=0;l<n_lb;l++){
-  //     Mat_A(a) += sub_plbA(l)*M_l(l);
-  //   }
-  //   sub_plbA.setZero();
-  // }    
+  }           
 
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
@@ -670,7 +587,6 @@ Type objective_function<Type>::operator() ()
   REPORT(plb);
   REPORT(W_a);
   REPORT(L_a);
-  REPORT(L_A);
   REPORT(Mat_a);
   REPORT(M);
     // Likelihoods
