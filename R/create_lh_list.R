@@ -148,7 +148,8 @@ create_lh_list <- function(vbk, linf, lwa, lwb, S50, M50, S95=NULL, M95=NULL, Ss
 
     if(selex_input=="length"){
         if(selex_type=="dome"){
-            Sfull <- which(round(S_l,1)==1.00)[1]
+            Sfull <- which(round(S_l,2)==1.00)[1]
+            if(is.na(Sfull)) Sfull <- which(round(S_l,1)==1.00)[1]
             index <- (Sfull+1):length(S_l)
             S_l[index] <- exp((-(index-Sfull)^2)/(2*dome_sd^2))
         }
