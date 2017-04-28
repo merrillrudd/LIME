@@ -66,38 +66,7 @@ for(iter in 1:length(itervec)){
       input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
     }
     
-  ### need to do the sensitivity out here so it also applies to LBSPR
     lh_new <- lh
-      if("ML50" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, M50=val_adjust[which(param_adjust=="ML50")], selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("M50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, M50=val_adjust[which(param_adjust=="M50")], selex_input="length", maturity_input="age", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("Sdelta" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, S95=val_adjust[which(param_adjust=="Sdelta")]*lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("SL50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=val_adjust[which(param_adjust=="SL50")], M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("S50" %in% param_adjust){
-          lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=val_adjust[which(param_adjust=="S50")], M50=lh$ML50, selex_input="age", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("linf" %in% param_adjust){
-            lh_new <- create_lh_list(vbk=lh$vbk, linf=val_adjust[which(param_adjust=="linf")], lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("vbk" %in% param_adjust){
-            lh_new <- create_lh_list(vbk=val_adjust[which(param_adjust=="vbk")], linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("M" %in% param_adjust){
-            lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=lh$lwb, S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=val_adjust[which(param_adjust=="M")], F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("lwa" %in% param_adjust){
-            lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=val_adjust[which(param_adjust=="lwa")], lwb=lh$lwb, S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
-      if("lwb" %in% param_adjust){
-            lh_new <- create_lh_list(vbk=lh$vbk, linf=lh$linf, lwa=lh$lwa, lwb=val_adjust[which(param_adjust=="lwb")], S50=lh$SL50, M50=lh$ML50, selex_input="length", maturity_input="length", selex_type=lh$selex_type, dome=lh$dome, binwidth=lh$binwidth, t0=lh$t0, CVlen=lh$CVlen, SigmaC=lh$SigmaC, SigmaI=lh$SigmaI, SigmaR=lh$SigmaR, SigmaF=lh$SigmaF, R0=lh$R0,  h=lh$h, qcoef=lh$qcoef, M=lh$M, F1=lh$F1, Fequil=lh$Fequil, Frate=lh$Frate, Fmax=lh$Fmax, start_ages=min(lh$ages), rho=lh$rho, theta=lh$theta, nseasons=lh$nseasons, AgeMax=lh$AgeMax)
-      }
       if("SigmaR" %in% param_adjust){
         lh_new[["SigmaR"]] <- val_adjust[which(param_adjust=="SigmaR")]
       }
@@ -113,7 +82,9 @@ for(iter in 1:length(itervec)){
       if("CVlen" %in% param_adjust){
         lh_new[["CVlen"]] <- val_adjust[which(param_adjust=="CVlen")]
       }
-      if(any(param_adjust %in% c("CVlen", "SigmaI", "SigmaC", "SigmaF", "SigmaR", "lwb", "lwa", "M", "vbk", "linf", "S50", "SL50", "Sdelta", "M50", "ML50") == FALSE)) warning("cannot internally adjust some parameters. create new life history list before entering into LIME model")
+      if(all(param_adjust==FALSE)==FALSE){
+        if(any(param_adjust %in% c("CVlen", "SigmaI", "SigmaC", "SigmaF", "SigmaR") == FALSE)) warning("cannot internally adjust some parameters. create new life history list before entering into LIME model")
+      }
       
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh_new, input_data=input_data)
