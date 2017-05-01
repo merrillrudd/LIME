@@ -28,8 +28,7 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
         }
         if(nseasons>1){
             Nyears2 <- ceiling(Nyears/nseasons)
-            S_yrs_inp_raw <- as.vector(sapply(1:Nyears2, function(x) rep(x, nseasons)))
-            S_yrs_inp <- S_yrs_inp_raw[1:Nyears]
+            S_yrs_inp <- years_i
         }
 
         ## data-rich model
