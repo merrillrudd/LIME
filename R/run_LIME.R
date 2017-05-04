@@ -30,7 +30,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=0, randomR=TRUE, Fpen=1, SigRpen=1){
+run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -63,7 +63,7 @@ for(iter in 1:length(itervec)){
       if(C_opt==2) C_t_input <- sim$Cw_t
       if(LFdist==0) obs_input <- sim$obs_per_year
       if(LFdist==1) obs_input <- rep(0, sim$Nyears)
-      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "years_i"=rownames(sim$LF), "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
+      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "years_i"=as.numeric(rownames(sim$LF)), "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
     }
     
     lh_new <- lh
