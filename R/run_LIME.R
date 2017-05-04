@@ -64,7 +64,7 @@ for(iter in 1:length(itervec)){
       if(LFdist==0) obs_input <- sim$obs_per_year
       if(LFdist==1) obs_input <- rep(0, sim$Nyears)
       true_nt <- sim$Nyears/sim$nseasons
-      s_all <- as.vector(sapply(1:true_nt), function(x), rep(x,sim$nseasons))
+      s_all <- as.vector(sapply(1:true_nt), function(x) rep(x,sim$nseasons))
       years_i <- s_all[as.numeric(rownames(sim$LF))]
       input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "years_i"=years_i, "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
     }
