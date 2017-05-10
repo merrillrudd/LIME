@@ -91,7 +91,7 @@ for(iter in 1:length(itervec)){
       
     ## check that inputs in right format    
     inits <- create_inputs(lh=lh_new, input_data=input_data)
-
+    
     Nyears <- inits$Nyears 
     
     Sdreport <- NA
