@@ -366,6 +366,7 @@ sim_pop <- function(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sa
     lh$plb <- plb
     lh$plba <- plba
     lh$page <- page
+    lh$N_at <- N_at
     lh$SPR <- SPR
     lh$SPR_t <- SPR_tout
     lh$SPR_alt <- SPR_alt
