@@ -85,16 +85,16 @@ for(iter in 1:length(itervec)){
       if("CVlen" %in% param_adjust){
         lh_new[["CVlen"]] <- val_adjust[which(param_adjust=="CVlen")]
       }
-      if("M", %in% param_adjust){
+      if("M" %in% param_adjust){
         lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=val_adjust[which(param_adjust=="M")], binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
       }
-      if("linf", %in% param_adjust){
+      if("linf" %in% param_adjust){
         lh_new <- create_lh_list(vbk=lh_new$vbk, linf=val_adjust[which(param_adjust=="linf")], t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
       }      
-      if("vbk", %in% param_adjust){
+      if("vbk" %in% param_adjust){
         lh_new <- create_lh_list(vbk=val_adjust[which(param_adjust=="vbk")], linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
       }    
-      if("ML50", %in% param_adjust){
+      if("ML50" %in% param_adjust){
         lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=val_adjust[which(param_adjust=="ML50")], M95=NULL, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
       }  
       if(all(param_adjust==FALSE)==FALSE){
