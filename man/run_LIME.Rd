@@ -6,9 +6,10 @@
 \usage{
 run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
   rewrite = TRUE, simulation = TRUE, param_adjust = FALSE,
-  val_adjust = FALSE, f_true = FALSE, fix_param = FALSE, C_opt = 0,
-  F_up = 10, LFdist = 0, derive_quants = FALSE, S_l_input = -1,
-  theta_type = 0, randomR = TRUE)
+  val_adjust = FALSE, f_true = FALSE, fix_param = FALSE,
+  fix_param_t = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
+  derive_quants = FALSE, S_l_input = -1, theta_type = 1, randomR = TRUE,
+  Fpen = 1, SigRpen = 1)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -35,6 +36,8 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 
 \item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
 
+\item{fix_param_t}{default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed.}
+
 \item{C_opt}{default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2.}
 
 \item{F_up}{upper bound of fishing mortality estimate; default=5}
@@ -48,6 +51,10 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 \item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
 
 \item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
+
+\item{Fpen}{penalty on fishing mortality; 0=OFF, 1=ON, default=1}
+
+\item{SigRpen}{penalty on sigmaR; 0=OFF, 1=ON, default=1}
 }
 \value{
 prints how many iterations were run in model directory

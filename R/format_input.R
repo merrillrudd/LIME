@@ -10,6 +10,7 @@
 #' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param f_startval default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
+#' @param fix_param_t default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed. 
 #' @param C_opt  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @param S_l_input input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity
@@ -18,7 +19,7 @@
 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
-format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, C_opt=0, LFdist, S_l_input, theta_type, randomR){
+format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, LFdist, S_l_input, theta_type, randomR){
 
     with(input, {
 
@@ -326,6 +327,15 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
                 Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
                 Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
+            }
+
+            if(all(fix_param_t[[1]]!=FALSE)){
+                for(i in 1:length(fix_param_t)){
+                    index <- 1:length(Parameters[[fix_param_t[[i]][1]]])
+                    index[as.numeric(fix_param_t[[i]][2:length(fix_param_t[[1]])])] <- NA
+                    Map[[fix_param_t[[i]][1]]] <- index
+                    Map[[fix_param_t[[i]][1]]] <- factor(Map[[fix_param_t[[i]][1]]])
+                }
             }
 
         if(length(Map)==0) Map <- NULL

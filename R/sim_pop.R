@@ -13,10 +13,11 @@
 #' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series
 #' @param modname save model name for true dynamics in named list output
+#' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
 
 #' @return named list of attributes of true population/data
 #' @export
-sim_pop <- function(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl, nburn, seed, modname){
+sim_pop <- function(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl, nburn, seed, modname, mismatch){
 
     ## SB_t = spawning biomass over time
     ## F_t = fishing mortality over time
@@ -350,10 +351,13 @@ sim_pop <- function(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sa
             rownames(LF0out) <- LFindex
         }
 
+    if(mismatch==TRUE) myrs <- 1:LFindex[1]
+    if(mismatch==FALSE) myrs <- 1:max(LFindex)
+
     ## outputs
-    lh$I_t <- I_tout
-    lh$C_t <- C_tout
-    lh$Cw_t <- Cw_tout
+    lh$I_t <- I_tout[myrs]
+    lh$C_t <- C_tout[myrs]
+    lh$Cw_t <- Cw_tout[myrs]
     lh$DataScenario <- modname
     lh$LF <- LFout
     lh$LF0 <- LF0out

@@ -5,8 +5,8 @@
 \title{Generate data for simulation testing}
 \usage{
 generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
-  write = TRUE, Nyears, comp_sample, rewrite = TRUE, init_depl,
-  derive_quants = FALSE)
+  pool = TRUE, write = TRUE, Nyears, comp_sample, rewrite = TRUE,
+  mismatch = FALSE, init_depl, derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -21,6 +21,8 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 
 \item{lh}{list of life history information to feed to population simulation function, output from create_lh_list}
 
+\item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length}
+
 \item{write}{write generated dataset? default=TRUE. FALSE helpful for plotting.}
 
 \item{Nyears}{number of years to simulate}
@@ -28,6 +30,8 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 \item{comp_sample}{vector with sample sizes of length composition data each year}
 
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
+
+\item{mismatch}{default=FALSE, if TRUE, catch and index overlap with length comp only 1 year}
 
 \item{init_depl}{default=0.4, can specify a different value or 2 values that indicate range from which to choose them}
 

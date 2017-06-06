@@ -5,7 +5,8 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
-  fix_param = FALSE, C_opt = 0, LFdist, S_l_input, theta_type, randomR)
+  fix_param = FALSE, fix_param_t = FALSE, C_opt = 0, LFdist, S_l_input,
+  theta_type, randomR)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -23,6 +24,8 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
 \item{f_startval}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
 
 \item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
+
+\item{fix_param_t}{default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed.}
 
 \item{C_opt}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
 

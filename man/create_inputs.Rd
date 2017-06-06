@@ -4,16 +4,16 @@
 \alias{create_inputs}
 \title{Create input parameters for TMB model}
 \usage{
-create_inputs(param = FALSE, val = FALSE, lh, input_data)
+create_inputs(lh, input_data)
 }
 \arguments{
-\item{param}{parameter name to adjust (sensitivity analysis), default=FALSE}
-
-\item{val}{value of parameter name to adjust (sensitivity analysis), default=FALSE}
-
 \item{lh}{tagged list of life history/starting value information}
 
 \item{input_data}{tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years.}
+
+\item{param}{parameter name to adjust (sensitivity analysis), default=FALSE}
+
+\item{val}{value of parameter name to adjust (sensitivity analysis), default=FALSE}
 }
 \value{
 List, a tagged list of potentially useful benchmarks

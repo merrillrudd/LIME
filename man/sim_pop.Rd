@@ -4,13 +4,15 @@
 \alias{sim_pop}
 \title{Operating model}
 \usage{
-sim_pop(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl,
-  nburn, seed, modname)
+sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
+  init_depl, nburn, seed, modname, mismatch)
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
 
 \item{Nyears}{number of years to simulate}
+
+\item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length}
 
 \item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None}
 
@@ -27,6 +29,8 @@ sim_pop(lh, Nyears, Fdynamics, Rdynamics, Nyears_comp, comp_sample, init_depl,
 \item{seed}{set seed for generating stochastic time series}
 
 \item{modname}{save model name for true dynamics in named list output}
+
+\item{mismatch}{if TRUE, catch and index overlap with length comp only 1 year}
 }
 \value{
 named list of attributes of true population/data
