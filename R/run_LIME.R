@@ -163,7 +163,8 @@ for(iter in 1:length(itervec)){
         Lwr[match("logS50",names(obj$par))] = log(1)
 
         ## Run optimizer
-        opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
+        # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
+        opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
         jnll <- obj$report()$jnll   
         if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
           opt[["final_gradient"]] = obj$gr( opt$par ) 
@@ -180,9 +181,7 @@ for(iter in 1:length(itervec)){
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
                     obj$env$inner.control <- c(obj$env$inner.control, "step.tol"=c(1e-8,1e-12)[1], "tol10"=c(1e-6,1e-8)[1], "grad.tol"=c(1e-8,1e-12)[1]) 
-                opt <- tryCatch( nlminb( start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), 
-                  objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, 
-                  control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10)), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
@@ -206,9 +205,7 @@ for(iter in 1:length(itervec)){
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
                       obj$env$inner.control <- c(obj$env$inner.control, "step.tol"=c(1e-8,1e-12)[1], "tol10"=c(1e-6,1e-8)[1], "grad.tol"=c(1e-8,1e-12)[1]) 
-                opt <- tryCatch( nlminb( start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), 
-                  objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, 
-                  control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10)), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }
