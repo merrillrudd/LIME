@@ -239,8 +239,6 @@ for(iter in 1:length(itervec)){
 
           if(all(is.na(opt_save)) & is.null(modpath)==FALSE) write("model_NA", file.path(iterpath, "model_NA.txt"))
           if(all(is.na(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "model_NA")
-
-        ParList <- obj_save$env$parList( x=obj_save$par, par=obj_save$env$last.par.best )
         
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
