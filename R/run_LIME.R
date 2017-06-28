@@ -53,6 +53,7 @@ for(iter in 1:length(itervec)){
     if(rewrite==TRUE & is.null(modpath)==FALSE){
       if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) unlink(file.path(iterpath, "NAs_final_gradient.txt"), TRUE)
       if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) unlink(file.path(iterpath, "high_final_gradient.txt"), TRUE)
+      if(file.exists(file.path(iterpath, "model_NA.txt"))) unlink(file.path(iterpath, "model_NA.txt"), TRUE)
     }
 
     if(simulation==TRUE & is.null(modpath)==FALSE){
