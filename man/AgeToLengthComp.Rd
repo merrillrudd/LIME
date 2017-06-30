@@ -4,7 +4,7 @@
 \alias{AgeToLengthComp}
 \title{Age-converted-to-length structure}
 \usage{
-AgeToLengthComp(lh, tyears, N_at, comp_sample)
+AgeToLengthComp(lh, tyears, N_at, comp_sample, sample_type = "catch")
 }
 \arguments{
 \item{lh}{list of life history attributes, output of create_lh_list}
@@ -14,6 +14,8 @@ AgeToLengthComp(lh, tyears, N_at, comp_sample)
 \item{N_at}{matrix of numbers in the population at each age over time}
 
 \item{comp_sample}{vector of number of individuals sampled each year (set as 1 for proportions)}
+
+\item{sample_type}{a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population}
 }
 \value{
 data frame - number of individuals in each length bin in each year

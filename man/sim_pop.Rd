@@ -5,7 +5,7 @@
 \title{Operating model}
 \usage{
 sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
-  init_depl, nburn, seed, modname, mismatch)
+  init_depl, nburn, seed, modname, mismatch, sample_type = "catch")
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
@@ -31,6 +31,8 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 \item{modname}{save model name for true dynamics in named list output}
 
 \item{mismatch}{if TRUE, catch and index overlap with length comp only 1 year}
+
+\item{sample_type}{a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population}
 }
 \value{
 named list of attributes of true population/data
