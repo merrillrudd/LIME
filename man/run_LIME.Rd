@@ -7,9 +7,9 @@
 run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
   rewrite = TRUE, simulation = TRUE, param_adjust = FALSE,
   val_adjust = FALSE, f_true = FALSE, fix_param = FALSE,
-  fix_param_t = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
-  derive_quants = FALSE, S_l_input = -1, theta_type = 1, randomR = TRUE,
-  Fpen = 1, SigRpen = 1, newtonsteps = 3)
+  fix_param_t = FALSE, C_opt = 0, F_up = 10, S50_up = NULL,
+  LFdist = 0, derive_quants = FALSE, S_l_input = -1, theta_type = 1,
+  randomR = TRUE, Fpen = 1, SigRpen = 1, newtonsteps = 3)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -41,6 +41,8 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 \item{C_opt}{default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2.}
 
 \item{F_up}{upper bound of fishing mortality estimate; default=5}
+
+\item{S50_up}{upper bound of length at 50% selectivity; default=NULL}
 
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
