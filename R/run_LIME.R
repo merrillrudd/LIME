@@ -265,7 +265,7 @@ for(iter in 1:length(itervec)){
 
       ## can calculate derived quants later if you want
       if(is.null(modpath)==FALSE) saveRDS(obj_save, file.path(iterpath, "TMB_obj.rds"))
-      if(null(modpath)==FALSE) saveRDS(opt_save, file.path(iterpath, "TMB_opt.rds"))
+      if(is.null(modpath)==FALSE) saveRDS(opt_save, file.path(iterpath, "TMB_opt.rds"))
       if(is.null(modpath)) output$obj <- obj_save
       if(is.null(modpath)) output$opt <- opt_save
 
