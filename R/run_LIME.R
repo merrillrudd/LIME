@@ -24,6 +24,7 @@
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
 #' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
+#' @param newtonsteps number of extra newton steps to take after optimization
 
 
 #' @useDynLib LIME
@@ -31,7 +32,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1){
+run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1, newtonsteps=3){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -164,7 +165,7 @@ for(iter in 1:length(itervec)){
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
-        opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
+        opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
         jnll <- obj$report()$jnll   
         if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
           opt[["final_gradient"]] = obj$gr( opt$par ) 
@@ -180,7 +181,7 @@ for(iter in 1:length(itervec)){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
@@ -203,7 +204,7 @@ for(iter in 1:length(itervec)){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=3, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }

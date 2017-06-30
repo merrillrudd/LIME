@@ -9,7 +9,7 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
   val_adjust = FALSE, f_true = FALSE, fix_param = FALSE,
   fix_param_t = FALSE, C_opt = 0, F_up = 10, LFdist = 0,
   derive_quants = FALSE, S_l_input = -1, theta_type = 1, randomR = TRUE,
-  Fpen = 1, SigRpen = 1)
+  Fpen = 1, SigRpen = 1, newtonsteps = 3)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -55,6 +55,8 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 \item{Fpen}{penalty on fishing mortality; 0=OFF, 1=ON, default=1}
 
 \item{SigRpen}{penalty on sigmaR; 0=OFF, 1=ON, default=1}
+
+\item{newtonsteps}{number of extra newton steps to take after optimization}
 }
 \value{
 prints how many iterations were run in model directory
