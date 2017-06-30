@@ -17,6 +17,7 @@
 #' @param fix_param_t default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed. 
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
 #' @param F_up upper bound of fishing mortality estimate; default=5
+#' @param S50_up upper bound of length at 50% selectivity; default=NULL
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @param S_l_input default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length
@@ -32,7 +33,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, F_up=10, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1, newtonsteps=3){
+run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=TRUE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, F_up=10, S50_up=NULL, LFdist=0, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1, newtonsteps=3){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -152,7 +153,8 @@ for(iter in 1:length(itervec)){
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
-        Upr[match("logS50", names(obj$par))] = log(inits$linf)
+        if(is.null(S50_up)) Upr[match("logS50", names(obj$par))] = log(inits$linf)
+        if(is.null(S50_up)==FALSE) Upr[match("logS50", names(obj$par))] <- log(S50_up)
         Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
