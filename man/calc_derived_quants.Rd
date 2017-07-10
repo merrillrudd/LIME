@@ -4,10 +4,12 @@
 \alias{calc_derived_quants}
 \title{Calculate biological reference points}
 \usage{
-calc_derived_quants(Obj)
+calc_derived_quants(Obj, lh)
 }
 \arguments{
 \item{Obj, }{the fitted TMB object}
+
+\item{lh, }{list of life history information}
 }
 \value{
 List, a tagged list of potentially useful benchmarks
