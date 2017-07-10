@@ -18,7 +18,7 @@ calc_derived_quants = function( Obj, lh ){
     lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=12))
   }
   if(max(Data$ages)>=10){
-      lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", dome_sd=dome_sd, binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=1))
+      lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=1))
   }
 
   SPR <- with(lh, calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=Report$F_t[length(Report$F_t)], ref=FALSE))
