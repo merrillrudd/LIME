@@ -69,14 +69,14 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
 
     if(derive_quants==TRUE){
         ## project the truth forward
-        inits <- create_inputs(lh=lh, input_data=DataList, param=FALSE, val=FALSE)
-        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", REML=FALSE, fix_f=0, f_startval=DataList$F_t, Sel0=0, LFdist=0)
+        inits <- create_inputs(lh=lh, input_data=DataList)
+        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$F_t, LFdist=1, S_l_input=-1, randomR=TRUE)
         ParList <- Inputs$Parameters    
 
         # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
 
         obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-        Derived <- calc_derived_quants(obj) 
+        Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
         DataList_out$MSY <- Derived$MSY
         DataList_out$Fmsy <- Derived$Fmsy
