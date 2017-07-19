@@ -5,8 +5,8 @@
 \title{Generate data for simulation testing}
 \usage{
 generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
-  pool = TRUE, write = TRUE, Nyears, comp_sample, rewrite = TRUE,
-  mismatch = FALSE, init_depl, derive_quants = FALSE)
+  pool = TRUE, Nyears, comp_sample, rewrite = TRUE, mismatch = FALSE,
+  init_depl, derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -22,8 +22,6 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 \item{lh}{list of life history information to feed to population simulation function, output from create_lh_list}
 
 \item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length}
-
-\item{write}{write generated dataset? default=TRUE. FALSE helpful for plotting.}
 
 \item{Nyears}{number of years to simulate}
 
