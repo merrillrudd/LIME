@@ -9,7 +9,6 @@
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param lh list of life history information to feed to population simulation function, output from create_lh_list
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length
-#' @param write write generated dataset? default=TRUE. FALSE helpful for plotting.
 #' @param Nyears number of years to simulate
 #' @param comp_sample vector with sample sizes of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
@@ -18,24 +17,18 @@
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, write=TRUE, Nyears, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
+generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
 
+    if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
+    if(is.null(modpath)) itervec <- 1
     for(iter in itervec){
 
-    iterpath <- file.path(modpath, iter)
-    if(write==TRUE) dir.create(iterpath, showWarnings=FALSE) 
-    if(rewrite==FALSE){
-      if(file.exists(file.path(iterpath, "True.rds"))) next
-    }
-
-    ## find out how many years of length comp data are available 
-    if(grepl("LBSPR", data_avail)==FALSE){
-        split_name <- unlist(strsplit(data_avail, "_"))
-        lc_name <- split_name[grepl("LC", split_name)]
-        Nyears_comp <- as.numeric(unlist(strsplit(lc_name, "LC"))[2])
-    }
-    if(grepl("LBSPR", data_avail)){
-        Nyears_comp <- as.numeric(unlist(strsplit(data_avail, "LBSPR"))[2])
+    if(is.null(modpath)==FALSE){
+        iterpath <- file.path(modpath, iter)
+        dir.create(iterpath, showWarnings=FALSE)
+        if(rewrite==FALSE){
+            if(file.exists(file.path(iterpath, "True.rds"))) next
+        }
     }
 
     ## if level of depletion in first year is specified:
@@ -90,8 +83,8 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
         DataList_out$TBmsy <- Derived$TBmsy
     }
 
-      if(write==TRUE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
-      if(write==FALSE) return(DataList_out)
+      if(is.null(modpath)==FALSE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
+      if(is.null(modpath)) return(DataList_out)
       rm(DataList)
       rm(DataList_out)
       rm(iterpath)
@@ -99,6 +92,6 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
 }
 
 
-  if(write==TRUE) return(modpath)
+  if(is.null(modpath)==FALSE) return(modpath)
 
 }
