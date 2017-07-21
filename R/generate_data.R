@@ -36,7 +36,7 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail, mismatch=mismatch)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
