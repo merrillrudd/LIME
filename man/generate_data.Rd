@@ -5,8 +5,8 @@
 \title{Generate data for simulation testing}
 \usage{
 generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
-  pool = TRUE, Nyears, comp_sample, rewrite = TRUE, mismatch = FALSE,
-  init_depl, derive_quants = FALSE)
+  pool = TRUE, Nyears, Nyears_comp, comp_sample, rewrite = TRUE,
+  mismatch = FALSE, init_depl, derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -25,7 +25,9 @@ generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
 
 \item{Nyears}{number of years to simulate}
 
-\item{comp_sample}{vector with sample sizes of length composition data each year}
+\item{Nyears_comp}{number of years to generate length composition data}
+
+\item{comp_sample}{sample size of length composition data each year}
 
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
 

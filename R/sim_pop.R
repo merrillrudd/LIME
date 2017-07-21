@@ -8,7 +8,7 @@
 #' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
-#' @param comp_sample vector with sample sizes of length composition data annually
+#' @param comp_sample sample size of length composition data annually
 #' @param init_depl initial depletion; if FALSE, will use F1 from lh list
 #' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series

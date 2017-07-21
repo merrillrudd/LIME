@@ -10,14 +10,15 @@
 #' @param lh list of life history information to feed to population simulation function, output from create_lh_list
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length
 #' @param Nyears number of years to simulate
-#' @param comp_sample vector with sample sizes of length composition data each year
+#' @param Nyears_comp number of years to generate length composition data
+#' @param comp_sample sample size of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
 #' @param mismatch default=FALSE, if TRUE, catch and index overlap with length comp only 1 year
 #' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
+generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1

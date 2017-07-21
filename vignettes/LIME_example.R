@@ -1,8 +1,6 @@
 rm(list=ls())
 
-###################################
 ## Packages
-###################################
 
 devtools::install_github("merrillrudd/LIME", build.vignettes=TRUE, dependencies=TRUE)
 library(LIME)
@@ -10,19 +8,50 @@ library(LIME)
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dep=TRUE)
 library(TMBhelper)
 
-###################################
-## Load example data
-###################################
+##----------------------------------------------------------------
+## Step 1: Specify biological inputs and parameter starting values
+##----------------------------------------------------------------
+lh <- create_lh_list(vbk=0.21, 
+					 linf=65, 
+					 t0=-0.01,
+					 lwa=0.0245, 
+					 lwb=2.79, 
+					 S50=20, 
+					 S95=26, 
+					 selex_input="length",
+					 M50=34,
+					 M95=NULL,
+					 maturity_input="length",
+					 M=0.27, 
+					 binwidth=1,
+					 CVlen=0.1,
+					 SigmaR=0.737,
+					 SigmaF=0.2,
+					 SigmaC=0.2,
+					 SigmaI=0.2,
+					 R0=1,
+					 qcoef=1e-5,
+					 start_ages=0,
+					 rho=0.43,
+					 nseasons=1)
 
-dir <- file.path("C:\\Git_Projects\\LIME\\vignettes")
+##----------------------------------------------------
+## Step 2: Setup data input
+## ---------------------------------------------------
 
-## Costa Rican spotted rose snapper (Lutjanus guttatus)
-lh <- create_lh_list(vbk=0.21, linf=64.58, lwa=0.0245, lwb=2.79, S50=30, selex_input="length", M50=34, maturity_input="length", binwidth=1, CVlen=0.1)
-# snapper <- c(lh, snapper)
-# save(snapper, file="C:\\Git_Projects\\LIME\\data\\snapper_example_data.rda")
+## Demonstrate data generation option
+true <- generate_data(modpath=NULL,
+					  data_avail="Index_Catch_LC",
+					  itervec=1, 
+					  Fdynamics="Constant",
+					  Rdynamics="AR",
+					  lh=lh,
+					  Nyears=20,
+					  comp_sample=200,
+					  init_depl=0.4)
 
-data <- snapper
-data_new <- list(LF=data$LF, years=data$years, obs_per_year=data$obs_per_year)
+
+
 
 #######################################################################
 ## ---------------- Model settings and directories ------------------

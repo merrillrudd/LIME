@@ -20,7 +20,7 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 
 \item{Nyears_comp}{number of years of length composition data}
 
-\item{comp_sample}{vector with sample sizes of length composition data annually}
+\item{comp_sample}{sample size of length composition data annually}
 
 \item{init_depl}{initial depletion; if FALSE, will use F1 from lh list}
 
