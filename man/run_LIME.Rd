@@ -5,10 +5,10 @@
 \title{run LIME model - simulation mode}
 \usage{
 run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
-  rewrite = TRUE, simulation = TRUE, param_adjust = FALSE,
+  rewrite = TRUE, simulation = FALSE, param_adjust = FALSE,
   val_adjust = FALSE, f_true = FALSE, fix_param = FALSE,
   fix_param_t = FALSE, C_opt = 0, F_up = 10, S50_up = NULL,
-  LFdist = 0, derive_quants = FALSE, S_l_input = -1, theta_type = 1,
+  LFdist = 1, derive_quants = FALSE, S_l_input = -1, theta_type = 1,
   randomR = TRUE, Fpen = 1, SigRpen = 1, newtonsteps = 3)
 }
 \arguments{

@@ -47,57 +47,63 @@ true <- generate_data(modpath=NULL,
 					  Rdynamics="AR",
 					  lh=lh,
 					  Nyears=20,
+					  Nyears_comp=10,
 					  comp_sample=200,
 					  init_depl=0.4)
 
+## Data input components
+years <- true$years ## total years to model, can be 1:20 or 1998:2017
+LF <- true$LF ## length composition data, years along rows and length bin along columns. year names should match 'year' quantity, e.g. 11:20 or 2008:2017 (can be any years within years to model)
+C_t <- true$C_t ## (optional) catch data, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
+I_t <- true$I_t ## (optional) abundance index, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
 
+## input data list
+data_LF <- list("years"=years, "LF"=LF)
+data_LF_Catch <- list("years"=years, "LF"=LF, "C_t"=C_t)
+data_LF_Index <- list("years"=years, "LF"=LF, "I_t"=I_t)
 
+##----------------------------------------------------
+## Step 3: Run Model
+## ---------------------------------------------------
 
-#######################################################################
-## ---------------- Model settings and directories ------------------
-#######################################################################
+## run LIME - may take a few minutes
+## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
 
-## data availability scenarios (can also set up for "Catch_LC" when both catch and length comp are available -- just need to make sure the data type is in the name -- with Index, Catch, and LC being the options)
-# avail_set <- c("Index_LC", "LC")
-avail_set <- "LC"
+## length comp only
+res <- run_LIME(modpath=NULL,
+				lh=lh,
+				input_data=data_LF,
+				est_sigma="log_sigma_R", 
+				data_avail="LC")
 
-## estimate variances -- always estimating Recruitment variation (log_sigma_R), but could add on other variance parameters (match variance names exactly ** update manual) -- in this case could estimate the CV for the growth curve 
-## these tags are used in the directory names and what they mean can be specified when model is run
-estsigma_set <- c("RecVar", "RecGrowthVars")
+## check convergence
+check <- res$df
 
-## setup combinations of models to run
-modcombos <- as.matrix(expand.grid("Data_avail"=avail_set, "Est_variance"=estsigma_set))
+## check for other issues
+issues <- res$issues
 
-## setup results directory
-res_dir <- file.path(dir, "results")
-dir.create(res_dir, showWarnings=FALSE)
+## check TMB inputs
+Inputs <- res$Inputs
 
-## transform model combinations into directory names
-alldirs <- model_paths(modcombos=modcombos, res_dir=res_dir)
+## Report file
+Report <- res$Report
 
-#######################################################################
-## ---------------- Assessment model ------------------
-#######################################################################
+## Standard error report
+Sdreport <- res$Sdreport
 
-start_run <- Sys.time()
+## length comp + catch
+res <- run_LIME(modpath=NULL,
+				lh=lh,
+				input_data=data_LF_Catch,
+				est_sigma="log_sigma_R", 
+				data_avail="Catch_LC")
 
-## loop over possible models
-for(dd in 1:length(alldirs)){
-
-	## get available data types from model path name, used for formatting TMB input
-	data_avail <- ifelse(grepl("Index", alldirs[dd]), avail_set[which(grepl("Index", avail_set))], avail_set[which(grepl("Index", avail_set)==FALSE)])
-
-	## get variance parameters to estimate from model name, used for formatting TMB input
-	id_sigma <- estsigma_set[which(sapply(1:length(estsigma_set), function(x) grepl(estsigma_set[x], alldirs[dd])))]
-	if(id_sigma=="RecVar") est_sigma <- "log_sigma_R"
-	if(id_sigma=="RecGrowthVars") est_sigma <- c("log_sigma_R", "log_CV_L")
-	if(id_sigma=="RecGrowthIndexVars") est_sigma <- c("log_sigma_R", "log_CV_L", "log_sigma_I")
-
-	## run assessment model and save final gradients, parameter names, and estimates to check convergence to directory
-	ignore <- runModel(modpath=alldirs[dd], itervec=NULL, est_sigma=est_sigma, data_avail=data_avail, lh_list=lh, rewrite=TRUE, start_f=0, simulation=FALSE, input_data=data_new)
-}
-
-end_run <- Sys.time() - start_run
+## length comp + index
+res <- run_LIME(modpath=NULL,
+				lh=lh,
+				input_data=data_LF_Index,
+				est_sigma="log_sigma_R", 
+				data_avail="Index_LC")
 
 #######################################################################
 ## ---------------- model comparison ------------------
