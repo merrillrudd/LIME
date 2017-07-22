@@ -238,9 +238,6 @@ for(iter in 1:length(itervec)){
           if(all(is.null(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "NAs_final_gradient")
           if(all(is.null(opt_save)==FALSE) & is.null(modpath)==FALSE & all(is.na(opt_save[["final_gradient"]]))==FALSE) if(max(abs(opt_save[["final_gradient"]]))>0.01) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
           if(all(is.null(opt_save)==FALSE & is.null(modpath)) & all(is.na(opt_save[["final_gradient"]]))==FALSE) if(max(abs(opt_save[["final_gradient"]]))>0.01) output$issue <- c(output$issue, "high_final_gradient")
-          if(all(is.null(opt_save)==FALSE) & is.null(modpath)==FALSE & all(is.na(opt_save[["final_gradient"]]))) write("model_NA", file.path(iterpath, "model_NA.txt"))
-          if(all(is.null(opt_save)==FALSE & is.null(modpath))) output$issue <- c(output$issue, "model_NA")
-
           if(all(is.na(opt_save)) & is.null(modpath)==FALSE) write("model_NA", file.path(iterpath, "model_NA.txt"))
           if(all(is.na(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "model_NA")
         
