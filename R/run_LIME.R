@@ -155,6 +155,7 @@ for(iter in 1:length(itervec)){
         # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
         if(is.null(S50_up)) Upr[match("logS50", names(obj$par))] = log(inits$linf)
         if(is.null(S50_up)==FALSE) Upr[match("logS50", names(obj$par))] <- log(S50_up)
+        Upr[match("logSdelta", names(obj$par))] <- log(inits$linf)
         Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
         Lwr <- rep(-Inf, length(obj$par))
