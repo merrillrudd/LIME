@@ -1,3 +1,21 @@
+#' plot LIME output
+#'
+#' \code{plot_output} plot output from LIME or LB-SPR
+#'
+#' @param all_years vector of all years modeled
+#' @param lc_years vector of years with length composition data
+#' @param Inputs LIME input file
+#' @param Report LIME report file
+#' @param Sdreport LIME standard error file
+#' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
+#' @param lh life history list
+#' @param true_years vector of true years (in case all_years and lc_years are 1:20 instead of 1998:2017)
+#' @param True default=NULL, possible to specify true list from generated data if simulation
+#' @param plot options for plotting include "Fish"=fishing mortality, "Rec"=recruitment (LIME only), "SPR"=spawning potential ratio, "ML"=mean length (including observed values; LIME only), "SB"=spawning biomass (LIME only), "Selex"=selectivity-at-length
+#' 
+#' @return figure with length composition data and model fits if Report or LBSPR are specified
+#' 
+#' @export
 plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex")){
 
 

@@ -58,9 +58,12 @@ C_t <- true$C_t ## (optional) catch data, with elements of vector named with the
 I_t <- true$I_t ## (optional) abundance index, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
 
 ## input data list
-data_LF <- list("years"=years, "LF"=LF)
-data_LF_Catch <- list("years"=years, "LF"=LF, "C_t"=C_t)
-data_LF_Index <- list("years"=years, "LF"=LF, "I_t"=I_t)
+data_LF <- list("years"=years, "LF"=LF) ## length comp only
+data_LF_Catch <- list("years"=years, "LF"=LF, "C_t"=C_t) ## length comp + catch
+data_LF_Index <- list("years"=years, "LF"=LF, "I_t"=I_t) ## length comp + index
+
+## plot length composition data
+plot_LCfits(Inputs=data_LF) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ##----------------------------------------------------
 ## Step 3: Run Model
@@ -90,6 +93,10 @@ Report <- res$Report
 
 ## Standard error report
 Sdreport <- res$Sdreport
+
+## plot length composition data
+plot_LCfits(Inputs=Inputs, Report=Report, Sdreport=Sdreport)
+
 
 ## length comp + catch
 res <- run_LIME(modpath=NULL,
