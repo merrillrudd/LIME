@@ -95,7 +95,25 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(Inputs=Inputs, Report=Report, Sdreport=Sdreport)
+plot_LCfits(Inputs=Inputs, 
+			Report=Report,
+			true_lc_years=2008:2017, 
+			ylim=NULL, 
+			ML50=lh$ML50, 
+			SL50=Report$S50,
+			dim=c(5,2), 
+			n=FALSE)
+
+## plot model output
+plot_output(all_years=1:20,
+			lc_years=11:20, 
+			Inputs=Inputs, 
+			Report=Report, 
+			Sdreport=Sdreport, 
+			lh=lh, 
+			true_years=1998:2017, 
+			True=NULL, 
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"))
 
 
 ## length comp + catch
