@@ -43,7 +43,7 @@ lh <- create_lh_list(vbk=0.21,
 true <- generate_data(modpath=NULL,
 					  data_avail="Index_Catch_LC",
 					  itervec=1, 
-					  Fdynamics="Constant",
+					  Fdynamics="Ramp",
 					  Rdynamics="AR",
 					  lh=lh,
 					  Nyears=20,
@@ -95,7 +95,7 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(Inputs=Inputs, 
+plot_LCfits(Inputs=Inputs$Data, 
 			Report=Report,
 			true_lc_years=2008:2017, 
 			ylim=NULL, 
@@ -112,8 +112,12 @@ plot_output(all_years=1:20,
 			Sdreport=Sdreport, 
 			lh=lh, 
 			true_years=1998:2017, 
-			True=NULL, 
+			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"))
+
+
+
+
 
 
 ## length comp + catch

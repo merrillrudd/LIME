@@ -32,7 +32,9 @@ AgeToLengthComp <-
       ################################################
       page <- matrix(ncol = dim(plba)[1], nrow = tyears)
       for (y in 1:tyears)
-        page[y, ] <- N_at[, y] * ifelse(sample_type == 'catch', S_a, 1)
+        # page[y, ] <- N_at[, y] * ifelse(sample_type == 'catch', S_a, 1)
+        if(sample_type=="catch") page[y,] <- N_at[,y] * S_a
+        if(sample_type!="catch") page[y,] <- N_at[,y]
       page <- page / rowSums(page)
 
       ################################################
