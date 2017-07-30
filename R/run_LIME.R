@@ -227,7 +227,9 @@ for(iter in 1:length(itervec)){
                     }
                 }
               }
-            if(max(abs(opt_save[["final_gradient"]]))<=0.001) break
+            if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
+              if(max(abs(opt_save[["final_gradient"]]))<=0.001) break
+            }
           }
         }
         if(all(is.na(opt_save))==FALSE)  df <- data.frame(opt_save$final_gradient, names(obj_save$par), opt_save$par, exp(opt_save$par))
@@ -235,10 +237,14 @@ for(iter in 1:length(itervec)){
 
         ## write error message in directory if opt wouldn't run
           if(is.null(modpath)) output$issue <- NULL
-          if(all(is.null(opt_save)) & is.null(modpath)==FALSE) write("NAs final gradient", file.path(iterpath, "NAs_final_gradient.txt"))
-          if(all(is.null(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "NAs_final_gradient")
-          if(all(is.null(opt_save)==FALSE) & is.null(modpath)==FALSE & all(is.na(opt_save[["final_gradient"]]))==FALSE) if(max(abs(opt_save[["final_gradient"]]))>0.001) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
-          if(all(is.null(opt_save)==FALSE & is.null(modpath)) & all(is.na(opt_save[["final_gradient"]]))==FALSE) if(max(abs(opt_save[["final_gradient"]]))>0.001) output$issue <- c(output$issue, "high_final_gradient")
+          if(all(is.null(opt_save)==FALSE){
+            if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
+              if(max(abs(opt_save[["final_gradient"]]))>0.001){
+                if(is.null(modpath)==FALSE) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
+                }
+              if(is.null(modpath)) output$issue <- c(output$issue, "high_final_gradient")
+              }
+          }
           if(all(is.na(opt_save)) & is.null(modpath)==FALSE) write("model_NA", file.path(iterpath, "model_NA.txt"))
           if(all(is.na(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "model_NA")
         
