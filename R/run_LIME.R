@@ -237,7 +237,7 @@ for(iter in 1:length(itervec)){
 
         ## write error message in directory if opt wouldn't run
           if(is.null(modpath)) output$issue <- NULL
-          if(all(is.null(opt_save)==FALSE){
+          if(all(is.null(opt_save)==FALSE)){
             if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
               if(max(abs(opt_save[["final_gradient"]]))>0.001){
                 if(is.null(modpath)==FALSE) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
