@@ -63,11 +63,11 @@ if(all(is.null(Inputs))==FALSE){
 if("Fish" %in% plot){
   if(all(is.null(Sdreport))==FALSE){
     ylim <- c(0, max(Report$F_t)*1.1)
-    # if(all(is.na(Sdreport))==FALSE){
-    #   sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
-    #   sd[,2][which(is.na(sd[,2]))] <- 0
-    #   ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
-    # }
+    if(all(is.na(Sdreport))==FALSE){
+      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
+      sd[,2][which(is.na(sd[,2]))] <- 0
+      # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
+    }
   }
 
   if(all(is.null(Report))==FALSE){
