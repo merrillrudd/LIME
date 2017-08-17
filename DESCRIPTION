@@ -11,8 +11,9 @@ Depends:
     TMB,
     devtools,
     Rcpp,
-    RcppEigen
-LinkingTo: TMB, RcppEigen, Rcpp
+    RcppEigen,
+    TMBhelper
+LinkingTo: TMB, RcppEigen, Rcpp, TMBhelper
 RoxygenNote: 6.0.1
 LazyData: true
 Suggests: testthat
