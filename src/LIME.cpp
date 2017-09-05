@@ -234,7 +234,7 @@ Type objective_function<Type>::operator() ()
   for(int a=0;a<n_a;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
-    if(a>=1 & a<(n_a-1)) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_t(0) * S_a(a-1));
+    if((a>=1) & (a<(n_a-1))) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_t(0) * S_a(a-1));
     if(a==(n_a-1)) N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_t(0) * S_a(a))) / (1 - exp(-M - F_t(0) * S_a(a)));
 
     // Spawning biomass
@@ -263,9 +263,9 @@ Type objective_function<Type>::operator() ()
     for(int a=0;a<n_a;a++){
       
       // Population abundance
-      if(t>=1 & a==0) N_ta(t,a) = R_t(t);
-      if(t>=1 & a>=1 & a<(n_a-1)) N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1));
-      if(t>=1 & a==(n_a-1)) N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1))) + (N_ta(t-1,a) * exp(-M - F_t(t-1) * S_a(a)));
+      if((t>=1) & (a==0)) N_ta(t,a) = R_t(t);
+      if((t>=1) & (a>=1) & (a<(n_a-1))) N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1));
+      if((t>=1) & (a==(n_a-1))) N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_t(t-1) * S_a(a-1))) + (N_ta(t-1,a) * exp(-M - F_t(t-1) * S_a(a)));
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
@@ -350,7 +350,7 @@ Type objective_function<Type>::operator() ()
         Na0(t,a) = 1;
         Naf(t,a) = 1;
       }
-      if(a>0 & a<(n_a-1)){
+      if((a>0) & (a<(n_a-1))){
         Na0(t,a) = Na0(t,a-1)*exp(-M);
         Naf(t,a) = Naf(t,a-1)*exp(-M-S_a(a-1)*F_t(t));
       }
