@@ -60,7 +60,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -79,7 +78,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -112,7 +110,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -141,7 +138,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=I_t, C_t=as.vector(0), C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -174,7 +170,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -204,7 +199,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=C_t, C_opt=C_opt,
                 ML_t=rowMeans(LF), LF=as.matrix(0), LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))       
         }
@@ -237,7 +231,6 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
                 obs_per_yr=n_inp,
                 I_t=as.vector(0), C_t=as.vector(0), C_opt=C_opt,
                 ML_t=as.vector(0), LF=LF, LFdist=LFdist, theta_type=theta_type, lbhighs=highs, lbmids=mids,
-                binwidth=binwidth, 
                 n_a=length(ages), ages=ages, L_a=L_a, W_a=W_a, M=M, h=h, Mat_a=Mat_a,
                 Fpen=Fpen,  SigRpen=SigRpen, SigRprior=SigRprior, S_l_input=S_l_input, S_yrs=S_yrs_inp, n_s=nseasons, n_y=max(S_yrs_inp))
         }       

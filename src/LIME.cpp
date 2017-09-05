@@ -50,7 +50,7 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(theta_type); //0= annual theta, 1=single theta
     DATA_VECTOR(lbhighs); // upper length bins
     DATA_VECTOR(lbmids);
-    DATA_INTEGER(binwidth);
+    // DATA_INTEGER(binwidth);
 
     // Known values
     DATA_INTEGER(n_a);
@@ -114,6 +114,7 @@ Type objective_function<Type>::operator() ()
   Type S95 = S50 + Sdelta;
   // int amax;
   // amax = n_a/n_s;
+  int t,y,ml,lc;
 
   vector<Type> theta(n_lc);
   // int l;
