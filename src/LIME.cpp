@@ -112,8 +112,8 @@ Type objective_function<Type>::operator() ()
   Type S50 = exp(logS50);
   Type Sdelta = exp(logSdelta);
   Type S95 = S50 + Sdelta;
-  int amax;
-  amax = n_a/n_s;
+  // int amax;
+  // amax = n_a/n_s;
 
   vector<Type> theta(n_lc);
   int l;
