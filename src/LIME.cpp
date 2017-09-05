@@ -116,7 +116,7 @@ Type objective_function<Type>::operator() ()
   // amax = n_a/n_s;
 
   vector<Type> theta(n_lc);
-  int l;
+  // int l;
   if(theta_type==0){
     for(int l=0;l<n_lc;l++){
       theta(l) = exp(log_theta(l));
@@ -134,8 +134,8 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_y(n_y); //number of years
   Type F_equil;
   F_equil = exp(log_F_t_input(0));
-  int t;
-  int y;
+  // int t;
+  // int y;
   int tmp; 
   for(int y=0;y<n_y;y++){
     F_y(y) = exp(log_F_t_input(y));
@@ -381,7 +381,7 @@ Type objective_function<Type>::operator() ()
     vector<Type> sum2(n_lc);
     sum1.setZero();
     sum2.setZero();
-  int lc;
+  // int lc;
   if(n_lc>0){
     for(int t=0;t<n_t;t++){
       log_pL_t(t) = 0;
@@ -452,7 +452,7 @@ Type objective_function<Type>::operator() ()
 
   vector<Type> log_pML_t(n_t);
   log_pML_t.setZero();
-  int ml;
+  // int ml;
   if(n_ml>0){
     for(int t=0;t<n_t;t++){
       log_pML_t(t) = 0;
