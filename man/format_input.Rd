@@ -43,3 +43,7 @@ List, a tagged list of Data, Parameters, Random, Map
 \description{
 \code{format_input} Formats data, parameters, random effects, and mapped parameters for TMB input
 }
+\author{
+M.B. Rudd
+}
+

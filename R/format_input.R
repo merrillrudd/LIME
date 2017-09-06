@@ -2,6 +2,7 @@
 #'
 #' \code{format_input} Formats data, parameters, random effects, and mapped parameters for TMB input
 #'
+#' @author M.B. Rudd
 #' @param input tagged list of LIME inputs. Output from create_inputs.
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include "Catch" or "Index" separated by underscore. For example, "LC10", "Catch_LC1", "Index_Catch_LC20".
 #' @param Fpen penalty on fishing mortality 0= off, 1=on
@@ -16,7 +17,7 @@
 #' @param S_l_input input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity
 #' @param theta_type if 0, estimate annual theta; if 1, estimate single theta for all years of length comp
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
-
+#' 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
 format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, LFdist, S_l_input, theta_type, randomR){

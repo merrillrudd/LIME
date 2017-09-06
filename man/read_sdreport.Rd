@@ -17,3 +17,4 @@ vector with lower and upper 95 confidence intervals. Upper intervals are reverse
 \description{
 \code{read_sdreport} read summary(Sdreport) to calculate confidence intervals for a parameter
 }
+

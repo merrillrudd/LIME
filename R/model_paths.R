@@ -2,6 +2,7 @@
 #'
 #' \code{model_paths} sets up directory paths for model combinations
 #'
+#' @author M.B. Rudd
 #' @param res_dir directory to store results
 #' @param modcombos data frame of all model combinations
 

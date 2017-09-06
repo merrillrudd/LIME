@@ -30,3 +30,7 @@ List, a tagged list of potentially useful benchmarks
 \details{
 Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
 }
+\author{
+M.B. Rudd
+}
+

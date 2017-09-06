@@ -43,3 +43,7 @@ print how many iterations were written into the model directory
 \description{
 \code{generate_data} Generates data from the operating model for use in simulation testing
 }
+\author{
+M.B. Rudd
+}
+

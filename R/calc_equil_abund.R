@@ -2,6 +2,7 @@
 #'
 #' \code{calc_equil_abund} calculates expected abundance given constant fishing mortality
 #'
+#' @author M.B. Rudd
 #' @param ages vector of ages
 #' @param S_a selectivity-at-age
 #' @param M natural mortality

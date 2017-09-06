@@ -2,6 +2,7 @@
 #'
 #' \code{calc_ref} Calculates derived spawning potential ratio: lifetime total egg production in fished:unfished states
 #'
+#' @author M.B. Rudd
 #' @param ages vector of ages
 #' @param Mat_a from report file / true file for simulation
 #' @param W_a from report file / true file for simulation

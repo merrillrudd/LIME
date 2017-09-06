@@ -42,7 +42,7 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 
 \item{F_up}{upper bound of fishing mortality estimate; default=5}
 
-\item{S50_up}{upper bound of length at 50% selectivity; default=NULL}
+\item{S50_up}{upper bound of length at 50 percent selectivity; default=NULL}
 
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
@@ -66,3 +66,7 @@ prints how many iterations were run in model directory
 \description{
 \code{run_LIME} run length-based integrated mixed-effects model with generated data
 }
+\author{
+M.B. Rudd
+}
+

@@ -2,6 +2,7 @@
 #'
 #' \code{create_lh_list} Creates list of life history information
 #'
+#' @author M.B. Rudd
 #' @param vbk von Bertalanffy k Brody growth coefficient
 #' @param linf von Bertalanffy Linf asymptotic length
 #' @param lwa length-weight scaling parameter
@@ -36,6 +37,8 @@
 #' @param rho first-order autocorrelation in recruitment residuals parameter, default=0 (recruitment not autocorrelated)
 #' @param theta dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)
 #' @param nseasons specify number of sub-time periods per year; default=1 (instantaneous sampling)
+#' @importFrom stats pnorm
+#' 
 #' 
 #' @return List, a tagged list of life history traits
 #' @export

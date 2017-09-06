@@ -40,3 +40,7 @@ named list of attributes of true population/data
 \description{
 \code{sim_pop} Age-converted-to-length-based operating model specifying true population dynamics
 }
+\author{
+M.B. Rudd
+}
+

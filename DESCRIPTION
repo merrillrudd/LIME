@@ -3,9 +3,11 @@ Title: Length-based Integrated Mixed Effects (LIME) assessment method
 Version: 0.1
 Authors@R: person("Merrill", "Rudd", email="merrillrudd@gmail.com", role=c("aut","cre"))
 Description: A flexible stock assessment method for fisheries with developing
-    data collection programs. Requires at least one year of length composition data and assumptions about biological parameters. Can integrate more years of length composition data, a time series of catch, and/or
-    an abundance index. Mixed effects structure accounts for time-variation in
-    fishing mortality and recruitment.
+    data collection programs. Requires at least one year of length composition
+    data and assumptions about biological parameters. Can integrate more years of
+    length composition data, a time series of catch, and/or an abundance index.
+    Mixed effects structure accounts for time-variation in fishing mortality and
+    recruitment.
 License: GPL-2
 Depends:
     TMB,
@@ -14,6 +16,7 @@ Depends:
     RcppEigen,
     TMBhelper
 LinkingTo: TMB, RcppEigen, Rcpp, TMBhelper
-RoxygenNote: 6.0.1
+RoxygenNote: 5.0.1
 LazyData: true
-Suggests: testthat
+Suggests:
+    testthat

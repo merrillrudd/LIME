@@ -2,6 +2,7 @@
 #'
 #' \code{generate_data} Generates data from the operating model for use in simulation testing
 #'
+#' @author M.B. Rudd
 #' @param modpath directory to save generated data
 #' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of iterations of data to generate
@@ -16,6 +17,9 @@
 #' @param mismatch default=FALSE, if TRUE, catch and index overlap with length comp only 1 year
 #' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
+#' @importFrom stats runif
+#' @importFrom TMB MakeADFun
+
 #' @return print how many iterations were written into the model directory
 #' @export
 generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){

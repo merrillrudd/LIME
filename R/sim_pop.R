@@ -2,6 +2,7 @@
 #'
 #' \code{sim_pop} Age-converted-to-length-based operating model specifying true population dynamics
 #'
+#' @author M.B. Rudd
 #' @param lh list of life history information, from create_lh_list
 #' @param Nyears number of years to simulate
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length
@@ -15,6 +16,7 @@
 #' @param modname save model name for true dynamics in named list output
 #' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
+#' @importFrom stats rnorm
 #' @return named list of attributes of true population/data
 #' @export
 sim_pop <-

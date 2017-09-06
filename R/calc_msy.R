@@ -2,6 +2,7 @@
 #'
 #' \code{calc_msy} calculates yield per recruit, when maximized across levels of F produces Fmsy
 #'
+#' @author M.B. Rudd
 #' @param F fishing mortality rate
 #' @param ages ages in the population
 #' @param S_a selectivity-at-age

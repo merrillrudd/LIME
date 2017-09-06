@@ -24,3 +24,7 @@ List, a tagged list of potentially useful benchmarks
 \details{
 Specifically used to merge life history information with other model settings; flexibility to change parameter inputs for sensitivity analysis without changing the baseline life history information that was used to generate data in a simulation study, or carefully compiled for real=life application
 }
+\author{
+M.B. Rudd
+}
+

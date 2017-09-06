@@ -2,6 +2,7 @@
 #'
 #' \code{create_inputs} Gets list of parameter inputs into the proper format
 #'
+#' @author M.B. Rudd
 #' @param param parameter name to adjust (sensitivity analysis), default=FALSE
 #' @param val value of parameter name to adjust (sensitivity analysis), default=FALSE
 #' @param lh tagged list of life history/starting value information

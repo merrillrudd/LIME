@@ -23,3 +23,7 @@ vector of expected abundance at age
 \description{
 \code{calc_equil_abund} calculates expected abundance given constant fishing mortality
 }
+\author{
+M.B. Rudd
+}
+

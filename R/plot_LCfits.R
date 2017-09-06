@@ -2,6 +2,7 @@
 #'
 #' \code{plot_LCfits} plot length composition data with option for model fits from LIME and LB-SPR
 #'
+#' @author M.B. Rudd
 #' @param Inputs LIME input file, must have "LF"=length frequency and "T_yrs"=total vector of years
 #' @param Inputs2 optional LIME input file for length data comparison; default NULL
 #' @param Inputs3 optional LIME input file for length data comparison; default NULL
@@ -11,10 +12,11 @@
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
 #' @param true_lc_years true years of length comp data for plotting; default NULL
 #' @param ylim ylim for plot; default NULL
-#' @param ML50 length at 50% maturity for comparison; default NULL
-#' @param SL50 length at 50% selectivity for comparison; default NULL
+#' @param ML50 length at 50 percent maturity for comparison; default NULL
+#' @param SL50 length at 50 percent selectivity for comparison; default NULL
 #' @param dim dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
+#' @importFrom graphics abline axis barplot box legend lines mtext par
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 

@@ -2,6 +2,7 @@
 #'
 #' \code{plot_output} plot output from LIME or LB-SPR
 #'
+#' @author M.B. Rudd
 #' @param all_years vector of all years modeled
 #' @param lc_years vector of years with length composition data
 #' @param Inputs LIME input file
@@ -12,6 +13,8 @@
 #' @param true_years vector of true years (in case all_years and lc_years are 1:20 instead of 1998:2017)
 #' @param True default=NULL, possible to specify true list from generated data if simulation
 #' @param plot options for plotting include "Fish"=fishing mortality, "Rec"=recruitment (LIME only), "SPR"=spawning potential ratio, "ML"=mean length (including observed values; LIME only), "SB"=spawning biomass (LIME only), "Selex"=selectivity-at-length
+#' @importFrom graphics points polygon segments
+#' @importFrom grDevices rgb
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 

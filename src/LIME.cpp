@@ -114,10 +114,11 @@ Type objective_function<Type>::operator() ()
   Type S95 = S50 + Sdelta;
   // int amax;
   // amax = n_a/n_s;
-  int t,y,ml,lc;
+
+  //Indices == l= year of length comp data or length bin, y=total years, t=total time step, a=age, ml=mean length year, c=catch year, i=index year
+  // int l,y,t,a,ml,c,i;
 
   vector<Type> theta(n_lc);
-  // int l;
   if(theta_type==0){
     for(int l=0;l<n_lc;l++){
       theta(l) = exp(log_theta(l));
@@ -135,8 +136,6 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_y(n_y); //number of years
   Type F_equil;
   F_equil = exp(log_F_t_input(0));
-  // int t;
-  // int y;
   int tmp; 
   for(int y=0;y<n_y;y++){
     F_y(y) = exp(log_F_t_input(y));
@@ -497,7 +496,7 @@ Type objective_function<Type>::operator() ()
     vector<Type> lC_t(n_t);
     vector<Type> lI_t(n_t);
     vector<Type> lD_t(n_t);
-    for(t=0;t<n_t;t++){
+    for(int t=0;t<n_t;t++){
       lN_t(t) = log(N_t_hat(t));
       lSB_t(t) = log(SB_t_hat(t));
       lTB_t(t) = log(TB_t_hat(t));
@@ -509,7 +508,7 @@ Type objective_function<Type>::operator() ()
     }
 
     vector<Type> lF_y(n_y);
-    for(t=0;t<n_y;t++){
+    for(int t=0;t<n_y;t++){
       lF_y(t) = log(F_y(t));
     }
 

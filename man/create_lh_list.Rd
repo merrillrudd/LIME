@@ -87,3 +87,7 @@ List, a tagged list of life history traits
 \description{
 \code{create_lh_list} Creates list of life history information
 }
+\author{
+M.B. Rudd
+}
+

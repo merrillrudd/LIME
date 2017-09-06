@@ -1,9 +1,10 @@
 #' Calculate biological reference points
 #'
 #' \code{calc_derived_quants} calculates derived quanties for status or productivity
-#'
+#' @author M.B. Rudd
 #' @param Obj, the fitted TMB object
 #' @param lh, list of life history information
+#' @importFrom stats uniroot optimize
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @export

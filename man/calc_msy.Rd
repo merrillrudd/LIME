@@ -27,3 +27,7 @@ yield per recruit, in biomass
 \description{
 \code{calc_msy} calculates yield per recruit, when maximized across levels of F produces Fmsy
 }
+\author{
+M.B. Rudd
+}
+

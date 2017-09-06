@@ -35,3 +35,7 @@ figure with length composition data and model fits if Report or LBSPR are specif
 \description{
 \code{plot_output} plot output from LIME or LB-SPR
 }
+\author{
+M.B. Rudd
+}
+

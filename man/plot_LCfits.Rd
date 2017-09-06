@@ -27,9 +27,9 @@ plot_LCfits(Inputs, Inputs2 = NULL, Inputs3 = NULL, Inputs4 = NULL,
 
 \item{ylim}{ylim for plot; default NULL}
 
-\item{ML50}{length at 50% maturity for comparison; default NULL}
+\item{ML50}{length at 50 percent maturity for comparison; default NULL}
 
-\item{SL50}{length at 50% selectivity for comparison; default NULL}
+\item{SL50}{length at 50 percent selectivity for comparison; default NULL}
 
 \item{dim}{dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot}
 
@@ -41,3 +41,7 @@ figure with length composition data and model fits if Report or LBSPR are specif
 \description{
 \code{plot_LCfits} plot length composition data with option for model fits from LIME and LB-SPR
 }
+\author{
+M.B. Rudd
+}
+

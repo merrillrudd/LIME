@@ -23,3 +23,7 @@ data frame - number of individuals in each length bin in each year
 \description{
 \code{AgeToLengthComp} Converts vulnerable numbers at age to length composition of catch
 }
+\author{
+M.B. Rudd
+}
+

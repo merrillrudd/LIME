@@ -2,6 +2,7 @@
 #'
 #' \code{run_LIME} run length-based integrated mixed-effects model with generated data
 #'
+#' @author M.B. Rudd
 #' @param modpath model directory
 #' @param lh list of life history information, from create_lh_list
 #' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
@@ -17,7 +18,7 @@
 #' @param fix_param_t default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed. 
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
 #' @param F_up upper bound of fishing mortality estimate; default=5
-#' @param S50_up upper bound of length at 50% selectivity; default=NULL
+#' @param S50_up upper bound of length at 50 percent selectivity; default=NULL
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @param S_l_input default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length
@@ -26,7 +27,10 @@
 #' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
 #' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
 #' @param newtonsteps number of extra newton steps to take after optimization
-
+#' @importFrom TMB MakeADFun
+#' @importFrom TMBhelper Optimize
+#' @importFrom utils write.csv
+#' 
 
 #' @useDynLib LIME
 
