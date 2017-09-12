@@ -4,7 +4,6 @@
 #'
 #' @author M.B. Rudd
 #' @param modpath directory to save generated data
-#' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.
 #' @param itervec number of iterations of data to generate
 #' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
@@ -22,7 +21,7 @@
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
+generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
@@ -40,7 +39,7 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail, mismatch=mismatch)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, mismatch=mismatch)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
@@ -51,7 +50,7 @@ generate_data <- function(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh
             set.seed(seed_init)
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, modname=data_avail, mismatch=mismatch), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=iter, mismatch=mismatch), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }

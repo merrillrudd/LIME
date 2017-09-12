@@ -13,7 +13,6 @@
 #' @param init_depl initial depletion; if FALSE, will use F1 from lh list
 #' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series
-#' @param modname save model name for true dynamics in named list output
 #' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
 #' @importFrom stats rnorm
@@ -30,7 +29,6 @@ sim_pop <-
            init_depl,
            nburn,
            seed,
-           modname,
            mismatch,
            sample_type = 'catch') {
     ## SB_t = spawning biomass over time
@@ -522,7 +520,6 @@ sim_pop <-
       lh$I_t <- I_tout[myrs]
       lh$C_t <- C_tout[myrs]
       lh$Cw_t <- Cw_tout[myrs]
-      lh$DataScenario <- modname
       lh$LF <- LFout
       lh$LF0 <- LF0out
       lh$R_t <- R_tout
