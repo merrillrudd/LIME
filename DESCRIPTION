@@ -8,15 +8,14 @@ Description: A flexible stock assessment method for fisheries with developing
     length composition data, a time series of catch, and/or an abundance index.
     Mixed effects structure accounts for time-variation in fishing mortality and
     recruitment.
-License: GPL-2
+License: MIT + file LICENSE
 Depends:
-    TMB,
-    devtools,
-    Rcpp,
-    RcppEigen,
-    TMBhelper
-LinkingTo: TMB, RcppEigen, Rcpp, TMBhelper
+  TMB,
+  TMBhelper
+LinkingTo: TMB, TMBhelper
 RoxygenNote: 5.0.1
 LazyData: true
 Suggests:
-    testthat
+    testthat,
+    rmarkdown
+VignetteBuilder: rmarkdown

@@ -47,7 +47,6 @@ plot(lh$S_l, type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion
 set.seed(143)
 ## Demonstrate data generation option
 true <- generate_data(modpath=NULL,
-					  data_avail="Index_Catch_LC",
 					  itervec=1, 
 					  Fdynamics="Ramp",
 					  Rdynamics="AR",

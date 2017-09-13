@@ -20,7 +20,7 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 
 \item{est_sigma}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
 
-\item{data_avail}{types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.}
+\item{data_avail}{types of data included, must at least include LC as length composition data is the minimum data input. May also include Catch or Index separated by underscore. For example, LC, Catch_LC, Index_Catch_LC.}
 
 \item{itervec}{number of datasets to generate in a simulation study. default=NULL for real stock assessment application.}
 
@@ -48,9 +48,9 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 
 \item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
 
-\item{S_l_input}{default=-1, use 1-parameter logistic selectivity function; alternatively can input fixed selectivity-at-length}
+\item{S_l_input}{default=-1, use 1 or 2--parameter logistic selectivity function; alternatively can input fixed selectivity-at-length}
 
-\item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
+\item{theta_type}{default=1, estimate single theta for all years of length comp; if 0, estimate annual theta}
 
 \item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
 

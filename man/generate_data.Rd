@@ -4,14 +4,12 @@
 \alias{generate_data}
 \title{Generate data for simulation testing}
 \usage{
-generate_data(modpath, data_avail, itervec, Fdynamics, Rdynamics, lh,
-  pool = TRUE, Nyears, Nyears_comp, comp_sample, rewrite = TRUE,
-  mismatch = FALSE, init_depl, derive_quants = FALSE)
+generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
+  Nyears_comp, comp_sample, rewrite = TRUE, mismatch = FALSE, init_depl,
+  derive_quants = FALSE)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
-
-\item{data_avail}{types of data included, must at least include LCX where X is the number of years of length composition data. May also include Catch or Index separated by underscore. For example, LC10, Catch_LC1, Index_Catch_LC20.}
 
 \item{itervec}{number of iterations of data to generate}
 

@@ -27,7 +27,7 @@
 #' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
 #' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
 #' @param newtonsteps number of extra newton steps to take after optimization
-#' @importFrom TMB MakeADFun
+#' @importFrom TMB MakeADFun sdreport
 #' @importFrom TMBhelper Optimize
 #' @importFrom utils write.csv
 #' 

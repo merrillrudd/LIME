@@ -3,8 +3,6 @@
 #' \code{create_inputs} Gets list of parameter inputs into the proper format
 #'
 #' @author M.B. Rudd
-#' @param param parameter name to adjust (sensitivity analysis), default=FALSE
-#' @param val value of parameter name to adjust (sensitivity analysis), default=FALSE
 #' @param lh tagged list of life history/starting value information
 #' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
 

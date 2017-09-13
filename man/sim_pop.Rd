@@ -5,7 +5,7 @@
 \title{Operating model}
 \usage{
 sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
-  init_depl, nburn, seed, modname, mismatch, sample_type = "catch")
+  init_depl, nburn, seed, mismatch, sample_type = "catch")
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
@@ -27,8 +27,6 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 \item{nburn}{number of years of burn-in for operating model}
 
 \item{seed}{set seed for generating stochastic time series}
-
-\item{modname}{save model name for true dynamics in named list output}
 
 \item{mismatch}{if TRUE, catch and index overlap with length comp only 1 year}
 
