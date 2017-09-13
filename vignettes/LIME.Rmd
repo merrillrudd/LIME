@@ -7,10 +7,6 @@ output:
     number_sections: true
     toc: yes
     toc_float: true
-  pdf_document:
-    number_sections: true
-    toc: yes
-    toc_float: true
 vignette: >
   %\VignetteIndexEntry{LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment}
   %\VignetteEngine{knitr::rmarkdown}
@@ -48,7 +44,7 @@ LIME also requires the package `TMBhelper`, which is not currently available on 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 ```
 
-## Load the Packages
+## Load the Package
 ```{r, message=FALSE}
 library(LIME)
 ```
@@ -63,7 +59,7 @@ The LIME package simulation and estimation features require the biological input
 
 The user is required to input the following parameters to `create_lh_list` for simulation and estimation:
 
-**Biology**
+ **Minium inputs: Biology**
 
  - von Bertalanffy asymptotic length (`linf`)
  - von Bertalanffy growth coefficient (`vbk`)
@@ -73,12 +69,12 @@ The user is required to input the following parameters to `create_lh_list` for s
  - Length or age at 50% maturity (`M50`)
  - Whether `M50` input is in "length" or "age" (`maturity_input`)
  
-**Exploitation**
+ **Minimum inputs: Exploitation**
 
  - Length at 50% selectivity (`S50`)
  - Whether `S50` input is in "length" or "age" (`selex_input`)
  
-**Assumptions using the default settings**
+ **Assumptions using the default settings**
 
  - Width of the length classes (`binwidth`) equal to 1
  - von Bertalanffy length at age=0 (`t0`) equal to -0.01
@@ -87,7 +83,7 @@ The user is required to input the following parameters to `create_lh_list` for s
  
 ### Other inputs for `create_lh_list`
 
-**Biology**
+ **Other inputs: Biology**
 
  - Length or age at 95% maturity (`M95`): Default=`NULL` for one-parameter logistic maturity; specifying `M95` will use two-parameter logistic maturity curve. It is assumed `M95` should be input as length if `M50` is length, same for age.
  - Length at age=0 (`t0`): Default=-0.01, should be adjusted based on local studies or meta-analysis.
@@ -96,7 +92,7 @@ The user is required to input the following parameters to `create_lh_list` for s
  - Maximum age (`AgeMax`): Default= the age at which 1% of the population is still alive based on the specified natural mortality rate `M`. This age can be adjusted based on local evidence of maximum age.
  - Recruitment autocorrelation (`rho`): Used in simulation only. Default=0 (no recruitment autocorrelation). Changing the value of `rho` will add autocorrelation to the generated recruitment time series for a simulation study. 
  
-**Exploitation**
+ **Other inputs: Exploitation**
 
  - Length or age at 95% selectivity (`S95`): Default=`NULL` for one-parameter logistic selectivity; specifying `S95` will use two-parameter logistic selectivity curve. It is assumed `S95` should be input as length if `S50` is length, same for age.
  - Selectivity function (`selex_type`): Default=`logistic` using a one-parameter logistic selectivity curve if `S95` is not specified, or a two-parameter logistic curve if `S95` is specified. Alternate option=`dome` to generate a population exploited based on a dome-shaped selectivity curve. Dome-shaped selectivity cannot currently be estimated in LIME, but specifying dome-shaped selectivity in the `create_lh_list` function can generate an assumed dome-shaped curve to be fixed when using LIME for estimation. 
@@ -105,7 +101,7 @@ The user is required to input the following parameters to `create_lh_list` for s
  - Dirichlet-multinomial parameter (`theta`): Default=10, a relatively large number coinciding with no variance inflation where the effective sample size will approach the input sample size (Thorson et al. 2017)
  - Number of seasons in a year (`nseasons`): Default=1 for annual length composition data and annual growth and mortality parameters. For short-lived species, it is helpful to use a shorter-than-annual time step to account for the growth of short-lived fish during one year, if length data is collected on time steps less than one year (e.g. month, `nseasons`=12).
 
-**Variation**
+ **Other inputs: Variation**
 
  - Coefficient of variation around the growth curve (`CVlen`): Default=0.1; Should be adjusted based on the expected variability in the age-length curve.
  - Recruitment standard deviation (`SigmaR`): Default=0.737, the median across all fish species (Thorson et al. 2014); Used for generating recruitment deviates in the simulation or as a starting value for its estimation using LIME. 
@@ -139,8 +135,9 @@ lh <- create_lh_list(vbk=0.21,
 
 ### Plot the biological and selectivity inputs
 And then check out the biological parameters and selectivity we've created. Note that even though we input maturity and selectivity by length, `create_lh_list` converts to age and outputs both age (`lh$S_a`) and length (`lh$S_l`).
-```{r, fig.height=6, fig.width=8, echo=FALSE}
-par(mfrow=c(2,2), mar=c(4,4,4,4))
+
+```{r, fig.height=6, fig.width=8, echo=FALSE, fig.cap="Example length-at-age, weight-at-age, maturity-at-length, and selectivity-at-length."}
+par(mfrow=c(2,2), mar=c(4,4,3,1))
 plot(lh$L_a, type="l", lwd=4, xlab="Age", ylab="Length (cm)")
 plot(lh$W_a, type="l", lwd=4, xlab="Age", ylab="Weight (g)")
 plot(lh$Mat_l, type="l", lwd=4, xlab="Length (cm)", ylab="Proportion mature")
@@ -188,7 +185,7 @@ true <- generate_data(modpath=NULL,
 
 ### Plot the simulated population
 
-```{r, fig.width=10, fig.height=6, echo=FALSE}
+```{r, fig.width=10, fig.height=6, echo=FALSE, fig.cap="True population: fishing mortality ramped (increasing then decreasing), autocorrelated recruitment, spawning potential ratio (SPR), mean length, spawning biomass, and relative spawning biomass."}
 par(mfrow=c(2,3))
 plot(true$F_t, type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true$F_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
@@ -201,10 +198,12 @@ plot(true$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", y
 ### Plot the generated data
 
 Each panel of length data is labeled with the year (1-20).
-```{r, fig.height=6, fig.width=8, echo=FALSE}
+
+```{r, fig.height=6, fig.width=8, echo=FALSE, fig.cap="Generated length composition data, labeled by years 1-20."}
 plot_LCfits(Inputs=list("LF"=true$LF))
 ```
-```{r, fig.height=3, fig.width=10, echo=FALSE}
+
+```{r, fig.height=3, fig.width=10, echo=FALSE, fig.cap="Generated catch and abundance index over time."}
 par(mfrow=c(1,2))
 plot(true$Cw_t, type="l", lwd=4, xlab="Year", ylab="Catch (g)", ylim=c(0,max(true$Cw_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true$I_t, type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true$I_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
@@ -217,6 +216,7 @@ Using LIME for estimation requires three vital steps:
  1. Setup data correctly
  2. Run the LIME model using TMB
  3. Check convergence and plot output
+ 4. Run sensitivities
 
 ## Data setup
 
@@ -245,7 +245,21 @@ rownames(LF) <- length_years
 ## set colnames as length bins
 colnames(LF) <- length_bins
 
-LF
+## first six years of length data
+head(LF)
+```
+
+It is possible length data exist for 10 years only, but either 1) catch or abundance index data are available for years prior to length data or 2) the first few years of length data hold information on recruitment from years prior. 
+
+In the scenario that you have ten years of length data but want to model over 20 years, just make sure the years of length data are labeled with the correct year in terms of the overall model:
+```{r}
+## years with length data, shortened
+years_short <- 11:20
+
+LF_short <- LF[years_short,]
+rownames(LF_short) <- years_short
+
+LF_short
 ```
 
 ### Catch and index data
@@ -288,8 +302,8 @@ LIME requires data in an list form, with a minimum:
     - Years can be in true years (1998-2017) or indexed years (1-20) as long as there is consistency between the length, catch, and/or index data. For example, if length data years are labeled 1998-2017, `years` should be 1998-2017 (or may start before 1998 if length data are informative for a few years prior to the first year of data). 
     
  - `LF`: the length frequency matrix. See "Length data" section above for formatting details.
-   - Rows labeled with years.
-   - Columns labeled with upper length bins.
+    - Rows labeled with years.
+    - Columns labeled with upper length bins.
  
 With the minium inputs, the data list should look like:  
 ```{r}
@@ -300,7 +314,6 @@ length_years <- as.numeric(rownames(LF))
 total_years <- min(length_years):max(length_years)
 
 data_list <- list("years"=total_years, "LF"=LF)
-data_list
 ```
 
 
@@ -309,6 +322,7 @@ If catch and/or an abundance index are available, these should also be included 
  - `C_t`: catch data, in numbers or weight (to be specified later)
  - `I_t`: abundance index.
  
+
 ```{r}
 ## years with catch data, make sure they are numbers and not characters
 catch_years <- as.numeric(names(C_t))
@@ -414,14 +428,9 @@ res_length <- run_LIME(modpath=NULL,
 
 Finally, let's run LIME with only 10 years of length data, but continue modeling 20 years:
 ```{r, results="hide", warning=FALSE}
-## last 10 years only
-LF_short <- LF[11:20,]
-
-## make sure year names are numeric
-rownames(LF_short) <- 11:20
 
 ## new data list
-data_list_short <- list("years"=total_years, "LF"=LF[11:20,])
+data_list_short <- list("years"=total_years, "LF"=LF_short)
 
 res_length_short <- run_LIME(modpath=NULL,
                        lh=lh,
@@ -435,45 +444,152 @@ res_length_short <- run_LIME(modpath=NULL,
 
 ## Check convergence and plot output
 
+All models we ran estimate 20 years of annual fishing mortality (`log_F_t_input`), recruitment standard deviation (`log_sigma_R`), selectivity parameters (`logS50` and `logSdelta`), and the Dirichlet-multinomial theta parameter (`log_theta`). 
+
+Some other parameters are estimated if an abundance index or catch data are included. 
+
 Before we use any of the above output, we need to check the model convergence. We assess model convergence based on if the absolute value of the final gradient of each parameter is less than 0.001. 
 ```{r, include=FALSE}
 colnames(res_rich$df) <- colnames(res_nocatch$df) <- colnames(res_length$df) <- c("Final gradient", "Parameter", "Estimate", "Transformed estimate")
 ```
-Data-rich:
+Data-rich scenario, includes default estimated parameters as well as catchability coefficient (`log_q_I`) and equilibrium recruitment (`beta`):
 ```{r}
 res_rich$df[,1:2]
 ```
-Index and length:
+
+Index and length scenario, includes default estimated parameters as well as catchability coefficient:
 ```{r}
 res_nocatch$df[,1:2]
 ```
-Length only:
+
+Length only scenarios (20 years and 10 years), include default estimated parameters only.
 ```{r}
 res_length$df[,1:2]
 ```
+
 10 years of length:
 ```{r}
 res_length_short$df[,1:2]
 ```
 
 
-Once we have confirmed each model has converged, we can explore model output.
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Data-rich"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_rich$Inputs, Report=res_rich$Report, Sdreport=res_rich$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR"))
+Once we have confirmed each model has converged, we can explore model output. The black lines indicate the true value of fishing mortality, recruitment, SPR, and selectivity. Blue lines indicate the maximum likelihood estimates, blue points indicate a year with data, and blue shading indicates 95% confidence intervals. 
+
+```{r, warning=FALSE, message=FALSE, fig.cap="Results from data-rich scenario"}
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_rich$Inputs, Report=res_rich$Report, Sdreport=res_rich$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Index and length"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_nocatch$Inputs, Report=res_nocatch$Report, Sdreport=res_nocatch$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR"))
+```{r, warning=FALSE, message=FALSE, fig.cap="Results from including index and length"}
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_nocatch$Inputs, Report=res_nocatch$Report, Sdreport=res_nocatch$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Length only"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR"))
+```{r, warning=FALSE, message=FALSE, fig.cap="Results including length only"}
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
-```{r, warning=FALSE, message=FALSE, fig.cap="10 years of length"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=11:20, Inputs=res_length_short$Inputs, Report=res_length_short$Report, Sdreport=res_length_short$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR"))
+```{r, warning=FALSE, message=FALSE, fig.cap="Results including 10 years of length data only"}
+plot_output(all_years=total_years, true_years=total_years, lc_years=11:20, Inputs=res_length_short$Inputs, Report=res_length_short$Report, Sdreport=res_length_short$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
+
+
+## Check sensitivites
+
+**Biological inputs**
+
+The most straightforward way to test LIME sensitivity to input parameters is to create alternate life history/input lists using `create_lh_list`. For example, if we want to test the impact of a 25% larger asympototic length, we could create a new list:
+
+```{r}
+lh_alt <- create_lh_list(vbk=0.21,
+                     linf=65*1.25,
+                     t0=-0.01,
+                     lwa=0.0245,
+                     lwb=2.79,
+                     M=0.27,
+                     M50=34,
+                     M95=NULL,
+                     maturity_input="length",
+                     S50=20,
+                     S95=26,
+                     selex_input="length",
+                     binwidth=1,
+                     CVlen=0.1,
+                     SigmaR=0.737,
+                     SigmaF=0.2,
+                     R0=1,
+                     rho=0.43,
+                     nseasons=1)
+```
+
+Then re-run the assessment with the new life history list, for example with length data only:
+
+```{r, results="hide", warning=FALSE}
+res_alt <- run_LIME(modpath=NULL,
+                    lh=lh_alt,
+                    input_data=data_list,
+                    est_sigma="log_sigma_R",
+                    data_avail="LC")
+```
+
+Then check how the larger asymptotic length impacts the assessment results:
+```{r}
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec", "SPR","Selex"))
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh_alt, True=true, plot=c("Fish", "Rec", "SPR", "Selex"))
+```
+
+
+**Selectivity model**
+
+Users may also want to fix the selectivity curve, either based on previous studies or to examine the impact of dome-shaped selectivity. Here is an example where we create an input list with an assumed function for dome-shaped selectivity:
+
+```{r}
+lh_dome <- create_lh_list(vbk=0.21,
+                     linf=65,
+                     t0=-0.01,
+                     lwa=0.0245,
+                     lwb=2.79,
+                     M=0.27,
+                     M50=34,
+                     M95=NULL,
+                     maturity_input="length",
+                     S50=20,
+                     S95=26,
+                     selex_input="length",
+                     selex_type="dome",
+                     dome_sd=15,
+                     binwidth=1,
+                     CVlen=0.1,
+                     SigmaR=0.737,
+                     SigmaF=0.2,
+                     R0=1,
+                     rho=0.43,
+                     nseasons=1)
+```
+
+```{r, echo=FALSE}
+par(mfrow=c(1,1))
+plot(lh$S_l, lwd=4, type="l", xlab="Length (cm)", ylab="Proportion selected to gear", xaxs="i", yaxs="i", cex.lab=1.5, cex.axis=1.5, xpd=NA)
+lines(lh_dome$S_l, col="red", lwd=4, lty=2)
+legend("bottomright", lwd=2, lty=c(1,2), col=c("black","red"), legend=c("Logistic","Dome"), title="Selectivity model")
+```
+
+Then use the `S_l_input` argument to re-run the assessment with the fixed dome-shaped selectivity curve. This assessment will not estimate selectivity parameters.
+
+```{r, results="hide", warning=FALSE}
+res_dome <- run_LIME(modpath=NULL,
+                    lh=lh,
+                    input_data=data_list,
+                    est_sigma="log_sigma_R",
+                    data_avail="LC",
+                    S_l_input=lh_dome$S_l)
+```
+
+Then check how the assumed dome-shaped selectivity curve impacts assessment results:
+```{r}
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish", "Rec","SPR", "Selex"))
+plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh_dome, True=true, plot=c("Fish","Rec", "SPR","Selex"))
+```
+
 
 
 # References
