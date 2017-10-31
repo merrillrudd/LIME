@@ -30,7 +30,7 @@ plot_output(all_years, lc_years, Inputs = NULL, Report = NULL,
 
 \item{plot}{options for plotting include "Fish"=fishing mortality, "Rec"=recruitment (LIME only), "SPR"=spawning potential ratio, "ML"=mean length (including observed values; LIME only), "SB"=spawning biomass (LIME only), "Selex"=selectivity-at-length}
 
-\item{ylim}{list to set ylim for each of the 'plot' arguments}
+\item{set_ylim}{list to set ylim for each of the 'plot' arguments}
 }
 \value{
 figure with length composition data and model fits if Report or LBSPR are specified
