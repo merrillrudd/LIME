@@ -82,7 +82,7 @@ if(all(is.null(Inputs))==FALSE){
 
 if("Fish" %in% plot){
   if(all(is.null(Sdreport))==FALSE){
-    ylim <- c(0, max(Report$F_t)*1.1)
+    ylim <- c(0, max(Report$F_t)*2)
     if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
@@ -92,7 +92,7 @@ if("Fish" %in% plot){
 
   if(all(is.null(Report))==FALSE){
     plot(x=xY, y=Report$F_y, lwd=2, col="blue", ylim=ylim, type="l", xaxt="n", xaxs="i", yaxs="i", cex.axis=2, ylab="Fishing mortality", xlab="Year", cex.lab=2, xlim=c(min(xY),max(xY)+1))
-    points(x=xLC, y=Report$F_y[xLC], col="blue", pch=19, xpd=NA, cex=2)
+    points(x=xLC, y=Report$F_y[xLC], col="blue", pch=19, cex=2)
     if(all(is.na(Sdreport))==FALSE){
       polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)  
     }
@@ -106,7 +106,7 @@ if("Fish" %in% plot){
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
     par(new=TRUE)
     xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="", ylab="", ylim=ylim, xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, xpd=NA, cex=2, xlim=c(min(xY),max(xY)+1))
+    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="", ylab="", ylim=ylim, xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)+1))
     index <- which(is.na(LBSPR$FM_Var)==FALSE)
     ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$FM_Var[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$FM_Var[index[x]]), lwd=4, col=rgb(1,0,0,alpha=0.4)))
     # lines(x=xxLC, y=LBSPR$Smooth[,"FM"]*(lh$M*lh$nseasons), lwd=2, col="red")
@@ -114,7 +114,7 @@ if("Fish" %in% plot){
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))){
     xxLC <- which(true_years %in% LBSPR$years)
     ylim <- c(0, max(LBSPR$FM*(lh$M*lh$nseasons))*1.5)
-    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="Year", ylab="Fishing mortality", cex.lab=2, ylim=ylim, xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, xpd=NA, cex=2, xlim=c(min(xY),max(xY)+1))
+    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="Year", ylab="Fishing mortality", cex.lab=2, ylim=ylim, xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)+1))
     index <- which(is.na(LBSPR$FM_Var)==FALSE)
     ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$FM_Var[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$FM_Var[index[x]]), lwd=4, col=rgb(1,0,0,alpha=0.4)))
     axis(2, cex.axis=2)
@@ -130,7 +130,7 @@ if("Rec" %in% plot){
   }
   ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
   plot(x=seq_along(all_years), y=Report$R_t, lwd=2, col="blue", ylim=c(0, max(Report$R_t)*1.5), type="l", xaxt="n", ylab="Recruitment", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
-  points(x=which(all_years %in% lc_years), y=Report$R_t[which(all_years %in% lc_years)], col="blue", pch=19, xpd=NA, cex=2)
+  points(x=which(all_years %in% lc_years), y=Report$R_t[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
   if(all(is.na(Sdreport))==FALSE){
     polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
   }
@@ -144,7 +144,7 @@ if("Rec" %in% plot){
 if("SPR" %in% plot){
   if(all(is.null(Report))==FALSE){
     plot(x=seq_along(all_years), y=Report$SPR_t, lwd=2, col="blue", ylim=c(0, 1), type="l", xaxt="n", ylab="SPR", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
-    points(x=which(all_years %in% lc_years), y=Report$SPR_t[which(all_years%in%lc_years)], col="blue", pch=19, xpd=NA, cex=2)
+    points(x=which(all_years %in% lc_years), y=Report$SPR_t[which(all_years%in%lc_years)], col="blue", pch=19, cex=2)
   }
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
@@ -160,14 +160,14 @@ if("SPR" %in% plot){
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
     par(new=TRUE)
     xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="", ylab="", ylim=c(0,1), xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, xpd=NA, cex=2, xlim=c(min(xY),max(xY)+1))
+    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="", ylab="", ylim=c(0,1), xaxt="n", yaxt="n", lwd=2, col="red", type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)+1))
     index <- which(is.na(LBSPR$SPR_Var)==FALSE)
     ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$SPR_Var[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$SPR_Var[index[x]]), lwd=4, col=rgb(1,0,0,alpha=0.4)))
     lines(x=xxLC, y=LBSPR$Smooth[,"SPR"], lwd=2, col="red")
   }
   if(all(is.null(Report))){
     xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="Year", ylab="SPR", ylim=c(0,1), xaxt="n", cex.axis=2, lwd=2, col="red", type="p", pch=19, xpd=NA, cex=2, xlim=c(min(xY),max(xY)+1), cex.lab=2)
+    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="Year", ylab="SPR", ylim=c(0,1), xaxt="n", cex.axis=2, lwd=2, col="red", type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)+1), cex.lab=2)
     index <- which(is.na(LBSPR$SPR_Var)==FALSE)
     ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$SPR_Var[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$SPR_Var[index[x]]), lwd=4, col=rgb(1,0,0,alpha=0.4)))
     lines(x=xxLC, y=LBSPR$Smooth[,"SPR"], lwd=2, col="red")    
@@ -182,7 +182,7 @@ if("ML" %in% plot){
   plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col="blue", ylim=c(0, max(Report$L_t_hat)*1.5), type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
   ML_obs <- sapply(1:nrow(Inputs$Data$LF), function(x) sum(Inputs$Data$LF[x,]*Inputs$Data$lbmids)/sum(Inputs$Data$LF[x,]))
   points(x=which(all_years %in% lc_years), y=ML_obs, pch=17, cex=2)
-  points(x=which(all_years %in% lc_years), y=Report$L_t_hat[which(all_years %in% lc_years)], col="blue", pch=19, xpd=NA, cex=2)
+  points(x=which(all_years %in% lc_years), y=Report$L_t_hat[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
   if(all(is.na(Sdreport))==FALSE){
   sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="L_t_hat"),]
   sd[,2][which(is.na(sd[,2]))] <- 0
@@ -202,7 +202,7 @@ if("SB" %in% plot){
   }
   ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
   plot(x=seq_along(all_years), y=Report$D_t, lwd=2, col="blue", ylim=c(0, max(Report$D_t)*1.5), type="l", xaxt="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
-  points(x=which(all_years %in% lc_years), y=Report$D_t[which(all_years %in% lc_years)], col="blue", pch=19, xpd=NA, cex=2)
+  points(x=which(all_years %in% lc_years), y=Report$D_t[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
   if(all(is.na(Sdreport))==FALSE){
     polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
   }
