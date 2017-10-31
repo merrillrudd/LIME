@@ -33,6 +33,7 @@ plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=
           LBSPR_outs$SL50_Var <- LBSPR@Vars[,"SL50"]
           LBSPR_outs$SL95_Var <- LBSPR@Vars[,"SL95"]
           LBSPR_outs$FM_Var <- LBSPR@Vars[,"FM"]
+          LBSPR_outs$years <- LBSPR@Years
 
           LBSPR <- LBSPR_outs
         }
