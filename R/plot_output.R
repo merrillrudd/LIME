@@ -21,7 +21,7 @@
 #' @export
 plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex")){
 
-    if(is.null(LBPSR)==FALSE){
+    if(is.null(LBSPR)==FALSE){
         if(isS4(LBSPR)){
           LBSPR_outs <- list()
           LBSPR_outs$pLF <- LBSPR@pLCatch
