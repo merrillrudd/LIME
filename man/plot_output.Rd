@@ -6,7 +6,8 @@
 \usage{
 plot_output(all_years, lc_years, Inputs = NULL, Report = NULL,
   Sdreport = NULL, LBSPR = NULL, lh, true_years, True = NULL,
-  plot = c("Fish", "Rec", "SPR", "ML", "SB", "Selex"))
+  plot = c("Fish", "Rec", "SPR", "ML", "SB", "Selex"), set_ylim = list(Fish
+  = c(0, 1), SPR = c(0, 1)))
 }
 \arguments{
 \item{all_years}{vector of all years modeled}
@@ -28,6 +29,8 @@ plot_output(all_years, lc_years, Inputs = NULL, Report = NULL,
 \item{True}{default=NULL, possible to specify true list from generated data if simulation}
 
 \item{plot}{options for plotting include "Fish"=fishing mortality, "Rec"=recruitment (LIME only), "SPR"=spawning potential ratio, "ML"=mean length (including observed values; LIME only), "SB"=spawning biomass (LIME only), "Selex"=selectivity-at-length}
+
+\item{ylim}{list to set ylim for each of the 'plot' arguments}
 }
 \value{
 figure with length composition data and model fits if Report or LBSPR are specified

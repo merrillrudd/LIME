@@ -13,13 +13,14 @@
 #' @param true_years vector of true years (in case all_years and lc_years are 1:20 instead of 1998:2017)
 #' @param True default=NULL, possible to specify true list from generated data if simulation
 #' @param plot options for plotting include "Fish"=fishing mortality, "Rec"=recruitment (LIME only), "SPR"=spawning potential ratio, "ML"=mean length (including observed values; LIME only), "SB"=spawning biomass (LIME only), "Selex"=selectivity-at-length
+#' @param ylim list to set ylim for each of the 'plot' arguments
 #' @importFrom graphics points polygon segments
 #' @importFrom grDevices rgb
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex")){
+plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1))){
 
     if(is.null(LBSPR)==FALSE){
         if(isS4(LBSPR)){
@@ -82,7 +83,8 @@ if(all(is.null(Inputs))==FALSE){
 
 if("Fish" %in% plot){
   if(all(is.null(Sdreport))==FALSE){
-    ylim <- c(0, max(Report$F_t)*2)
+    if("Fish" %in% set_ylim ==FALSE) ylim <- c(0, max(Report$F_t)*2)
+    if("Fish" %in% set_ylim) ylim <- set_ylim[["Fish"]]
     if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
@@ -128,7 +130,9 @@ if("Rec" %in% plot){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lR_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
   }
-  ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
+  if("Rec" %in% set_ylim == FALSE) ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
+  if("Rec" %in% set_ylim) ylim <- set_ylim[["Rec"]]
+
   plot(x=seq_along(all_years), y=Report$R_t, lwd=2, col="blue", ylim=c(0, max(Report$R_t)*1.5), type="l", xaxt="n", ylab="Recruitment", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
   points(x=which(all_years %in% lc_years), y=Report$R_t[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
   if(all(is.na(Sdreport))==FALSE){
@@ -143,6 +147,8 @@ if("Rec" %in% plot){
 
 if("SPR" %in% plot){
   if(all(is.null(Report))==FALSE){
+  if("SPR" %in% set_ylim == FALSE) ylim <- c(0,1)
+  if("SPR" %in% set_ylim) ylim <- set_ylim[["SPR"]]
     plot(x=seq_along(all_years), y=Report$SPR_t, lwd=2, col="blue", ylim=c(0, 1), type="l", xaxt="n", ylab="SPR", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
     points(x=which(all_years %in% lc_years), y=Report$SPR_t[which(all_years%in%lc_years)], col="blue", pch=19, cex=2)
   }
@@ -155,7 +161,7 @@ if("SPR" %in% plot){
   }
   if(all(is.null(True))==FALSE){
       par(new=TRUE)
-    plot(True$SPR_t, xaxs="i", yaxs="i", xlab="", ylab="", ylim=c(0, 1), xaxt="n", yaxt="n", lwd=2, type="l", xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
+    plot(True$SPR_t, xaxs="i", yaxs="i", xlab="", ylab="", ylim=ylim, xaxt="n", yaxt="n", lwd=2, type="l", xlim=c(min(seq_along(all_years)),max(seq_along(all_years))+lh$nseasons))
   }
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
     par(new=TRUE)
@@ -179,7 +185,11 @@ if("SPR" %in% plot){
 }
 
 if("ML" %in% plot){
-  plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col="blue", ylim=c(0, max(Report$L_t_hat)*1.5), type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
+
+  if("ML" %in% set_ylim == FALSE) ylim <- c(0, max(Report$L_t_hat)*1.5)
+  if("ML" %in% set_ylim) ylim <- set_ylim[["ML"]]
+
+  plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col="blue", ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
   ML_obs <- sapply(1:nrow(Inputs$Data$LF), function(x) sum(Inputs$Data$LF[x,]*Inputs$Data$lbmids)/sum(Inputs$Data$LF[x,]))
   points(x=which(all_years %in% lc_years), y=ML_obs, pch=17, cex=2)
   points(x=which(all_years %in% lc_years), y=Report$L_t_hat[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
@@ -200,8 +210,10 @@ if("SB" %in% plot){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lD_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
   }
-  ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
-  plot(x=seq_along(all_years), y=Report$D_t, lwd=2, col="blue", ylim=c(0, max(Report$D_t)*1.5), type="l", xaxt="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
+  if("SB" %in% set_ylim == FALSE) ylim <- c(0, max(Report$D_t)*1.5)
+  if("SB" %in% set_ylim) ylim <- set_ylim[["SB"]]
+
+  plot(x=seq_along(all_years), y=Report$D_t, lwd=2, col="blue", ylim=ylim, type="l", xaxt="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))+lh$nseasons))
   points(x=which(all_years %in% lc_years), y=Report$D_t[which(all_years %in% lc_years)], col="blue", pch=19, cex=2)
   if(all(is.na(Sdreport))==FALSE){
     polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
