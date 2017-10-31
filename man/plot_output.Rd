@@ -19,7 +19,7 @@ plot_output(all_years, lc_years, Inputs = NULL, Report = NULL,
 
 \item{Sdreport}{LIME standard error file}
 
-\item{LBSPR}{LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL}
+\item{LBSPR}{LBSPR results - either straight from LBSPR output or LIME-edited}
 
 \item{lh}{life history list}
 

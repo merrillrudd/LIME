@@ -8,7 +8,7 @@
 #' @param Inputs LIME input file
 #' @param Report LIME report file
 #' @param Sdreport LIME standard error file
-#' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
+#' @param LBSPR LBSPR results - either straight from LBSPR output or LIME-edited
 #' @param lh life history list
 #' @param true_years vector of true years (in case all_years and lc_years are 1:20 instead of 1998:2017)
 #' @param True default=NULL, possible to specify true list from generated data if simulation
@@ -21,6 +21,22 @@
 #' @export
 plot_output <- function(all_years, lc_years, Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex")){
 
+    if(is.null(LBPSR)==FALSE){
+        if(isS4(LBSPR)){
+          LBSPR_outs <- list()
+          LBSPR_outs$pLF <- LBSPR@pLCatch
+          LBSPR_outs$SL50 <- LBSPR@Ests[,"SL50"]
+          LBSPR_outs$SL95 <- LBSPR@Ests[,"SL95"]
+          LBSPR_outs$FM <- LBSPR@Ests[,"FM"]
+          LBSPR_outs$SPR <- LBSPR@Ests[,"SPR"]
+          LBSPR_outs$SPR_Var <- LBSPR@Vars[,"SPR"]
+          LBSPR_outs$SL50_Var <- LBSPR@Vars[,"SL50"]
+          LBSPR_outs$SL95_Var <- LBSPR@Vars[,"SL95"]
+          LBSPR_outs$FM_Var <- LBSPR@Vars[,"FM"]
+
+          LBSPR <- LBSPR_outs
+        }
+    }
 
 if(length(plot)==1) dim <- c(1,1)
 if(length(plot)==2) dim <- c(2,1)

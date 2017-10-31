@@ -10,8 +10,8 @@ Description: A flexible stock assessment method for fisheries with developing
     recruitment.
 License: MIT + file LICENSE
 Depends:
-  TMB,
-  TMBhelper
+    TMB,
+    TMBhelper
 LinkingTo: TMB
 RoxygenNote: 5.0.1
 LazyData: true
