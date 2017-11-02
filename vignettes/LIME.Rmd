@@ -1,16 +1,18 @@
 ---
-title: "LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment"
+title: 'LIME: An R package for simulation and estimation using length data to account
+  for variable fishing mortality and recruitment'
 author: "Merrill Rudd"
-date: "`r Sys.Date()`"
-output: 
-  html_document:
-    number_sections: true
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    number_sections: yes
     toc: yes
-    toc_float: true
-vignette: >
-  %\VignetteIndexEntry{LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+vignette: |
+  %\VignetteIndexEntry{LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
@@ -34,15 +36,20 @@ You can install the development version of the package from GitHub using the `de
 ```{r, eval=FALSE}
 install.packages("devtools", repos='http://cran.us.r-project.org')
 ```
-```{r, eval=FALSE}
-devtools::install_github("merrillrudd/LIME")
-```
 
+Before installing LIME, make sure you have two TMB-related packages. The first is the `TMB` package itself. I recommend the development version from github, installed by cloning/downloading and unzipping the repository at https://github.com/kaskr/adcomp, then type `make` in the command prompt open at the adcomp directory. 
 
-LIME also requires the package `TMBhelper`, which is not currently available on CRAN. You'll need to make sure this package is installed as well:
+The second required package is `TMBhelper`:
 ```{r, eval=FALSE}
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 ```
+
+
+With `TMB` and `TMBhelper` installed, you should now be ready to install LIME:
+```{r, eval=FALSE}
+devtools::install_github("merrillrudd/LIME")
+```
+The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then re-run the above code to install LIME. 
 
 ## Load the Package
 ```{r, message=FALSE}
