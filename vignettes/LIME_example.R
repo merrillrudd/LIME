@@ -119,7 +119,8 @@ plot_output(all_years=1:20,
 			lh=lh, 
 			true_years=1998:2017, 
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"))
+			plot=c("Fish","Rec","SPR","Selex"),
+			set_ylim=list("Fish"=c(0,2)))
 
 
 
@@ -174,7 +175,8 @@ plot_output(all_years=1:20,
 			lh=lh, 
 			true_years=1998:2017, 
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"))
+			plot=c("Fish","Rec","SPR","Selex"),
+			set_ylim=list("Fish"=c(0,2)))
 
 
 ## length comp + catch
@@ -216,7 +218,8 @@ plot_output(all_years=1:20,
 			lh=lh, 
 			true_years=1998:2017, 
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"))
+			plot=c("Fish","Rec","SPR","Selex"),
+			set_ylim=list("Fish"=c(0,2)))
 
 
 ## length comp + index
@@ -256,4 +259,5 @@ plot_output(all_years=1:20,
 			lh=lh, 
 			true_years=1998:2017, 
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"))
+			plot=c("Fish","Rec","SPR","Selex"),
+			set_ylim=list("Fish"=c(0,2)))
