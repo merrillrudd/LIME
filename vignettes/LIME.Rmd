@@ -31,9 +31,12 @@ Finally, please make sure you understand the data and the biological parameters 
 install.packages("devtools", repos='http://cran.us.r-project.org')
 ```
 
-2) Follow the steps to install TMB
+2) Follow the steps to install TMB:
+
 Windows: https://github.com/kaskr/adcomp/wiki/Windows-installation
+
 Linux: https://github.com/kaskr/adcomp (See README)
+
 Mac: should be the same as Linux, please see contact info under Bug Reports if that doesn't work.
 
 3) Install required package `TMBhelper`:
