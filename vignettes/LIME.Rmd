@@ -1,18 +1,12 @@
 ---
-title: 'LIME: An R package for simulation and estimation using length data to account
-  for variable fishing mortality and recruitment'
+title: 'LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment'
 author: "Merrill Rudd"
 date: '`r Sys.Date()`'
-output:
-  pdf_document:
-    number_sections: yes
-    toc: yes
-  html_document:
-    number_sections: yes
-    toc: yes
-    toc_float: yes
-vignette: |
-  %\VignetteIndexEntry{LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
@@ -25,31 +19,35 @@ See Rudd and Thorson (2017) in the reference list for full details of the model,
 ## Bug Reports
 Please alert me to any bugs or issues by using [GitHub](https://github.com/merrillrudd/LIME/issues).
 
-Comments and suggestions for additional features are welcome and we can discuss via email  at mbrudd@uw.edu. [GitHub pull requests](https://github.com/merrillrudd/LIME/pulls) are also welcome.
+Comments and suggestions for additional features are welcome and we can discuss via email  at mbrudd@uw.edu.
 
 Finally, please make sure you understand the data and the biological parameters (and how the model treats these) and critically evaluate any output of LIME. 
 
 # First Steps
 
 ## Installing the Package
-You can install the development version of the package from GitHub using the `devtools` package:
+1) `devtools`: You can install the development version of the package from GitHub using the `devtools` package:
 ```{r, eval=FALSE}
 install.packages("devtools", repos='http://cran.us.r-project.org')
 ```
 
-Before installing LIME, make sure you have two TMB-related packages. The first is the `TMB` package itself. I recommend the development version from github, installed by cloning/downloading and unzipping the repository at https://github.com/kaskr/adcomp, then type `make` in the command prompt open at the adcomp directory. 
+2) Follow the steps to install TMB
+Windows: https://github.com/kaskr/adcomp/wiki/Windows-installation
+Linux: https://github.com/kaskr/adcomp (See README)
+Mac: should be the same as Linux, please see contact info under Bug Reports if that doesn't work.
 
-The second required package is `TMBhelper`:
+3) Install required package `TMBhelper`:
 ```{r, eval=FALSE}
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 ```
 
 
-With `TMB` and `TMBhelper` installed, you should now be ready to install LIME:
+4) Install LIME:
 ```{r, eval=FALSE}
 devtools::install_github("merrillrudd/LIME")
 ```
-The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then re-run the above code to install LIME. 
+
+The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then start from the step that produced the error. Again, please use the contact info in Bug Reports if this doesn't work, as you may have discovered a new installation error... congratulations!
 
 ## Load the Package
 ```{r, message=FALSE}

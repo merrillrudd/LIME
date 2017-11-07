@@ -113,7 +113,7 @@ plot_LCfits <- function(Inputs, Inputs2=NULL, Inputs3=NULL, Inputs4=NULL, Report
 			if(length(SL50)>1) abline(v=SL50[i], lty=2, lwd=2)
 		}
 		if(all(is.null(ML50))==FALSE) abline(v=ML50, col="orange", lty=2, lwd=2)
-		if(n==TRUE) print.letter(xy=c(0.15,0.9), paste0("n = ", sum(Inputs$LF[i,])), cex=2)
+		if(n==TRUE) print_letter(xy=c(0.15,0.9), paste0("n = ", sum(Inputs$LF[i,])), cex=2)
 	}
 	mtext(side=1, "Length bin (cm)", outer=TRUE, line=4, cex=1.5)
 	mtext(side=2, "Proportion", outer=TRUE, line=5, cex=1.5)

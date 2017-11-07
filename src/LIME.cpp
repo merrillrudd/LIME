@@ -11,7 +11,8 @@
 //   2) annual F as fixed effect
 //   3) annual R as random effect 
 
-# include <TMB.hpp>
+#define TMB_LIB_INIT R_init_LIME
+#include <TMB.hpp>
 
 // dlnorm
 template<class Type>

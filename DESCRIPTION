@@ -12,10 +12,12 @@ License: MIT + file LICENSE
 Depends:
     TMB,
     TMBhelper
-LinkingTo: TMB
+LinkingTo: TMB, RcppEigen
 RoxygenNote: 5.0.1
 LazyData: true
 Suggests:
     testthat,
-    rmarkdown
-VignetteBuilder: rmarkdown
+    rmarkdown,
+    knitr
+VignetteBuilder: rmarkdown,
+    knitr
