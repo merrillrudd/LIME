@@ -27,6 +27,7 @@ plot_LCfits <- function(Inputs, Inputs2=NULL, Inputs3=NULL, Inputs4=NULL, Report
 	obs <- Inputs$LF
 	lbhighs <- colnames(obs)
 	lc_years <- rownames(obs)
+	if(all(is.null(true_lc_years))) true_lc_years <- lc_years
 
 	if(all(is.null(Inputs2))==FALSE){
 		obs2 <- Inputs2$LF
@@ -80,16 +81,22 @@ plot_LCfits <- function(Inputs, Inputs2=NULL, Inputs3=NULL, Inputs4=NULL, Report
 		lines(pred2[which(lc_years==yr),], col="red", lwd=4)
 		box()
 		if(all(is.null(Inputs2))==FALSE){
-			par(new=TRUE)
-			barplot(as.numeric(obs2[which(lc_years2==yr),]/sum(obs2[which(lc_years2==yr),])), border=NA, space=0, col="#DD000050", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			if(yr %in% lc_years2){
+				par(new=TRUE)
+				barplot(as.numeric(obs2[which(lc_years2==yr),]/sum(obs2[which(lc_years2==yr),])), border=NA, space=0, col="#DD000050", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			}
 		}
 		if(all(is.null(Inputs3))==FALSE){
-			par(new=TRUE)
-			barplot(as.numeric(obs3[which(lc_years2==yr),]/sum(obs3[which(lc_years2==yr),])), border=NA, space=0, col="#0000DD50", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			if(yr %in% lc_years3){
+				par(new=TRUE)
+				barplot(as.numeric(obs3[which(lc_years3==yr),]/sum(obs3[which(lc_years3==yr),])), border=NA, space=0, col="#0000DD50", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			}
 		}
 		if(all(is.null(Inputs4))==FALSE){
-			par(new=TRUE)
-			barplot(as.numeric(obs4[which(lc_years2==yr),]/sum(obs4[which(lc_years2==yr),])), border=NA, space=0, col="#00DD0050", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			if(yr %in% lc_years4){
+				par(new=TRUE)
+				barplot(as.numeric(obs4[which(lc_years2==yr),]/sum(obs4[which(lc_years2==yr),])), border=NA, space=0, col="#00DD0050", xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+			}
 		}
 
 		xlabs <- pretty(seq_along(lbhighs))
