@@ -6,7 +6,7 @@
 \usage{
 generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
   Nyears_comp, comp_sample, rewrite = TRUE, mismatch = FALSE, init_depl,
-  derive_quants = FALSE)
+  derive_quants = FALSE, nburn = 50)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -34,6 +34,8 @@ generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
 \item{init_depl}{default=0.4, can specify a different value or 2 values that indicate range from which to choose them}
 
 \item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
+
+\item{nburn}{number of years burn-in for operating model, default=50}
 }
 \value{
 print how many iterations were written into the model directory
