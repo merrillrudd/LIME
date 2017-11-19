@@ -167,6 +167,7 @@ The `generate_data` function has several settings for which the user is required
  - `Nyears_comp`: number of years to generate length data; e.g. if 10 years and `Nyears` is 20 years, will be the last 10 years in the 20 year time series.
  - `comp_sample`: nominal sample size of length data annually; e.g. 200 length measurements collected annually.
  - `init_depl`: initial depletion, or the proportion of the unfished population biomass in the first year of the population to be modeled. Specifying a single value indicates the initial depletion (e.g. 0.5) or two values indicates the lower and upper bounds of a uniform distribution for which the population simulation will randomly draw a depletion value (e.g. c(0.1,0.9)).
+ -  `seed`: set a seed for random numbers for generating process deviations.
  
 There are also several other settings not required but may be useful:
 
@@ -188,7 +189,8 @@ true <- generate_data(modpath=NULL,
                       Nyears=20,
                       Nyears_comp=20,
                       comp_sample=200,
-                      init_depl=0.8)
+                      init_depl=0.8,
+                      seed=1)
 ```
 
 ### Plot the simulated population
