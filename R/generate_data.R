@@ -41,18 +41,18 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=seed, mismatch=mismatch)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=seed[itervec[iter]], mismatch=mismatch)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
         DataList <- NA
         add <- 0
         while(all(is.na(DataList))){
-            seed_init <- seed + 1000 + add
+            seed_init <- seed[itervec[iter]] + 1000 + add
             set.seed(seed_init)
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=seed, mismatch=mismatch), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=seed[itervec[iter]], mismatch=mismatch), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }
