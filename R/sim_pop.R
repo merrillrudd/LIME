@@ -495,6 +495,7 @@ sim_pop <-
       D_tout <- D_t[-c(1:nburn_real)]
       F_tout <- F_t[-c(1:nburn_real)]
       SPR_tout <- SPR_t[-c(1:nburn_real)]
+      Z_tout <- Z_t[-c(1:nburn_real)]
 
       LFout <- LFout[LFindex,]
       LF0out <- LF0out[LFindex,]
@@ -538,7 +539,7 @@ sim_pop <-
       lh$VB_t <- VB_tout
       lh$TB_t <- TB_tout
       lh$nlbins <- length(mids)
-      lh$Z_t <- Z_t
+      lh$Z_t <- Z_tout
       if (pool == TRUE) {
         lh$Nyears <- Nyears_real
         lh$years <- 1:Nyears_real
