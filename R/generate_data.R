@@ -5,7 +5,7 @@
 #' @author M.B. Rudd
 #' @param modpath directory to save generated data
 #' @param itervec number of iterations of data to generate
-#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None
+#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None. Input number to project forward using a specific F.
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param lh list of life history information to feed to population simulation function, output from create_lh_list
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? default=TRUE, FALSE will generate shorter time step life history info, mean length
@@ -23,7 +23,7 @@
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed){
+generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed, rule=FALSE){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
