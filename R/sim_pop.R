@@ -379,7 +379,7 @@ sim_pop <-
       VB_t <- VB_t[which(1:tyears %% nseasons == 0)]
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
 
-      I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
+      I_t <- qcoef * TB_t * exp(IndexDev)
       Cn_t <- sapply(1:tyears_only, function(x) {
         if (nseasons == 1)
           time_index <- x
