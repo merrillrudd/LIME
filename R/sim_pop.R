@@ -138,7 +138,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_a = S_a,
-            ref = 0.2
+            ref = 0.05
           )$root,
           error = function(e)
             NA
@@ -251,6 +251,8 @@ sim_pop <-
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
       F_t[1] <- getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1])
+      F_t[1] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
+
       Cn_at[, 1] <-
         N_at[, 1] * (1 - exp(-M - F_t[1] * S_a)) * (F_t[1] * S_a) / (M + F_t[1] * S_a)
       Z_t[1] <- mean(M + F_t[1] * S_a, na.rm = T)
@@ -301,9 +303,7 @@ sim_pop <-
             (4 * h_use * R0 * SB_t[y - 1] / (SB0 * (1 - h_use) + SB_t[y - 1] * (5 *
                                                                                   h_use - 1))) / nseasons * exp(RecDev[y])
         }
-        if(is.numeric(Fdynamics) & mgt_type=="catch"){
-          F_t[y] <- getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y-1])
-        }
+
 
         ## age-structured dynamics
         for (a in 1:length(L_a)) {
@@ -322,11 +322,18 @@ sim_pop <-
             N_at0[a, y] <-
               (N_at0[a - 1, y - 1] * exp(-M)) + (N_at0[a, y - 1] * exp(-M))
           }
+        }
 
           ## spawning biomass
           SB_t[y] <- sum((N_at[, y] * W_a * Mat_a))
           VB_t[y] <- sum(N_at[, y] * W_a * S_a)
           TB_t[y] <- sum(N_at[, y] * W_a)
+
+          if(is.numeric(Fdynamics) & mgt_type=="catch"){
+            F_t[y] <- getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y])
+            F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
+
+          }
 
           ## catch
           Cn_at[, y] <-
@@ -334,9 +341,7 @@ sim_pop <-
 
           Z_t[y] <- mean(M + F_t[y] * S_a, na.rm = T)
 
-          D_t <- SB_t / SB0
-
-        }
+          D_t[y] <- SB_t[y] / SB0
       }
 
       ## static SPR
