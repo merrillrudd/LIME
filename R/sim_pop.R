@@ -250,8 +250,11 @@ sim_pop <-
       VB_t[1] <- sum(N_at[, 1] * W_a * S_a)
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
-      F_t[1] <- getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1])
-      F_t[1] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
+
+      if(is.numeric(Fdynamics) & mgt_type=="catch"){
+        F_t[1] <- getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1])
+        F_t[1] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
+      }
 
       Cn_at[, 1] <-
         N_at[, 1] * (1 - exp(-M - F_t[1] * S_a)) * (F_t[1] * S_a) / (M + F_t[1] * S_a)
@@ -332,7 +335,6 @@ sim_pop <-
           if(is.numeric(Fdynamics) & mgt_type=="catch"){
             F_t[y] <- getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y])
             F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
-
           }
 
           ## catch
@@ -378,7 +380,7 @@ sim_pop <-
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
 
       I_t <- qcoef * TB_t #* exp(IndexDev - (SigmaI^2)/2)
-      C_t <- sapply(1:tyears_only, function(x) {
+      Cn_t <- sapply(1:tyears_only, function(x) {
         if (nseasons == 1)
           time_index <- x
         if (nseasons > 1)
@@ -499,9 +501,9 @@ sim_pop <-
       }
 
       I_tout <- I_t[-c(1:nburn_real)]
-      C_tout <- C_t[-c(1:nburn_real)]
+      Cn_tout <- Cn_t[-c(1:nburn_real)]
       Cw_tout <- Cw_t[-c(1:nburn_real)]
-      names(C_tout) <-
+      names(Cn_tout) <-
         names(Cw_tout) <- names(I_tout) <- 1:Nyears_real
       R_tout <- R_t[-c(1:nburn_real)]
       N_tout <- N_t[-c(1:nburn_real)]
@@ -535,8 +537,9 @@ sim_pop <-
 
       ## outputs
       lh$I_t <- I_tout[myrs]
-      lh$C_t <- C_tout[myrs]
+      lh$Cn_t <- Cn_tout[myrs]
       lh$Cw_t <- Cw_tout[myrs]
+      if(is.numeric(Fdynamics) & mgt_type=="catch") lh$C_t <- C_t
       lh$LF <- LFout
       lh$LF0 <- LF0out
       lh$R_t <- R_tout

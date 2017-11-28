@@ -6,14 +6,14 @@
 \usage{
 generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
   Nyears_comp, comp_sample, rewrite = TRUE, mismatch = FALSE, init_depl,
-  derive_quants = FALSE, nburn = 50, seed)
+  derive_quants = FALSE, nburn = 50, seed, mgt_type = "F")
 }
 \arguments{
 \item{modpath}{directory to save generated data}
 
 \item{itervec}{number of iterations of data to generate}
 
-\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None}
+\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None. Input number to project forward using a specific F.}
 
 \item{Rdynamics}{Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH}
 
@@ -38,6 +38,8 @@ generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
 \item{nburn}{number of years burn-in for operating model, default=50}
 
 \item{seed}{single seed or vector of seeds for each iteration}
+
+\item{mgt_type}{removals based on F (default) or catch}
 }
 \value{
 print how many iterations were written into the model directory

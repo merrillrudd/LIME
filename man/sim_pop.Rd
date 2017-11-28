@@ -5,7 +5,7 @@
 \title{Operating model}
 \usage{
 sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
-  init_depl, nburn, seed, mismatch, sample_type = "catch")
+  init_depl, nburn, seed, mismatch, sample_type = "catch", mgt_type = "F")
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
@@ -14,7 +14,7 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 
 \item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length}
 
-\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None}
+\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None. Input number to project forward using a specific F.}
 
 \item{Rdynamics}{Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH}
 
@@ -31,6 +31,8 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 \item{mismatch}{if TRUE, catch and index overlap with length comp only 1 year}
 
 \item{sample_type}{a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population}
+
+\item{mgt_type}{removals based on F (default) or catch}
 }
 \value{
 named list of attributes of true population/data
