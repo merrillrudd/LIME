@@ -169,7 +169,7 @@ sim_pop <-
       if (Fdynamics == "4010")
         F_t <- rep(NA, tyears)
       if(is.numeric(Fdynamics)) 
-        F_t <- rep(Fdynamics, tyears)
+        F_t <- rep(Fdynamics, tyears) * exp(FishDev)
 
       if (Rdynamics == "Pulsed")
         Rpulse_t <- c(
