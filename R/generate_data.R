@@ -18,12 +18,13 @@
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @param nburn number of years burn-in for operating model, default=50
 #' @param seed single seed or vector of seeds for each iteration
+#' @param mgt_type removals based on F (default) or catch
 #' @importFrom stats runif
 #' @importFrom TMB MakeADFun
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed, rule=FALSE){
+generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed, mgt_type="F"){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
@@ -41,7 +42,7 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=seed, mismatch=mismatch)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=seed, mismatch=mismatch, mgt_type=mgt_type)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){

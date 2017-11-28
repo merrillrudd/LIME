@@ -15,6 +15,7 @@
 #' @param seed set seed for generating stochastic time series
 #' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
+#' @param mgt_type removals based on F (default) or catch
 #' @importFrom stats rnorm
 #' @return named list of attributes of true population/data
 #' @export
@@ -30,7 +31,8 @@ sim_pop <-
            nburn,
            seed,
            mismatch,
-           sample_type = 'catch') {
+           sample_type = 'catch',
+           mgt_type = 'F') {
     ## SB_t = spawning biomass over time
     ## F_t = fishing mortality over time
     ## Cn_at = number of individuals that die from fishing mortality
@@ -168,8 +170,12 @@ sim_pop <-
         F_t <- rep(0, tyears)
       if (Fdynamics == "4010")
         F_t <- rep(NA, tyears)
-      if(is.numeric(Fdynamics)) 
+      if(is.numeric(Fdynamics) & mgt_type == "F") 
         F_t <- rep(Fdynamics, tyears) * exp(FishDev)
+      if(is.numeric(Fdynamics) & mgt_type == "catch"){
+        C_t <- rep(Fdynamics, tyears) * exp(FishDev)
+        F_t[1] <- F1
+      }
 
       if (Rdynamics == "Pulsed")
         Rpulse_t <- c(
@@ -244,8 +250,10 @@ sim_pop <-
       VB_t[1] <- sum(N_at[, 1] * W_a * S_a)
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
+      F_t[1] <- getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1])
       Cn_at[, 1] <-
         N_at[, 1] * (1 - exp(-M - F_t[1] * S_a)) * (F_t[1] * S_a) / (M + F_t[1] * S_a)
+      Z_t[1] <- mean(M + F_t[1] * S_a, na.rm = T)
 
       ##########################
       ## Projection
@@ -293,6 +301,9 @@ sim_pop <-
             (4 * h_use * R0 * SB_t[y - 1] / (SB0 * (1 - h_use) + SB_t[y - 1] * (5 *
                                                                                   h_use - 1))) / nseasons * exp(RecDev[y])
         }
+        if(is.numeric(Fdynamics) & mgt_type=="catch"){
+          F_t[y] <- getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y-1])
+        }
 
         ## age-structured dynamics
         for (a in 1:length(L_a)) {
@@ -325,7 +336,6 @@ sim_pop <-
 
           D_t <- SB_t / SB0
 
-
         }
       }
 
@@ -351,8 +361,7 @@ sim_pop <-
         (1 - P ^ (x / (M / vbk))) * linf # length at relative age
       rLens <- EL / linf # relative length
       SPR_alt <-
-        sum(Mat_a * rowSums(N_at) * rLens ^ 3) / sum(Mat_a * rowSums(N_at0) * rLens ^
-                                                       3)
+        sum(Mat_a * rowSums(N_at) * rLens ^ 3) / sum(Mat_a * rowSums(N_at0) * rLens ^ 3)
 
       Cn_t <- colSums(Cn_at)
       Cw_t <- colSums(Cn_at * W_a)
