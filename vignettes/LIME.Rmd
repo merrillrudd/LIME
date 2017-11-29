@@ -47,7 +47,7 @@ devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 
 4) Install LIME:
 ```{r, eval=FALSE}
-devtools::install_github("merrillrudd/LIME")
+devtools::install_github("merrillrudd/LIME", build_vignettes=TRUE)
 ```
 
 The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then start from the step that produced the error. Again, please use the contact info in Bug Reports if this doesn't work, as you may have discovered a new installation error... congratulations!
