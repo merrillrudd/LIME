@@ -2,7 +2,13 @@
 title: 'LIME: An R package for simulation and estimation using length data to account for variable fishing mortality and recruitment'
 author: "Merrill Rudd"
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
+output:
+  html_document:
+    toc: true
+    toc_float: true
+  pdf_document:
+    toc: true
+        
 vignette: >
   %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment}
   %\VignetteEngine{knitr::rmarkdown}

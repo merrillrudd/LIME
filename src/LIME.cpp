@@ -503,7 +503,9 @@ Type objective_function<Type>::operator() ()
       lTB_t(t) = log(TB_t_hat(t));
       lR_t(t) = log(R_t_hat(t));
       lF_t(t) = log(F_t(t));
-      lC_t(t) = log(C_t_hat(t));
+      if(C_opt==0) lC_t(t) = log(Cw_t_hat(t));
+      if(C_opt==1) lC_t(t) = log(C_t_hat(t));
+      if(C_opt==2) lC_t(t) = log(Cw_t_hat(t));
       lI_t(t) = log(I_t_hat(t));
       lD_t(t) = log(D_t(t));
     }
