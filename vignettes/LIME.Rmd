@@ -175,6 +175,7 @@ There are also several other settings not required but may be useful:
  - `derive_quants`: default=FALSE to save time, changing this argument to TRUE will calculate MSY-based reference points. 
  - `pool`: default=TRUE, meaning that if the number of seasons per year as specified in the `create_lh_list` function is more than 1, the length composition data collected in each time set is pooled together annually. `pool`=FALSE would mean the generated length composition data is on a time step shorter than 1 year (e.g. monthly if `nseasons`=12). The total sample size for the year will still be equal to `comp_sample`.
  - `mismatch`: default=FALSE, indicating that the length data, catch, and abundance index are all generated from the same years. `mismatch`=FALSE forces the length data to be collected in separate years from the catch and abundance index, overlapping only 1 year.
+ - `mgt_type`: relevant if using  the LIME package to project forward a harvest control rule. If `Fdynamics` is input as numeric, `mgt_type` specifies whether `Fdynamics` is the fishing mortality rate to project forward (`mgt_type`='F', default) or catch in weight (`mgt_type`="catch").
 
 Now let's use `generate_data` to simulate 1 example population (itervec=1) to generate length, catch, and an abundance index. We won't specify a `modpath` so the simulated population will just be used locally in this vignette.
 ```{r, echo=FALSE}
