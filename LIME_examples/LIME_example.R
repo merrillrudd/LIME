@@ -2,10 +2,10 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", build_vignettes=TRUE, dependencies=TRUE)
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
 library(LIME)
 
-devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dep=TRUE)
+devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
 library(TMBhelper)
 
 ##----------------------------------------------------------------
