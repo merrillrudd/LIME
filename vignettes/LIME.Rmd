@@ -10,7 +10,7 @@ output:
     toc: yes
     toc_float: yes
 vignette: |
-  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment} %\VignetteEngine{knitr::knitr} %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
