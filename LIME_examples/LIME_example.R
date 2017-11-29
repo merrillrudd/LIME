@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", build.vignettes=TRUE, dependencies=TRUE)
+devtools::install_github("merrillrudd/LIME", build_vignettes=TRUE, dependencies=TRUE)
 library(LIME)
 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dep=TRUE)
@@ -44,8 +44,8 @@ plot(lh$S_l, type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion
 ##----------------------------------------------------
 ## Step 2: Setup data input
 ## ---------------------------------------------------
-set.seed(143)
 ## Demonstrate data generation option
+## specify model path to save true population/generated data
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
 					  Fdynamics="Ramp",
@@ -54,7 +54,8 @@ true <- generate_data(modpath=NULL,
 					  Nyears=20,
 					  Nyears_comp=10,
 					  comp_sample=200,
-					  init_depl=0.8)
+					  init_depl=0.8,
+					  seed=143)
 
 ## Data input components
 years <- true$years ## total years to model, can be 1:20 or 1998:2017
@@ -72,7 +73,7 @@ plot_LCfits(Inputs=data_LF) ## "Inputs" argument just must be a list with "LF" a
 
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
-
+## specify model path to save results
 ## length comp only
 start <- Sys.time()
 res <- run_LIME(modpath=NULL,
@@ -104,11 +105,8 @@ Sdreport <- res$Sdreport
 plot_LCfits(Inputs=Inputs$Data, 
 			Report=Report,
 			true_lc_years=2008:2017, 
-			ylim=NULL, 
-			ML50=lh$ML50, 
-			SL50=Report$S50,
-			dim=c(5,2), 
-			n=FALSE)
+			ylim=c(0,0.15), 
+			dim=c(5,2))
 
 ## plot model output
 plot_output(all_years=1:20,
@@ -160,11 +158,8 @@ Sdreport <- res$Sdreport
 plot_LCfits(Inputs=Inputs$Data, 
 			Report=Report,
 			true_lc_years=2008:2017, 
-			ylim=NULL, 
-			ML50=lh$ML50, 
-			SL50=Report$S50,
-			dim=c(5,2), 
-			n=FALSE)
+			ylim=c(0,0.15), 
+			dim=c(5,2))
 
 ## plot model output
 plot_output(all_years=1:20,
@@ -206,8 +201,7 @@ plot_LCfits(Inputs=Inputs$Data,
 			ylim=NULL, 
 			ML50=lh$ML50, 
 			SL50=Report$S50,
-			dim=c(5,2), 
-			n=FALSE)
+			dim=c(5,2))
 
 ## plot model output
 plot_output(all_years=1:20,
@@ -247,8 +241,7 @@ plot_LCfits(Inputs=Inputs$Data,
 			ylim=NULL, 
 			ML50=lh$ML50, 
 			SL50=Report$S50,
-			dim=c(5,2), 
-			n=FALSE)
+			dim=c(5,2))
 
 ## plot model output
 plot_output(all_years=1:20,
