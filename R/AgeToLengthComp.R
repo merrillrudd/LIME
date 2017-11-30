@@ -53,9 +53,14 @@ AgeToLengthComp <-
       LF <- array(0, dim = dim(plb))
       rownames(LF) <- 1:tyears
       for (y in 1:tyears) {
-        LF[y, ] <- rmultinom(n = 1,
+        if(is.na(sum(plb[y,]))==FALSE){
+          LF[y, ] <- rmultinom(n = 1,
                              size = comp_sample[y],
                              prob = plb[y, ])
+        }
+        if(is.na(sum(plb[y,]))){
+          LF[y,] <- NA
+        }
       }
 
       Outs <- NULL
