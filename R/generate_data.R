@@ -70,7 +70,7 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
     if(derive_quants==TRUE){
         ## project the truth forward
         inits <- create_inputs(lh=lh, input_data=DataList)
-        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$F_t, LFdist=1, S_l_input=-1, randomR=TRUE)
+        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$F_t, LFdist=1, S_l_input=-1, randomR=TRUE, C_opt=2)
         ParList <- Inputs$Parameters    
 
         # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       

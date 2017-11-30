@@ -173,7 +173,7 @@ sim_pop <-
       if(is.numeric(Fdynamics) & mgt_type == "F") 
         F_t <- rep(Fdynamics, tyears) * exp(FishDev)
       if(is.numeric(Fdynamics) & mgt_type == "catch"){
-        C_t <- rep(Fdynamics, tyears) * exp(FishDev)
+        C_t <- rep(Fdynamics, tyears) * exp(CatchDev)
         F_t[1] <- F1
       }
 
@@ -252,7 +252,7 @@ sim_pop <-
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
 
       if(is.numeric(Fdynamics) & mgt_type=="catch"){
-        F_t[1] <- getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1])
+        F_t[1] <- max(0.01, getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1]))
         F_t[1] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
       }
 
@@ -274,7 +274,7 @@ sim_pop <-
       #             if(D_t[t-1] >= 0.40) F_t[t] <- F40 * exp(FishDev[t])
       #             if(D_t[t-1] >= 0.10 & D_t[t-1] < 0.40) F_t[t] <- ((F40/0.3)*D_t[t-1] - ((0.10*F40)/0.30)) * exp(FishDev[t])
       # }
-
+      ## static SPR
       for (y in 2:tyears) {
         ## fishing effort and recruitment, not dependent on age structure
         if (Fdynamics == "Endogenous") {
@@ -333,7 +333,7 @@ sim_pop <-
           TB_t[y] <- sum(N_at[, y] * W_a)
 
           if(is.numeric(Fdynamics) & mgt_type=="catch"){
-            F_t[y] <- getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y])
+            F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
             F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
           }
 
@@ -346,7 +346,7 @@ sim_pop <-
           D_t[y] <- SB_t[y] / SB0
       }
 
-      ## static SPR
+
       SPR_t <-
         sapply(1:length(F_t), function(x)
           calc_ref(
