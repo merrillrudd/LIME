@@ -334,7 +334,7 @@ sim_pop <-
 
           if(is.numeric(Fdynamics) & mgt_type=="catch"){
             F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
-            F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
+            # F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
           }
 
           ## catch
@@ -412,14 +412,49 @@ sim_pop <-
 
       ## age to length comp
       obs_per_year <- rep(comp_sample / nseasons, tyears)
-      LFinfo <-
-        AgeToLengthComp(
-          lh = lh,
-          tyears = tyears,
-          N_at = N_at,
-          comp_sample = obs_per_year,
-          sample_type = sample_type
-        )
+      if(is.na(SPR)==FALSE){
+        LFinfo <-
+          AgeToLengthComp(
+            lh = lh,
+            tyears = tyears,
+            N_at = N_at,
+            comp_sample = obs_per_year,
+            sample_type = sample_type
+          )      
+          plba <- LFinfo$plba
+          plb <- LFinfo$plb
+          page <- LFinfo$page
+          LF <- LFinfo$LF
+
+          if (pool == TRUE) {
+            LF_t <- matrix(NA, nrow = tyears_only, ncol = ncol(LF))
+            for (y in 1:tyears_only) {
+              if (nseasons == 1) {
+                LF_t[y,] <- LF[y,]
+                LF0_t[y,] <- LF0[y,]
+              }
+              if (nseasons > 1) {
+                time_index <- (1:nseasons) + ((y - 1) * nseasons)
+                LF_t[y,] <- colSums(LF[time_index,])
+                LF0_t[y,] <- colSums(LF0[time_index,])
+              }
+            }
+            obs_per_year <- sapply(1:tyears_only, function(x) {
+              if (nseasons == 1)
+                time_index <- x
+              if (nseasons > 1)
+                time_index <- (1:nseasons) + ((x - 1) * nseasons)
+              sum(obs_per_year[time_index])
+            })
+          }             
+
+          if (pool == FALSE) LF_t <- LF
+
+      }
+      if(is.na(SPR)){
+        LFinfo <- plba <- plb <- page <- LF <- LF_t <- NA
+      }
+
       LF0info <-
         AgeToLengthComp(
           lh = lh,
@@ -428,38 +463,25 @@ sim_pop <-
           comp_sample = obs_per_year,
           sample_type = sample_type
         )
-
-      plba <- LFinfo$plba
-      plb <- LFinfo$plb
-      page <- LFinfo$page
-      LF <- LFinfo$LF
       LF0 <- LF0info$LF
 
-      if (pool == TRUE) {
-        LF_t <- LF0_t <- matrix(NA, nrow = tyears_only, ncol = ncol(LF))
+      if(pool == TRUE){
+        LF0_t <- matrix(NA, nrow = tyears_only, ncol = length(mids))
         for (y in 1:tyears_only) {
           if (nseasons == 1) {
-            LF_t[y,] <- LF[y,]
             LF0_t[y,] <- LF0[y,]
           }
           if (nseasons > 1) {
             time_index <- (1:nseasons) + ((y - 1) * nseasons)
-            LF_t[y,] <- colSums(LF[time_index,])
             LF0_t[y,] <- colSums(LF0[time_index,])
           }
         }
-        obs_per_year <- sapply(1:tyears_only, function(x) {
-          if (nseasons == 1)
-            time_index <- x
-          if (nseasons > 1)
-            time_index <- (1:nseasons) + ((x - 1) * nseasons)
-          sum(obs_per_year[time_index])
-        })
       }
-      if (pool == FALSE) {
-        LF_t <- LF
-        LF0_t <- LF0
-      }
+      if(pool==FALSE) LF0_t <- LF0
+
+
+
+
 
 
 
@@ -480,8 +502,10 @@ sim_pop <-
       ########################################################
 
       if (pool == TRUE) {
-        LFout <- LF_t[-c(1:nburn_real),]
-        rownames(LFout) <- 1:Nyears_real
+        if(is.na(SPR)==FALSE){
+          LFout <- LF_t[-c(1:nburn_real),]
+          rownames(LFout) <- 1:Nyears_real
+        } else { LFout <- NA }
         LF0out <- LF0_t[-c(1:nburn_real),]
         rownames(LF0out) <- 1:Nyears_real
 
@@ -490,8 +514,10 @@ sim_pop <-
         LFindex <- (Nyears_real - Nyears_comp + 1):Nyears_real
       }
       if (pool == FALSE) {
-        LFout <- LF_t[-c(1:nburn),]
-        rownames(LFout) <- 1:Nyears
+        if(is.na(SPR)==FALSE){
+          LFout <- LF_t[-c(1:nburn),]
+          rownames(LFout) <- 1:Nyears
+        } else{ LFout <- NA }
         LF0out <- LF0_t[-c(1:nburn),]
         rownames(LF0out) <- 1:Nyears
 
@@ -515,7 +541,9 @@ sim_pop <-
       SPR_tout <- SPR_t[-c(1:nburn_real)]
       Z_tout <- Z_t[-c(1:nburn_real)]
 
-      LFout <- LFout[LFindex,]
+      if(is.na(SPR)==FALSE){
+        LFout <- LFout[LFindex,]
+      } else{ LFout <- NA }
       LF0out <- LF0out[LFindex,]
       if (is.vector(LFout) == FALSE)
         colnames(LFout) <- highs
