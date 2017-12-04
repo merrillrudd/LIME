@@ -282,7 +282,7 @@ sim_pop <-
             F_t[y] <- Finit
           if (y > nburn)
             F_t[y] <-
-              F_t[y - 1] * (SB_t[y - 1] / (Fequil * SB0)) ^ Frate * exp(FishDev[y])
+              F_t[y - 1] * (SB_t[y - 1] / (Fequil * SB0/2)) ^ Frate * exp(FishDev[y])
         }
         if (Fdynamics == "4010") {
           if (y <= nburn)
