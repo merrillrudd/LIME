@@ -51,7 +51,7 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
         DataList <- NA
         add <- 0
         while(all(is.na(DataList))){
-            seed_init <- iseed + 1000 + add
+            seed_init <- iseed + add
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
             DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=seed_init, mismatch=mismatch), error=function(e) NA)
