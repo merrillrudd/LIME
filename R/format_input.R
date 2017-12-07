@@ -24,7 +24,8 @@ format_input <- function(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma,
 
     with(input, {
 
-        if(C_opt==0 | C_opt==2) C_t <- Cw_t
+        if(C_opt==0) C_t <- as.matrix(0)
+        if(C_opt==2) C_t <- Cw_t
         if(C_opt==1) C_t <- Cn_t
 
         if(nseasons==1){
