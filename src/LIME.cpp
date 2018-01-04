@@ -486,7 +486,7 @@ Type objective_function<Type>::operator() ()
        R_t_hat(t) = R_t(t);
        SB_t_hat(t) = SB_t(t);
        TB_t_hat(t) = TB_t(t);
-       D_t(t) = SB_t_hat(t)/SB_t_hat(0);
+       D_t(t) = SB_t_hat(t)/SB0;
     }
 
     vector<Type> lN_t(n_t);
