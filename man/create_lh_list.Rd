@@ -9,7 +9,7 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   maturity_input = "length", selex_type = "logistic", dome_sd = NULL,
   binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.001,
   SigmaI = 0.001, SigmaR = 0.737, SigmaF = 0.2, R0 = 1, h = 1,
-  qcoef = 1e-05, M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.2,
+  qcoef = 1e-05, M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.5,
   Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, theta = 10,
   nseasons = 1)
 }
