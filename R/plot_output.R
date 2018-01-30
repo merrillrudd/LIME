@@ -309,7 +309,7 @@ if("Selex" %in% plot){
       # legend("bottomright", col=c(gray(0.3), "black", "black","black"), lwd=2, legend=c("LB-SPR", "SPR 40%", "SPR 30%"), cex=1.7, lty=c(1,2,3), pch=c(19,NA,NA))
     }
   }
-  if(all(is.null(True))==FALSE) lines(True$S_l[1,], lwd=2)
+  if(all(is.null(True))==FALSE) lines(True$S_l, lwd=2)
     axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
 }
 
