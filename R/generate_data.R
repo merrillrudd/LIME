@@ -24,7 +24,23 @@
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed, mgt_type="F"){
+generate_data <- 
+    function(modpath, 
+            itervec, 
+            Fdynamics, 
+            Rdynamics, 
+            lh, 
+            pool=TRUE, 
+            Nyears, 
+            Nyears_comp, 
+            comp_sample, 
+            rewrite=TRUE, 
+            mismatch=FALSE, 
+            init_depl, 
+            derive_quants=FALSE, 
+            nburn=50, 
+            seed, 
+            mgt_type="F"){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
