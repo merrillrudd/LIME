@@ -218,7 +218,7 @@ if("ML" %in% plot){
     }
     if(nf==1) cols <- "#228B22"
   for(f in 1:nf){
-    ML_obs <- sapply(1:nrow(Inputs$Data$LF_tbf[,,f]), function(x) sum(Inputs$Data$LF_tbf[x,,f]*Inputs$Data$lbmids)/sum(Inputs$Data$LF_tbf[x,,f]))
+    ML_obs <- sapply(1:nrow(Inputs$Data$LF), function(x) sum(Inputs$Data$LF[x,]*Inputs$Data$lbmids)/sum(Inputs$Data$LF[x,]))
 
     if(f==1)   plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))))
     if(f>1) lines(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f])
@@ -267,7 +267,7 @@ if("Selex" %in% plot){
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_fl"),]
+      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_l"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
     }
@@ -282,8 +282,8 @@ if("Selex" %in% plot){
     if(nf==1) cols <- "#228B22"
 
     for(f in 1:nf){
-      if(f==1) plot(x=1:length(mids), y=Report$S_fl[f,], lwd=2, col=cols[f], ylim=c(0, 1.1), type="l", xaxt="n", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
-      if(f>1) lines(x=1:length(mids), y=Report$S_fl[f,], lwd=2, col=cols[f])
+      if(f==1) plot(x=1:length(mids), y=Report$S_l, lwd=2, col=cols[f], ylim=c(0, 1.1), type="l", xaxt="n", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
+      if(f>1) lines(x=1:length(mids), y=Report$S_l, lwd=2, col=cols[f])
       if(all(is.na(Sdreport))==FALSE){
         index <- seq(f,nrow(sd),by=nf)
         polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"20"), border=NA)  
