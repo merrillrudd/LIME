@@ -10,7 +10,7 @@
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample sample size of length composition data annually
-#' @param init_depl initial depletion; if FALSE, will use F1 from lh list
+#' @param init_depl initial depletion on which to calculate F1; default = 0.99
 #' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series
 #' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
@@ -27,7 +27,7 @@ sim_pop <-
            Rdynamics,
            Nyears_comp,
            comp_sample,
-           init_depl,
+           init_depl=0.99,
            nburn,
            seed,
            mismatch,
@@ -106,10 +106,7 @@ sim_pop <-
           error = function(e)
             NA
         )
-      if (init_depl == FALSE)
-        Finit <- F1
-      if (init_depl != FALSE)
-        Finit <-
+      Finit <-
         tryCatch(
           uniroot(
             calc_ref,
@@ -174,7 +171,7 @@ sim_pop <-
         F_t <- rep(Fdynamics, tyears) * exp(FishDev)
       if(is.numeric(Fdynamics) & mgt_type == "catch"){
         C_t <- rep(Fdynamics, tyears) * exp(CatchDev)
-        F_t[1] <- F1
+        F_t[1] <- Finit
       }
 
       if (Rdynamics == "Pulsed")
