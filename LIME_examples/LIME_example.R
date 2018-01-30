@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE, build_vignettes=TRUE)
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
 library(LIME)
 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
@@ -65,7 +65,7 @@ LF <- true$LF ## length composition data, years along rows and length bin along 
 data_LF <- list("years"=years, "LF"=LF) ## length comp only
 
 ## plot length composition data
-plot_LCfits(Inputs=data_LF) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+plot_LCfits(LFlist=list("LF"=LF)) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ##----------------------------------------------------
 ## Step 3: Run Model
@@ -102,23 +102,19 @@ Sdreport <- res$Sdreport
 ## Step 4: Plot fits
 ## ---------------------------------------------------
 ## plot length composition data
-plot_LCfits(Inputs=Inputs$Data, 
+plot_LCfits(LFlist=list("LF"=LF), 
+			Inputs=Inputs, 
 			Report=Report,
-			true_lc_years=2008:2017, 
-			ylim=c(0,0.15), 
 			dim=c(5,2))
 
 ## plot model output
-plot_output(all_years=1:20,
-			lc_years=11:20, 
-			Inputs=Inputs, 
-			Report=Report, 
+plot_output(Inputs=Inputs, 
+			Report=Report,
 			Sdreport=Sdreport, 
-			lh=lh, 
-			true_years=1998:2017, 
+			lh=lh,
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"),
-			set_ylim=list("Fish"=c(0,2)))
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
 
 
 
@@ -155,23 +151,21 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(Inputs=Inputs$Data, 
+plot_LCfits(LFlist=list("LF"=LF), 
+			Inputs=Inputs, 
 			Report=Report,
-			true_lc_years=2008:2017, 
-			ylim=c(0,0.15), 
 			dim=c(5,2))
 
+
 ## plot model output
-plot_output(all_years=1:20,
-			lc_years=11:20, 
-			Inputs=Inputs, 
-			Report=Report, 
+plot_output(Inputs=Inputs, 
+			Report=Report,
 			Sdreport=Sdreport, 
-			lh=lh, 
-			true_years=1998:2017, 
+			lh=lh,
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"),
-			set_ylim=list("Fish"=c(0,2)))
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
+
 
 
 ## length comp + catch
@@ -195,25 +189,21 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(Inputs=Inputs$Data, 
+plot_LCfits(LFlist=list("LF"=LF), 
+			Inputs=Inputs, 
 			Report=Report,
-			true_lc_years=2008:2017, 
-			ylim=NULL, 
-			ML50=lh$ML50, 
-			SL50=Report$S50,
 			dim=c(5,2))
 
+
 ## plot model output
-plot_output(all_years=1:20,
-			lc_years=11:20, 
-			Inputs=Inputs, 
-			Report=Report, 
+plot_output(Inputs=Inputs, 
+			Report=Report,
 			Sdreport=Sdreport, 
-			lh=lh, 
-			true_years=1998:2017, 
+			lh=lh,
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"),
-			set_ylim=list("Fish"=c(0,2)))
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
+
 
 
 ## length comp + index
@@ -235,22 +225,17 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(Inputs=Inputs$Data, 
+plot_LCfits(LFlist=list("LF"=LF), 
+			Inputs=Inputs, 
 			Report=Report,
-			true_lc_years=2008:2017, 
-			ylim=NULL, 
-			ML50=lh$ML50, 
-			SL50=Report$S50,
 			dim=c(5,2))
 
+
 ## plot model output
-plot_output(all_years=1:20,
-			lc_years=11:20, 
-			Inputs=Inputs, 
-			Report=Report, 
+plot_output(Inputs=Inputs, 
+			Report=Report,
 			Sdreport=Sdreport, 
-			lh=lh, 
-			true_years=1998:2017, 
+			lh=lh,
 			True=true, 
-			plot=c("Fish","Rec","SPR","Selex"),
-			set_ylim=list("Fish"=c(0,2)))
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
