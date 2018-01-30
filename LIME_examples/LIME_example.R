@@ -16,9 +16,10 @@ lh <- create_lh_list(vbk=0.21,
 					 t0=-0.01,
 					 lwa=0.0245, 
 					 lwb=2.79, 
-					 S50=20, 
-					 S95=26, 
+					 S50=c(20,30), 
+					 S95=c(26,36), 
 					 selex_input="length",
+					 selex_type=c("logistic","logistic"),
 					 M50=34,
 					 M95=NULL,
 					 maturity_input="length",
@@ -33,14 +34,17 @@ lh <- create_lh_list(vbk=0.21,
 					 qcoef=1e-5,
 					 start_ages=0,
 					 rho=0.43,
-					 nseasons=1)
+					 nseasons=1,
+					 nfleets=2)
 
 par(mfrow=c(2,2))
 plot(lh$L_a, type="l", lwd=3, col="forestgreen", xlab="Age", ylab="Length")
 plot(lh$W_a, type="l", lwd=3, col="forestgreen", xlab="Age", ylab="Weight")
 plot(lh$Mat_l, type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion mature")
-plot(lh$S_l, type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion vulnerable to gear")
-
+plot(lh$S_l[1,], type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion vulnerable to gear")
+for(f in 1:lh$nfleets){
+	if(f>1) lines(lh$S_l[f,], lwd=3, col="forestgreen", lty=f)
+}
 ##----------------------------------------------------
 ## Step 2: Setup data input
 ## ---------------------------------------------------
