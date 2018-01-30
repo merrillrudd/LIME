@@ -34,11 +34,9 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
 
 	if(all(is.null(Report))==FALSE){
 		pred <- Report$plb
-		if(length(dim(pred))==3){
 			pred <- lapply(1:nf, function(x){
 				return(Report$plb)
 			})
-		}
 	}
 	if(all(is.null(Report))){
 		pred <- NULL
