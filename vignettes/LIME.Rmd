@@ -550,7 +550,7 @@ res_alt <- run_LIME(modpath=NULL,
 Then check how the larger asymptotic length impacts the assessment results:
 ```{r}
 plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-plot_output(Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh_alt, True=true, plot=c("Fish","Rec","SPR","Selex"), set_ylim=list("F"=c(0,1), "R"=c(0,5)))
 ```
 
 
@@ -603,7 +603,7 @@ res_dome <- run_LIME(modpath=NULL,
 Then check how the assumed dome-shaped selectivity curve impacts assessment results:
 ```{r}
 plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-plot_output(Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh_dome, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 
