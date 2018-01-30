@@ -4,26 +4,17 @@
 \alias{plot_LCfits}
 \title{plot length composition data and model fits}
 \usage{
-plot_LCfits(Inputs, Inputs2 = NULL, Inputs3 = NULL, Inputs4 = NULL,
-  Report = NULL, Report2 = NULL, LBSPR = NULL, true_lc_years = NULL,
+plot_LCfits(LFlist, Inputs = NULL, Report = NULL, LBSPR = NULL,
   ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE)
 }
 \arguments{
-\item{Inputs}{LIME input file, must have "LF"=length frequency and "T_yrs"=total vector of years}
+\item{LFlist}{list of length frequency matrices}
 
-\item{Inputs2}{optional LIME input file for length data comparison; default NULL}
-
-\item{Inputs3}{optional LIME input file for length data comparison; default NULL}
-
-\item{Inputs4}{optional LIME input file for length data comparison; default NULL}
+\item{Inputs}{LIME input file; default NULL if only plotting length data}
 
 \item{Report}{LIME report file; default NULL if only plotting length data}
 
-\item{Report2}{optional LIME report file for model fit comparison; default NULL}
-
 \item{LBSPR}{LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL}
-
-\item{true_lc_years}{true years of length comp data for plotting; default NULL}
 
 \item{ylim}{ylim for plot; default NULL}
 

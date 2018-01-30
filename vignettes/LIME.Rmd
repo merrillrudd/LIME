@@ -216,7 +216,7 @@ plot(true$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", y
 Each panel of length data is labeled with the year (1-20).
 
 ```{r, fig.height=6, fig.width=8, echo=FALSE, fig.cap="Generated length composition data, labeled by years 1-20."}
-plot_LCfits(Inputs=list("LF"=true$LF))
+plot_LCfits(LFlist=list("LF"=true$LF))
 ```
 
 ```{r, fig.height=3, fig.width=10, echo=FALSE, fig.cap="Generated catch and abundance index over time."}
@@ -493,19 +493,19 @@ res_length_short$df[,1:2]
 Once we have confirmed each model has converged, we can explore model output. The black lines indicate the true value of fishing mortality, recruitment, SPR, and selectivity. Blue lines indicate the maximum likelihood estimates, blue points indicate a year with data, and blue shading indicates 95% confidence intervals. 
 
 ```{r, warning=FALSE, message=FALSE, fig.cap="Results from data-rich scenario"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_rich$Inputs, Report=res_rich$Report, Sdreport=res_rich$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_rich$Inputs, Report=res_rich$Report, Sdreport=res_rich$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 ```{r, warning=FALSE, message=FALSE, fig.cap="Results from including index and length"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_nocatch$Inputs, Report=res_nocatch$Report, Sdreport=res_nocatch$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_nocatch$Inputs, Report=res_nocatch$Report, Sdreport=res_nocatch$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 ```{r, warning=FALSE, message=FALSE, fig.cap="Results including length only"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 ```{r, warning=FALSE, message=FALSE, fig.cap="Results including 10 years of length data only"}
-plot_output(all_years=total_years, true_years=total_years, lc_years=11:20, Inputs=res_length_short$Inputs, Report=res_length_short$Report, Sdreport=res_length_short$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_length_short$Inputs, Report=res_length_short$Report, Sdreport=res_length_short$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 
@@ -549,8 +549,8 @@ res_alt <- run_LIME(modpath=NULL,
 
 Then check how the larger asymptotic length impacts the assessment results:
 ```{r}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec", "SPR","Selex"))
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh_alt, True=true, plot=c("Fish", "Rec", "SPR", "Selex"))
+plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 
@@ -602,8 +602,8 @@ res_dome <- run_LIME(modpath=NULL,
 
 Then check how the assumed dome-shaped selectivity curve impacts assessment results:
 ```{r}
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish", "Rec","SPR", "Selex"))
-plot_output(all_years=total_years, true_years=total_years, lc_years=length_years, Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh_dome, True=true, plot=c("Fish","Rec", "SPR","Selex"))
+plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+plot_output(Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
 ```
 
 

@@ -4,16 +4,11 @@
 \alias{plot_output}
 \title{plot LIME output}
 \usage{
-plot_output(all_years, lc_years, Inputs = NULL, Report = NULL,
-  Sdreport = NULL, LBSPR = NULL, lh, true_years, True = NULL,
-  plot = c("Fish", "Rec", "SPR", "ML", "SB", "Selex"), set_ylim = list(Fish
-  = c(0, 1), SPR = c(0, 1)))
+plot_output(Inputs = NULL, Report = NULL, Sdreport = NULL, LBSPR = NULL,
+  lh, true_years = NULL, True = NULL, plot = c("Fish", "Rec", "SPR", "ML",
+  "SB", "Selex"), set_ylim = list(Fish = c(0, 1), SPR = c(0, 1)))
 }
 \arguments{
-\item{all_years}{vector of all years modeled}
-
-\item{lc_years}{vector of years with length composition data}
-
 \item{Inputs}{LIME input file}
 
 \item{Report}{LIME report file}
