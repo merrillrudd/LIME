@@ -106,9 +106,15 @@ function(vbk,
     if(is.null(M95)) mat_param <- 1
     if(is.null(M95)==FALSE) mat_param <- 2
     if(is.null(Mslope)==FALSE) mat_param <- 3
-    if(is.null(S95)) sel_param <- 1
-    if(is.null(S95)==FALSE) sel_param <- 2
-    if(is.null(Sslope)==FALSE) sel_param <- 3
+
+    sel_param <- rep(1, nfleets)
+    if(is.null(S95)==FALSE){
+        sel_param[which(is.na(S95))] <- 1
+        sel_param[which(is.na(S95)==FALSE)] <- 2
+    }
+    if(is.null(Sslope)==FALSE){
+        sel_param[which(is.na(Sslope)==FALSE)] <- 3        
+    }
 
 
     if(selex_input=="length"){
@@ -116,12 +122,12 @@ function(vbk,
         S50 <- ceiling(t0-log(1-(SL50/linf))/vbk)
         if(is.null(S95)==FALSE){
             SL95 <- S95
-            S95 <- ceiling(t0-log(1-(SL95/linf))/vbk)
+            S95 <- sapply(1:length(SL95), function(x) ceiling(t0-log(1-(SL95[x]/linf))/vbk))
         }
     }
     if(selex_input=="age"){
         SL50 <- ceiling(linf*(1-exp(-vbk*(S50-t0))))
-        if(is.null(S95)==FALSE) SL95 <- ceiling(linf*(1-exp(-vbk*(S95-t0))))
+        if(is.null(S95)==FALSE) SL95 <- sapply(1:length(S95), function(x) ceiling(linf*(1-exp(-vbk*(S95[x]-t0)))))
     }
 
     if(maturity_input=="length"){
@@ -171,15 +177,29 @@ function(vbk,
     }
 
 
+    S_l <- matrix(NA, nrow=nfleets, ncol=length(mids))
+    S_a <- matrix(NA, nrow=nfleets, ncol=length(ages))
     ## selectivity
-    if(sel_param==1){
-        S_l <- (1 / (1 + exp(SL50 - mids)))
+    if(any(sel_param==1)){
+        index <- which(sel_param==1)
+        for(i in 1:length(index)){
+            S_l[index[i],] <- (1 / (1 + exp(SL50[index[i]] - mids)))
+        }
     }
-    if(sel_param==2){
-        S_l <- (1 /(1 + exp(-log(19)*(mids-SL50)/(SL95-SL50)))) # Selectivity-at-Length
+    if(any(sel_param==2)){
+        index <- which(sel_param==2)
+        for(i in 1:length(index)){
+            S_l[index[i],] <- (1 /(1 + exp(-log(19)*(mids-SL50[index[i]])/(SL95[index[i]]-SL50[index[i]]))))
+        }
     }
-    if(sel_param==3){
-        S_l <- (1 /(1 + exp(-((mids-SL50)/Sslope))))
+    if(any(sel_param==3)){
+        index <- which(sel_param==3)
+        for(i in 1:length(index)){
+            S_l[index[i],] <- (1 /(1 + exp(-((mids-SL50[index[i]])/Sslope[index[i]]))))
+        }
+    }
+    if(start_ages==0){
+        S_l[,1] <- 1e-5
     }
 
     if(selex_input=="length"){
