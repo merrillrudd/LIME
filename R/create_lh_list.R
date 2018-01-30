@@ -179,7 +179,7 @@ function(vbk,
 
     S_l <- matrix(NA, nrow=nfleets, ncol=length(mids))
     S_a <- matrix(NA, nrow=nfleets, ncol=length(ages))
-    ## selectivity
+    ## selectivity-at-length
     if(any(sel_param==1)){
         index <- which(sel_param==1)
         for(i in 1:length(index)){
@@ -202,35 +202,21 @@ function(vbk,
         S_l[,1] <- 1e-5
     }
 
-    if(selex_input=="length"){
-        if(selex_type=="dome"){
-            Sfull <- which(round(S_l,2)==1.00)[1]
-            if(is.na(Sfull)) Sfull <- which(round(S_l,1)==1.00)[1]
-            index <- (Sfull+1):length(S_l)
-            S_l[index] <- exp((-(index-Sfull)^2)/(2*dome_sd^2))
-        }
-        S_a <- apply(t(plba_a)*S_l, 2, sum)
+    if(any(selex_type=="dome")){
+            index <- which(selex_type=="dome")
+            for(i in 1:length(index)){
+                Sfull <- which(round(S_l[index[i],],2)==1.00)[1]
+                if(is.na(Sfull)) Sfull <- which(round(S_l[index[i],],1)==1.00)[1]
+                find_dome <- (Sfull+1):length(S_l[index[i],])
+                S_l[index[i],find_dome] <- exp((-(find_dome-Sfull)^2)/(2*dome_sd[index[i]]^2))                
+            }
     }
-    if(selex_input=="age"){
-        S_a <- rep(NA, length(ages))
-        if(sel_param==1){
-           S_a <- 1/(1+exp(S50 - ages))
-        }
-        if(sel_param==2){
-            S_a <- 1/(1+exp(-log(19)*(ages-S50)/(S95-S50)))
-        }
-        if(selex_type=="dome"){
-            Sfull <- which(round(S_a,1)==1.00)[1]
-            index <- (Sfull+1):length(S_a)
-            S_a[index] <- exp((-(index-Sfull)^2)/(2*dome_sd^2))
-        }
-    }
-    if(is.null(S95)){
-        id_L95 <- which(round(S_a, 2) %in% seq(from=0.92,to=1.00,by=0.01))[1]
-        SL95 <- L_a[id_L95]
-        S95 <- ceiling(t0-log(1-(SL95/linf))/vbk)
-    }
-    if(selex_type!="dome") Sfull <- NULL
+
+    S_a <- t(sapply(1:nfleets, function(x){
+        colSums(t(plba_a)*S_l[x,])
+    }))
+
+    if(any(selex_type=="dome")==FALSE) Sfull <- NULL
 
     ## output list
     Outs <- NULL
@@ -279,5 +265,6 @@ function(vbk,
     Outs$rho <- rho
     Outs$theta <- theta
     Outs$nseasons <- nseasons
+    Outs$nfleets <- nfleets
     return(Outs)
 }
