@@ -2,16 +2,16 @@
 title: 'LIME: An R package for simulation and estimation using length data to account
   for variable fishing mortality and recruitment'
 author: "Merrill Rudd"
-date: '`r Sys.Date()`'
+date: "`r Sys.Date()`"
 output:
-  html_document:
+  pdf_document:
     toc: yes
-    toc_float: true
-    number_sections: true
-vignette: >
-  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment} 
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteEncoding{UTF-8}
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+vignette: |
+  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment}  %\VignetteEngine{knitr::rmarkdown}  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
