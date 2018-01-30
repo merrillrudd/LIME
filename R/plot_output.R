@@ -52,7 +52,8 @@ if(length(plot)==5 | length(plot)==6) dim <- c(2,3)
     lab <- rev(seq(from=true_years[length(true_years)], to=min(true_years), by=-by))
     ilab <- which(true_years %in% lab)
 
-    nf <- Inputs$Data$n_f
+    # nf <- Inputs$Data$n_f
+    nf <- 1
     ns <- Inputs$Data$n_s
 
 if(all(is.null(Inputs))==FALSE){
@@ -87,12 +88,12 @@ if(all(is.null(Inputs))==FALSE){
 }
 
 if("Fish" %in% plot){
-    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_fy)*2)
+    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_y)*2)
     if("Fish" %in% names(set_ylim)) ylim <- set_ylim[["Fish"]]
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_fy"),]
+      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
     }
@@ -105,9 +106,9 @@ if("Fish" %in% plot){
     }
     if(nf==1) cols <- "#228B22"
     for(f in 1:nf){
-      if(f==1) plot(x=xY, y=Report$F_fy[f,], lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", xaxs="i", yaxs="i", cex.axis=2, ylab="Fishing mortality", xlab="Year", cex.lab=2, xlim=c(min(xY),max(xY)))
-      if(f>1) lines(x=xY, y=Report$F_fy[f,], lwd=2, col=cols[f])
-      points(x=xLC, y=Report$F_fy[f,xLC], col=cols[f], pch=19, cex=2, xpd=NA)
+      if(f==1) plot(x=xY, y=Report$F_y, lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", xaxs="i", yaxs="i", cex.axis=2, ylab="Fishing mortality", xlab="Year", cex.lab=2, xlim=c(min(xY),max(xY)))
+      if(f>1) lines(x=xY, y=Report$F_y, lwd=2, col=cols[f])
+      points(x=xLC, y=Report$F_y[xLC], col=cols[f], pch=19, cex=2, xpd=NA)
       index <- seq(f, nrow(sd), by=nf)
       if(all(is.na(Sdreport))==FALSE){
         polygon( y=read_sdreport(sd[index,], log=TRUE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"20"), border=NA)  
@@ -204,11 +205,11 @@ if("SPR" %in% plot){
 
 if("ML" %in% plot){
 
-  if("ML" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$L_ft_hat)*1.5)
+  if("ML" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$L_t_hat)*1.5)
   if("ML" %in% names(set_ylim)) ylim <- set_ylim[["ML"]]
 
   if(all(is.na(Sdreport))==FALSE){
-    sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="L_ft_hat"),]
+    sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="L_t_hat"),]
     sd[,2][which(is.na(sd[,2]))] <- 0
   }
     if(nf>1){
@@ -219,9 +220,9 @@ if("ML" %in% plot){
   for(f in 1:nf){
     ML_obs <- sapply(1:nrow(Inputs$Data$LF_tbf[,,f]), function(x) sum(Inputs$Data$LF_tbf[x,,f]*Inputs$Data$lbmids)/sum(Inputs$Data$LF_tbf[x,,f]))
 
-    if(f==1)   plot(x=seq_along(all_years), y=Report$L_ft_hat[f,], lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))))
-    if(f>1) lines(x=seq_along(all_years), y=Report$L_ft_hat[f,], lwd=2, col=cols[f])
-    points(x=which(all_years %in% lc_years), y=Report$L_ft_hat[f,which(all_years %in% lc_years)], col=cols[f], pch=19, cex=2, xpd=NA)
+    if(f==1)   plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))))
+    if(f>1) lines(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f])
+    points(x=which(all_years %in% lc_years), y=Report$L_t_hat[which(all_years %in% lc_years)], col=cols[f], pch=19, cex=2, xpd=NA)
     points(x=which(all_years %in% lc_years), y=ML_obs, cex=2.5, xpd=NA, col=cols[f], lwd=2)
     index <- seq(f,nrow(sd), by=nf)
     polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"20"), border=NA)
