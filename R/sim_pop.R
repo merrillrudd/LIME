@@ -11,7 +11,6 @@
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample sample size of length composition data annually
 #' @param init_depl initial depletion on which to calculate F1; default = 0.99
-#' @param nburn number of years of burn-in for operating model
 #' @param seed set seed for generating stochastic time series
 #' @param mismatch if TRUE, catch and index overlap with length comp only 1 year
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
@@ -29,7 +28,6 @@ sim_pop <-
            Nyears_comp,
            comp_sample,
            init_depl=0.99,
-           nburn,
            seed,
            mismatch,
            sample_type = 'catch',
@@ -45,12 +43,9 @@ sim_pop <-
       ## Initial calcs
       ##########################
 
-      tyears_only <- nburn + Nyears
       Nyears_real <- Nyears
-      nburn_real <- nburn
-      nburn <- nburn * nseasons
       Nyears <- Nyears * nseasons
-      tyears <- tyears_only * nseasons
+      tyears <- Nyears_real * nseasons
 
 
       ##########################
@@ -94,7 +89,6 @@ sim_pop <-
       if (Rdynamics == "Pulsed"){
         choose <- sample(1:2, 1)
         R_t <- c(
-          rep(R0, nburn),
           "initial" = rep(R0, floor(Nyears / 3)),
           "pulse1" = ifelse(choose==1, rep(R0 / 2, floor(Nyears / 3)), rep(R0 * 2, floor(Nyears / 3))),
           "pulse2" = ifelse(choose==1, rep(R0 *2, Nyears - (2 * floor(Nyears / 3))), rep(R0/2, Nyears - (2 * floor(Nyears / 3))))
@@ -105,9 +99,6 @@ sim_pop <-
         R_t <- (rep(R0, tyears) / nseasons) * exp(RecDev_AR)
       }
 
-      if (Rdynamics == "BH") {
-        R_t[1] <- (R0 / nseasons) * exp(RecDev_AR[1])
-      }
 
 
       #####################################
@@ -177,7 +168,7 @@ sim_pop <-
       if(any(Fdynamics=="Oneway")){
         index <- which(Fdynamics=="Oneway")
         for(i in 1:length(index)){
-          E_ft[index[i],] <- c(rep(1,nburn), seq(1,by=0.05,length=Nyears))
+          E_ft[index[i],] <- c(seq(1,by=0.05,length=Nyears))
         }
       }
       if(any(Fdynamics=="Endogenous")){
@@ -252,9 +243,6 @@ sim_pop <-
       ##########################
       ## Data objects
       ##########################
-      D_t <- Z_t <- rep(NA, tyears)
-      E_ft <- Z_ft <- matrix(NA, nrow=nfleets, ncol=tyears)
-
 
       ## year 1 abundance at age
       N_at <- N_at0 <- matrix(NA, nrow = length(L_a), ncol = tyears)
@@ -291,91 +279,79 @@ sim_pop <-
         Cw_atf[,1,f] <- Cn_atf[,1,f] * W_a
       }
 
+      ## unfished spawning biomass
+      SB0 <- sum(N_at0[, 1] * Mat_a * W_a)
+
+      ## relative biomass (depletion) over time
+      D_t <- rep(NA, tyears)
+      D_t[1] <- SB_t[1] / SB0
 
       ##########################
       ## Projection
       ##########################
-      SB0 <- sum(N_at0[, 1] * Mat_a * W_a)
-      D_t[1] <- SB_t[1] / SB0
 
-      # D_t <- seq(0,1,length=tyears)
-      # F_t <- rep(NA, tyears)
-      # F_t[1] <- 0
-      # for(t in 2:tyears){
-      #             if(D_t[t-1] < 0.10) F_t[t] <- 0
-      #             if(D_t[t-1] >= 0.40) F_t[t] <- F40 * exp(FishDev[t])
-      #             if(D_t[t-1] >= 0.10 & D_t[t-1] < 0.40) F_t[t] <- ((F40/0.3)*D_t[t-1] - ((0.10*F40)/0.30)) * exp(FishDev[t])
-      # }
-      ## static SPR
-      for (y in 2:tyears) {
-        ## fishing effort and recruitment, not dependent on age structure
-        if (Fdynamics == "Endogenous") {
-          if (y <= nburn)
-            F_t[y] <- Finit
-          if (y > nburn)
-            F_t[y] <-
-              F_t[y - 1] * (SB_t[y - 1] / (Fequil * SB0/2)) ^ Frate * exp(FishDev[y])
-        }
-        if (Fdynamics == "4010") {
-          if (y <= nburn)
-            F_t[y] <- Finit
-          if (y > nburn) {
-            if (D_t[y - 1] < 0.10)
-              F_t[y] <- 0
-            # if(D_t[y-1] >= 0.40) F_t[y] <- F40 * exp(FishDev[y])
-            # if(D_t[y-1] >= 0.10 & D_t[y-1] < 0.40) F_t[y] <- ((F40/0.3)*D_t[y-1] - ((0.10*F40)/0.30)) * exp(FishDev[y])
-            if (D_t[y - 1] >= 0.10)
-              F_t[y] <-
-                ((F40 / 0.3) * D_t[y - 1] - ((0.10 * F40) / 0.30)) * exp(FishDev[y])
+      for (t in 2:tyears) {
+        ## fishing effort based on spawning biomass
+        if (any(Fdynamics == "Endogenous")) {
+          index <- which(Fdynamics == "Endogenous")
+          for(i in 1:length(index)){
+            E_ft[index[i],t] <- (E_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * exp(FishDev_f[index[i],t])
           }
-        }
-        if (Rdynamics == "BH") {
-          if (h == 1)
-            h_use <- 0.7
-          if (h != 1)
-            h_use <- h
-          R_t[y] <-
-            (4 * h_use * R0 * SB_t[y - 1] / (SB0 * (1 - h_use) + SB_t[y - 1] * (5 *
-                                                                                  h_use - 1))) / nseasons * exp(RecDev[y])
+          ## include relative catchability by fleet
+          qE_ft <- t(sapply(1:nfleets, function(x){
+            return(E_ft[x,]*fleet_percentage[x])
+          }))   
+
+          ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
+          for(a in 1:length(ages)){
+            F_atf[a,t,index[i]] <- qE_ft[index[i],t] * Finit * S_fa[index[i],a]
+          }
         }
 
 
         ## age-structured dynamics
         for (a in 1:length(L_a)) {
           if (a == 1) {
-            N_at[a, y] <- R_t[y]
-            N_at0[a, y] <- R_t[y]
+            N_at[a, t] <- R_t[t]
+            N_at0[a, t] <- R_t[t]
           }
           if (a > 1 & a < length(L_a)) {
-            N_at[a, y] <- N_at[a - 1, y - 1] * exp(-M - F_t[y - 1] * S_a[a - 1])
-            N_at0[a, y] <- N_at0[a - 1, y - 1] * exp(-M)
+            N_at[a, t] <- N_at[a - 1, t - 1] * exp(-M - sum(F_atf[a-1,t-1,]))
+            N_at0[a, t] <- N_at0[a - 1, t - 1] * exp(-M)
           }
           if (a == length(L_a)) {
-            N_at[a, y] <-
-              (N_at[a - 1, y - 1] * exp(-M - F_t[y - 1] * S_a[a - 1])) + (N_at[a, y -
-                                                                                 1] * exp(-M - F_t[y - 1] * S_a[a]))
-            N_at0[a, y] <-
-              (N_at0[a - 1, y - 1] * exp(-M)) + (N_at0[a, y - 1] * exp(-M))
+            N_at[a, t] <- (N_at[a - 1, t - 1] * exp(-M - sum(F_atf[a-1,t-1,]))) + (N_at[a, t - 1] * exp(-M - sum(F_atf[a,t-1,])))
+            N_at0[a, t] <- (N_at0[a - 1, t - 1] * exp(-M)) + (N_at0[a, t - 1] * exp(-M))
           }
         }
 
           ## spawning biomass
-          SB_t[y] <- sum((N_at[, y] * W_a * Mat_a))
-          TB_t[y] <- sum(N_at[, y] * W_a)
+          SB_t[t] <- sum((N_at[, t] * W_a * Mat_a))
+          TB_t[t] <- sum(N_at[, t] * W_a)
 
-          if(is.numeric(Fdynamics) & mgt_type=="catch"){
-            F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
-            # F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
-          }
+          # if(is.numeric(Fdynamics) & mgt_type=="catch"){
+          #   F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
+          #   # F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
+          # }
 
           ## catch
-          Cn_at[, y] <-
-            N_at[, y] * (1 - exp(-M - F_t[y] * S_a)) * (F_t[y] * S_a) / (M + F_t[y] * S_a)
+          for(f in 1:nfleets){
+            Cn_atf[,t,f] <- N_at[,t] * (1 - exp(-M - F_atf[,t,f])) * (F_atf[,t,f] / (M + F_atf[,t,f]))
+            Cw_atf[,t,f] <- Cn_atf[,t,f] * W_a
+          }
 
-          Z_t[y] <- mean(M + F_t[y] * S_a, na.rm = T)
-
-          D_t[y] <- SB_t[y] / SB0
+          D_t[t] <- SB_t[t] / SB0
       }
+
+      F_ft <- t(sapply(1:nfleets, function(x){
+        sub <- F_atf[,,x]
+        findMax <- sapply(1:tyears, function(y){
+          sub2 <- sub[,y]
+          return(max(sub2))
+        })
+        return(findMax)
+      }))
+      F_t <- colSums(F_ft)
 
 
       SPR_t <-
@@ -385,21 +361,9 @@ sim_pop <-
             Mat_a = Mat_a,
             W_a = W_a,
             M = M,
-            S_a = S_a,
             F = F_t[x]
           ))
       SPR <- SPR_t[length(SPR_t)]
-
-      P <- 0.01
-      x <-
-        seq(from = 0,
-            to = 1,
-            length.out = length(L_a)) # relative age vector
-      EL <-
-        (1 - P ^ (x / (M / vbk))) * linf # length at relative age
-      rLens <- EL / linf # relative length
-      SPR_alt <-
-        sum(Mat_a * rowSums(N_at) * rLens ^ 3) / sum(Mat_a * rowSums(N_at0) * rLens ^ 3)
 
       Cn_t <- colSums(Cn_at)
       Cw_t <- colSums(Cn_at * W_a)
