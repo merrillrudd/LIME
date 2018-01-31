@@ -177,43 +177,43 @@ function(vbk,
     }
 
 
-    S_l <- matrix(NA, nrow=nfleets, ncol=length(mids))
-    S_a <- matrix(NA, nrow=nfleets, ncol=length(ages))
+    S_fl <- matrix(NA, nrow=nfleets, ncol=length(mids))
+    S_fa <- matrix(NA, nrow=nfleets, ncol=length(ages))
     ## selectivity-at-length
     if(any(sel_param==1)){
         index <- which(sel_param==1)
         for(i in 1:length(index)){
-            S_l[index[i],] <- (1 / (1 + exp(SL50[index[i]] - mids)))
+            S_fl[index[i],] <- (1 / (1 + exp(SL50[index[i]] - mids)))
         }
     }
     if(any(sel_param==2)){
         index <- which(sel_param==2)
         for(i in 1:length(index)){
-            S_l[index[i],] <- (1 /(1 + exp(-log(19)*(mids-SL50[index[i]])/(SL95[index[i]]-SL50[index[i]]))))
+            S_fl[index[i],] <- (1 /(1 + exp(-log(19)*(mids-SL50[index[i]])/(SL95[index[i]]-SL50[index[i]]))))
         }
     }
     if(any(sel_param==3)){
         index <- which(sel_param==3)
         for(i in 1:length(index)){
-            S_l[index[i],] <- (1 /(1 + exp(-((mids-SL50[index[i]])/Sslope[index[i]]))))
+            S_fl[index[i],] <- (1 /(1 + exp(-((mids-SL50[index[i]])/Sslope[index[i]]))))
         }
     }
     if(start_ages==0){
-        S_l[,1] <- 1e-5
+        S_fl[,1] <- 1e-5
     }
 
     if(any(selex_type=="dome")){
             index <- which(selex_type=="dome")
             for(i in 1:length(index)){
-                Sfull <- which(round(S_l[index[i],],2)==1.00)[1]
-                if(is.na(Sfull)) Sfull <- which(round(S_l[index[i],],1)==1.00)[1]
-                find_dome <- (Sfull+1):length(S_l[index[i],])
-                S_l[index[i],find_dome] <- exp((-(find_dome-Sfull)^2)/(2*dome_sd[index[i]]^2))                
+                Sfull <- which(round(S_fl[index[i],],2)==1.00)[1]
+                if(is.na(Sfull)) Sfull <- which(round(S_fl[index[i],],1)==1.00)[1]
+                find_dome <- (Sfull+1):length(S_fl[index[i],])
+                S_fl[index[i],find_dome] <- exp((-(find_dome-Sfull)^2)/(2*dome_sd[index[i]]^2))                
             }
     }
 
-    S_a <- t(sapply(1:nfleets, function(x){
-        colSums(t(plba_a)*S_l[x,])
+    S_fa <- t(sapply(1:nfleets, function(x){
+        colSums(t(plba_a)*S_fl[x,])
     }))
 
     if(any(selex_type=="dome")==FALSE) Sfull <- NULL
@@ -249,8 +249,8 @@ function(vbk,
     Outs$mids <- mids
     Outs$highs <- highs
     Outs$lows <- lows
-    Outs$S_a <- S_a
-    Outs$S_l <- S_l
+    Outs$S_fa <- S_fa
+    Outs$S_fl <- S_fl
     Outs$L_a <- L_a
     Outs$W_a <- W_a
     Outs$W_l <- W_l
