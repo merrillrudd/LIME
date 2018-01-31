@@ -7,7 +7,6 @@
 #' @param Mat_a from report file / true file for simulation
 #' @param W_a from report file / true file for simulation
 #' @param M from report file / true file for simulation
-#' @param S_a from report file / true file for simulation
 #' @param F typically terminal estimated/true F, can be any year
 #' @param ref FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
 
