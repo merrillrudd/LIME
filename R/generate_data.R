@@ -19,6 +19,7 @@
 #' @param nburn number of years burn-in for operating model, default=50
 #' @param seed single seed or vector of seeds for each iteration
 #' @param mgt_type removals based on F (default) or catch
+#' @param fleet_percentage vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
 #' @importFrom stats runif
 #' @importFrom TMB MakeADFun
 
@@ -40,7 +41,8 @@ generate_data <-
             derive_quants=FALSE, 
             nburn=50, 
             seed, 
-            mgt_type="F"){
+            mgt_type="F",
+            fleet_percentage=1){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
@@ -60,7 +62,7 @@ generate_data <-
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=iseed, mismatch=mismatch, mgt_type=mgt_type)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=iseed, mismatch=mismatch, mgt_type=mgt_type, fleet_percentage=fleet_percentage)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
