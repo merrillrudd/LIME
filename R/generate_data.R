@@ -13,10 +13,8 @@
 #' @param Nyears_comp number of years to generate length composition data
 #' @param comp_sample sample size of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
-#' @param mismatch default=FALSE, if TRUE, catch and index overlap with length comp only 1 year
 #' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
-#' @param nburn number of years burn-in for operating model, default=50
 #' @param seed single seed or vector of seeds for each iteration
 #' @param mgt_type removals based on F (default) or catch
 #' @param fleet_percentage vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
@@ -36,10 +34,8 @@ generate_data <-
             Nyears_comp, 
             comp_sample, 
             rewrite=TRUE, 
-            mismatch=FALSE, 
             init_depl, 
             derive_quants=FALSE, 
-            nburn=50, 
             seed, 
             mgt_type="F",
             fleet_percentage=1){
@@ -62,7 +58,7 @@ generate_data <-
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=iseed, mismatch=mismatch, mgt_type=mgt_type, fleet_percentage=fleet_percentage)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_percentage=fleet_percentage)
     }
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
@@ -72,7 +68,7 @@ generate_data <-
             seed_init <- iseed + add
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=seed_init, mismatch=mismatch), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_percentage=fleet_percentage), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }
@@ -82,9 +78,9 @@ generate_data <-
 
    
     DataList_out <- DataList
-    if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
-    if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
-    rownames(DataList_out$LF) <- rownames(DataList$LF)
+    # if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
+    # if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
+    # rownames(DataList_out$LF) <- rownames(DataList$LF)
 
     if(derive_quants==TRUE){
         ## project the truth forward
