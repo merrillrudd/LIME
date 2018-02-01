@@ -41,9 +41,9 @@ par(mfrow=c(2,2))
 plot(lh$L_a, type="l", lwd=3, col="forestgreen", xlab="Age", ylab="Length")
 plot(lh$W_a, type="l", lwd=3, col="forestgreen", xlab="Age", ylab="Weight")
 plot(lh$Mat_l, type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion mature")
-plot(lh$S_l[1,], type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion vulnerable to gear")
+plot(lh$S_fl[1,], type="l", lwd=3, col="forestgreen", xlab="Length", ylab="Proportion vulnerable to gear")
 for(f in 1:lh$nfleets){
-	if(f>1) lines(lh$S_l[f,], lwd=3, col="forestgreen", lty=f)
+	if(f>1) lines(lh$S_fl[f,], lwd=3, col="forestgreen", lty=f)
 }
 ##----------------------------------------------------
 ## Step 2: Setup data input
@@ -52,13 +52,13 @@ for(f in 1:lh$nfleets){
 ## specify model path to save true population/generated data
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics="Ramp",
-					  Rdynamics="AR",
+					  Fdynamics=c("Constant","Endogenous"),
+					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=10,
+					  Nyears_comp=c(20,10),
 					  comp_sample=200,
-					  init_depl=0.8,
+					  init_depl=0.7,
 					  seed=143)
 
 ## Data input components
