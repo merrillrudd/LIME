@@ -443,18 +443,19 @@ sim_pop <-
       LF <- lapply(1:nfleets, function(x) LFinfo[[x]]$LF)
       LF0 <- lapply(1:nfleets, function(x) LF0info[[x]]$LF)
 
+      LF_tf <- LF0_tf <- NULL
       if (pool == TRUE) {
-        LF_tf <- LF0_tf <- array(NA, dim=c(Nyears_real, ncol(LF[[1]]), nfleets))
         for(f in 1:nfleets){
+          LF_tf[[f]] <- LF0_tf[[f]] <- matrix(NA, nrow=Nyears_real, ncol=ncol(LF[[1]]))
          for (y in 1:Nyears_real) {
             if (nseasons == 1) {
-              LF_tf[y,,f] <- LF[[f]][y,]
-              LF0_tf[y,,f] <- LF0[[f]][y,]
+              LF_tf[[f]][y,] <- LF[[f]][y,]
+              LF0_tf[[f]][y,] <- LF0[[f]][y,]
             }
             if (nseasons > 1) {
               time_index <- (1:nseasons) + ((y - 1) * nseasons)
-              LF_tf[y,,f] <- colSums(LF[[f]][time_index,])
-              LF0_tf[y,,f] <- colSums(LF0[[f]][time_index,])
+              LF_tf[[f]][y,] <- colSums(LF[[f]][time_index,])
+              LF0_tf[[f]][y,] <- colSums(LF0[[f]][time_index,])
             }
           }
           obs_per_year <- t(sapply(1:nfleets, function(y){
@@ -466,6 +467,7 @@ sim_pop <-
               sum(obs_per_year[y,time_index])
             })
           }))
+        }
       }
       if (pool == FALSE) {
         LF_t <- LF
