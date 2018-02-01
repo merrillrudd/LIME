@@ -26,7 +26,7 @@
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
 #' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
-#' @param newtonsteps number of extra newton steps to take after optimization
+#' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
 #' @importFrom TMB MakeADFun sdreport
 #' @importFrom TMBhelper Optimize
 #' @importFrom utils write.csv

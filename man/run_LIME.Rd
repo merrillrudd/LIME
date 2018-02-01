@@ -58,7 +58,7 @@ run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
 
 \item{SigRpen}{penalty on sigmaR; 0=OFF, 1=ON, default=1}
 
-\item{newtonsteps}{number of extra newton steps to take after optimization}
+\item{newtonsteps}{number of extra newton steps to take after optimization; FALSE to turn off}
 }
 \value{
 prints how many iterations were run in model directory
