@@ -4,6 +4,7 @@
 #' @author M.B. Rudd
 
 #' @param lh list of life history attributes, output of create_lh_list
+#' @param S_a flexiblity to set selectivity-at-age by fleet
 #' @param tyears number of years of data
 #' @param N_at matrix of numbers in the population at each age over time
 #' @param comp_sample vector of number of individuals sampled each year (set as 1 for proportions)
@@ -14,6 +15,7 @@
 #' @export
 AgeToLengthComp <-
   function(lh,
+           S_a,
            tyears,
            N_at,
            comp_sample,
