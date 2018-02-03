@@ -30,7 +30,7 @@ create_inputs <- function(lh, input_data){
         lows <- highs - bw
         time <- unique(length_raw$Time)[order(unique(length_raw$Time))]
         LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
-        for(f in 1:nfleets){
+        for(f in 1:dat_input$nfleets){
             lfind <- length_raw %>% filter(Fleet==f)
             lfreq <- t(sapply(1:length(time), function(x){
                 sub <- lfind %>% filter(Time==time[x])
