@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="multifleet")
 library(LIME)
 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
@@ -59,7 +59,8 @@ true <- generate_data(modpath=NULL,
 					  Nyears_comp=c(20,10),
 					  comp_sample=200,
 					  init_depl=0.7,
-					  seed=143)
+					  seed=143,
+					  fleet_percentage=c(0.5,0.5))
 
 ## Data input components
 years <- true$years ## total years to model, can be 1:20 or 1998:2017
@@ -69,7 +70,7 @@ LF <- true$LF ## length composition data, years along rows and length bin along 
 data_LF <- list("years"=years, "LF"=LF) ## length comp only
 
 ## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF)) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+plot_LCfits(LFlist=lapply(1:dim(LF)[3], function(x) LF[,,x])) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ##----------------------------------------------------
 ## Step 3: Run Model

@@ -21,31 +21,37 @@ create_inputs <- function(lh, input_data){
         dat_input$log_CV_L <- log(dat_input$CVlen)
 
         ## make sure length bins from life history and observed data match
-        if(ncol(dat_input$LF)!=length(dat_input$highs)){
-          if(is.null(colnames(dat_input$LF))==FALSE) obs_lb <- as.numeric(names(which(rev(colSums(dat_input$LF))>0)[1]))
-          if(is.null(colnames(dat_input$LF))) obs_lb <- max(seq(dat_input$binwidth,length=ncol(dat_input$LF), by=dat_input$binwidth))
-            if(obs_lb < max(dat_input$highs)){
-                new <- matrix(0, nrow=nrow(dat_input$LF), ncol=length(seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)))
-                rownames(new) <- rownames(dat_input$LF)
-                colnames(new) <- seq(obs_lb+dat_input$binwidth, max(dat_input$highs), by=dat_input$binwidth)
-                if(nrow(dat_input$LF)==1) LF_new <- cbind(t(as.matrix(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)])), new)
-                if(nrow(dat_input$LF)>1) LF_new <- cbind(dat_input$LF[,1:which(colnames(dat_input$LF)==obs_lb)], new)
-                dat_input$LF <- as.matrix(LF_new)
-            }
-            if(obs_lb >= max(dat_input$highs)){
-                max_lb <- max(from=seq(dat_input$binwidth, to=ncol(dat_input$LF), by=dat_input$binwidth))
-                test_lb <- max(seq(from=(obs_lb + dat_input$binwidth), length=5, by=dat_input$binwidth))
-                change_lb <- min(test_lb, max_lb)
-                if(is.null(colnames(dat_input$LF))==FALSE) index_lb <- which(colnames(dat_input$LF)==change_lb)
-                if(is.null(colnames(dat_input$LF))) index_lb <- which(seq(dat_input$binwidth, length=ncol(dat_input$LF), by=dat_input$binwidth)==change_lb)
-                dat_input$LF <- dat_input$LF[,1:index_lb]
-                dat_input$highs <- seq(dat_input$binwidth, change_lb, by=dat_input$binwidth)
-                dat_input$mids <- seq(dat_input$binwidth/2, change_lb-dat_input$binwidth/2, by=dat_input$binwidth)
-                dat_input$lows <- dat_input$highs - dat_input$binwidth
-            }
-        }
+        if(is.null(dat_input$df)==FALSE) length_raw <- dat_input$df %>% filter(Variable == "Length")
+        if(is.null(dat_input$df)) stop("Data required as long-form data frame. See LIME reference materials for guidance https://github.com/merrillrudd/LIME/docs")
+        max_bin <- max(c(max(dat_input$highs), ceiling(max(length_raw$Value)*1.25)))
+        bw <- dat_input$binwidth
+        highs <- seq(bw, max_bin, by=bw)
+        mids <- seq(bw/2, max(highs), by=bw)
+        lows <- highs - bw
+        time <- unique(length_raw$Time)[order(unique(length_raw$Time))]
+        LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+        for(f in 1:nfleets){
+            lfind <- length_raw %>% filter(Fleet==f)
+            lfreq <- t(sapply(1:length(time), function(x){
+                sub <- lfind %>% filter(Time==time[x])
+                if(nrow(sub)>0){
+                    out <- sapply(1:length(highs), function(y){
+                        sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
+                        return(length(sub2))
+                    })
+                    return(out)
+                }
+                if(nrow(sub==0)) out <- rep(0, length(highs))
+            }))
 
-        LF <- dat_input$LF
+            LF[,,f] <- lfreq
+        }
+        rownames(LF) <- time
+        colnames(LF) <- highs
+        dat_input$LF <- LF
+        dat_input$highs <- highs
+        dat_input$mids <- mids
+        dat_input$lows <- lows
 
         years_i <- seq_along(dat_input$years)
         years_o <- which(dat_input$years %in% as.numeric(rownames(LF)))

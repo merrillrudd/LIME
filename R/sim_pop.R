@@ -490,27 +490,78 @@ sim_pop <-
       if (pool == TRUE)
         ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
 
+      ## generated data
+      I_out <- data.frame("Variable"="Index", "Time"=c(sapply(1:ncol(I_ft), function(x) rep(x, nfleets))), "Value"=c(I_ft), "Fleet"=rep(1:nfleets, ncol(I_ft)))
+      Cn_out <- data.frame("Variable"="Catch_numbers", "Time"=c(sapply(1:ncol(Cn_ft), function(x) rep(x, nfleets))), "Value"=c(Cn_ft), "Fleet"=rep(1:nfleets, ncol(Cn_ft)))
+      Cw_out <- data.frame("Variable"="Catch_biomass", "Time"=c(sapply(1:ncol(Cw_ft), function(x) rep(x, nfleets))), "Value"=c(Cw_ft), "Fleet"=rep(1:nfleets, ncol(Cw_ft)))
+
+      if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
+      LFlong <- lapply(1:nfleets, function(x){
+        LFsub <- LF_tf[[x]]
+        LFlong <- melt(LFsub)
+        colnames(LFlong) <- c("Time", "LengthBin", "Value")
+
+        tyears <- unique(LFlong$Time)[order(unique(LFlong$Time))]
+        oyears <- (max(tyears)-Nyears_comp[f] + 1):max(tyears)
+        LFlonger <- lapply(1:nrow(LFlong), function(y){
+          if(LFlong$Value[y]>0){
+            len <- rep(LFlong$LengthBin[y], LFlong$Value[y])
+            out <- data.frame("Time"=LFlong$Time[y], "Variable"="Length","Value"=len)
+            return(out)
+          }
+          if(LFlong$Value[y]==0) return(data.frame("Time"=LFlong$Time[y], "Variable"="Length", "Value"=0))
+        })
+        LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=x) %>% filter("Time" %in% oyears)
+        return(LF2)
+      })
+      LF_out <- do.call(rbind, LFlong) %>% 
+                filter(Value != 0)
+
+      LF0long <- lapply(1:nfleets, function(x){
+        LF0sub <- LF0_tf[[x]]
+        LF0long <- melt(LF0sub)
+        colnames(LF0long) <- c("Time", "LengthBin", "Value")
+
+        tyears <- unique(LF0long$Time)[order(unique(LF0long$Time))]
+        oyears <- (max(tyears)-Nyears_comp[f] + 1):max(tyears)
+
+        LF0longer <- lapply(1:nrow(LF0long), function(y){
+          if(LF0long$Value[y]>0){
+            len <- rep(LF0long$LengthBin[y], LF0long$Value[y])
+            out <- data.frame("Time"=LF0long$Time[y], "Variable"="Length","Value"=len)
+            return(out)
+          }
+          if(LF0long$Value[y]==0) return(data.frame("Time"=LF0long$Time[y], "Variable"="Length_unfished", "Value"=0))
+        })
+        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter("Time" %in% oyears)
+        return(LF02)
+      })
+      LF0_out <- do.call(rbind, LF0long) %>% 
+                filter(Value != 0)
+
+      ## population parameters
+      Ff_out <- data.frame("Variable"="F", "Time"=c(sapply(1:ncol(F_ft), function(x) rep(x, nfleets))), "Value"=c(F_ft), "Fleet"=rep(1:nfleets, ncol(F_ft)))
+      ML_out <- data.frame("Variable"="MeanLen", "Time"=c(sapply(1:ncol(ML_ft), function(x) rep(x, nfleets))), "Value"=c(ML_ft), "Fleet"=rep(1:nfleets, ncol(ML_ft)))
+
+      ## not fleet-specific
+      R_out <- data.frame("Variable"="Recruitment", "Time"=1:length(R_t), "Value"=c(R_t), "Fleet"=0)
+      N_out <- data.frame("Variable"="Numbers", "Time"=1:length(N_t), "Value"=c(N_t), "Fleet"=0)
+      SB_out <- data.frame("Variable"="SpawningBiomass", "Time"=1:length(SB_t), "Value"=c(SB_t), "Fleet"=0)
+      D_out <- data.frame("Variable"="RelativeSB", "Time"=1:length(D_t), "Value"=c(D_t), "Fleet"=0)
+      F_out <- data.frame("Variable"="F", "Time"=1:length(F_t), "Value"=c(F_t), "Fleet"=0)
+      SPR_out <- data.frame("Variable"="SPR", "Time"=1:length(SPR_t), "Value"=c(SPR_t), "Fleet"=0)
+      TB_out <- data.frame("Variable"="TotalBiomass", "Time"=1:length(TB_t), "Value"=c(TB_t), "Fleet"=0)
+
+      outdf <- rbind(I_out, Cn_out, Cw_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
+      outdf$Fleet <- as.factor(outdf$Fleet)
+
+
       ## outputs
-      lh$I_ft <- I_ft
-      lh$Cn_ft <- Cn_ft
-      lh$Cw_ft <- Cw_ft
-      # if(is.numeric(Fdynamics) & mgt_type=="catch") lh$C_t <- C_t
-      lh$LF <- LF
-      lh$LF0 <- LF0
-      lh$R_t <- R_t
-      lh$N_t <- N_t
-      lh$SB_t <- SB_t
-      lh$D_t <- D_t
-      lh$F_t <- F_t
-      lh$F_ft <- F_ft
-      lh$ML_ft <- ML_ft
+      lh$df <- outdf
       lh$plb <- plb
       lh$plba <- plba
       lh$page <- page
       lh$N_at <- N_at
-      lh$SPR <- SPR
-      lh$SPR_t <- SPR_t
-      lh$TB_t <- TB_t
       lh$nlbins <- length(mids)
       if (pool == TRUE) {
         lh$Nyears <- Nyears_real

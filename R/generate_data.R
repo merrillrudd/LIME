@@ -60,6 +60,8 @@ generate_data <-
         ## simulated data with no spatial structure in growth
         DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_percentage=fleet_percentage)
     }
+
+  
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
         DataList <- NA
@@ -77,38 +79,39 @@ generate_data <-
     if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
    
-    DataList_out <- DataList
+    inits <- create_inputs(lh=lh, input_data=DataList)
+
     # if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
     # if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
     # rownames(DataList_out$LF) <- rownames(DataList$LF)
 
-    if(derive_quants==TRUE){
-        ## project the truth forward
-        inits <- create_inputs(lh=lh, input_data=DataList)
-        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$F_t, LFdist=1, S_l_input=-1, randomR=TRUE, C_opt=2)
-        ParList <- Inputs$Parameters    
+    # if(derive_quants==TRUE){
+    #     ## project the truth forward
+    #     inits <- create_inputs(lh=lh, input_data=DataList)
+    #     Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$df, LFdist=1, S_l_input=-1, randomR=TRUE, C_opt=2)
+    #     ParList <- Inputs$Parameters    
 
-        # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
+    #     # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
 
-        obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-        Derived <- calc_derived_quants(Obj=obj, lh=lh) 
+    #     obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
+    #     Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
-        DataList_out$MSY <- Derived$MSY
-        DataList_out$Fmsy <- Derived$Fmsy
-        DataList_out$FFmsy <- Derived$FFmsy
-        DataList_out$SBBmsy <- Derived$SBBmsy
-        DataList_out$SBmsy <- Derived$SBmsy
-        DataList_out$F30 <- Derived$F30
-        DataList_out$FF30 <- Derived$FF30
-        DataList_out$F40 <- Derived$F40
-        DataList_out$FF40 <- Derived$FF40
-        DataList_out$TBmsy <- Derived$TBmsy
-    }
+    #     DataList_out$MSY <- Derived$MSY
+    #     DataList_out$Fmsy <- Derived$Fmsy
+    #     DataList_out$FFmsy <- Derived$FFmsy
+    #     DataList_out$SBBmsy <- Derived$SBBmsy
+    #     DataList_out$SBmsy <- Derived$SBmsy
+    #     DataList_out$F30 <- Derived$F30
+    #     DataList_out$FF30 <- Derived$FF30
+    #     DataList_out$F40 <- Derived$F40
+    #     DataList_out$FF40 <- Derived$FF40
+    #     DataList_out$TBmsy <- Derived$TBmsy
+    # }
 
-      if(is.null(modpath)==FALSE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
-      if(is.null(modpath)) return(DataList_out)
+      if(is.null(modpath)==FALSE) saveRDS(inits, file.path(iterpath, "True.rds"))
+      if(is.null(modpath)) return(inits)
       rm(DataList)
-      rm(DataList_out)
+    rm(inits)
       rm(iterpath)
 
 }
