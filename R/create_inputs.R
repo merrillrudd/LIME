@@ -39,9 +39,9 @@ create_inputs <- function(lh, input_data){
                         sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
                         return(length(sub2))
                     })
-                    return(out)
                 }
-                if(nrow(sub==0)) out <- rep(0, length(highs))
+                if(nrow(sub)==0) out <- rep(0, length(highs))
+                return(out)
             }))
 
             LF[,,f] <- lfreq

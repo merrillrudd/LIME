@@ -419,10 +419,21 @@ sim_pop <-
 
 
       ## age to length comp
-      if(length(comp_sample)!=nfleets) comp_sample <- rep(comp_sample, nfleets)
-      obs_per_year <- t(sapply(1:nfleets, function(x){
-          rep(comp_sample[x] / nseasons, tyears)
-      }))
+      if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
+
+      ## years with observed length comps
+      oyears_mat <- matrix(0, nrow=nfleets, ncol=tyears)
+      for(f in 1:nfleets){
+        oyears <- (tyears-Nyears_comp[f] + 1):tyears
+        oyears_mat[f,oyears] <- 1
+      }
+
+      obs_per_year <- matrix(0, nrow=nfleets, ncol=tyears)
+      for(f in 1:nfleets){
+        for(t in 1:tyears){
+          if(oyears_mat[f,t]!=0) obs_per_year[f,t] <- (comp_sample/nseasons) / colSums(oyears_mat)[t]
+        }
+      }
 
       LFinfo <-lapply(1:nfleets, function(x){
         AgeToLengthComp(
@@ -502,14 +513,13 @@ sim_pop <-
       Cn_out <- data.frame("Variable"="Catch_numbers", "Time"=c(sapply(1:ncol(Cn_ft), function(x) rep(x, nfleets))), "Value"=c(Cn_ft), "Fleet"=rep(1:nfleets, ncol(Cn_ft)))
       Cw_out <- data.frame("Variable"="Catch_biomass", "Time"=c(sapply(1:ncol(Cw_ft), function(x) rep(x, nfleets))), "Value"=c(Cw_ft), "Fleet"=rep(1:nfleets, ncol(Cw_ft)))
 
-      if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
       LFlong <- lapply(1:nfleets, function(x){
         LFsub <- LF_tf[[x]]
         LFlong <- melt(LFsub)
         colnames(LFlong) <- c("Time", "LengthBin", "Value")
 
-        tyears <- unique(LFlong$Time)[order(unique(LFlong$Time))]
-        oyears <- (max(tyears)-Nyears_comp[f] + 1):max(tyears)
+        tyears_vec <- unique(LFlong$Time)[order(unique(LFlong$Time))]
+        oyears <- (max(tyears_vec)-Nyears_comp[x] + 1):max(tyears_vec)
         LFlonger <- lapply(1:nrow(LFlong), function(y){
           if(LFlong$Value[y]>0){
             len <- rep(LFlong$LengthBin[y], LFlong$Value[y])
@@ -518,7 +528,7 @@ sim_pop <-
           }
           if(LFlong$Value[y]==0) return(data.frame("Time"=LFlong$Time[y], "Variable"="Length", "Value"=0))
         })
-        LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=x) %>% filter("Time" %in% oyears)
+        LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=x) %>% filter(Time %in% oyears)
         return(LF2)
       })
       LF_out <- do.call(rbind, LFlong) %>% 
@@ -529,8 +539,8 @@ sim_pop <-
         LF0long <- melt(LF0sub)
         colnames(LF0long) <- c("Time", "LengthBin", "Value")
 
-        tyears <- unique(LF0long$Time)[order(unique(LF0long$Time))]
-        oyears <- (max(tyears)-Nyears_comp[f] + 1):max(tyears)
+        tyears_vec <- unique(LF0long$Time)[order(unique(LF0long$Time))]
+        oyears <- (max(tyears_vec)-Nyears_comp[f] + 1):max(tyears_vec)
 
         LF0longer <- lapply(1:nrow(LF0long), function(y){
           if(LF0long$Value[y]>0){
@@ -540,7 +550,7 @@ sim_pop <-
           }
           if(LF0long$Value[y]==0) return(data.frame("Time"=LF0long$Time[y], "Variable"="Length_unfished", "Value"=0))
         })
-        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter("Time" %in% oyears)
+        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter(Time %in% oyears)
         return(LF02)
       })
       LF0_out <- do.call(rbind, LF0long) %>% 
