@@ -579,7 +579,7 @@ sim_pop <-
 
 
       ## outputs
-      lh$df <- outdf
+      lh$dfsim <- outdf
       lh$plb <- plb
       lh$plba <- plba
       lh$page <- page
