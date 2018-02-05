@@ -356,7 +356,6 @@ sim_pop <-
         })
         return(findMax)
       }))
-      F_t <- colSums(F_ft)
 
 
       SPR_t <-
@@ -390,6 +389,7 @@ sim_pop <-
             sum(Cn_ft[y,time_index])
           }) #* exp(CatchDev - (SigmaC^2)/2)
         }))
+      Cn_t <- colSums(Cn_ft)
       Cw_ft <- t(sapply(1:nfleets, function(y){
           sapply(1:Nyears_real, function(x) {
             if (nseasons == 1)
@@ -399,6 +399,7 @@ sim_pop <-
             sum(Cw_ft[y,time_index])
           }) #* exp(CatchDev - (SigmaC^2)/2)
       }))
+      Cw_t <- colSums(Cw_ft)
 
       F_ft <- t(sapply(1:nfleets, function(y){
           sapply(1:Nyears_real, function(x) {
@@ -409,6 +410,8 @@ sim_pop <-
             sum(F_ft[y,time_index])
           })
       }))
+      F_t <- colSums(F_ft)
+
       R_t <- sapply(1:Nyears_real, function(x) {
         if (nseasons == 1)
           time_index <- x
@@ -566,10 +569,12 @@ sim_pop <-
       SB_out <- data.frame("Variable"="SpawningBiomass", "Time"=1:length(SB_t), "Value"=c(SB_t), "Fleet"=0)
       D_out <- data.frame("Variable"="RelativeSB", "Time"=1:length(D_t), "Value"=c(D_t), "Fleet"=0)
       F_out <- data.frame("Variable"="F", "Time"=1:length(F_t), "Value"=c(F_t), "Fleet"=0)
+      Cn_total_out <- data.frame("Variable"="Catch_numbers", "Time"=1:length(Cn_t), "Value"=Cn_t, "Fleet"=0)
+      Cw_total_out <- data.frame("Variable"="Catch_biomass", "Time"=1:length(Cw_t), "Value"=Cw_t, "Fleet"=0)
       SPR_out <- data.frame("Variable"="SPR", "Time"=1:length(SPR_t), "Value"=c(SPR_t), "Fleet"=0)
       TB_out <- data.frame("Variable"="TotalBiomass", "Time"=1:length(TB_t), "Value"=c(TB_t), "Fleet"=0)
 
-      outdf <- rbind(I_out, Cn_out, Cw_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
+      outdf <- rbind(I_out, Cn_out, Cw_out, Cn_total_out, Cw_total_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
       outdf$Fleet <- as.factor(outdf$Fleet)
 
 
