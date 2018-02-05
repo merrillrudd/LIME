@@ -218,8 +218,26 @@ function(vbk,
 
     if(any(selex_type=="dome")==FALSE) Sfull <- NULL
 
+    S_fl_out <- data.frame("Variable"="Selectivity", "Length"=c(sapply(1:ncol(S_fl), function(x) rep(mids[x], nfleets))), "Value"=c(S_fl), "Fleet"=rep(1:nfleets, ncol(S_fl)))
+    W_l_out <- data.frame("Variable"="Weight", "Length"=mids, "Value"=W_l, "Fleet"=0)
+    Mat_l_out <- data.frame("Variable"="Maturity", "Length"=mids, "Value"=Mat_l, "Fleet"=0)
+
+    S_fa_out <- data.frame("Variable"="Selectivity", "Age"=c(sapply(1:ncol(S_fa), function(x) rep(ages[x], nfleets))), "Value"=c(S_fa), "Fleet"=rep(1:nfleets, ncol(S_fa)))
+    L_a_out <- data.frame("Variable"="Length", "Age"=ages, "Value"=L_a, "Fleet"=0)
+    W_a_out <- data.frame("Variable"="Weight", "Age"=ages, "Value"=W_a, "Fleet"=0)
+    Mat_a_out <- data.frame("Variable"="Maturity", "Age"=ages, "Value"=Mat_a, "Fleet"=0)
+
+    df_lengths <- rbind(S_fl_out, W_l_out, Mat_l_out)
+    df_ages <- rbind(S_fa_out, L_a_out, W_a_out, Mat_a_out)
+    df_lengths$Fleet <- as.factor(df_lengths$Fleet)
+    df_ages$Fleet <- as.factor(df_ages$Fleet)
+
+
+
     ## output list
     Outs <- NULL
+    Outs$df_lengths <- df_lengths
+    Outs$df_ages <- df_ages
     Outs$vbk <- vbk
     Outs$linf <- linf
     Outs$t0 <- t0
