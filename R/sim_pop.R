@@ -434,7 +434,7 @@ sim_pop <-
       obs_per_year <- matrix(0, nrow=nfleets, ncol=tyears)
       for(f in 1:nfleets){
         for(t in 1:tyears){
-          if(oyears_mat[f,t]!=0) obs_per_year[f,t] <- (comp_sample/nseasons) / colSums(oyears_mat)[t]
+          if(oyears_mat[f,t]!=0) obs_per_year[f,t] <- (comp_sample/nseasons)
         }
       }
 
