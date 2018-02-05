@@ -8,6 +8,10 @@ library(LIME)
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
 library(TMBhelper)
 
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
 ##----------------------------------------------------------------
@@ -72,9 +76,52 @@ data_LF <- list("years"=years, "LF"=LF) ## length comp only
 ## plot length composition data
 plot_LCfits(LFlist=lapply(1:dim(LF)[3], function(x) LF[,,x])) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
+## plot simulated data
+df <- true$df
+p <- ggplot(df %>% filter(Variable %in% c("Index","Catch_biomass","MeanLen","RelativeSB"))) +
+	geom_line(aes(x=Time, y=Value, colour=Fleet), lwd=2) +
+	facet_wrap(~Variable, scale='free_y') +
+	expand_limits(y=0) +
+	theme_lsd()
+
 ##----------------------------------------------------
 ## Step 3: Run Model
 ## ---------------------------------------------------
+##-------------------------
+## template file
+##--------------------------
+src_dir <- file.path("C:\\merrill\\LIME\\src")
+setwd(src_dir)
+compile("LIME.cpp")
+
+dyn.load( dynlib("LIME") )
+
+## ----------------------
+## starting values
+## ---------------------
+
+
+##--------------------------
+## build inputs and object
+##--------------------------
+
+Data <- list()
+Params <- list()
+Map <- list()
+    # Map[["logsigma"]] <- NA
+    # Map[["logsigma"]] <- factor(Map[["logsigma"]])
+
+Obj <- MakeADFun( data=Data, parameters=Params, map=Map, Random="Nu_input", DLL="LIME")
+
+Opt <- TMBhelper::Optimize( obj=Obj, loopnum=3 )
+# Opt <- nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, upper=Upr, lower=Lwr)
+Opt[["final_gradient"]] = Obj$gr( Opt$par ) 
+df <- Opt[["final_gradient"]]
+colnames(df) <- names(Obj$par)
+which(abs(df) > 0.001)
+ 
+Report <- Obj$report()
+Sdreport <- sdreport(Obj)
 
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model

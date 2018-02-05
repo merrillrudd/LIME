@@ -34,6 +34,7 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(n_i); // number of years of index data available
     DATA_INTEGER(n_lc); // number of years of length composition data
     DATA_INTEGER(n_ml); // number of years of mean length data
+    DATA_INTEGER(n_fl); // number of fleets
     DATA_VECTOR(T_yrs); // vector of years of all data types
     DATA_VECTOR(C_yrs); // vector of years of catch data available
     DATA_VECTOR(I_yrs); // vector of years of index data available

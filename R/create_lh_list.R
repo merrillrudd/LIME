@@ -228,7 +228,7 @@ function(vbk,
     Mat_a_out <- data.frame("Variable"="Maturity", "By"="Age", "x"=ages, "Value"=Mat_a, "Fleet"=0)
 
     df <- rbind(S_fl_out, W_l_out, Mat_l_out, S_fa_out, L_a_out, W_a_out, Mat_a_out)
-    df$Fleet <- as.factor(df_lengths$Fleet)
+    df$Fleet <- as.factor(df$Fleet)
 
 
 
