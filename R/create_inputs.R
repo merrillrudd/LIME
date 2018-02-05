@@ -21,7 +21,7 @@ create_inputs <- function(lh, input_data){
         dat_input$log_CV_L <- log(dat_input$CVlen)
 
         ## make sure length bins from life history and observed data match
-        if(is.null(dat_input$df)==FALSE) length_raw <- dat_input$df %>% filter(Variable == "Length")
+        if(is.null(dat_input$df)==FALSE) length_raw <- dat_input$dfsim %>% filter(Variable == "LengthComp")
         if(is.null(dat_input$df)) stop("Data required as long-form data frame. See LIME reference materials for guidance https://github.com/merrillrudd/LIME/docs")
         max_bin <- max(c(max(dat_input$highs), ceiling(max(length_raw$Value)*1.25)))
         bw <- dat_input$binwidth
@@ -33,7 +33,7 @@ create_inputs <- function(lh, input_data){
         for(f in 1:dat_input$nfleets){
             lfind <- length_raw %>% filter(Fleet==f)
             lfreq <- t(sapply(1:length(time), function(x){
-                sub <- lfind %>% filter(Time==time[x])
+                sub <- lfind %>% filter(X==time[x])
                 if(nrow(sub)>0){
                     out <- sapply(1:length(highs), function(y){
                         sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]

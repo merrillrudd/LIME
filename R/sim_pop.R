@@ -526,10 +526,10 @@ sim_pop <-
         LFlonger <- lapply(1:nrow(LFlong), function(y){
           if(LFlong$Value[y]>0){
             len <- rep(LFlong$LengthBin[y], LFlong$Value[y])
-            out <- data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="Length","Value"=len)
+            out <- data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="LengthComp","Value"=len)
             return(out)
           }
-          if(LFlong$Value[y]==0) return(data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="Length", "Value"=0))
+          if(LFlong$Value[y]==0) return(data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="LengthComp", "Value"=0))
         })
         LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=z) %>% filter(X %in% oyears)
         return(LF2)
@@ -537,13 +537,13 @@ sim_pop <-
       LF_out <- do.call(rbind, LFlong) %>% 
                 filter(Value != 0)
 
-      LF0long <- lapply(1:nfleets, function(x){
-        LF0sub <- LF0_tf[[x]]
+      LF0long <- lapply(1:nfleets, function(z){
+        LF0sub <- LF0_tf[[z]]
         LF0long <- melt(LF0sub)
         colnames(LF0long) <- c("X", "LengthBin", "Value")
 
         tyears_vec <- unique(LF0long$X)[order(unique(LF0long$X))]
-        oyears <- (max(tyears_vec)-Nyears_comp[f] + 1):max(tyears_vec)
+        oyears <- (max(tyears_vec)-Nyears_comp[z] + 1):max(tyears_vec)
 
         LF0longer <- lapply(1:nrow(LF0long), function(y){
           if(LF0long$Value[y]>0){
@@ -553,7 +553,7 @@ sim_pop <-
           }
           if(LF0long$Value[y]==0) return(data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="LengthComp", "Value"=0))
         })
-        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter(X %in% oyears)
+        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=z) %>% filter(X %in% oyears)
         return(LF02)
       })
       LF0_out <- do.call(rbind, LF0long) %>% 
