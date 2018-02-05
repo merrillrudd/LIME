@@ -234,8 +234,7 @@ function(vbk,
 
     ## output list
     Outs <- NULL
-    Outs$df_lengths <- df_lengths
-    Outs$df_ages <- df_ages
+    Outs$df <- df
     Outs$vbk <- vbk
     Outs$linf <- linf
     Outs$t0 <- t0
