@@ -512,26 +512,26 @@ sim_pop <-
         ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
 
       ## generated data
-      I_out <- data.frame("Variable"="Index", "Time"=c(sapply(1:ncol(I_ft), function(x) rep(x, nfleets))), "Value"=c(I_ft), "Fleet"=rep(1:nfleets, ncol(I_ft)))
-      Cn_out <- data.frame("Variable"="Catch_numbers", "Time"=c(sapply(1:ncol(Cn_ft), function(x) rep(x, nfleets))), "Value"=c(Cn_ft), "Fleet"=rep(1:nfleets, ncol(Cn_ft)))
-      Cw_out <- data.frame("Variable"="Catch_biomass", "Time"=c(sapply(1:ncol(Cw_ft), function(x) rep(x, nfleets))), "Value"=c(Cw_ft), "Fleet"=rep(1:nfleets, ncol(Cw_ft)))
+      I_out <- data.frame("Variable"="Index", "By"="Time", "X"=c(sapply(1:ncol(I_ft), function(x) rep(x, nfleets))), "Value"=c(I_ft), "Fleet"=rep(1:nfleets, ncol(I_ft)))
+      Cn_out <- data.frame("Variable"="Catch_numbers", "By"="Time", "X"=c(sapply(1:ncol(Cn_ft), function(x) rep(x, nfleets))), "Value"=c(Cn_ft), "Fleet"=rep(1:nfleets, ncol(Cn_ft)))
+      Cw_out <- data.frame("Variable"="Catch_biomass", "By"="Time", "X"=c(sapply(1:ncol(Cw_ft), function(x) rep(x, nfleets))), "Value"=c(Cw_ft), "Fleet"=rep(1:nfleets, ncol(Cw_ft)))
 
-      LFlong <- lapply(1:nfleets, function(x){
-        LFsub <- LF_tf[[x]]
+      LFlong <- lapply(1:nfleets, function(z){
+        LFsub <- LF_tf[[z]]
         LFlong <- melt(LFsub)
-        colnames(LFlong) <- c("Time", "LengthBin", "Value")
+        colnames(LFlong) <- c("X", "LengthBin", "Value")
 
-        tyears_vec <- unique(LFlong$Time)[order(unique(LFlong$Time))]
-        oyears <- (max(tyears_vec)-Nyears_comp[x] + 1):max(tyears_vec)
+        tyears_vec <- unique(LFlong$X)[order(unique(LFlong$X))]
+        oyears <- (max(tyears_vec)-Nyears_comp[z] + 1):max(tyears_vec)
         LFlonger <- lapply(1:nrow(LFlong), function(y){
           if(LFlong$Value[y]>0){
             len <- rep(LFlong$LengthBin[y], LFlong$Value[y])
-            out <- data.frame("Time"=LFlong$Time[y], "Variable"="Length","Value"=len)
+            out <- data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="Length","Value"=len)
             return(out)
           }
-          if(LFlong$Value[y]==0) return(data.frame("Time"=LFlong$Time[y], "Variable"="Length", "Value"=0))
+          if(LFlong$Value[y]==0) return(data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="Length", "Value"=0))
         })
-        LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=x) %>% filter(Time %in% oyears)
+        LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=z) %>% filter(X %in% oyears)
         return(LF2)
       })
       LF_out <- do.call(rbind, LFlong) %>% 
@@ -540,39 +540,39 @@ sim_pop <-
       LF0long <- lapply(1:nfleets, function(x){
         LF0sub <- LF0_tf[[x]]
         LF0long <- melt(LF0sub)
-        colnames(LF0long) <- c("Time", "LengthBin", "Value")
+        colnames(LF0long) <- c("X", "LengthBin", "Value")
 
-        tyears_vec <- unique(LF0long$Time)[order(unique(LF0long$Time))]
+        tyears_vec <- unique(LF0long$X)[order(unique(LF0long$X))]
         oyears <- (max(tyears_vec)-Nyears_comp[f] + 1):max(tyears_vec)
 
         LF0longer <- lapply(1:nrow(LF0long), function(y){
           if(LF0long$Value[y]>0){
             len <- rep(LF0long$LengthBin[y], LF0long$Value[y])
-            out <- data.frame("Time"=LF0long$Time[y], "Variable"="Length","Value"=len)
+            out <- data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="Length","Value"=len)
             return(out)
           }
-          if(LF0long$Value[y]==0) return(data.frame("Time"=LF0long$Time[y], "Variable"="Length_unfished", "Value"=0))
+          if(LF0long$Value[y]==0) return(data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="Length_unfished", "Value"=0))
         })
-        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter(Time %in% oyears)
+        LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter(X %in% oyears)
         return(LF02)
       })
       LF0_out <- do.call(rbind, LF0long) %>% 
                 filter(Value != 0)
 
       ## population parameters
-      Ff_out <- data.frame("Variable"="F", "Time"=c(sapply(1:ncol(F_ft), function(x) rep(x, nfleets))), "Value"=c(F_ft), "Fleet"=rep(1:nfleets, ncol(F_ft)))
-      ML_out <- data.frame("Variable"="MeanLen", "Time"=c(sapply(1:ncol(ML_ft), function(x) rep(x, nfleets))), "Value"=c(ML_ft), "Fleet"=rep(1:nfleets, ncol(ML_ft)))
+      Ff_out <- data.frame("Variable"="F", "By"="Time", "X"=c(sapply(1:ncol(F_ft), function(x) rep(x, nfleets))), "Value"=c(F_ft), "Fleet"=rep(1:nfleets, ncol(F_ft)))
+      ML_out <- data.frame("Variable"="MeanLen", "By"="Time", "X"=c(sapply(1:ncol(ML_ft), function(x) rep(x, nfleets))), "Value"=c(ML_ft), "Fleet"=rep(1:nfleets, ncol(ML_ft)))
 
       ## not fleet-specific
-      R_out <- data.frame("Variable"="Recruitment", "Time"=1:length(R_t), "Value"=c(R_t), "Fleet"=0)
-      N_out <- data.frame("Variable"="Numbers", "Time"=1:length(N_t), "Value"=c(N_t), "Fleet"=0)
-      SB_out <- data.frame("Variable"="SpawningBiomass", "Time"=1:length(SB_t), "Value"=c(SB_t), "Fleet"=0)
-      D_out <- data.frame("Variable"="RelativeSB", "Time"=1:length(D_t), "Value"=c(D_t), "Fleet"=0)
-      F_out <- data.frame("Variable"="F", "Time"=1:length(F_t), "Value"=c(F_t), "Fleet"=0)
-      Cn_total_out <- data.frame("Variable"="Catch_numbers", "Time"=1:length(Cn_t), "Value"=Cn_t, "Fleet"=0)
-      Cw_total_out <- data.frame("Variable"="Catch_biomass", "Time"=1:length(Cw_t), "Value"=Cw_t, "Fleet"=0)
-      SPR_out <- data.frame("Variable"="SPR", "Time"=1:length(SPR_t), "Value"=c(SPR_t), "Fleet"=0)
-      TB_out <- data.frame("Variable"="TotalBiomass", "Time"=1:length(TB_t), "Value"=c(TB_t), "Fleet"=0)
+      R_out <- data.frame("Variable"="Recruitment", "By"="Time", "X"=1:length(R_t), "Value"=c(R_t), "Fleet"=0)
+      N_out <- data.frame("Variable"="Numbers", "By"="Time", "X"=1:length(N_t), "Value"=c(N_t), "Fleet"=0)
+      SB_out <- data.frame("Variable"="SpawningBiomass", "By"="Time", "X"=1:length(SB_t), "Value"=c(SB_t), "Fleet"=0)
+      D_out <- data.frame("Variable"="RelativeSB", "By"="Time", "X"=1:length(D_t), "Value"=c(D_t), "Fleet"=0)
+      F_out <- data.frame("Variable"="F", "By"="Time", "X"=1:length(F_t), "Value"=c(F_t), "Fleet"=0)
+      Cn_total_out <- data.frame("Variable"="Catch_numbers", "By"="Time", "X"=1:length(Cn_t), "Value"=Cn_t, "Fleet"=0)
+      Cw_total_out <- data.frame("Variable"="Catch_biomass", "By"="Time", "X"=1:length(Cw_t), "Value"=Cw_t, "Fleet"=0)
+      SPR_out <- data.frame("Variable"="SPR", "By"="Time", "X"=1:length(SPR_t), "Value"=c(SPR_t), "Fleet"=0)
+      TB_out <- data.frame("Variable"="TotalBiomass", "By"="Time", "X"=1:length(TB_t), "Value"=c(TB_t), "Fleet"=0)
 
       outdf <- rbind(I_out, Cn_out, Cw_out, Cn_total_out, Cw_total_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
       outdf$Fleet <- as.factor(outdf$Fleet)
