@@ -356,6 +356,7 @@ sim_pop <-
         })
         return(findMax)
       }))
+      F_t <- colSums(F_ft)
 
 
       SPR_t <-
@@ -410,7 +411,6 @@ sim_pop <-
             sum(F_ft[y,time_index])
           })
       }))
-      F_t <- colSums(F_ft)
 
       R_t <- sapply(1:Nyears_real, function(x) {
         if (nseasons == 1)
