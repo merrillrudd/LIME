@@ -28,7 +28,7 @@ create_inputs <- function(lh, input_data){
         highs <- seq(bw, max_bin, by=bw)
         mids <- seq(bw/2, max(highs), by=bw)
         lows <- highs - bw
-        time <- unique(length_raw$Time)[order(unique(length_raw$Time))]
+        time <- unique(length_raw$X)[order(unique(length_raw$X))]
         LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
         for(f in 1:dat_input$nfleets){
             lfind <- length_raw %>% filter(Fleet==f)
