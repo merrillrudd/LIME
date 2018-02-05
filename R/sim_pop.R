@@ -285,7 +285,7 @@ sim_pop <-
       }
 
       ## unfished spawning biomass
-      SB0 <- sum(N_at0[, 1] * Mat_a * W_a)
+      SB0 <- sum(R0 * exp(-M * ages[-1]) * W_a[-1] * Mat_a[-1])      
 
       ## relative biomass (depletion) over time
       D_t <- rep(NA, tyears)
