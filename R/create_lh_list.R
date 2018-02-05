@@ -218,14 +218,14 @@ function(vbk,
 
     if(any(selex_type=="dome")==FALSE) Sfull <- NULL
 
-    S_fl_out <- data.frame("Variable"="Selectivity", "By"="Length", "x"=c(sapply(1:ncol(S_fl), function(x) rep(mids[x], nfleets))), "Value"=c(S_fl), "Fleet"=rep(1:nfleets, ncol(S_fl)))
-    W_l_out <- data.frame("Variable"="Weight", "By"="Length", "x"=mids, "Value"=W_l, "Fleet"=0)
-    Mat_l_out <- data.frame("Variable"="Maturity", "By"="Length", "x"=mids, "Value"=Mat_l, "Fleet"=0)
+    S_fl_out <- data.frame("Variable"="Selectivity", "By"="Length", "X"=c(sapply(1:ncol(S_fl), function(x) rep(mids[x], nfleets))), "Value"=c(S_fl), "Fleet"=rep(1:nfleets, ncol(S_fl)))
+    W_l_out <- data.frame("Variable"="Weight", "By"="Length", "X"=mids, "Value"=W_l, "Fleet"=0)
+    Mat_l_out <- data.frame("Variable"="Maturity", "By"="Length", "X"=mids, "Value"=Mat_l, "Fleet"=0)
 
-    S_fa_out <- data.frame("Variable"="Selectivity", "By"="Age", "x"=c(sapply(1:ncol(S_fa), function(x) rep(ages[x], nfleets))), "Value"=c(S_fa), "Fleet"=rep(1:nfleets, ncol(S_fa)))
-    L_a_out <- data.frame("Variable"="Length", "By"="Age", "x"=ages, "Value"=L_a, "Fleet"=0)
-    W_a_out <- data.frame("Variable"="Weight", "By"="Age", "x"=ages, "Value"=W_a, "Fleet"=0)
-    Mat_a_out <- data.frame("Variable"="Maturity", "By"="Age", "x"=ages, "Value"=Mat_a, "Fleet"=0)
+    S_fa_out <- data.frame("Variable"="Selectivity", "By"="Age", "X"=c(sapply(1:ncol(S_fa), function(x) rep(ages[x], nfleets))), "Value"=c(S_fa), "Fleet"=rep(1:nfleets, ncol(S_fa)))
+    L_a_out <- data.frame("Variable"="Length", "By"="Age", "X"=ages, "Value"=L_a, "Fleet"=0)
+    W_a_out <- data.frame("Variable"="Weight", "By"="Age", "X"=ages, "Value"=W_a, "Fleet"=0)
+    Mat_a_out <- data.frame("Variable"="Maturity", "By"="Age", "X"=ages, "Value"=Mat_a, "Fleet"=0)
 
     df <- rbind(S_fl_out, W_l_out, Mat_l_out, S_fa_out, L_a_out, W_a_out, Mat_a_out)
     df$Fleet <- as.factor(df$Fleet)
