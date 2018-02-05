@@ -548,10 +548,10 @@ sim_pop <-
         LF0longer <- lapply(1:nrow(LF0long), function(y){
           if(LF0long$Value[y]>0){
             len <- rep(LF0long$LengthBin[y], LF0long$Value[y])
-            out <- data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="Length","Value"=len)
+            out <- data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="LengthComp","Value"=len)
             return(out)
           }
-          if(LF0long$Value[y]==0) return(data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="Length_unfished", "Value"=0))
+          if(LF0long$Value[y]==0) return(data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="LengthComp", "Value"=0))
         })
         LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=x) %>% filter(X %in% oyears)
         return(LF02)
