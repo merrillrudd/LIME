@@ -596,6 +596,7 @@ sim_pop <-
       lh$obs_per_year <- obs_per_year
       lh$RecDev <- RecDev_AR
       lh$FishDev_f <- FishDev_f
+      lh$SB0 <- SB0
 
 
       return(lh)
