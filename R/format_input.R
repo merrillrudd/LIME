@@ -238,7 +238,7 @@ format_input <- function(input,
         }       
 
         ## set input parameters - regardless of data availability 
-        if(all(is.null(f_startval_ft))) f_startval_ft <- t(sapply(1:nfleets, function(x) rep(1, Nyears2)))
+        if(all(is.null(f_startval_ft))) f_startval_ft <- t(sapply(1:nfleets, function(x) rep(0.2, Nyears2)))
         if(all(is.null(rdev_startval_t))) rdev_startval_t <- rep(0, Nyears2)
         Parameters <- list("log_F_ft"=log(f_startval_ft),
                         "log_q_f"=rep(log(qcoef), Data$n_fl),
@@ -262,15 +262,15 @@ format_input <- function(input,
                 Map[["beta"]] <- factor(Map[["beta"]])
             }
             if(grepl("Index",data_avail)==FALSE){
-                Map[["log_q_f"]] <- rep(NA, length(which(names(Parameters)=="log_q_f")))
+                Map[["log_q_f"]] <- rep(NA, length(Parameters[["log_q_f"]]))
                 Map[["log_q_f"]] <- factor(Map[["log_q_f"]])
             }
 
             ## based on function inputs
             if(all(fix_more!=FALSE)){
-                for(i in 1:length(fix_param)){
-                    Map[[fix_param[i]]] <- rep(NA, length(which(names(Parameters)==fix_param[i])))
-                    Map[[fix_param[i]]] <- factor(Map[[fix_param[i]]])
+                for(i in 1:length(fix_more)){
+                    Map[[fix_more[i]]] <- rep(NA, length(Parameters[[fix_more[i]]]))
+                    Map[[fix_more[i]]] <- factor(Map[[fix_more[i]]])
                 }
             }
             if("log_sigma_F" %in% est_more==FALSE){
@@ -308,12 +308,12 @@ format_input <- function(input,
             if(any(est_selex_f == FALSE)){
                 Map[["log_S50_f"]] <- Parameters$log_S50_f
                 if(all(est_selex_f==FALSE) & nfleets > 1) Map[["log_S50_f"]][which(est_selex_f==FALSE)] <- NA
-                if(all(est_selex_f==FALSE)) Map[["log_S50_f"]] <- rep(NA, length(which(names(Parameters)=="log_S50_f")))
+                if(all(est_selex_f==FALSE)) Map[["log_S50_f"]] <- rep(NA, length(Parameters[["log_S50_f"]]))
                 Map[["log_S50_f"]] <- factor(Map[["log_S50_f"]])
 
                 Map[["log_Sdelta_f"]] <- Parameters$log_Sdelta_f
                 if(all(est_selex_f==FALSE) & nfleets > 1) Map[["log_Sdelta_f"]][which(est_selex_f==FALSE)] <- NA
-                if(all(est_selex_f==FALSE)) Map[["log_Sdelta_f"]] <- rep(NA, length(which(names(Parameters)=="log_Sdelta_f")))
+                if(all(est_selex_f==FALSE)) Map[["log_Sdelta_f"]] <- rep(NA, length(Parameters[["log_Sdelta_f"]]))
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])
             }
 

@@ -43,26 +43,7 @@ create_inputs <- function(lh, input_data){
                 }
             }
         }
-
-        if(is.list(dat_input$LF)){
-            for(f in 1:length(length_raw)){
-                colnames(length_raw[[x]]) <- seq(bw, by=bw, length=ncol(length_raw[[x]]))
-            }
-            max_bin <- max(c(max(dat_input$highs), 
-                            sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]])))), 
-                            sapply(1:length(length_raw), function(x) as.numeric(colnames(length_raw[[x]])[max(which(colSums(length_raw[[x]])>0))]))))
-            highs <- seq(bw, max_bin, by=bw)
-            mids <- seq(bw/2, max(highs), by=bw)
-            lows <- highs - bw
-            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw[[x]]))))))
-            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
-            rownames(LF) <- time
-            colnames(LF) <- highs
-            for(f in 1:dat_input$nfleets){
-                LFsub <- length_raw[[f]]
-                LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
-            }
-        }
+        dat_input$LF <- LF
 
         ## make sure length bins from life history and observed data match
         if(is.data.frame(dat_input$LF)){
@@ -90,6 +71,27 @@ create_inputs <- function(lh, input_data){
             }
             rownames(LF) <- time
             colnames(LF) <- highs
+        }
+        dat_input$LF <- LF
+
+        if(is.list(dat_input$LF)){
+            for(f in 1:length(length_raw)){
+                colnames(length_raw[[x]]) <- seq(bw, by=bw, length=ncol(length_raw[[x]]))
+            }
+            max_bin <- max(c(max(dat_input$highs), 
+                            sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]])))), 
+                            sapply(1:length(length_raw), function(x) as.numeric(colnames(length_raw[[x]])[max(which(colSums(length_raw[[x]])>0))]))))
+            highs <- seq(bw, max_bin, by=bw)
+            mids <- seq(bw/2, max(highs), by=bw)
+            lows <- highs - bw
+            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw[[x]]))))))
+            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+            rownames(LF) <- time
+            colnames(LF) <- highs
+            for(f in 1:dat_input$nfleets){
+                LFsub <- length_raw[[f]]
+                LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
+            }
         }
         dat_input$LF <- LF
         dat_input$highs <- highs
