@@ -150,19 +150,21 @@ Type objective_function<Type>::operator() ()
 
   // Transform vectors
   matrix<Type> F_ft(n_fl,n_t); //number of total time steps
-  matrix<Type> F_fy(n_fl,n_y); //number of years
+  F_ft.setZero();
   for(int f=0;f<n_fl;f++){
-    for(int y=0;y<n_y;y++){
-      F_fy(f,y) = exp(log_F_ft(f,y));
+    for(int t=0;t<n_t;t++){
+      F_ft(f,t) = exp(log_F_ft(f,t));
     }
   }
 
+  matrix<Type> F_fy(n_fl,n_y); //number of years
+  F_fy.setZero();
   int tmp; 
   for(int f=0;f<n_fl;f++){
-    for(int t=0;t<n_t;t++){
-      tmp = S_yrs(t) - 1;
-      // match fishing mortality in the total number of time steps to the annual parameter F
-      F_ft(f,t) = F_fy(f,tmp)/n_s;
+      for(int t=0;t<n_t;t++){
+        tmp = S_yrs(t) - 1;
+        // match fishing mortality in the total number of time steps to the annual parameter F
+        F_fy(f,tmp) += F_ft(f,t);
     }
   }
 

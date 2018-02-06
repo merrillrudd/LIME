@@ -92,7 +92,7 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=length(Nyears2))   
+                         "n_y"=Nyears2)   
         }
 
         ## index and length composition data
@@ -139,7 +139,7 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=length(Nyears2))   
+                         "n_y"=Nyears2)   
         }
 
 
@@ -187,7 +187,7 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=length(Nyears2))      
+                         "n_y"=Nyears2)      
         }
 
         ## length composition data only 
@@ -234,7 +234,7 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=length(Nyears2))   
+                         "n_y"=Nyears2)   
         }       
 
         ## set input parameters - regardless of data availability 
