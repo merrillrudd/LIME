@@ -20,34 +20,77 @@ create_inputs <- function(lh, input_data){
         
         dat_input$log_CV_L <- log(dat_input$CVlen)
 
-        ## make sure length bins from life history and observed data match
-        if(is.null(dat_input$df)==FALSE) length_raw <- dat_input$dfsim %>% filter(Variable == "LengthComp")
-        if(is.null(dat_input$df)) stop("Data required as long-form data frame. See LIME reference materials for guidance https://github.com/merrillrudd/LIME/docs")
-        max_bin <- max(c(max(dat_input$highs), ceiling(max(length_raw$Value)*1.25)))
+        length_raw <- dat_input$LF
         bw <- dat_input$binwidth
-        highs <- seq(bw, max_bin, by=bw)
-        mids <- seq(bw/2, max(highs), by=bw)
-        lows <- highs - bw
-        time <- unique(length_raw$X)[order(unique(length_raw$X))]
-        LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
-        for(f in 1:dat_input$nfleets){
-            lfind <- length_raw %>% filter(Fleet==f)
-            lfreq <- t(sapply(1:length(time), function(x){
-                sub <- lfind %>% filter(X==time[x])
-                if(nrow(sub)>0){
-                    out <- sapply(1:length(highs), function(y){
-                        sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
-                        return(length(sub2))
-                    })
-                }
-                if(nrow(sub)==0) out <- rep(0, length(highs))
-                return(out)
-            }))
 
-            LF[,,f] <- lfreq
+        if(is.array(dat_input$LF)){
+            length_raw <- dat_input$LF
+            bins_dim <- seq(bw, by=bw, length=dim(length_raw)[2])
+            max_bin <- max(c(max(dat_input$highs), 
+                            max(bins_dim), 
+                            sapply(1:dat_input$nfleets, function(x) as.numeric(colnames(length_raw[,,x])[max(which(colSums(length_raw[,,x])>0))]))))
+            highs <- seq(bw, max_bin, by=bw)
+            mids <- seq(bw/2, max(highs), by=bw)
+            lows <- highs - bw
+            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw))))))
+            if(max_bin > max(bins_dim)){
+                LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))            
+                rownames(LF) <- time
+                colnames(LF) <- highs
+                for(f in 1:dat_input$nfleets){
+                    LFsub <- length_raw[,,f]
+                    LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
+                }
+            }
         }
-        rownames(LF) <- time
-        colnames(LF) <- highs
+
+        if(is.list(dat_input$LF)){
+            for(f in 1:length(length_raw)){
+                colnames(length_raw[[x]]) <- seq(bw, by=bw, length=ncol(length_raw[[x]]))
+            }
+            max_bin <- max(c(max(dat_input$highs), 
+                            sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]])))), 
+                            sapply(1:length(length_raw), function(x) as.numeric(colnames(length_raw[[x]])[max(which(colSums(length_raw[[x]])>0))]))))
+            highs <- seq(bw, max_bin, by=bw)
+            mids <- seq(bw/2, max(highs), by=bw)
+            lows <- highs - bw
+            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw[[x]]))))))
+            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+            rownames(LF) <- time
+            colnames(LF) <- highs
+            for(f in 1:dat_input$nfleets){
+                LFsub <- length_raw[[f]]
+                LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
+            }
+        }
+
+        ## make sure length bins from life history and observed data match
+        if(is.data.frame(dat_input$LF)){
+            max_bin <- max(c(max(dat_input$highs), ceiling(max(length_raw$Value)*1.25)))
+            highs <- seq(bw, max_bin, by=bw)
+            mids <- seq(bw/2, max(highs), by=bw)
+            lows <- highs - bw
+            time <- unique(length_raw$X)[order(unique(length_raw$X))]
+            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+            for(f in 1:dat_input$nfleets){
+                lfind <- length_raw %>% filter(Fleet==f)
+                lfreq <- t(sapply(1:length(time), function(x){
+                    sub <- lfind %>% filter(X==time[x])
+                    if(nrow(sub)>0){
+                        out <- sapply(1:length(highs), function(y){
+                            sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
+                            return(length(sub2))
+                        })
+                    }
+                    if(nrow(sub)==0) out <- rep(0, length(highs))
+                    return(out)
+                })) 
+
+                LF[,,f] <- lfreq
+            }
+            rownames(LF) <- time
+            colnames(LF) <- highs
+        }
         dat_input$LF <- LF
         dat_input$highs <- highs
         dat_input$mids <- mids
