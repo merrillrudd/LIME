@@ -234,7 +234,7 @@ Type objective_function<Type>::operator() ()
       }
     }
   }
-  
+
   // combine total fishing mortality at age over time across fleets
   matrix<Type> F_ta(n_t,n_a);
   F_ta.setZero();
@@ -668,6 +668,7 @@ Type objective_function<Type>::operator() ()
   REPORT( N_t );
   REPORT( F_ft );
   REPORT( F_fy );
+  REPORT( F_ta );
 
   // Predicted quantities
   REPORT( ML_ft_hat );
