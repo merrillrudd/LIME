@@ -234,7 +234,17 @@ Type objective_function<Type>::operator() ()
       }
     }
   }
-
+  
+  // combine total fishing mortality at age over time across fleets
+  matrix<Type> F_ta(n_t,n_a);
+  F_ta.setZero();
+  for(int f=0;f<n_fl;f++){
+    for(int t=0;t<n_t;t++){
+      for(int a=0;a<n_a;a++){
+        F_ta(t,a) += F_atf(a,t,f);     
+      }      
+    }
+  }
 
   // =========================== Population dynamics ===============================  
 
@@ -242,15 +252,6 @@ Type objective_function<Type>::operator() ()
   vector<Type> R_t(n_t); //recruitment
   R_t.setZero();
   R_t(0) = exp(beta) * exp(Nu_input(0) - pow(sigma_R,2)/Type(2));
-
-  // combine total fishing mortality at age over time across fleets
-  matrix<Type> F_ta(n_t,n_a);
-  F_ta.setZero();
-  for(int f=0;f<n_fl;f++){
-    for(int a=0;a<n_a;a++){
-      F_ta(0,a) += F_atf(a,0,f);     
-    }
-  }
 
   //over time by age
   matrix<Type> N_ta(n_t,n_a); // abundance
