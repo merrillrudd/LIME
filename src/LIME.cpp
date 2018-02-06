@@ -38,7 +38,7 @@ Type objective_function<Type>::operator() ()
     DATA_MATRIX(n_lc_ft); // number of independent observation times annually, likely between 1 and C_t
     DATA_MATRIX(I_ft); // CPUE for each year
     DATA_MATRIX(C_ft); // catch each year
-    DATA_INTEGER(C_opt); // if C_opt=0, no catch data, if C_opt=1, numbers, if C_opt=2, biomass
+    DATA_INTEGER(C_type); // if C_type=0, no catch data, if C_type=1, numbers, if C_type=2, biomass
     DATA_MATRIX(ML_ft); // mean length each year
 
     // Known values
@@ -541,8 +541,8 @@ Type objective_function<Type>::operator() ()
   //     for(int c=0;c<n_c;c++){
   //       if(C_yrs(c)==T_yrs(t)){
   //         // probability of index at that sample
-  //         if(C_opt==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
-  //         if(C_opt==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
+  //         if(C_type==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
+  //         if(C_type==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
   //         }
   //       }
   //     }
@@ -594,9 +594,9 @@ Type objective_function<Type>::operator() ()
       lTB_t(t) = log(TB_t(t));
       lR_t(t) = log(R_t(t));
       lF_t(t) = log(F_t(t));
-      // if(C_opt==0) lC_t(t) = log(Cw_t_hat(t));
-      // if(C_opt==1) lC_t(t) = log(Cn_t_hat(t));
-      // if(C_opt==2) lC_t(t) = log(Cw_t_hat(t));
+      // if(C_type==0) lC_t(t) = log(Cw_t_hat(t));
+      // if(C_type==1) lC_t(t) = log(Cn_t_hat(t));
+      // if(C_type==2) lC_t(t) = log(Cw_t_hat(t));
       // lI_t(t) = log(I_ft_hat(t));
       lD_t(t) = log(D_t(t));
     }
