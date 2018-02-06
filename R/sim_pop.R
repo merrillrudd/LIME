@@ -597,6 +597,7 @@ sim_pop <-
       lh$RecDev <- RecDev_AR
       lh$FishDev_f <- FishDev_f
       lh$SB0 <- SB0
+      lh$F_ft <- F_ft
 
 
       return(lh)
