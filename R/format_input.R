@@ -8,13 +8,13 @@
 #' @param Fpen penalty on fishing mortality 0= off, 1=on
 #' @param SigRpen penalty on sigmaR, 0=off, 1=on
 #' @param SigRprior vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation
-#' @param est_more list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
-#' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
-#' @param fix_more default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
-#' @param C_type  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
-#' @param S_l_input input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity
-#' @param theta_type if 0, estimate annual theta; if 1, estimate single theta for all years of length comp
+#' @param C_type  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
+#' @param est_more list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
+#' @param fix_more default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
+#' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
+#' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
+#' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' 
 #' @return List, a tagged list of Data, Parameters, Random, Map
@@ -307,11 +307,13 @@ format_input <- function(input,
 
             if(any(est_selex_f == FALSE)){
                 Map[["log_S50_f"]] <- Parameters$log_S50_f
-                Map[["log_S50_f"]][which(est_selex_f==FALSE)] <- NA
+                if(all(est_selex_f==FALSE) & nfleets > 1) Map[["log_S50_f"]][which(est_selex_f==FALSE)] <- NA
+                if(all(est_selex_f==FALSE)) Map[["log_S50_f"]] <- rep(NA, length(which(names(Parameters)=="log_S50_f")))
                 Map[["log_S50_f"]] <- factor(Map[["log_S50_f"]])
 
                 Map[["log_Sdelta_f"]] <- Parameters$log_Sdelta_f
-                Map[["log_Sdelta_f"]][which(est_selex_f==FALSE)] <- NA
+                if(all(est_selex_f==FALSE) & nfleets > 1) Map[["log_Sdelta_f"]][which(est_selex_f==FALSE)] <- NA
+                if(all(est_selex_f==FALSE)) Map[["log_Sdelta_f"]] <- rep(NA, length(which(names(Parameters)=="log_Sdelta_f")))
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])
             }
 
