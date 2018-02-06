@@ -42,8 +42,9 @@ create_inputs <- function(lh, input_data){
                     LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
                 }
             }
+            if(max_bin <= max(bins_dim)) LF <- length_raw
+            dat_input$LF <- LF
         }
-        dat_input$LF <- LF
 
         ## make sure length bins from life history and observed data match
         if(is.data.frame(dat_input$LF)){
@@ -71,8 +72,8 @@ create_inputs <- function(lh, input_data){
             }
             rownames(LF) <- time
             colnames(LF) <- highs
+            dat_input$LF <- LF
         }
-        dat_input$LF <- LF
 
         if(is.list(dat_input$LF)){
             for(f in 1:length(length_raw)){
@@ -92,8 +93,8 @@ create_inputs <- function(lh, input_data){
                 LFsub <- length_raw[[f]]
                 LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
             }
+            dat_input$LF <- LF
         }
-        dat_input$LF <- LF
         dat_input$highs <- highs
         dat_input$mids <- mids
         dat_input$lows <- lows
