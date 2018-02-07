@@ -20,8 +20,8 @@
 #' @export
 plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1))){
 
-  all_years <- Inputs$Data$T_yrs
-  lc_years <- Inputs$Data$LC_yrs
+  all_years <- 1:Inputs$Data$n_t
+  lc_years <- all_years
   if(all(is.null(true_years))) true_years <- all_years
 
     if(is.null(LBSPR)==FALSE){
@@ -205,11 +205,11 @@ if("SPR" %in% plot){
 
 if("ML" %in% plot){
 
-  if("ML" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$L_t_hat)*1.5)
+  if("ML" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$L_ft_hat)*1.5)
   if("ML" %in% names(set_ylim)) ylim <- set_ylim[["ML"]]
 
   if(all(is.na(Sdreport))==FALSE){
-    sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="L_t_hat"),]
+    sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="L_ft_hat"),]
     sd[,2][which(is.na(sd[,2]))] <- 0
   }
     if(nf>1){
@@ -220,9 +220,9 @@ if("ML" %in% plot){
   for(f in 1:nf){
     ML_obs <- sapply(1:nrow(Inputs$Data$LF), function(x) sum(Inputs$Data$LF[x,]*Inputs$Data$lbmids)/sum(Inputs$Data$LF[x,]))
 
-    if(f==1)   plot(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))))
-    if(f>1) lines(x=seq_along(all_years), y=Report$L_t_hat, lwd=2, col=cols[f])
-    points(x=which(all_years %in% lc_years), y=Report$L_t_hat[which(all_years %in% lc_years)], col=cols[f], pch=19, cex=2, xpd=NA)
+    if(f==1)   plot(x=seq_along(all_years), y=Report$L_ft_hat, lwd=2, col=cols[f], ylim=ylim, type="l", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))))
+    if(f>1) lines(x=seq_along(all_years), y=Report$L_ft_hat, lwd=2, col=cols[f])
+    points(x=which(all_years %in% lc_years), y=Report$L_ft_hat[which(all_years %in% lc_years)], col=cols[f], pch=19, cex=2, xpd=NA)
     points(x=which(all_years %in% lc_years), y=ML_obs, cex=2.5, xpd=NA, col=cols[f], lwd=2)
     index <- seq(f,nrow(sd), by=nf)
     polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"20"), border=NA)

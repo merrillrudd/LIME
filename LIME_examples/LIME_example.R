@@ -16,22 +16,48 @@ library(reshape2)
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
 ##----------------------------------------------------------------
+# lh <- create_lh_list(vbk=0.21, 
+# 					 linf=65, 
+# 					 t0=-0.01,
+# 					 lwa=0.0245, 
+# 					 lwb=2.79, 
+# 					 S50=c(20,30), 
+# 					 S95=c(26,36), 
+# 					 selex_input="length",
+# 					 selex_type=c("logistic","logistic"),
+# 					 M50=34,
+# 					 M95=NULL,
+# 					 maturity_input="length",
+# 					 M=0.27, 
+# 					 binwidth=1,
+# 					 CVlen=0.1,
+# 					 SigmaR=0.737,
+# 					 SigmaF=0.2,
+# 					 SigmaC=0.2,
+# 					 SigmaI=0.2,
+# 					 R0=1,
+# 					 qcoef=1e-5,
+# 					 start_ages=0,
+# 					 rho=0.43,
+# 					 nseasons=1,
+# 					 nfleets=2)
+
 lh <- create_lh_list(vbk=0.21, 
 					 linf=65, 
 					 t0=-0.01,
 					 lwa=0.0245, 
 					 lwb=2.79, 
-					 S50=c(20,30), 
-					 S95=c(26,36), 
+					 S50=c(20), 
+					 S95=c(26), 
 					 selex_input="length",
-					 selex_type=c("logistic","logistic"),
+					 selex_type=c("logistic"),
 					 M50=34,
 					 M95=NULL,
 					 maturity_input="length",
 					 M=0.27, 
 					 binwidth=1,
 					 CVlen=0.1,
-					 SigmaR=0.737,
+					 SigmaR=0.2,
 					 SigmaF=0.2,
 					 SigmaC=0.2,
 					 SigmaI=0.2,
@@ -40,7 +66,7 @@ lh <- create_lh_list(vbk=0.21,
 					 start_ages=0,
 					 rho=0.43,
 					 nseasons=1,
-					 nfleets=2)
+					 nfleets=1)
 
 ## by age
 p <- ggplot(lh$df %>% 
@@ -66,27 +92,29 @@ p <- ggplot(lh$df %>%
 ## ---------------------------------------------------
 ## Demonstrate data generation option
 ## specify model path to save true population/generated data
+# true <- generate_data(modpath=NULL,
+# 					  itervec=1, 
+# 					  Fdynamics=c("Constant","Endogenous"),
+# 					  Rdynamics="Constant",
+# 					  lh=lh,
+# 					  Nyears=20,
+# 					  Nyears_comp=c(20,10),
+# 					  comp_sample=200,
+# 					  init_depl=0.7,
+# 					  seed=44,
+# 					  fleet_percentage=c(0.5,0.5))
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics=c("Constant","Endogenous"),
+					  Fdynamics=c("Constant"),
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20,10),
+					  Nyears_comp=c(20),
 					  comp_sample=200,
 					  init_depl=0.7,
-					  seed=143,
-					  fleet_percentage=c(0.5,0.5))
+					  seed=28,
+					  fleet_percentage=1)
 
-## Data input components
-years <- true$years ## total years to model, can be 1:20 or 1998:2017
-LF <- true$LF ## length composition data, years along rows and length bin along columns. year names should match 'year' quantity, e.g. 11:20 or 2008:2017 (can be any years within years to model)
-
-## input data list
-data_LF <- list("LF"=LF) ## length comp only
-
-## plot length composition data
-plot_LCfits(LFlist=lapply(1:dim(LF)[3], function(x) LF[,,x])) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ## plot simulated data
 dfsim <- true$dfsim
@@ -97,12 +125,38 @@ p <- ggplot(dfsim %>% filter(Variable %in% c("LengthComp", "TotalBiomass", "Spaw
 	xlab("Year") +
 	theme_lsd()
 
+#######################################
+## Length comp data input options
+#######################################
+## Option 1: Length comp array
+LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd dimension = fleets
+
+## Option 2: Length comp list
+LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
+
+	## plot length composition data using LF_list
+	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+
+## Option 3: Data frame
+LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
+
+## example with length data only
+data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
+
+##if using multinomial distribution, must specify annual effective sample size by fleet
+data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_per_year)
+
+## create model inputs with life history information and data
+## outputs length data as array
+inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
+
+
 ##----------------------------------------------------
 ## Step 3: Run Model
 ## ---------------------------------------------------
 ##-------------------------
 ## template file
-##--------------------------
+# ##--------------------------
 src_dir <- file.path("C:\\merrill\\LIME\\src")
 setwd(src_dir)
 compile("LIME.cpp")
@@ -114,79 +168,40 @@ dyn.load( dynlib("LIME") )
 ## build inputs and object
 ##--------------------------
 
-Data <- list("n_t"=dim(LF)[1],
-			 "n_lb"=dim(LF)[2],
-			 "n_fl"=dim(LF)[3],
-			 "n_a"=length(lh$ages),
-			 "LF_tlf"=LF,
-			 "n_lc_ft"=true$obs_per_year,
-			 "I_ft"=as.matrix(0),
-			 "C_ft"=as.matrix(0),
-			 "C_opt"=0,
-			 "ML_ft"=as.matrix(0),
-			 "ages"=lh$ages,
-			 "L_a"=lh$L_a,
-			 "W_a"=lh$W_a,
-			 "M"=lh$M,
-			 "h"=lh$h,
-			 "Mat_a"=lh$Mat_a,
-			 "lbhighs"=seq(lh$binwidth, by=lh$binwidth, length=dim(LF)[2]),
-			 "lbmids"=seq(lh$binwidth/2, by=lh$binwidth, length=dim(LF)[2]),
-			 "Fpen"=1,
-			 "SigRpen"=1,
-			 "SigRprior"=c(lh$SigmaR,0.3),
-			 "selex_type_f"=c(1,1),
-			 "LFdist"=1,
-			 "S_yrs"=c(sapply(1:dim(LF)[1], function(x) rep(x, lh$nseasons))),
-			 "n_s"=lh$nseasons,
-			 "n_y"=ceiling(dim(LF)[1]/lh$nseasons))
+res <- run_LIME(modpath=NULL, 
+				input=inputs_LC,
+				data_avail="LC",
+				Fpen=1,
+				SigRpen=1,
+				SigRprior=c(0.737,0.3),
+				LFdist=1,
+				C_type=0,
+				est_more=FALSE,
+				fix_more=FALSE,
+				f_startval_ft=NULL,
+				rdev_startval_t=NULL,
+				est_selex_f=TRUE,
+				randomR=TRUE,
+				newtonsteps=FALSE,
+				F_up=10,
+				S50_up=lh$linf,
+				derive_quants=FALSE,
+				itervec=NULL,
+				rewrite=TRUE,
+				simulation=FALSE)
 
-Params <- list("log_F_ft"=matrix(log(1), nrow=Data$n_fl, ncol=Data$n_t),
-				"log_q_f"=rep(log(lh$qcoef), Data$n_fl),
-				"beta"=log(lh$R0),
-				"log_sigma_R"=log(lh$SigmaR),
-				"log_S50_f"=log(lh$SL50),
-				"log_Sdelta_f"=log(lh$SL95 - lh$SL50),
-				"log_sigma_F"=log(lh$SigmaF),
-				"log_sigma_C"=log(lh$SigmaC),
-				"log_sigma_I"=log(lh$SigmaI),
-				"log_CV_L"=log(lh$CVlen),
-				"log_theta"=log(rep(1, Data$n_fl)),
-				"Nu_input"=rep(0, Data$n_t))
-
-Map <- list()
-    # Map[["logsigma"]] <- NA
-    # Map[["logsigma"]] <- factor(Map[["logsigma"]])
-
-Inputs <- list("Data"=Data, "Parameters"=Params, "Map"=Map, "Random"="Nu_input")
-Obj <- MakeADFun( data=Inputs$Data, parameters=Inputs$Parameters, map=Inputs$Map, Random=Inputs$Random, DLL="LIME")
-
-
-Upr <- rep(Inf, length(Obj$par))
-Upr[which(names(Obj$par)=="log_S50_f")] <- log(lh$linf)
-
-
-Opt <- TMBhelper::Optimize( obj=Obj, loopnum=3, upper=Upr )
-# Opt <- nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, upper=Upr, lower=Lwr)
-Opt[["final_gradient"]] = Obj$gr( Opt$opt$par ) 
-df <- Opt[["final_gradient"]]
-colnames(df) <- names(Obj$par)
-which(abs(df) > 0.001)
- 
-Report <- Obj$report()
-Sdreport <- sdreport(Obj)
 
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
 ## specify model path to save results
 ## length comp only
-start <- Sys.time()
-res <- run_LIME(modpath=NULL,
-				lh=lh,
-				input_data=data_LF,
-				est_sigma="log_sigma_R", 
-				data_avail="LC")
-end <- Sys.time() - start
+# start <- Sys.time()
+# res <- run_LIME(modpath=NULL,
+# 				lh=lh,
+# 				input_data=data_LF,
+# 				est_sigma="log_sigma_R", 
+# 				data_avail="LC")
+# end <- Sys.time() - start
 
 ## check convergence
 check <- res$df
@@ -207,7 +222,7 @@ Sdreport <- res$Sdreport
 ## Step 4: Plot fits
 ## ---------------------------------------------------
 ## plot length composition data
-plot_LCfits(LFlist=lapply(1:dim(LF)[3], function(x) LF[,,x]), 
+plot_LCfits(LFlist=LF_list, 
 			Inputs=Inputs, 
 			Report=Report)
 
