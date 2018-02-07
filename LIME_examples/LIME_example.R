@@ -150,6 +150,10 @@ data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_pe
 ## outputs length data as array
 inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 
+## save for testing
+saveRDS(data_LF, "C:\\merrill\\LF_multifleet_example.rds")
+saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
+saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
 
 ##----------------------------------------------------
 ## Step 3: Run Model
