@@ -28,11 +28,11 @@ create_inputs <- function(lh, input_data){
             bins_dim <- seq(bw, by=bw, length=dim(length_raw)[2])
             max_bin <- max(c(max(dat_input$highs), 
                             max(bins_dim), 
-                            sapply(1:dat_input$nfleets, function(x) as.numeric(colnames(length_raw[,,x])[max(which(colSums(length_raw[,,x])>0))]))))
+                            sapply(1:dat_input$nfleets, function(x) as.numeric(bins_dim[max(which(colSums(length_raw[,,x])>0))]))))
             highs <- seq(bw, max_bin, by=bw)
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
-            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw))))))
+            time <- dat_input$years
             if(max_bin > max(bins_dim)){
                 LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))            
                 rownames(LF) <- time
@@ -52,12 +52,12 @@ create_inputs <- function(lh, input_data){
             highs <- seq(bw, max_bin, by=bw)
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
-            time <- unique(length_raw$X)[order(unique(length_raw$X))]
+            time <- dat_input$years
             LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
             for(f in 1:dat_input$nfleets){
                 lfind <- length_raw %>% filter(Fleet==f)
                 lfreq <- t(sapply(1:length(time), function(x){
-                    sub <- lfind %>% filter(X==time[x])
+                    sub <- lfind %>% filter(Time==time[x])
                     if(nrow(sub)>0){
                         out <- sapply(1:length(highs), function(y){
                             sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
@@ -85,7 +85,7 @@ create_inputs <- function(lh, input_data){
             highs <- seq(bw, max_bin, by=bw)
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
-            time <- as.numeric(unique(c(sapply(1:length(length_raw), function(x) unique(rownames(length_raw[[x]]))))))
+            time <- dat_input$years
             LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
             rownames(LF) <- time
             colnames(LF) <- highs

@@ -495,12 +495,6 @@ sim_pop <-
         LF0_tf <- LF0
       }
 
-      rownames(LF_tf) <- 1:tyears
-      colnames(LF_tf) <- highs
-      rownames(LF0_tf) <- 1:tyears
-      colnames(LF0_tf) <- highs
-
-
 
       ########################################################
       ## Expected mean length in catch
