@@ -135,7 +135,8 @@ sim_pop <-
             Mat_a = Mat_a,
             W_a = W_a,
             M = M,
-            ref = init_depl
+            ref = init_depl,
+            type = "biomass"
           )$root,
           error = function(e)
             NA
@@ -152,7 +153,8 @@ sim_pop <-
             Mat_a = Mat_a,
             W_a = W_a,
             M = M,
-            ref = 0.05
+            ref = 0.05,
+            type = "biomass"
           )$root,
           error = function(e)
             NA
@@ -609,6 +611,9 @@ sim_pop <-
       lh$Cn_ft <- Cn_ft
       lh$Cw_ft <- Cw_ft 
       lh$F_t <- F_t
+      lh$F40 <- F40
+      lh$Fmax <- Fmax
+      lh$E_ft <- E_ft
 
 
       return(lh)
