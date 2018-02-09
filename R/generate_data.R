@@ -78,7 +78,7 @@ generate_data <-
     }
     if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
-    inits <- create_inputs(lh=lh, input_data=input)
+    inits <- create_inputs(lh=lh, input_data=DataList)
 
     # if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
     # if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
