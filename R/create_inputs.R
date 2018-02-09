@@ -77,7 +77,7 @@ create_inputs <- function(lh, input_data){
 
         if(is.list(dat_input$LF)){
             for(f in 1:length(length_raw)){
-                colnames(length_raw[[x]]) <- seq(bw, by=bw, length=ncol(length_raw[[x]]))
+                colnames(length_raw[[f]]) <- seq(bw, by=bw, length=ncol(length_raw[[f]]))
             }
             max_bin <- max(c(max(dat_input$highs), 
                             sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]])))), 
