@@ -91,7 +91,7 @@ create_inputs <- function(lh, input_data){
             colnames(LF) <- highs
             for(f in 1:dat_input$nfleets){
                 LFsub <- length_raw[[f]]
-                LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
+                LF[,,f] <- LFsub
             }
             dat_input$LF <- LF
         }
