@@ -495,6 +495,11 @@ sim_pop <-
         LF0_tf <- LF0
       }
 
+      rownames(LF_tf) <- 1:tyears
+      colnames(LF_tf) <- highs
+      rownames(LF0_tf) <- 1:tyears
+      colnames(LF0_tf) <- highs
+
 
 
       ########################################################
@@ -599,6 +604,8 @@ sim_pop <-
       lh$SB0 <- SB0
       lh$F_ft <- F_ft
       lh$LF_tf <- LF_tf
+      lh$LF0_tf <- LF0_tf
+      lh$LF <- LF_tf
       lh$ML_ft <- ML_ft
       lh$R_t <- R_t
       lh$N_t <- N_t
