@@ -78,8 +78,6 @@ generate_data <-
     }
     if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
-    input <- DataList
-    input$LF <- DataList$dfsim %>% filter(Variable == "LengthComp")
     inits <- create_inputs(lh=lh, input_data=input)
 
     # if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
