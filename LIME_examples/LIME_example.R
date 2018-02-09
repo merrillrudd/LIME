@@ -58,7 +58,7 @@ lh <- create_lh_list(vbk=0.21,
 					 binwidth=1,
 					 CVlen=0.1,
 					 SigmaR=0.2,
-					 SigmaF=0.2,
+					 SigmaF=0.1,
 					 SigmaC=0.2,
 					 SigmaI=0.2,
 					 R0=1,
@@ -74,8 +74,7 @@ p <- ggplot(lh$df %>%
 			filter(By == "Age")) + 
 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) +
 	facet_wrap(~Variable, scale="free_y") +
-	xlab("Age") +
-	theme_lsd()
+	xlab("Age")
 
 ## by length
 p <- ggplot(lh$df %>% 
@@ -83,8 +82,7 @@ p <- ggplot(lh$df %>%
 			filter(By == "Length")) + 
 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) +
 	facet_grid(Variable~., scale="free_y") +
-	xlab("Length") +
-	theme_lsd()
+	xlab("Length")
 
 
 ##----------------------------------------------------
@@ -105,7 +103,7 @@ p <- ggplot(lh$df %>%
 # 					  fleet_percentage=c(0.5,0.5))
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics=c("Constant"),
+					  Fdynamics=c("Endogenous"),
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
@@ -116,14 +114,18 @@ true <- generate_data(modpath=NULL,
 					  fleet_percentage=1)
 
 
+## create data frame -- TO DO
 ## plot simulated data
-dfsim <- true$dfsim
-p <- ggplot(dfsim %>% filter(Variable %in% c("LengthComp", "TotalBiomass", "SpawningBiomass") == FALSE)) +
-	geom_line(aes(x=X, y=Value, colour=Fleet), lwd=2) +
-	facet_wrap(~Variable, scale='free_y') +
-	expand_limits(y=0) +
-	xlab("Year") +
-	theme_lsd()
+par(mfrow=c(2,2))
+plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
+plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
+plot(x=1,y=1,type="n", ylim=c(0,1), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
+lty <- ifelse(lh$nfleets==1,1,2)
+for(f in 1:lh$nfleets){
+	lines(true$F_ft[f,], lwd=2, lty=lty)
+}
+plot(true$D_t, type="l", ylim=c(0,2), lwd=2, xlab="Time", ylab="Relative spawning biomass")
+
 
 #######################################
 ## Length comp data input options
@@ -138,7 +140,7 @@ LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element 
 	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ## Option 3: Data frame
-LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
+# LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
 
 ## example with length data only
 data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
@@ -149,11 +151,6 @@ data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_pe
 ## create model inputs with life history information and data
 ## outputs length data as array
 inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
-
-## save for testing
-saveRDS(data_LF, "C:\\merrill\\LF_multifleet_example.rds")
-saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
-saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
 
 ##----------------------------------------------------
 ## Step 3: Run Model
@@ -186,7 +183,7 @@ res <- run_LIME(modpath=NULL,
 				rdev_startval_t=NULL,
 				est_selex_f=TRUE,
 				randomR=TRUE,
-				newtonsteps=FALSE,
+				newtonsteps=3,
 				F_up=10,
 				S50_up=lh$linf,
 				derive_quants=FALSE,
