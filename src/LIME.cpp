@@ -667,6 +667,8 @@ Type objective_function<Type>::operator() ()
   // Derived quantities
   REPORT( Cn_t_hat );
   REPORT( Cw_t_hat );
+  REPORT( Cn_ft );
+  REPORT( Cw_ft );
   REPORT( SB_t );
   REPORT( TB_t );
   REPORT( SB0 );

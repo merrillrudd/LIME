@@ -116,7 +116,7 @@ true <- generate_data(modpath=NULL,
 
 ## create data frame -- TO DO
 ## plot simulated data
-par(mfrow=c(2,2))
+par(mfrow=c(3,2))
 plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
 plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
 plot(x=1,y=1,type="n", ylim=c(0,1), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
@@ -125,7 +125,14 @@ for(f in 1:lh$nfleets){
 	lines(true$F_ft[f,], lwd=2, lty=lty)
 }
 plot(true$D_t, type="l", ylim=c(0,2), lwd=2, xlab="Time", ylab="Relative spawning biomass")
-
+plot(x=1, y=1, type="n", ylim=c(0,max(true$Cw_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Catch (biomass)")
+for(f in 1:lh$nfleets){
+	lines(true$Cw_ft[f,], lwd=2, lty=lty)
+}
+plot(x=1, y=1, type="n", ylim=c(0,max(true$I_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Abundance index")
+for(f in 1:lh$nfleets){
+	lines(true$I_ft[f,], lwd=2, lty=lty)
+}
 
 #######################################
 ## Length comp data input options
@@ -152,6 +159,8 @@ data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_pe
 ## outputs length data as array
 inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 
+## example with all data types
+data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft)
 ##----------------------------------------------------
 ## Step 3: Run Model
 ## ---------------------------------------------------
