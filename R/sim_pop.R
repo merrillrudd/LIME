@@ -374,12 +374,6 @@ sim_pop <-
       TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
 
-      ## relative spawning biomass (depletion)
-      D_t <- SB_t / SB0 
-
-
-      if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
-      I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))
 
       Cn_ft <- t(sapply(1:nfleets, function(y){
           sapply(1:Nyears_real, function(x) {
@@ -420,6 +414,28 @@ sim_pop <-
         sum(R_t[time_index])
       })
 
+      TB_t <- sapply(1:Nyears_real, function(x) {
+        if (nseasons == 1)
+          time_index <- x
+        if (nseasons > 1)
+          time_index <- (1:nseasons) + ((x - 1) * nseasons)
+        sum(TB_t[time_index])
+      })
+
+      SB_t <- sapply(1:Nyears_real, function(x) {
+        if (nseasons == 1)
+          time_index <- x
+        if (nseasons > 1)
+          time_index <- (1:nseasons) + ((x - 1) * nseasons)
+        sum(SB_t[time_index])
+      })
+
+      ## relative spawning biomass (depletion)
+      D_t <- SB_t / SB0 
+
+      ## abundance index
+      if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
+      I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))
 
       ## age to length comp
       if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
@@ -612,6 +628,7 @@ sim_pop <-
       lh$F40 <- F40
       lh$Fmax <- Fmax
       lh$E_ft <- E_ft
+      lh$I_ft <- I_ft
 
 
       return(lh)
