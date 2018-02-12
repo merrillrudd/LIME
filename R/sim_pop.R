@@ -289,10 +289,6 @@ sim_pop <-
       ## unfished spawning biomass
       SB0 <- sum(R0 * exp(-M * ages[-1]) * W_a[-1] * Mat_a[-1])      
 
-      ## relative biomass (depletion) over time
-      D_t <- rep(NA, tyears)
-      D_t[1] <- SB_t[1] / SB0
-
       ##########################
       ## Projection
       ##########################
@@ -347,7 +343,6 @@ sim_pop <-
             Cw_atf[,t,f] <- Cn_atf[,t,f] * W_a
           }
 
-          D_t[t] <- SB_t[t] / SB0
       }
 
       F_ft <- t(sapply(1:nfleets, function(x){
@@ -376,9 +371,12 @@ sim_pop <-
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
       N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
       SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
-      D_t <- D_t[which(1:tyears %% nseasons == 0)]
       TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
+
+      ## relative spawning biomass (depletion)
+      D_t <- SB_t / SB0 
+
 
       if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
       I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))

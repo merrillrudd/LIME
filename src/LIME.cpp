@@ -35,7 +35,7 @@ Type objective_function<Type>::operator() ()
 
     // Data in likelihood
     DATA_ARRAY(LF_tlf); // length composition
-    DATA_MATRIX(n_lc_ft); // number of independent observation times annually, likely between 1 and C_t
+    DATA_MATRIX(n_LF_ft); // number of independent observations by fleet annually, between 1 and C_t
     DATA_MATRIX(I_ft); // CPUE for each year
     DATA_MATRIX(C_ft); // catch each year
     DATA_INTEGER(C_type); // if C_type=0, no catch data, if C_type=1, numbers, if C_type=2, biomass
@@ -490,7 +490,7 @@ Type objective_function<Type>::operator() ()
       }
       if(checklc > 0){
         if(LFdist==0){
-          LFprob = n_lc_ft(f,t)*(LFraw/LFraw.sum());
+          LFprob = n_LF_ft(f,t)*(LFraw/LFraw.sum());
           log_pL_ft(f,t) += dmultinom(LFprob, prob, true);
         }
         if(LFdist==1){
@@ -523,59 +523,46 @@ Type objective_function<Type>::operator() ()
     }
   }
 
-  // matrix<Type> log_pI_ft(n_fl,n_t);
-  // log_pI_ft.setZero();
-  // Type n_i;
-  // n_i = I_ft.size()
-  // if(n_i > 1){
-  //   for(int f=0;f<n_fl;f++){
-  //     for(int t=0;t<n_t;t++){
-  //         // probability of index at that sample
-  //         log_pI_ft(t) += dlognorm( I_ft(i), log(I_ft_hat(t)), sigma_I, true);
-  //     }
-  //   }
-  // }
+  matrix<Type> log_pI_ft(n_fl,n_t);
+  log_pI_ft.setZero();
+  for(int f=0;f<n_fl;f++){
+    for(int t=0;t<n_t;t++){
+        // probability of index at that sample
+        if(I_ft(f,t)>0) log_pI_ft(t) += dlognorm( I_ft(f,t), log(I_ft_hat(f,t)), sigma_I, true);
+    }
+  }
 
-  // vector<Type> log_pC_t(n_t);
-  // log_pC_t.setZero();
-  // if(n_c>0){
-  //   for(int t=0;t<n_t;t++){  
-  //     log_pC_t(t) = 0;
-  //     for(int c=0;c<n_c;c++){
-  //       if(C_yrs(c)==T_yrs(t)){
-  //         // probability of index at that sample
-  //         if(C_type==1) log_pC_t(t) += dlognorm( C_t(c), log(C_t_hat(t)), sigma_C, true);
-  //         if(C_type==2) log_pC_t(t) += dlognorm( C_t(c), log(Cw_t_hat(t)), sigma_C, true);
-  //         }
-  //       }
-  //     }
-  //   }
-
-
-
-  // vector<Type> log_pML_t(n_t);
-  // log_pML_t.setZero();
-  // // int ml;
-  // if(n_ml>0){
-  //   for(int t=0;t<n_t;t++){
-  //     log_pML_t(t) = 0;
-  //     for(int ml=0;ml<n_ml;ml++){
-  //        if(ML_yrs(ml)==T_yrs(t)){
-  //           log_pML_t(t) += dnorm( ML_t(ml), L_t_hat(t), L_t_hat(t)*CV_L, true);
-  //        }
-  //     }
-  //   }
-  // }
+  matrix<Type> log_pC_ft(n_fl,n_t);
+  log_pC_ft.setZero();
+  for(int f=0;f<n_fl;f++){
+    for(int t=0;t<n_t;t++){  
+          // probability of index at that sample
+        if(C_ft(f,t)>0){
+          if(C_type==1) log_pC_ft(f,t) += dlognorm( C_ft(f,t), log(Cn_ft(f,t)), sigma_C, true);
+          if(C_type==2) log_pC_ft(f,t) += dlognorm( C_ft(f,t), log(Cw_ft(f,t)), sigma_C, true);
+        }
+    }
+  }
+  
+  matrix<Type> log_pML_ft(n_fl,n_t);
+  log_pML_ft.setZero();
+  for(int f=0;f<n_fl;f++){
+    for(int t=0;t<n_t;t++){
+          if(ML_ft(f,t)>0){
+            log_pML_ft(f,t) += dnorm( ML_ft(f,t), ML_ft_hat(f,t), ML_ft_hat(f,t)*CV_L, true);
+          }
+    }
+  }
 
   jnll_comp(1) = 0;
   jnll_comp(1) = Type(-1)*sum( log_pL_ft );
-  // jnll_comp(2) = 0;
-  // if(n_ml>0) jnll_comp(2) = Type(-1)*sum( log_pML_t ); 
+  jnll_comp(2) = 0;
+  jnll_comp(2) = Type(-1)*sum( log_pML_ft ); 
 
-  // jnll_comp(3) = 0;
-  // if(n_i>0) jnll_comp(3) = Type(-1)*sum( log_pI_t );
-  // jnll_comp(4) = 0;
-  // if(n_c>0) jnll_comp(4) = Type(-1)*sum( log_pC_t );
+  jnll_comp(3) = 0;
+  jnll_comp(3) = Type(-1)*sum( log_pI_ft );
+  jnll_comp(4) = 0;
+  jnll_comp(4) = Type(-1)*sum( log_pC_ft );
 
   // Likelihood contributions from site-aggregated observations
     vector<Type> D_t(n_t);
@@ -588,8 +575,8 @@ Type objective_function<Type>::operator() ()
     vector<Type> lTB_t(n_t);
     vector<Type> lR_t(n_t);
     vector<Type> lF_t(n_t);
-    // vector<Type> lC_t(n_t);
-    // vector<Type> lI_t(n_t);
+    matrix<Type> lC_ft(n_fl,n_t);
+    matrix<Type> lI_ft(n_fl,n_t);
     vector<Type> lD_t(n_t);
     for(int t=0;t<n_t;t++){
       lN_t(t) = log(N_t(t));
@@ -597,11 +584,15 @@ Type objective_function<Type>::operator() ()
       lTB_t(t) = log(TB_t(t));
       lR_t(t) = log(R_t(t));
       lF_t(t) = log(F_t(t));
-      // if(C_type==0) lC_t(t) = log(Cw_t_hat(t));
-      // if(C_type==1) lC_t(t) = log(Cn_t_hat(t));
-      // if(C_type==2) lC_t(t) = log(Cw_t_hat(t));
-      // lI_t(t) = log(I_ft_hat(t));
       lD_t(t) = log(D_t(t));
+    }
+    for(int f=0;f<n_fl;f++){
+      for(int t=0;t<n_t;t++){
+        if(C_type==0) lC_ft(f,t) = log(Cw_ft(f,t));
+        if(C_type==1) lC_ft(f,t) = log(Cn_ft(f,t));
+        if(C_type==2) lC_ft(f,t) = log(Cw_ft(f,t));
+        lI_ft(f,t) = log(I_ft_hat(f,t));
+      }
     }
 
     vector<Type> lF_y(n_y);
@@ -626,10 +617,10 @@ Type objective_function<Type>::operator() ()
 
   // // ============ Reporting section ======================================
 
-  // ADREPORT( lC_t );
   ADREPORT( lN_t );
   ADREPORT( lR_t );
-  // ADREPORT( lI_t );
+  ADREPORT( lI_ft );
+  ADREPORT( lC_ft );
   ADREPORT( ML_ft_hat );
   ADREPORT( lSB_t );
   ADREPORT( lF_t );
@@ -690,12 +681,12 @@ Type objective_function<Type>::operator() ()
   REPORT(Mat_a);
   REPORT(M);
     // Likelihoods
-  // REPORT(log_pC_t);
-  // REPORT(log_pI_t);
+  REPORT(log_pC_ft);
+  REPORT(log_pI_ft);
   REPORT(log_pL_ft);
   REPORT(neff);
   REPORT(theta);
-  // REPORT(log_pML_ft);
+  REPORT(log_pML_ft);
   REPORT(sigrp);
   REPORT(jnll_comp);
   REPORT(jnll); 
