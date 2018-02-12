@@ -12,12 +12,13 @@
 #' @param SL50 length at 50 percent selectivity for comparison; default NULL
 #' @param dim dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
+#' @param true_years optional vector of true years to label years of length comp
 #' @importFrom graphics abline axis barplot box legend lines mtext par
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE){
+plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	nf <- length(LFlist)
@@ -25,6 +26,7 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
 		rownames(LFlist[[x]])
 	})
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
+	if(all(is.null(true_years))) true_years <- all_lc_years
 
 	if(all(is.null(dim))) dim <- c(ceiling(sqrt(length(all_lc_years))), ceiling(sqrt(length(all_lc_years))))
 
@@ -83,12 +85,12 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
 
 			if(i %% dim[1] == 0 | i==length(all_lc_years)) axis(1, at=xlabs, labels=plot_labs, cex.axis=2)
 			if(i %in% 1:dim[1]) axis(2, at=pretty(ylim), las=2, cex.axis=2)
-			if(all(is.null(all_lc_years))==FALSE & length(all_lc_years)!=length(all_lc_years)){
-				mtext(side=3, all_lc_years[i], font=2, cex=2, line=-2)
+			if(all(is.null(true_years))==FALSE & length(true_years)!=length(true_years)){
+				mtext(side=3, true_years[i], font=2, cex=2, line=-2)
 				warning("Input years for length composition data do not match number of years in analysis")
 			}
-			if(all(is.null(all_lc_years))) mtext(side=3, line=-3, all_lc_years[i], font=2, cex=2)
-			if(all(is.null(all_lc_years))==FALSE) mtext(side=3, line=-2, all_lc_years[i], font=2)
+			if(all(is.null(true_years))) mtext(side=3, line=-3, true_years[i], font=2, cex=2)
+			if(all(is.null(true_years))==FALSE) mtext(side=3, line=-2, true_years[i], font=2)
 			if(all(is.null(SL50))==FALSE){
 				if(length(SL50)==1) abline(v=SL50, lty=2, lwd=2)
 				if(length(SL50)>1) abline(v=SL50[i], lty=2, lwd=2)
