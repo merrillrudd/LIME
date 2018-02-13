@@ -67,6 +67,10 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(n_s); // number of time steps within a year
     DATA_INTEGER(n_y); // number of years
 
+    //mirror options
+    DATA_INTEGER(mirror_theta);
+    DATA_INTEGER(mirror_q);
+
   // ======== Parameters =================================
     // Fixed, estimated parameters
     PARAMETER_MATRIX(log_F_ft);  // fishing mortality by fleet
@@ -115,7 +119,8 @@ Type objective_function<Type>::operator() ()
   // dirichlet-multinomial parameter
   vector<Type> theta(n_fl);
   for(int f=0;f<n_fl;f++){
-    theta(f) = exp(log_theta(f));
+    if(mirror_theta!=1) theta(f) = exp(log_theta(f));
+    if(mirror_theta==1) theta(f) = exp(log_theta(0));
   }
 
   // catchability coefficient

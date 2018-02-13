@@ -16,15 +16,41 @@ library(reshape2)
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
 ##----------------------------------------------------------------
+lh <- create_lh_list(vbk=0.21, 
+					 linf=65, 
+					 t0=-0.01,
+					 lwa=0.0245, 
+					 lwb=2.79, 
+					 S50=c(20,30,40), 
+					 S95=c(26,36,42), 
+					 selex_input="length",
+					 selex_type=c("logistic","logistic","logistic"),
+					 M50=34,
+					 M95=NULL,
+					 maturity_input="length",
+					 M=0.27, 
+					 binwidth=1,
+					 CVlen=0.1,
+					 SigmaR=0.737,
+					 SigmaF=0.1,
+					 SigmaC=0.1,
+					 SigmaI=0.1,
+					 R0=1,
+					 qcoef=1e-5,
+					 start_ages=0,
+					 rho=0.43,
+					 nseasons=1,
+					 nfleets=3)
+
 # lh <- create_lh_list(vbk=0.21, 
 # 					 linf=65, 
 # 					 t0=-0.01,
 # 					 lwa=0.0245, 
 # 					 lwb=2.79, 
-# 					 S50=c(20,30), 
-# 					 S95=c(26,36), 
+# 					 S50=c(20), 
+# 					 S95=c(26), 
 # 					 selex_input="length",
-# 					 selex_type=c("logistic","logistic"),
+# 					 selex_type=c("logistic"),
 # 					 M50=34,
 # 					 M95=NULL,
 # 					 maturity_input="length",
@@ -32,41 +58,15 @@ library(reshape2)
 # 					 binwidth=1,
 # 					 CVlen=0.1,
 # 					 SigmaR=0.737,
-# 					 SigmaF=0.2,
-# 					 SigmaC=0.2,
-# 					 SigmaI=0.2,
+# 					 SigmaF=0.1,
+# 					 SigmaC=0.1,
+# 					 SigmaI=0.1,
 # 					 R0=1,
 # 					 qcoef=1e-5,
 # 					 start_ages=0,
 # 					 rho=0.43,
 # 					 nseasons=1,
-# 					 nfleets=2)
-
-lh <- create_lh_list(vbk=0.21, 
-					 linf=65, 
-					 t0=-0.01,
-					 lwa=0.0245, 
-					 lwb=2.79, 
-					 S50=c(20), 
-					 S95=c(26), 
-					 selex_input="length",
-					 selex_type=c("logistic"),
-					 M50=34,
-					 M95=NULL,
-					 maturity_input="length",
-					 M=0.27, 
-					 binwidth=1,
-					 CVlen=0.1,
-					 SigmaR=0.2,
-					 SigmaF=0.1,
-					 SigmaC=0.2,
-					 SigmaI=0.2,
-					 R0=1,
-					 qcoef=1e-5,
-					 start_ages=0,
-					 rho=0.43,
-					 nseasons=1,
-					 nfleets=1)
+# 					 nfleets=1)
 
 ## by age
 p <- ggplot(lh$df %>% 
@@ -90,28 +90,28 @@ p <- ggplot(lh$df %>%
 ## ---------------------------------------------------
 ## Demonstrate data generation option
 ## specify model path to save true population/generated data
-# true <- generate_data(modpath=NULL,
-# 					  itervec=1, 
-# 					  Fdynamics=c("Constant","Endogenous"),
-# 					  Rdynamics="Constant",
-# 					  lh=lh,
-# 					  Nyears=20,
-# 					  Nyears_comp=c(20,10),
-# 					  comp_sample=200,
-# 					  init_depl=0.7,
-# 					  seed=44,
-# 					  fleet_percentage=c(0.5,0.5))
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics=c("Endogenous"),
+					  Fdynamics=c("Constant","Endogenous","Constant"),
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20),
+					  Nyears_comp=c(20,10,5),
 					  comp_sample=200,
 					  init_depl=0.7,
-					  seed=28,
-					  fleet_percentage=1)
+					  seed=2828,
+					  fleet_percentage=c(0.6,0.2,0.1))
+# true <- generate_data(modpath=NULL,
+# 					  itervec=1, 
+# 					  Fdynamics=c("Endogenous"),
+# 					  Rdynamics="Constant",
+# 					  lh=lh,
+# 					  Nyears=20,
+# 					  Nyears_comp=c(20),
+# 					  comp_sample=200,
+# 					  init_depl=0.7,
+# 					  seed=434,
+# 					  fleet_percentage=1)
 
 
 ## create data frame -- TO DO
@@ -159,8 +159,12 @@ data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_pe
 ## outputs length data as array
 inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 
-## example with all data types
-data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft)
+#######################################
+## Other data type input options
+#######################################
+data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
+inputs_all <- create_inputs(lh=lh, input_data=data_all)
+
 ##----------------------------------------------------
 ## Step 3: Run Model
 ## ---------------------------------------------------
@@ -177,18 +181,23 @@ dyn.load( dynlib("LIME") )
 ##--------------------------
 ## build inputs and object
 ##--------------------------
+## fix selectivity
+## fix log_theta
+## --- try estimating selectivity and fixing log_theta --> works!
+## only problem with log_theta
 
 res <- run_LIME(modpath=NULL, 
-				input=inputs_LC,
-				data_avail="LC",
+				input=inputs_all,
+				data_avail="Index_Catch_LC",
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=1,
-				C_type=0,
+				LFdist=0,
+				C_type=2,
 				est_more=FALSE,
-				fix_more=FALSE,
-				f_startval_ft=NULL,
+				fix_more="log_F_ft",
+				mirror=NULL,
+				f_startval_ft=true$F_ft,
 				rdev_startval_t=NULL,
 				est_selex_f=TRUE,
 				randomR=TRUE,
@@ -199,8 +208,6 @@ res <- run_LIME(modpath=NULL,
 				itervec=NULL,
 				rewrite=TRUE,
 				simulation=FALSE)
-
-
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
 ## specify model path to save results
@@ -243,7 +250,8 @@ plot_output(Inputs=Inputs,
 			lh=lh,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
+			set_ylim=list("SPR" = c(0,1)))
+
 
 
 

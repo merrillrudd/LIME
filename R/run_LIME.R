@@ -24,6 +24,7 @@
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
 #' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param simulation is this a simulation? default FALSE means you are using real data (can set itervec=NULL)
+#' @param mirror vector of parameter names to mirror between fleets
 #' @importFrom TMB MakeADFun sdreport
 #' @importFrom TMBhelper Optimize
 #' @importFrom utils write.csv
@@ -54,7 +55,8 @@ run_LIME <- function(modpath,
                       derive_quants=FALSE,
                       itervec=NULL,
                       simulation=FALSE,
-                      rewrite=TRUE){
+                      rewrite=TRUE,
+                      mirror=NULL){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -102,7 +104,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(is.null(modpath)) output <- NULL
 
-      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, randomR=randomR)
+      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, randomR=randomR, mirror=mirror)
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList

@@ -16,6 +16,7 @@
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
+#' @param mirror vector of parameter names to mirror between fleets
 #' 
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
@@ -31,7 +32,8 @@ format_input <- function(input,
                         f_startval_ft, 
                         rdev_startval_t,
                         est_selex_f,
-                        randomR){
+                        randomR,
+                        mirror){
 
     with(input, {
 
@@ -45,6 +47,9 @@ format_input <- function(input,
         }
         selex_type_f <- sapply(1:nfleets, function(x) ifelse(selex_type[x]=="logistic",1, ifelse(selex_type[x]=="dome",2,0)))
         if(any(selex_type_f==0)) stop("specify selex_type in create_lh_list")
+
+            mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
+            mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
 
 
         ## data-rich model
@@ -92,7 +97,9 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=Nyears2)   
+                         "n_y"=Nyears2,
+                         "mirror_theta"=mirror_theta_inp,
+                         "mirror_q"=mirror_q_inp)   
         }
 
         ## index and length composition data
@@ -139,7 +146,9 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=Nyears2)   
+                         "n_y"=Nyears2,
+                         "mirror_theta"=mirror_theta_inp,
+                         "mirror_q"=mirror_q_inp)   
         }
 
 
@@ -187,7 +196,9 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=Nyears2)      
+                         "n_y"=Nyears2,
+                         "mirror_theta"=mirror_theta_inp,
+                         "mirror_q"=mirror_q_inp)      
         }
 
         ## length composition data only 
@@ -234,7 +245,9 @@ format_input <- function(input,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
-                         "n_y"=Nyears2)   
+                         "n_y"=Nyears2,
+                         "mirror_theta"=mirror_theta_inp,
+                         "mirror_q"=mirror_q_inp)   
         }       
 
         ## set input parameters - regardless of data availability 
@@ -301,8 +314,8 @@ format_input <- function(input,
             }
 
             if(LFdist==0){
-                Map[["theta"]] <- NA
-                Map[["theta"]] <- factor(Map[["theta"]])
+                Map[["log_theta"]] <- rep(NA, length(Parameters[["log_theta"]]))
+                Map[["log_theta"]] <- factor(Map[["log_theta"]])
             }
 
             if(any(est_selex_f == FALSE)){
@@ -323,6 +336,11 @@ format_input <- function(input,
 
                 Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
                 Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
+            }
+
+            if("log_theta" %in% mirror){
+                Map[["log_theta"]] <- c(Parameters$log_theta[1], rep(NA, (length(Parameters$log_theta)-1)))
+                Map[["log_theta"]] <- factor(Map[["log_theta"]])
             }
 
         if(length(Map)==0) Map <- NULL
