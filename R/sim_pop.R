@@ -206,6 +206,13 @@ sim_pop <-
         }
       }
 
+      F_at <- matrix(NA, nrow=length(ages), ncol=tyears)
+      for(t in 1:tyears){
+        for(a in 1:length(ages)){
+          F_at[a,t] <- sum(F_atf[a,t,])
+        }
+      }
+
 
 
       # ## fishing dynamics after burn-in
@@ -259,12 +266,12 @@ sim_pop <-
           N_at0[a, 1] <- R_t[1]
         }
         if (a > 1 & a < length(L_a)) {
-          N_at[a, 1] <- N_at[a - 1, 1] * exp(-M - sum(F_atf[a,1,]))
+          N_at[a, 1] <- N_at[a - 1, 1] * exp(-M - F_at[a,1])
           N_at0[a, 1] <- N_at0[a - 1, 1] * exp(-M)
         }
         if (a == length(L_a)) {
           N_at[a, 1] <-
-            (N_at[a - 1, 1] * exp(-M - sum(F_atf[a,1,]))) / (1 - exp(-M - sum(F_atf[a,1,])))
+            (N_at[a - 1, 1] * exp(-M - F_at[a,1])) / (1 - exp(-M - F_at[a,1]))
           N_at0[a, 1] <- (N_at0[a - 1, 1] * exp(-M)) / (1 - exp(-M))
         }
       }
@@ -319,11 +326,11 @@ sim_pop <-
             N_at0[a, t] <- R_t[t]
           }
           if (a > 1 & a < length(L_a)) {
-            N_at[a, t] <- N_at[a - 1, t - 1] * exp(-M - sum(F_atf[a-1,t-1,]))
+            N_at[a, t] <- N_at[a - 1, t - 1] * exp(-M - F_at[a-1,t-1])
             N_at0[a, t] <- N_at0[a - 1, t - 1] * exp(-M)
           }
           if (a == length(L_a)) {
-            N_at[a, t] <- (N_at[a - 1, t - 1] * exp(-M - sum(F_atf[a-1,t-1,]))) + (N_at[a, t - 1] * exp(-M - sum(F_atf[a,t-1,])))
+            N_at[a, t] <- (N_at[a - 1, t - 1] * exp(-M - F_at[a-1,t-1])) + (N_at[a, t - 1] * exp(-M - F_at[a,t-1]))
             N_at0[a, t] <- (N_at0[a - 1, t - 1] * exp(-M)) + (N_at0[a, t - 1] * exp(-M))
           }
         }
@@ -369,7 +376,7 @@ sim_pop <-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
-      N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
+      N_t <- colSums(N_at[, which(1:tyears %% nseasons == 0)])
       SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
       TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
