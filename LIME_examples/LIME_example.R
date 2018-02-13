@@ -97,7 +97,7 @@ true <- generate_data(modpath=NULL,
 					  lh=lh,
 					  Nyears=20,
 					  Nyears_comp=c(20,10,5),
-					  comp_sample=200,
+					  comp_sample=500,
 					  init_depl=0.7,
 					  seed=2828,
 					  fleet_percentage=c(0.4,0.3,0.3))
@@ -112,8 +112,6 @@ true <- generate_data(modpath=NULL,
 # 					  init_depl=0.7,
 # 					  seed=434,
 # 					  fleet_percentage=1)
-
-
 ## create data frame -- TO DO
 ## plot simulated data
 par(mfrow=c(3,2))
@@ -164,6 +162,10 @@ inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 #######################################
 data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 inputs_all <- create_inputs(lh=lh, input_data=data_all)
+
+saveRDS(data_all, "C:\\merrill\\data_multifleet_example.rds")
+saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
+saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
 
 ##----------------------------------------------------
 ## Step 3: Run Model
