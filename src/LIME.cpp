@@ -299,7 +299,7 @@ Type objective_function<Type>::operator() ()
     Cw_ta(0,a) = Cn_ta(0,a) * W_a(a);
 
     //Annual values
-    N_t(0) += N_ta(0,a);
+    if(a>0) N_t(0) += N_ta(0,a);
     SB_t(0) += SB_ta(0,a);
     TB_t(0) += TB_ta(0,a);
     Cn_t_hat(0) += Cn_ta(0,a);
@@ -351,7 +351,7 @@ Type objective_function<Type>::operator() ()
       Cw_ta(t,a) = Cn_ta(t,a) * W_a(a);
 
       //Annual values
-      N_t(t) += N_ta(t,a);
+      if(a>0) N_t(t) += N_ta(t,a);
       SB_t(t) += SB_ta(t,a);
       TB_t(t) += TB_ta(t,a);
       Cn_t_hat(t) += Cn_ta(t,a);
