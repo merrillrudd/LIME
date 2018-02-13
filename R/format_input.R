@@ -330,13 +330,13 @@ format_input <- function(input,
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])
             }
 
-            if(randomR==FALSE){
-                Map[["log_sigma_R"]] <- NA
-                Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
+            # if(randomR==FALSE){
+            #     Map[["log_sigma_R"]] <- NA
+            #     Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
 
-                Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
-                Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
-            }
+            #     Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
+            #     Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
+            # }
 
             if("log_theta" %in% mirror){
                 Map[["log_theta"]] <- c(Parameters$log_theta[1], rep(NA, (length(Parameters$log_theta)-1)))

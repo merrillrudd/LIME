@@ -14,28 +14,31 @@ calc_derived_quants = function( Obj, lh ){
   ParHat = Obj$env$parList()
   Report = Obj$report()
 
-  if(max(Data$ages)<10){
-    ## update life history with estimated values, but more refined time step for life history type
-    lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=12))
-  }
-  if(max(Data$ages)>=10){
-      lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=1))
-  }
+  lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type=rep("logistic",nfleets), binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=nseasons, nfleets=nfleets))
 
-  SPR <- with(lh, calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, F=Report$F_t[length(Report$F_t)], ref=FALSE))
-  F30 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.3)$root), error=function(e) NA) * lh_new$nseasons
-  F40 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_a=S_a, ref=0.4)$root), error=function(e) NA) * lh_new$nseasons
+
+  # if(max(Data$ages)<10){
+  #   ## update life history with estimated values, but more refined time step for life history type
+  #   lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=12))
+  # }
+  # if(max(Data$ages)>=10){
+  #     lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=1))
+  # }
+
+  SPR <- with(lh, calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, F=Report$F_t[length(Report$F_t)], ref=FALSE, type="SPR"))
+  F30 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, ref=0.3, type="SPR")$root), error=function(e) NA) * lh_new$nseasons
+  F40 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, ref=0.4, type="SPR")$root), error=function(e) NA) * lh_new$nseasons
   FF30 <- FF40 <- NULL
-  if(is.na(F30)==FALSE) FF30 <- Report$F_y[length(Report$F_y)]/F30
-  if(is.na(F40)==FALSE) FF40 <- Report$F_y[length(Report$F_y)]/F40
+  if(is.na(F30)==FALSE) FF30 <- Report$F_y/F30
+  if(is.na(F40)==FALSE) FF40 <- Report$F_y/F40
 
   # Total biomass
-  TB_t = as.vector( Report$W_a %*% t(Report$N_ta) )
-  Cw_t <- as.vector(Report$W_a %*% t(Report$Cn_ta))
+  TB_t = Report$TB_t
+  Cw_t <- Report$Cw_t_hat
 
   # MSY calculations
-  fmsy <- optimize(calc_msy, ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a, Mat_a=lh_new$Mat_a, lower=0, upper=10, maximum=TRUE)$objective
-  msy <- calc_msy(F=fmsy, ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a, Mat_a=lh_new$Mat_a)
+  fmsy <- optimize(calc_msy, ages=lh_new$ages, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a, lower=0, upper=10, maximum=TRUE)$maximum
+  msy <- calc_msy(F=fmsy, ages=lh_new$ages, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a)
 
   # Yield_Fn = function( Fmean, Return_type="Yield" ){
   #   # Modify data
@@ -70,14 +73,14 @@ calc_derived_quants = function( Obj, lh ){
 
   # # Calculate Fmsy
   Fmsy = fmsy
-  TBmsy = calc_equil_abund(ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta)) * lh_new$W_a
-  SBmsy = calc_equil_abund(ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta)) * lh_new$W_a * lh_new$Mat_a
+  TBmsy = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta)) * lh_new$W_a)
+  SBmsy = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta)) * lh_new$W_a * lh_new$Mat_a)
   MSY = msy
-  TB0 = calc_equil_abund(ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, F=0, R0=exp(Report$beta)) * lh_new$W_a
-  SB0 = calc_equil_abund(ages=lh_new$ages, S_a=lh_new$S_a, M=lh_new$M, F=0, R0=exp(Report$beta)) * lh_new$W_a * lh_new$Mat_a
+  TB0 = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=0, R0=exp(Report$beta)) * lh_new$W_a)
+  SB0 = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=0, R0=exp(Report$beta)) * lh_new$W_a * lh_new$Mat_a)
 
   # Return
-  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "FFmsy"=Report$F_t[length(Report$F_t)]/Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t[length(TB_t)]/TBmsy, "SBBmsy"=Report$SB_t[length(Report$SB_t)]/SBmsy)
+  Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "FFmsy"=Report$F_t/Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t/TBmsy, "SBBmsy"=Report$SB_t/SBmsy)
   return( Return )
 }
 

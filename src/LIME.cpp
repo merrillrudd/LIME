@@ -689,6 +689,7 @@ Type objective_function<Type>::operator() ()
   REPORT(L_a);
   REPORT(Mat_a);
   REPORT(M);
+  REPORT(h);
     // Likelihoods
   REPORT(log_pC_ft);
   REPORT(log_pI_ft);

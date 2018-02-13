@@ -84,28 +84,28 @@ generate_data <-
     # if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
     # rownames(DataList_out$LF) <- rownames(DataList$LF)
 
-    # if(derive_quants==TRUE){
-    #     ## project the truth forward
-    #     inits <- create_inputs(lh=lh, input_data=DataList)
-    #     Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$df, LFdist=1, S_l_input=-1, randomR=TRUE, C_opt=2)
-    #     ParList <- Inputs$Parameters    
+    if(derive_quants==TRUE){
+        ## project the truth forward
+        inits$C_ft <- DataList$Cw_ft
+        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=TRUE, randomR=TRUE, mirror=FALSE)
+        ParList <- TmbList$Parameters    
 
-    #     # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
+        # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
 
-    #     obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-    #     Derived <- calc_derived_quants(Obj=obj, lh=lh) 
+        obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
+        Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
-    #     DataList_out$MSY <- Derived$MSY
-    #     DataList_out$Fmsy <- Derived$Fmsy
-    #     DataList_out$FFmsy <- Derived$FFmsy
-    #     DataList_out$SBBmsy <- Derived$SBBmsy
-    #     DataList_out$SBmsy <- Derived$SBmsy
-    #     DataList_out$F30 <- Derived$F30
-    #     DataList_out$FF30 <- Derived$FF30
-    #     DataList_out$F40 <- Derived$F40
-    #     DataList_out$FF40 <- Derived$FF40
-    #     DataList_out$TBmsy <- Derived$TBmsy
-    # }
+        inits$MSY <- Derived$MSY
+        inits$Fmsy <- Derived$Fmsy
+        inits$FFmsy <- Derived$FFmsy
+        inits$SBBmsy <- Derived$SBBmsy
+        inits$SBmsy <- Derived$SBmsy
+        inits$F30 <- Derived$F30
+        inits$FF30 <- Derived$FF30
+        inits$F40 <- Derived$F40
+        inits$FF40 <- Derived$FF40
+        inits$TBmsy <- Derived$TBmsy
+    }
 
       if(is.null(modpath)==FALSE) saveRDS(inits, file.path(iterpath, "True.rds"))
       if(is.null(modpath)) return(inits)

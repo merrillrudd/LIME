@@ -257,7 +257,7 @@ for(iter in 1:length(itervec)){
       if(is.null(modpath)) output$opt <- opt_save
 
       if(derive_quants==TRUE){
-          Derived = calc_derived_quants( Obj=obj_save )
+          Derived = calc_derived_quants( Obj=obj_save, lh=lh )
           if(is.null(modpath)==FALSE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
           if(is.null(modpath)) output$Derived <- Derived
       }

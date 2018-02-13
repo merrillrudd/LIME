@@ -21,14 +21,15 @@ lh <- create_lh_list(vbk=0.21,
 					 t0=-0.01,
 					 lwa=0.0245, 
 					 lwb=2.79, 
-					 S50=c(20,30,40), 
-					 S95=c(26,36,42), 
+					 S50=c(20,30), 
+					 S95=c(26,36), 
 					 selex_input="length",
-					 selex_type=c("logistic","logistic","logistic"),
+					 selex_type=c("logistic","logistic"),
 					 M50=34,
 					 M95=NULL,
 					 maturity_input="length",
 					 M=0.27, 
+					 h=0.7,
 					 binwidth=1,
 					 CVlen=0.1,
 					 SigmaR=0.737,
@@ -40,7 +41,7 @@ lh <- create_lh_list(vbk=0.21,
 					 start_ages=0,
 					 rho=0.43,
 					 nseasons=1,
-					 nfleets=3)
+					 nfleets=2)
 
 # lh <- create_lh_list(vbk=0.21, 
 # 					 linf=65, 
@@ -92,15 +93,16 @@ p <- ggplot(lh$df %>%
 ## specify model path to save true population/generated data
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics=c("Constant","Endogenous","Constant"),
+					  Fdynamics=c("Constant","Endogenous"),
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20,10,5),
+					  Nyears_comp=c(20,10),
 					  comp_sample=500,
 					  init_depl=0.7,
 					  seed=2828,
-					  fleet_percentage=c(0.4,0.3,0.3))
+					  fleet_percentage=c(0.6,0.4),
+					  derive_quants=TRUE)
 # true <- generate_data(modpath=NULL,
 # 					  itervec=1, 
 # 					  Fdynamics=c("Endogenous"),
@@ -113,6 +115,8 @@ true <- generate_data(modpath=NULL,
 # 					  seed=434,
 # 					  fleet_percentage=1)
 ## create data frame -- TO DO
+
+
 ## plot simulated data
 par(mfrow=c(3,2))
 plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
@@ -163,9 +167,9 @@ inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 inputs_all <- create_inputs(lh=lh, input_data=data_all)
 
-saveRDS(data_all, "C:\\merrill\\data_multifleet_example.rds")
-saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
-saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
+# saveRDS(data_all, "C:\\merrill\\data_multifleet_example.rds")
+# saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
+# saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
 
 ##----------------------------------------------------
 ## Step 3: Run Model
@@ -206,10 +210,11 @@ res <- run_LIME(modpath=NULL,
 				newtonsteps=3,
 				F_up=10,
 				S50_up=lh$linf,
-				derive_quants=FALSE,
+				derive_quants=TRUE,
 				itervec=NULL,
 				rewrite=TRUE,
 				simulation=FALSE)
+
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
 ## specify model path to save results
@@ -236,6 +241,8 @@ Report <- res$Report
 
 ## Standard error report
 Sdreport <- res$Sdreport
+
+Derived <- res$Derived
 
 ##----------------------------------------------------
 ## Step 4: Plot fits
