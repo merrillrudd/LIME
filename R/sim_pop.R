@@ -313,9 +313,15 @@ sim_pop <-
           }))   
 
           ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
-          for(a in 1:length(ages)){
-            F_atf[a,t,index[i]] <- qE_ft[index[i],t] * Finit * S_fa[index[i],a] * exp(FishDev_f[index[i],t])
+          for(i in 1:length(index)){
+            for(a in 1:length(ages)){
+              F_atf[a,t,index[i]] <- qE_ft[index[i],t] * Finit * S_fa[index[i],a] * exp(FishDev_f[index[i],t])
+            }            
           }
+          for(a in 1:length(ages)){
+            F_at[a,t] <- sum(F_atf[a,t,])
+          }
+
         }
 
 
@@ -376,7 +382,7 @@ sim_pop <-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
-      N_t <- colSums(N_at[, which(1:tyears %% nseasons == 0)])
+      N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
       SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
       TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
