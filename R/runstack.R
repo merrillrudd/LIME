@@ -136,7 +136,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=0.1, SigmaR=SigmaR,
 									AgeMax=AgeMax))		
-				input <- create_inputs(lh=plist, input_data=input_data)
+				input <- create_inputs(lh=lhinp, input_data=input_data)
 				out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)	
 		 		if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
 		 		if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
