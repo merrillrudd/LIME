@@ -4,22 +4,18 @@
 \alias{calc_msy}
 \title{Calculate MSY reference point}
 \usage{
-calc_msy(F, ages, S_a, M, R0, W_a, Mat_a)
+calc_msy(F, ages, M, R0, W_a)
 }
 \arguments{
 \item{F}{fishing mortality rate}
 
 \item{ages}{ages in the population}
 
-\item{S_a}{selectivity-at-age}
-
 \item{M}{natural mortality}
 
 \item{R0}{equilibrium recruits}
 
 \item{W_a}{weight-at-age}
-
-\item{Mat_a}{maturity-at-age}
 }
 \value{
 yield per recruit, in biomass

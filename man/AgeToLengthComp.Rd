@@ -4,10 +4,12 @@
 \alias{AgeToLengthComp}
 \title{Age-converted-to-length structure}
 \usage{
-AgeToLengthComp(lh, tyears, N_at, comp_sample, sample_type = "catch")
+AgeToLengthComp(lh, S_a, tyears, N_at, comp_sample, sample_type = "catch")
 }
 \arguments{
 \item{lh}{list of life history attributes, output of create_lh_list}
+
+\item{S_a}{flexiblity to set selectivity-at-age by fleet}
 
 \item{tyears}{number of years of data}
 

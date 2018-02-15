@@ -9,9 +9,8 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
   maturity_input = "length", selex_type = "logistic", dome_sd = NULL,
   binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.001,
   SigmaI = 0.001, SigmaR = 0.737, SigmaF = 0.2, R0 = 1, h = 1,
-  qcoef = 1e-05, M = NULL, AgeMax = NULL, F1 = 0.2, Fequil = 0.5,
-  Frate = 0.2, Fmax = 0.7, start_ages = 0, rho = 0, theta = 10,
-  nseasons = 1)
+  qcoef = 1e-05, M = NULL, AgeMax = NULL, Fequil = 0.5, Frate = 0.2,
+  start_ages = 0, rho = 0, theta = 10, nseasons = 1, nfleets = 1)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}
@@ -22,15 +21,15 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{lwb}{length-weight allometric parameter}
 
-\item{S50}{starting value for age or length at 50 percent selectivity (will be estimated in LIME method)}
+\item{S50}{starting value for age or length at 50 percent selectivity (will be estimated in LIME method) -- can be vector for multiple fleets}
 
 \item{M50}{age or length at 50 percent maturity}
 
-\item{S95}{default=NULL for one-parameter logistic model; starting value for age or length at 95 percent selectivity}
+\item{S95}{default=NULL for one-parameter logistic model; starting value for age or length at 95 percent selectivity -- can be vector for multiple fleets}
 
 \item{M95}{default=NULL for one-parameter logistic model; age or length at 50 percent maturity}
 
-\item{Sslope}{default=NULL, option to specify slope of logistic curve for length-at-selectivity}
+\item{Sslope}{default=NULL, option to specify slope of logistic curve for length-at-selectivity -- can be vector for multiple fleets}
 
 \item{Mslope}{default=NULL option to specify slope of logistic curve for length-at-maturity}
 
@@ -38,9 +37,9 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{maturity_input}{specify whether argument M50 is an age or a length (default length)}
 
-\item{selex_type}{default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV.}
+\item{selex_type}{default="logistic" for 1-parameter logistic selex, alternate="dome" for dome-shaped selectivity and must specify dome-params LV and RV. -- can be vector for multiple fleets}
 
-\item{dome_sd}{standard deviation of normal distribution to the right side of the fully selected age/length}
+\item{dome_sd}{standard deviation of normal distribution to the right side of the fully selected age/length  -- can be vector for multiple fleets}
 
 \item{binwidth}{width of length bins (default = 1)}
 
@@ -54,25 +53,21 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 
 \item{SigmaR}{standard deviation - process error for recruitment time series (default = 0.6 -- starting value, will be estimated)}
 
-\item{SigmaF}{standard deviation - process error for fishing mortality time series (default = 0.3)}
+\item{SigmaF}{standard deviation - process error for fishing mortality time series (default = 0.3) -- can be vector for multiple fleets}
 
 \item{R0}{equilibrium recruitment (default = 1); when no information on scale is available, will estimate relative deviations around equilibrium 1}
 
 \item{h}{steepness parameter (default = 1)}
 
-\item{qcoef}{starting value for catchability coefficient (when index data is available, default = 1e-5)}
+\item{qcoef}{starting value for catchability coefficient (when index data is available, default = 1e-5) -- can be vector for multiple fleets}
 
 \item{M}{value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)}
 
 \item{AgeMax}{option to specify maximum age; default=NULL will calculate as the age at which 1 percent of individuals are left in the unfished condition}
 
-\item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
+\item{Fequil}{equilibrium fishing mortality rate (used for simulation; default=0.2) -- can be vector for multiple fleets}
 
-\item{Fequil}{equilibrium fishing mortality rate (used for simulation; default=0.2)}
-
-\item{Frate}{parameter used to simulate fishing moratality time series (default=NULL)}
-
-\item{Fmax}{maximum F used in simulation (default=NULL)}
+\item{Frate}{parameter used to simulate fishing moratality time series (default=NULL) -- can be vector for multiple fleets}
 
 \item{start_ages}{age to start (either 0 or 1; default = 0)}
 
@@ -81,6 +76,10 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 \item{theta}{dirichlet-multinomial parameter related to effective sample size. default to 10, will not be used if length frequency distribution LFdist is set to multinomial (0). Only used if distribution is dirichlet-multinomial (LFdist=1)}
 
 \item{nseasons}{specify number of sub-time periods per year; default=1 (instantaneous sampling)}
+
+\item{nfleets}{specify number of fleets - fleet-specific parameters can be length nfleets, or shared by specifying only one number}
+
+\item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
 }
 \value{
 List, a tagged list of life history traits

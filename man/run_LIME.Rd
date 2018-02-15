@@ -4,61 +4,57 @@
 \alias{run_LIME}
 \title{run LIME model - simulation mode}
 \usage{
-run_LIME(modpath, lh, input_data, est_sigma, data_avail, itervec = NULL,
-  rewrite = TRUE, simulation = FALSE, param_adjust = FALSE,
-  val_adjust = FALSE, f_true = FALSE, fix_param = FALSE,
-  fix_param_t = FALSE, C_opt = 0, F_up = 10, S50_up = NULL,
-  LFdist = 1, derive_quants = FALSE, S_l_input = -1, theta_type = 1,
-  randomR = TRUE, Fpen = 1, SigRpen = 1, newtonsteps = 3)
+run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
+  SigRprior = c(0.737, 0.3), LFdist = 1, C_type = 0, est_more = FALSE,
+  fix_more = FALSE, f_startval_ft = NULL, rdev_startval_t = NULL,
+  est_selex_f = TRUE, randomR = TRUE, newtonsteps = FALSE, F_up = 10,
+  S50_up = NULL, derive_quants = FALSE, itervec = NULL,
+  simulation = FALSE, rewrite = TRUE, mirror = NULL)
 }
 \arguments{
 \item{modpath}{model directory}
 
-\item{lh}{list of life history information, from create_lh_list}
+\item{input}{tagged list of LIME inputs. Output from create_inputs.}
 
-\item{input_data}{tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years.}
+\item{data_avail}{types of data included, must at least include LCX where X is the number of years of length composition data. May also include "Catch" or "Index" separated by underscore. For example, "LC10", "Catch_LC1", "Index_Catch_LC20".}
 
-\item{est_sigma}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
+\item{Fpen}{penalty on fishing mortality 0= off, 1=on}
 
-\item{data_avail}{types of data included, must at least include LC as length composition data is the minimum data input. May also include Catch or Index separated by underscore. For example, LC, Catch_LC, Index_Catch_LC.}
+\item{SigRpen}{penalty on sigmaR, 0=off, 1=on}
 
-\item{itervec}{number of datasets to generate in a simulation study. default=NULL for real stock assessment application.}
+\item{SigRprior}{vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation}
 
-\item{rewrite}{default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE}
+\item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
-\item{simulation}{is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)}
+\item{C_type}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
 
-\item{param_adjust}{character or vector of parameter names to change input values}
+\item{est_more}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
 
-\item{val_adjust}{number or vector of numbers for corresponding parameter value changes}
+\item{fix_more}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
 
-\item{f_true}{default=FALSE will make starting logF values =0; change to true and will use true values from simulation}
+\item{f_startval_ft}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
 
-\item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
+\item{rdev_startval_t}{default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)}
 
-\item{fix_param_t}{default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed.}
+\item{est_selex_f}{default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets}
 
-\item{C_opt}{default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2.}
+\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
+
+\item{newtonsteps}{number of extra newton steps to take after optimization; FALSE to turn off}
 
 \item{F_up}{upper bound of fishing mortality estimate; default=5}
 
 \item{S50_up}{upper bound of length at 50 percent selectivity; default=NULL}
 
-\item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
+\item{derive_quants}{if TRUE, derive MSY-related reference points, default=FALSE}
 
-\item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
+\item{itervec}{number of datasets to generate in a simulation study. default=NULL for real stock assessment application.}
 
-\item{S_l_input}{default=-1, use 1 or 2--parameter logistic selectivity function; alternatively can input fixed selectivity-at-length}
+\item{simulation}{is this a simulation? default FALSE means you are using real data (can set itervec=NULL)}
 
-\item{theta_type}{default=1, estimate single theta for all years of length comp; if 0, estimate annual theta}
+\item{rewrite}{default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE}
 
-\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
-
-\item{Fpen}{penalty on fishing mortality; 0=OFF, 1=ON, default=1}
-
-\item{SigRpen}{penalty on sigmaR; 0=OFF, 1=ON, default=1}
-
-\item{newtonsteps}{number of extra newton steps to take after optimization; FALSE to turn off}
+\item{mirror}{vector of parameter names to mirror between fleets}
 }
 \value{
 prints how many iterations were run in model directory
