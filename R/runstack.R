@@ -1,3 +1,26 @@
+#' Predictive stacking
+#'
+#' \code{runstack} run predicted stacking for life history parameters using LIME
+#'
+#' @author M.B. Rudd
+#' @param savedir directory to save results
+#' @param iter iteration of generated data
+#' @param seed set seed
+#' @param tmax maximum age
+#' @param nodes matrix of nodes where each column is a different parameter and each row is a value from a distribution
+#' @param param parameters (column names for nodes)
+#' @param mean mean of each parameter value 
+#' @param cov covariance matrix across parameters
+#' @param modname model name to save in directory
+#' @param input_data for LIME use with real data (not simulated)
+#' @param Fscenario fishing mortality scenario to generate data
+#' @param rewrite rewrite results?
+
+#' @useDynLib LIME
+
+#' @return prints how many iterations were run in model directory
+#' 
+#' @export
 runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname, input_data, Fscenario, rewrite){
 
 	iterpath <- file.path(savedir, iter)
