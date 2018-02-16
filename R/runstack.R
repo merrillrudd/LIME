@@ -129,12 +129,9 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			## if model doesn't converge:
 			while(file.exists(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"))){
 
-				## remove nonconvergence flag
-				remove <- unlink(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"), TRUE)
-
 				## change starting values for F to those estimated in previous, nonconverged run
 				out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-				if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_FishLifeMeans.txt"))
+				if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"), TRUE)
 				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_FishLifeMeans.txt"))
 				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
 			}
@@ -164,12 +161,9 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			## if model doesn't converge:
 			while(file.exists(file.path(iterpath, "nonconvergence_IterTrue.txt"))){
 
-				## remove nonconvergence flag
-				remove <- unlink(file.path(iterpath, "nonconvergence_IterTrue.txt"), TRUE)
-
 				## change starting values for F to those estimated in previous, nonconverged run
 				out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-				if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_IterTrue.txt"))
+				if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, "nonconvergence_IterTrue.txt"), TRUE)
 				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
 				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
 			}
@@ -207,12 +201,10 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			 		## if model doesn't converge:
 					while(file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
 
-						## remove nonconvergence flag
-						remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)		
-
 						## change starting values for F to those estimated in previous, nonconverged run
 						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
+						if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)		
+
 						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
 						if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
 					}
