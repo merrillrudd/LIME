@@ -61,12 +61,12 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=tmax)	
 
-			p <- ggplot(plist$df %>% filter(By=="Age")) +
-				geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
-				facet_grid(Variable~., scale="free_y") +
-				xlab("Age") +
-				guides(color=FALSE)
-			ggsave(file.path(iterpath, "LH_info.png"), p)
+			# p <- ggplot(plist$df %>% filter(By=="Age")) +
+			# 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
+			# 	facet_grid(Variable~., scale="free_y") +
+			# 	xlab("Age") +
+			# 	guides(color=FALSE)
+			# ggsave(file.path(iterpath, "LH_info.png"), p)
 
 		if(all(input_data==FALSE)){
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
@@ -82,9 +82,9 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 				for(f in 1:plist$nfleets){
 					LFlist[[f]] <- data$LF[,,f]
 				}
-				png(file.path(iterpath, "LF_data.png"), height=8, width=10, res=200, units="in")
-				plot_LCfits(LFlist=LFlist, ylim=c(0,0.15))	
-				dev.off()
+				# png(file.path(iterpath, "LF_data.png"), height=8, width=10, res=200, units="in")
+				# plot_LCfits(LFlist=LFlist, ylim=c(0,0.15))	
+				# dev.off()
 			}
 			data <- readRDS(file.path(iterpath, "True.rds"))
 			input_data <- list("years"=data$years, "LF"=data$LF)	
