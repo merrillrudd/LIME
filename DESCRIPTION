@@ -14,7 +14,7 @@ License: MIT + file LICENSE
 Depends:
     TMB,
     TMBhelper
-LinkingTo: TMB, RcppEigen
+LinkingTo: TMB, RcppEigen, ggplot2, dplyr
 RoxygenNote: 5.0.1
 LazyData: true
 Suggests:
