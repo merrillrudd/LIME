@@ -199,16 +199,25 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			 		if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
 
 			 		## if model doesn't converge:
-					while(file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
-
+			 		try <- 0
+					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
+						try <- try + 1
 						## change starting values for F to those estimated in previous, nonconverged run
 						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-						if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)		
+						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
 
 						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
 						if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+						if(try == 3){
+							if(max(abs(out$df[,1]))<=0.01){
+								remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)
+								saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_", modname, "node", x, ".txt")))
+							}
+						}
 					}
 				return(out)
+
 			})
 			saveRDS(res, file.path(iterpath, paste0("res_", modname, ".rds")))
 			files <- list.files(path=file.path(iterpath))
