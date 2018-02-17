@@ -78,10 +78,10 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 								init_depl=c(0.10,0.90), 
 								seed=rep(seed+1000,iter),
 								rewrite=TRUE)
-				LFlist <- NULL
-				for(f in 1:plist$nfleets){
-					LFlist[[f]] <- data$LF[,,f]
-				}
+				# LFlist <- NULL
+				# for(f in 1:plist$nfleets){
+				# 	LFlist[[f]] <- data$LF[,,f]
+				# }
 				# png(file.path(iterpath, "LF_data.png"), height=8, width=10, res=200, units="in")
 				# plot_LCfits(LFlist=LFlist, ylim=c(0,0.15))	
 				# dev.off()
