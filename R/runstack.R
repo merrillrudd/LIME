@@ -23,7 +23,8 @@
 #' @export
 runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname, input_data, Fscenario, rewrite){
 
-	iterpath <- file.path(savedir, iter)
+	if(is.null(iter)==FALSE) iterpath <- file.path(savedir, iter)
+	if(is.null(iter)) iterpath <- file.path(savedir, modname)
 	dir.create(iterpath, showWarnings=FALSE)
 
 	## delete files if rewriting
@@ -68,7 +69,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			# 	guides(color=FALSE)
 			# ggsave(file.path(iterpath, "LH_info.png"), p)
 
-		if(all(input_data==FALSE)){
+		if(is.list(input_data)==FALSE & is.data.frame(input_data)==FALSE){
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
 				## use seed + 1000 to generate data
 				data <- generate_data(modpath=savedir, itervec=iter, 
@@ -138,6 +139,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 		}	
 
 		## run at true values
+		if(is.null(iter)==FALSE){
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_IterTrue.rds")))==FALSE){	
 			
 
@@ -168,6 +170,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
 			}
 		}	
+		}
 	
 
 		## predictive stacking
