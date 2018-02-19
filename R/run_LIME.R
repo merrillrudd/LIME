@@ -18,7 +18,7 @@
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
-#' @param F_up upper bound of fishing mortality estimate; default=5
+#' @param F_up upper bound of fishing mortality estimate; default=10
 #' @param S50_up upper bound of length at 50 percent selectivity; default=NULL
 #' @param derive_quants if TRUE, derive MSY-related reference points, default=FALSE
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
@@ -147,6 +147,7 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
         Lwr[which(names(obj$par)=="log_S50_f")] = log(1)
+        Lwr[which(names(obj$par)=="log_F_ft")] <- log(0.001)
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
