@@ -25,6 +25,13 @@ create_inputs <- function(lh, input_data){
 
         if(is.array(dat_input$LF)){
             length_raw <- dat_input$LF
+            if(is.matrix(length_raw)){
+                new <- array(NA, dim=c(dim(length_raw),1))
+                new[,,1] <- length_raw
+                rownames(new) <- rownames(length_raw)
+                colnames(new) <- colnames(length_raw)
+                length_raw <- new
+            }
             bins_dim <- seq(bw, by=bw, length=dim(length_raw)[2])
             max_bin <- max(c(max(dat_input$highs), 
                             max(bins_dim), 
