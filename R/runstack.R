@@ -47,7 +47,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 				rho_inp <- 0
 				Fdynamics_inp <- "Constant"
 			}
-			if(Fscenario=="harvestdyn" | is.null(Fscenario)){
+			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
 				SigmaF_inp <- 0.2
 				SigmaR_inp <- 0.6
 				rho_inp <- 0.4
