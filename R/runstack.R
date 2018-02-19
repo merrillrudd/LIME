@@ -207,7 +207,10 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
 
 						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
-						if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+						if(max(abs(out$df[,1]))<=0.001){
+							remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
+							saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+						}
 						if(try == 3){
 							if(max(abs(out$df[,1]))<=0.01){
 								remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)
