@@ -64,12 +64,12 @@ Type objective_function<Type>::operator() ()
 
     // option for shorter time-step than years
     DATA_IVECTOR(S_yrs); // matching each time step with a year
-    DATA_INTEGER(n_s); // number of time steps within a year
+    // DATA_INTEGER(n_s); // number of time steps within a year
     DATA_INTEGER(n_y); // number of years
 
     //mirror options
     DATA_INTEGER(mirror_theta);
-    DATA_INTEGER(mirror_q);
+    // DATA_INTEGER(mirror_q);
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
