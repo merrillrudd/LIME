@@ -6,7 +6,7 @@
 #' @param savedir directory to save results
 #' @param iter iteration of generated data
 #' @param seed set seed
-#' @param tmax maximum age
+#' @param lh life history list, with elements contained as output from LIME::create_lh_list
 #' @param nodes matrix of nodes where each column is a different parameter and each row is a value from a distribution
 #' @param param parameters (column names for nodes)
 #' @param mean mean of each parameter value 
@@ -22,7 +22,7 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname, input_data, Fscenario, rewrite, binwidth=1){
+runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, input_data, Fscenario, rewrite, binwidth=1){
 
 	if(is.null(iter)==FALSE) iterpath <- file.path(savedir, iter)
 	if(is.null(iter)) iterpath <- file.path(savedir, modname)
@@ -51,17 +51,17 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
 				SigmaF_inp <- 0.2
-				SigmaR_inp <- 0.6
+				SigmaR_inp <- 0.737
 				rho_inp <- 0.4
 				Fdynamics_inp <- "Endogenous"
 			}
-			plist <- create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=-1.77,
-									lwa=0.053, lwb=2.706,
+			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
+									lwa=lwa, lwb=lwb,
 									M=M_choose,
-									M50=16.9, maturity_input="length",
-									S50=16.9, S95=25, selex_input="length",
+									M50=ML50, maturity_input="length",
+									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
-									AgeMax=tmax,
+									AgeMax=AgeMax,
 									binwidth=binwidth)	
 
 			# p <- ggplot(plist$df %>% filter(By=="Age")) +
@@ -113,7 +113,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 					create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_inp,
-									M50=M50, maturity_input="length",
+									M50=ML50, maturity_input="length",
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=0.1, SigmaR=SigmaR,
 									AgeMax=AgeMax,
@@ -213,7 +213,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			 				 create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 										lwa=lwa, lwb=lwb,
 										M=M_inp,
-										M50=M50, maturity_input="length",
+										M50=ML50, maturity_input="length",
 										S50=SL50, S95=SL95, selex_input="length",
 										SigmaF=0.1, SigmaR=SigmaR,
 										AgeMax=AgeMax,
