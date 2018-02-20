@@ -62,7 +62,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
-									binwidth=binwidth)	
+									binwidth=binwidth))
 
 			# p <- ggplot(plist$df %>% filter(By=="Age")) +
 			# 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
