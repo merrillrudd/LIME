@@ -149,6 +149,7 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 								saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
 								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
 							}
+							saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans_NC.rds")))
 						}
 					}
 		}	
