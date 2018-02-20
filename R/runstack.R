@@ -130,15 +130,27 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			## save results if converged
 			if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
 
-			## if model doesn't converge:
-			while(file.exists(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"))){
+			 		## if model doesn't converge:
+			 		try <- 0
+					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))){		
+						try <- try + 1
+						## change starting values for F to those estimated in previous, nonconverged run
+						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
+						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
 
-				## change starting values for F to those estimated in previous, nonconverged run
-				out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-				if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"), TRUE)
-				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_FishLifeMeans.txt"))
-				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
-			}
+						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
+						if(max(abs(out$df[,1]))<=0.001){
+							remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+							saveRDS(out, file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+						}
+						if(try == 3){
+							if(max(abs(out$df[,1]))<=0.01){
+								remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")), TRUE)
+								saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
+							}
+						}
+					}
 		}	
 
 		## run at true values
@@ -163,15 +175,27 @@ runstack <- function(savedir, iter, seed, tmax, nodes, param, mean, cov, modname
 			## save results if converged
 			if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
 
-			## if model doesn't converge:
-			while(file.exists(file.path(iterpath, "nonconvergence_IterTrue.txt"))){
+			 		## if model doesn't converge:
+			 		try <- 0
+					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))){		
+						try <- try + 1
+						## change starting values for F to those estimated in previous, nonconverged run
+						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
+						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
 
-				## change starting values for F to those estimated in previous, nonconverged run
-				out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-				if(max(abs(out$df[,1]))<=0.001) remove <- unlink(file.path(iterpath, "nonconvergence_IterTrue.txt"), TRUE)
-				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
-				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
-			}
+						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_IterTrue.txt")))
+						if(max(abs(out$df[,1]))<=0.001){
+							remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
+							saveRDS(out, file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
+						}
+						if(try == 3){
+							if(max(abs(out$df[,1]))<=0.01){
+								remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")), TRUE)
+								saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
+								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_IterTrue.txt")))
+							}
+						}
+					}
 		}	
 		}
 	
