@@ -651,7 +651,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( S50_f );
   ADREPORT( S_fl );
   ADREPORT( F_ft );
-  ADREPORT( F_fy );
+  // ADREPORT( F_fy );
   ADREPORT( F_t );
   // ADREPORT( F_y );
 
@@ -681,7 +681,7 @@ Type objective_function<Type>::operator() ()
   // REPORT( F_y );
   REPORT( N_t );
   REPORT( F_ft );
-  REPORT( F_fy );
+  // REPORT( F_fy );
   REPORT( F_ta );
 
   // Predicted quantities
