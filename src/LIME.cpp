@@ -585,7 +585,8 @@ Type objective_function<Type>::operator() ()
     // F
     jnll_comp(5) = 0;
     if(Fpen==1){
-        for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
+        // for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
+        for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
     }
 
     // SigmaR
@@ -628,10 +629,10 @@ Type objective_function<Type>::operator() ()
       }
     }
 
-    vector<Type> lF_y(n_y);
-    for(int t=0;t<n_y;t++){
-      lF_y(t) = log(F_y(t));
-    }
+    // vector<Type> lF_y(n_y);
+    // for(int t=0;t<n_y;t++){
+    //   lF_y(t) = log(F_y(t));
+    // }
 
 
 
@@ -644,7 +645,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( ML_ft_hat );
   ADREPORT( lSB_t );
   ADREPORT( lF_t );
-  ADREPORT( lF_y );
+  // ADREPORT( lF_y );
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
   ADREPORT( S50_f );
@@ -652,7 +653,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( F_ft );
   ADREPORT( F_fy );
   ADREPORT( F_t );
-  ADREPORT( F_y );
+  // ADREPORT( F_y );
 
   // Parameters
   REPORT( q_f );
@@ -677,7 +678,7 @@ Type objective_function<Type>::operator() ()
    // State variables
   REPORT( R_t );
   REPORT( F_t );
-  REPORT( F_y );
+  // REPORT( F_y );
   REPORT( N_t );
   REPORT( F_ft );
   REPORT( F_fy );
