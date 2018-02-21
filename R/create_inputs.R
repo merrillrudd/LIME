@@ -33,7 +33,7 @@ create_inputs <- function(lh, input_data){
                 dat_input$LF <- as.matrix(LF_new)
             }
             if(obs_lb >= max(dat_input$highs)){
-                max_lb <- max(from=seq(dat_input$binwidth, to=ncol(dat_input$LF), by=dat_input$binwidth))
+                max_lb <- max(from=seq(dat_input$binwidth, to=ncol(dat_input$LF)*dat_input$binwidth, by=dat_input$binwidth))
                 test_lb <- max(seq(from=(obs_lb + dat_input$binwidth), length=5, by=dat_input$binwidth))
                 change_lb <- min(test_lb, max_lb)
                 if(is.null(colnames(dat_input$LF))==FALSE) index_lb <- which(colnames(dat_input$LF)==change_lb)
