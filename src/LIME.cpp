@@ -318,7 +318,7 @@ Type objective_function<Type>::operator() ()
   //year 1
   for(int f=0;f<n_fl;f++){
     for(int a=0;a<n_a;a++){
-      Cn_taf(0,a,f) = N_ta(0,a) * (Type(1.0) - exp(-M - F_at(a,0))) * (F_atf(a,0,f))/(M + F_at(a,0));
+      Cn_taf(0,a,f) = N_ta(0,a) * (Type(1.0) - exp(-M - F_ta(0,a))) * (F_atf(a,0,f))/(M + F_ta(0,a));
       Cw_taf(0,a,f) = W_a(a) * Cn_taf(0,a,f);
 
       Cn_ta(0,a) += Cn_taf(0,a,f);
@@ -362,7 +362,7 @@ Type objective_function<Type>::operator() ()
   for(int f=0;f<n_fl;f++){
     for(int t=1;t<n_t;t++){
       for(int a=0;a<n_a;a++){
-        Cn_taf(t,a,f) = N_ta(t,a) * (Type(1.0) - exp(-M - F_at(a,t))) * (F_atf(a,t,f))/(M + F_at(a,t));
+        Cn_taf(t,a,f) = N_ta(t,a) * (Type(1.0) - exp(-M - F_ta(t,a))) * (F_atf(a,t,f))/(M + F_ta(t,a));
         Cw_taf(t,a,f) = Cn_taf(t,a,f) * W_a(a);  
 
         Cn_ta(t,a) += Cn_taf(t,a,f);
