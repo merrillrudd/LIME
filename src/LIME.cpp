@@ -58,6 +58,7 @@ Type objective_function<Type>::operator() ()
 
     // option for fixed time series for selectivity
     DATA_IVECTOR(selex_type_f); //0 =fixed, 1=estimated
+    DATA_VECTOR(selex_input);
 
     // option for likelihood distribution for length comps
     DATA_INTEGER(LFdist); // 0=multinomial, 1=dirichlet-multinomial
@@ -70,6 +71,7 @@ Type objective_function<Type>::operator() ()
     //mirror options
     DATA_INTEGER(mirror_theta);
     DATA_INTEGER(mirror_q);
+    // DATA_INTEGER(mirror_F);
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
@@ -155,24 +157,24 @@ Type objective_function<Type>::operator() ()
   // ========= By fleet  =============================
 
   // Transform vectors
-  matrix<Type> F_ft(n_fl,n_t); //number of total time steps
-  F_ft.setZero();
+  matrix<Type> F_ft(n_fl,n_t); // number of total time steps
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
       F_ft(f,t) = exp(log_F_ft(f,t));
     }
   }
 
-  matrix<Type> F_fy(n_fl,n_y); //number of years
-  F_fy.setZero();
-  int tmp; 
-  for(int f=0;f<n_fl;f++){
-      for(int t=0;t<n_t;t++){
-        tmp = S_yrs(t) - 1;
-        // match fishing mortality in the total number of time steps to the annual parameter F
-        F_fy(f,tmp) += F_ft(f,t);
-    }
-  }
+  // redo seasonal to include option to estimate annual or seasonal F (mirror_F)
+  //with high enough sample size, could estimate seasonal F
+  // matrix<Type> F_fy(n_fl,n_y); // annually
+  // int tmp;
+  // for(int f=0;f<n_fl;f++){
+  //   for(int t=0;t<n_t;t++){
+  //     tmp = S_yrs(t) - 1;
+  //     // match fishing mortality in the total number of time steps to the annual parameter F
+  //     F_ft(f,t) = F_fy(f,tmp)/n_s;
+  //   }
+  // }
 
   //total F
   vector<Type> F_t(n_t);
@@ -182,19 +184,20 @@ Type objective_function<Type>::operator() ()
       F_t(t) += F_ft(f,t);
     }
   }
-  vector<Type> F_y(n_y);
-  F_y.setZero();
-  for(int f=0;f<n_fl;f++){
-    for(int y=0;y<n_y;y++){
-      F_y(y) += F_fy(f,y);
-    }
-  }
+  // vector<Type> F_y(n_y);
+  // F_y.setZero();
+  // for(int f=0;f<n_fl;f++){
+  //   for(int y=0;y<n_y;y++){
+  //     F_y(y) += F_fy(f,y);
+  //   }
+  // }
 
   //selectivity at length
   matrix<Type> S_fl(n_fl,n_lb);
   S_fl.setZero();
   for(int f=0;f<n_fl;f++){
     for(int l=0;l<n_lb;l++){
+      if(selex_type_f(f)==0) S_fl(f,l) = selex_input(f,l);
       if(selex_type_f(f)==1) S_fl(f,l) = 1 / (1 + exp(-log(Type(19))*(lbmids(l) - S50_f(f))/(S95_f(f) - S50_f(f))));
     }   
   }
