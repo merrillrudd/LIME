@@ -69,7 +69,7 @@ Type objective_function<Type>::operator() ()
 
     //mirror options
     DATA_INTEGER(mirror_theta);
-    // DATA_INTEGER(mirror_q);
+    DATA_INTEGER(mirror_q);
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
@@ -126,7 +126,8 @@ Type objective_function<Type>::operator() ()
   // catchability coefficient
   vector<Type> q_f(n_fl);
   for(int f=0;f<n_fl;f++){
-    q_f(f) = exp(log_q_f(f));
+    if(mirror_q!=1) q_f(f) = exp(log_q_f(f));
+    if(mirror_q==1) q_f(f) = exp(log_q_f(0));
   } 
 
   // ========= Probability of being length at age  =============================
