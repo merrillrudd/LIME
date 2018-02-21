@@ -107,7 +107,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 
 			## life history inputs
 			vbk_choose <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
-			M_choose <- ifelse("M" %in% param, exp(mean["M"]), , lh$M
+			M_choose <- ifelse("M" %in% param, exp(mean["M"]), , lh$M)
 			Linf_choose <- ifelse("Loo" %in% param, exp(mean["Loo"]), lh$linf)
 			lhinp <- with(plist, 
 					create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
