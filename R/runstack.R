@@ -58,17 +58,17 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_choose,
-									M50=ML50, maturity_input="length",
-									S50=SL50, S95=SL95, selex_input="length",
+									M50=M50, maturity_input="age",
+									S50=S50, S95=S95, selex_input="age",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
 									binwidth=binwidth))
 
-			# p <- ggplot(plist$df %>% filter(By=="Age")) +
-			# 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
-			# 	facet_grid(Variable~., scale="free_y") +
-			# 	xlab("Age") +
-			# 	guides(color=FALSE)
+			p <- ggplot(plist$df %>% filter(By=="Age")) +
+				geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
+				facet_grid(Variable~., scale="free_y") +
+				xlab("Age") +
+				guides(color=FALSE)
 			# ggsave(file.path(iterpath, "LH_info.png"), p)
 
 		if(is.list(input_data)==FALSE & is.data.frame(input_data)==FALSE){
@@ -106,15 +106,15 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			if(file.exists(file.path(iterpath,"res__FishLifeMeans.txt"))) unlink(file.path(iterpath, "res__FishLifeMeans.txt"), TRUE)	
 
 			## life history inputs
-			vbk_inp <- exp(mean["K"])
-			M_inp <- exp(mean["M"])
-			linf_inp <- exp(mean["Loo"])
+			vbk_choose <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
+			M_choose <- ifelse("M" %in% param, exp(mean["M"]), , lh$M
+			Linf_choose <- ifelse("Loo" %in% param, exp(mean["Loo"]), lh$linf)
 			lhinp <- with(plist, 
 					create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_inp,
-									M50=ML50, maturity_input="length",
-									S50=SL50, S95=SL95, selex_input="length",
+									M50=M50, maturity_input="age",
+									S50=S50, S95=S95, selex_input="age",
 									SigmaF=0.1, SigmaR=SigmaR,
 									AgeMax=AgeMax,
 									binwidth=binwidth))		
@@ -213,8 +213,8 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			 				 create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 										lwa=lwa, lwb=lwb,
 										M=M_inp,
-										M50=ML50, maturity_input="length",
-										S50=SL50, S95=SL95, selex_input="length",
+										M50=M50, maturity_input="age",
+										S50=S50, S95=S95, selex_input="age",
 										SigmaF=0.1, SigmaR=SigmaR,
 										AgeMax=AgeMax,
 										binwidth=binwidth))		
