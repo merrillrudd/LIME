@@ -218,11 +218,6 @@ Type objective_function<Type>::operator() ()
     }     
   }
           
-  // ============ Probability of random effects =============
-  jnll_comp(0) = 0;
-  for(int y=0;y<n_y;y++){
-    jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
-  }
 
   // ============ equilibrium spawning biomass ===============
   Type SB0 = 0;
@@ -233,8 +228,8 @@ Type objective_function<Type>::operator() ()
   // // ============ joint F rate including selectivity ===========================
 
   // calculate fishing mortality at age over time by fleet
-  // includes fishing pressure by fleet and selectivity
-  // may need to include fleet percentage?
+  // includes fishing pressure by fleet, selectivity, and catchability by fleet
+  //catchability could be sinusoidal by quarter 
   array<Type> F_atf(n_a,n_t,n_fl);
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
@@ -266,25 +261,17 @@ Type objective_function<Type>::operator() ()
   matrix<Type> N_ta(n_t,n_a); // abundance
   matrix<Type> SB_ta(n_t,n_a); // spawning biomass
   matrix<Type> TB_ta(n_t,n_a); // total biomass
-  matrix<Type> Cn_ta(n_t,n_a); //catch in numbers
-  matrix<Type> Cw_ta(n_t,n_t); //catch in biomass
   N_ta.setZero();
   SB_ta.setZero();
   TB_ta.setZero();
-  Cn_ta.setZero();
-  Cw_ta.setZero();
 
   //over time
   vector<Type> N_t(n_t); // abundance
   vector<Type> SB_t(n_t); //spawning biomass
   vector<Type> TB_t(n_t); //total biomass
-  vector<Type> Cn_t_hat(n_t); //catch in numbers
-  vector<Type> Cw_t_hat(n_t); //catch in biomass
   N_t.setZero();
   SB_t.setZero();
   TB_t.setZero();
-  Cn_t_hat.setZero();
-  Cw_t_hat.setZero();
 
   for(int a=0;a<n_a;a++){
     // Population abundance
@@ -298,38 +285,52 @@ Type objective_function<Type>::operator() ()
     // Total biomass
     TB_ta(0,a) = N_ta(0,a) * W_a(a);
 
-    // Catch
-    Cn_ta(0,a) = N_ta(0,a) * (Type(1.0) - exp(-M - F_ta(0,a))) * (F_ta(0,a))/(M + F_ta(0,a));
-    Cw_ta(0,a) = Cn_ta(0,a) * W_a(a);
-
     //Annual values
     if(a>0) N_t(0) += N_ta(0,a);
     SB_t(0) += SB_ta(0,a);
     TB_t(0) += TB_ta(0,a);
-    Cn_t_hat(0) += Cn_ta(0,a);
-    Cw_t_hat(0) += Cw_ta(0,a);
   }
 
-  //catch by fleet
+  //catch by time, age, fleet
   array<Type> Cn_taf(n_t,n_a,n_fl);
   array<Type> Cw_taf(n_t,n_a,n_fl);
-  matrix<Type> Cn_ft(n_fl,n_t);
-  matrix<Type> Cw_ft(n_fl,n_t);
   Cn_taf.setZero();
   Cw_taf.setZero();
+
+  //catch by time, age
+  matrix<Type> Cn_ta(n_t,n_a); //catch in numbers
+  matrix<Type> Cw_ta(n_t,n_a); //catch in biomass
+  Cn_ta.setZero();
+  Cw_ta.setZero();
+
+  //catch by fleet, time
+  matrix<Type> Cn_ft(n_fl,n_t);
+  matrix<Type> Cw_ft(n_fl,n_t);
   Cn_ft.setZero();
   Cw_ft.setZero();
 
+  //catch by time
+  vector<Type> Cn_t_hat(n_t); //catch in numbers
+  vector<Type> Cw_t_hat(n_t); //catch in biomass
+  Cn_t_hat.setZero();
+  Cw_t_hat.setZero();
+
+  //year 1
   for(int f=0;f<n_fl;f++){
     for(int a=0;a<n_a;a++){
-      Cn_taf(0,a,f) = N_ta(0,a) * (Type(1.0) - exp(-M - F_atf(a,0,f))) * (F_atf(a,0,f))/(M + F_atf(a,0,f));
-      Cw_taf(0,a,f) = W_a(a) * N_ta(0,a) * (Type(1.0) - exp(-M - F_atf(a,0,f))) * (F_atf(a,0,f))/(M + F_atf(a,0,f));
+      Cn_taf(0,a,f) = N_ta(0,a) * (Type(1.0) - exp(-M - F_at(a,0))) * (F_atf(a,0,f))/(M + F_at(a,0));
+      Cw_taf(0,a,f) = W_a(a) * Cn_taf(0,a,f);
+
+      Cn_ta(0,a) += Cn_taf(0,a,f);
+      Cw_ta(0,a) += Cw_taf(0,a,f);
 
       Cn_ft(f,0) += Cn_taf(0,a,f);
       Cw_ft(f,0) += Cw_taf(0,a,f);
+
+      Cn_t_hat(0) += Cn_taf(0,a,f);
+      Cw_t_hat(0) += Cw_taf(0,a,f);
     }
   }
-
 
   // ============ project forward in time =============  
   for(int t=1;t<n_t;t++){
@@ -350,16 +351,10 @@ Type objective_function<Type>::operator() ()
       // Total biomass
       TB_ta(t,a) = N_ta(t,a)*W_a(a);
       
-      // Catch
-      Cn_ta(t,a) = N_ta(t,a) * (Type(1.0) - exp(-M - F_ta(t,a))) * (F_ta(t,a) / (M + F_ta(t,a)));
-      Cw_ta(t,a) = Cn_ta(t,a) * W_a(a);
-
       //Annual values
       if(a>0) N_t(t) += N_ta(t,a);
       SB_t(t) += SB_ta(t,a);
       TB_t(t) += TB_ta(t,a);
-      Cn_t_hat(t) += Cn_ta(t,a);
-      Cw_t_hat(t) += Cw_ta(t,a);
     }
   }
 
@@ -367,11 +362,17 @@ Type objective_function<Type>::operator() ()
   for(int f=0;f<n_fl;f++){
     for(int t=1;t<n_t;t++){
       for(int a=0;a<n_a;a++){
-        Cn_taf(t,a,f) = N_ta(t,a) * (Type(1.0) - exp(-M - F_atf(a,t,f))) * (F_atf(a,t,f))/(M + F_atf(a,t,f));
+        Cn_taf(t,a,f) = N_ta(t,a) * (Type(1.0) - exp(-M - F_at(a,t))) * (F_atf(a,t,f))/(M + F_at(a,t));
         Cw_taf(t,a,f) = Cn_taf(t,a,f) * W_a(a);  
+
+        Cn_ta(t,a) += Cn_taf(t,a,f);
+        Cw_ta(t,a) += Cw_taf(t,a,f);
 
         Cn_ft(f,t) += Cn_taf(t,a,f);
         Cw_ft(f,t) += Cw_taf(t,a,f);
+
+        Cn_t_hat(t) += Cn_taf(t,a,f);
+        Cw_t_hat(t) += Cw_taf(t,a,f);
       }      
     }
   }
@@ -563,6 +564,14 @@ Type objective_function<Type>::operator() ()
     }
   }
 
+  // ------ likelihood components ----------//
+  // ============ Probability of random effects =============
+  jnll_comp(0) = 0;
+  for(int y=0;y<n_y;y++){
+    jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
+  }
+
+  // ============ Probability of data =============
   jnll_comp(1) = 0;
   jnll_comp(1) = Type(-1)*sum( log_pL_ft );
   jnll_comp(2) = 0;
@@ -572,6 +581,21 @@ Type objective_function<Type>::operator() ()
   jnll_comp(3) = Type(-1)*sum( log_pI_ft );
   jnll_comp(4) = 0;
   jnll_comp(4) = Type(-1)*sum( log_pC_ft );
+
+    // F
+    jnll_comp(5) = 0;
+    if(Fpen==1){
+        for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
+    }
+
+    // SigmaR
+    Type sigrp;
+    sigrp = 0;
+    jnll_comp(6) = 0;
+    sigrp = dlognorm(sigma_R, log(SigRprior(0)), SigRprior(1), true);
+    if(SigRpen==1) jnll_comp(6) = Type(-1)*sigrp;
+
+    jnll = sum(jnll_comp);
 
   // Likelihood contributions from site-aggregated observations
     vector<Type> D_t(n_t);
@@ -609,20 +633,7 @@ Type objective_function<Type>::operator() ()
       lF_y(t) = log(F_y(t));
     }
 
-    // F
-    jnll_comp(5) = 0;
-    if(Fpen==1){
-        for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
-    }
 
-    // SigmaR
-    Type sigrp;
-    sigrp = 0;
-    jnll_comp(6) = 0;
-    sigrp = dlognorm(sigma_R, log(SigRprior(0)), SigRprior(1), true);
-    if(SigRpen==1) jnll_comp(6) = Type(-1)*sigrp;
-
-    jnll = sum(jnll_comp);
 
   // // ============ Reporting section ======================================
 
