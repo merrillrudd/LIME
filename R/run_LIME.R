@@ -168,7 +168,18 @@ for(iter in 1:length(itervec)){
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
-          ParList <- opt$par
+          ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
         }      
 
 
@@ -186,7 +197,18 @@ for(iter in 1:length(itervec)){
               opt_save <- opt
               obj_save <- obj
               jnll_save <- jnll
-              ParList <- opt$par
+              ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
               break
             }
           }
@@ -212,7 +234,18 @@ for(iter in 1:length(itervec)){
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
-                    ParList <- opt$par
+                    ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))    
                 }
                 if(is.null(jnll_save)==FALSE){
                     if(jnll<=jnll_save){
@@ -220,8 +253,18 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
-                        ParList <- opt$par
-                    }
+                    ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))                     }
                 }
               }
             if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
