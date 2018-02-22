@@ -107,10 +107,13 @@ for(iter in 1:length(itervec)){
     if(is.null(modpath)) output <- NULL
 
     if(all(selex_input < 0)){
-      selex_input <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
+      selex_input_new <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
+    }
+    if(any(selex_input >= 0)){
+      selex_input_new <- selex_input
     }
 
-      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, selex_input=selex_input, randomR=randomR, mirror=mirror)
+      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, selex_input=selex_input_new, randomR=randomR, mirror=mirror)
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList
