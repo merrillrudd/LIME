@@ -15,7 +15,7 @@
 #' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
-#' @param selex_input input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
+#' @param vals_selex_ft input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param mirror vector of parameter names to mirror between fleets
 #' 
@@ -33,7 +33,7 @@ format_input <- function(input,
                         f_startval_ft, 
                         rdev_startval_t,
                         est_selex_f,
-                        selex_input,
+                        vals_selex_ft,
                         randomR,
                         mirror){
 
@@ -96,7 +96,7 @@ format_input <- function(input,
                          "SigRpen"=SigRpen,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
-                         "selex_input"=selex_input,
+                         "vals_selex_ft"=vals_selex_ft,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          # "n_s"=nseasons,
@@ -146,7 +146,7 @@ format_input <- function(input,
                          "SigRpen"=SigRpen,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
-                         "selex_input"=selex_input,
+                         "vals_selex_ft"=vals_selex_ft,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          # "n_s"=nseasons,
@@ -197,7 +197,7 @@ format_input <- function(input,
                          "SigRpen"=SigRpen,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
-                         "selex_input"=selex_input,
+                         "vals_selex_ft"=vals_selex_ft,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          # "n_s"=nseasons,
@@ -247,7 +247,7 @@ format_input <- function(input,
                          "SigRpen"=SigRpen,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
-                         "selex_input"=selex_input,
+                         "vals_selex_ft"=vals_selex_ft,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          # "n_s"=nseasons,
@@ -336,13 +336,13 @@ format_input <- function(input,
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])
             }
 
-            if(any(selex_input >= 0)){
+            if(any(vals_selex_ft >= 0)){
                 Map[["log_S50_f"]] <- Parameters$log_S50_f
-                Map[["log_S50_f"]][which(selex_input[,1] >= 0)] <- NA
+                Map[["log_S50_f"]][which(vals_selex_ft[,1] >= 0)] <- NA
                 Map[["log_S50_f"]] <- factor(Map[["log_S50_f"]])
 
                 Map[["log_Sdelta_f"]] <- Parameters$log_Sdelta_f
-                Map[["log_Sdelta_f"]][which(selex_input[,1] >= 0)] <- NA
+                Map[["log_Sdelta_f"]][which(vals_selex_ft[,1] >= 0)] <- NA
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])                
             }
 

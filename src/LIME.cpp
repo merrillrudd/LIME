@@ -58,7 +58,7 @@ Type objective_function<Type>::operator() ()
 
     // option for fixed time series for selectivity
     DATA_IVECTOR(selex_type_f); //0 =fixed, 1=estimated
-    DATA_VECTOR(selex_input);
+    DATA_VECTOR(vals_selex_ft);
 
     // option for likelihood distribution for length comps
     DATA_INTEGER(LFdist); // 0=multinomial, 1=dirichlet-multinomial
@@ -197,7 +197,7 @@ Type objective_function<Type>::operator() ()
   S_fl.setZero();
   for(int f=0;f<n_fl;f++){
     for(int l=0;l<n_lb;l++){
-      if(selex_type_f(f)==0) S_fl(f,l) = selex_input(f,l);
+      if(selex_type_f(f)==0) S_fl(f,l) = vals_selex_ft(f,l);
       if(selex_type_f(f)==1) S_fl(f,l) = 1 / (1 + exp(-log(Type(19))*(lbmids(l) - S50_f(f))/(S95_f(f) - S50_f(f))));
     }   
   }
