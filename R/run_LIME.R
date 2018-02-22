@@ -16,6 +16,7 @@
 #' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
+#' @param selex_input input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
 #' @param F_up upper bound of fishing mortality estimate; default=10
@@ -48,6 +49,7 @@ run_LIME <- function(modpath,
                       f_startval_ft=NULL,
                       rdev_startval_t=NULL,
                       est_selex_f=TRUE,
+                      selex_input=matrix(-1, nrow=input$nfleets, ncol=1),
                       randomR=TRUE,
                       newtonsteps=FALSE,
                       F_up=10,
@@ -104,7 +106,7 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(is.null(modpath)) output <- NULL
 
-      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, randomR=randomR, mirror=mirror)
+      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, selex_input=selex_input, randomR=randomR, mirror=mirror)
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList
