@@ -336,7 +336,7 @@ format_input <- function(input,
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])
             }
 
-            if(any(selex_input) >= 0){
+            if(any(selex_input >= 0)){
                 Map[["log_S50_f"]] <- Parameters$log_S50_f
                 Map[["log_S50_f"]][which(selex_input[,1] >= 0)] <- NA
                 Map[["log_S50_f"]] <- factor(Map[["log_S50_f"]])
