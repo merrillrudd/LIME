@@ -159,6 +159,7 @@ for(iter in 1:length(itervec)){
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
+          ParList <- opt$par
         }      
 
 
@@ -176,6 +177,7 @@ for(iter in 1:length(itervec)){
               opt_save <- opt
               obj_save <- obj
               jnll_save <- jnll
+              ParList <- opt$par
               break
             }
           }
@@ -191,7 +193,7 @@ for(iter in 1:length(itervec)){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= ParList, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }
@@ -201,6 +203,7 @@ for(iter in 1:length(itervec)){
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
+                    ParList <- opt$par
                 }
                 if(is.null(jnll_save)==FALSE){
                     if(jnll<=jnll_save){
@@ -208,6 +211,7 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
+                        ParList <- opt$par
                     }
                 }
               }
