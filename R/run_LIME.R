@@ -49,7 +49,7 @@ run_LIME <- function(modpath,
                       f_startval_ft=NULL,
                       rdev_startval_t=NULL,
                       est_selex_f=TRUE,
-                      selex_input=matrix(-1, nrow=input$nfleets, ncol=1),
+                      selex_input=-1,
                       randomR=TRUE,
                       newtonsteps=FALSE,
                       F_up=10,
@@ -105,6 +105,10 @@ for(iter in 1:length(itervec)){
     # if(inits$SigmaR > 0.05) SigRpen <- 0
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
     if(is.null(modpath)) output <- NULL
+
+    if(all(selex_input < 0)){
+      selex_input <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
+    }
 
       TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, selex_input=selex_input, randomR=randomR, mirror=mirror)
 
