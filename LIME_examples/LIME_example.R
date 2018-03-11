@@ -22,18 +22,18 @@ lh <- create_lh_list(vbk=0.21,
 					 t0=-0.01,
 					 lwa=0.0245, 
 					 lwb=2.79, 
-					 S50=c(20), 
-					 S95=c(26), 
+					 S50=20, 
+					 S95=26, 
 					 selex_input="length",
 					 selex_type=c("logistic"),
 					 M50=34,
 					 M95=NULL,
 					 maturity_input="length",
 					 M=0.27, 
-					 binwidth=2,
+					 binwidth=1,
 					 CVlen=0.1,
-					 SigmaR=0.2,
-					 SigmaF=0.2,
+					 SigmaR=0.7,
+					 SigmaF=0.1,
 					 SigmaC=0.2,
 					 SigmaI=0.2,
 					 R0=1,
@@ -61,8 +61,8 @@ true <- generate_data(modpath=NULL,
 					  Nyears=20,
 					  Nyears_comp=20,
 					  comp_sample=200,
-					  init_depl=0.7,
-					  seed=28)
+					  init_depl=0.5,
+					  seed=123)
 
 
 ## plot simulated data
@@ -89,40 +89,17 @@ plot_LCfits(LFlist=list("LF"=LF_matrix))
 ## Step 3: Run Model
 ## ---------------------------------------------------
 
-##--------------------------
-## build inputs and object
-##--------------------------
-
-res <- run_LIME(modpath=NULL,
-				lh=lh,  
-				input=data_LF,
-				data_avail="LC",
-				LFdist=1,
-				C_opt=0,
-				est_sigma="log_sigma_R",
-				fix_param=FALSE,
-				fix_param_t=FALSE,
-				randomR=TRUE,
-				newtonsteps=3,
-				F_up=10,
-				S50_up=lh$linf,
-				derive_quants=FALSE,
-				itervec=NULL,
-				rewrite=TRUE,
-				simulation=FALSE)
-
-
 ## run LIME - may take a few minutes
 ## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
 ## specify model path to save results
 ## length comp only
-# start <- Sys.time()
-# res <- run_LIME(modpath=NULL,
-# 				lh=lh,
-# 				input_data=data_LF,
-# 				est_sigma="log_sigma_R", 
-# 				data_avail="LC")
-# end <- Sys.time() - start
+start <- Sys.time()
+res <- run_LIME(modpath=NULL,
+				lh=lh,
+				input_data=data_LF,
+				est_sigma="log_sigma_R", 
+				data_avail="LC")
+end <- Sys.time() - start
 
 ## check convergence
 check <- res$df

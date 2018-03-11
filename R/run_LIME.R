@@ -13,7 +13,7 @@
 #' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)
 #' @param param_adjust character or vector of parameter names to change input values
 #' @param val_adjust number or vector of numbers for corresponding parameter value changes
-#' @param f_true default=FALSE will make starting logF values =0; change to true and will use true values from simulation
+#' @param f_start default=FALSE will make starting logF values =0; change to true and will use true values from simulation
 #' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
 #' @param fix_param_t default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed. 
 #' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
