@@ -29,8 +29,8 @@ calc_derived_quants = function( Obj, lh ){
   F30 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, ref=0.3, type="SPR")$root), error=function(e) NA) * lh_new$nseasons
   F40 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, ref=0.4, type="SPR")$root), error=function(e) NA) * lh_new$nseasons
   FF30 <- FF40 <- NULL
-  if(is.na(F30)==FALSE) FF30 <- Report$F_y/F30
-  if(is.na(F40)==FALSE) FF40 <- Report$F_y/F40
+  if(is.na(F30)==FALSE) FF30 <- Report$F_t/F30
+  if(is.na(F40)==FALSE) FF40 <- Report$F_t/F40
 
   # Total biomass
   TB_t = Report$TB_t
