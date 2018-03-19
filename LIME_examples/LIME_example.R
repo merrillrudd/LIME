@@ -16,46 +16,20 @@ library(reshape2)
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
 ##----------------------------------------------------------------
-lh <- create_lh_list(vbk=0.21, 
-					 linf=65, 
-					 t0=-0.01,
-					 lwa=0.0245, 
-					 lwb=2.79, 
-					 S50=c(20,30), 
-					 S95=c(26,36), 
-					 selex_input="length",
-					 selex_type=c("logistic","logistic"),
-					 M50=34,
-					 M95=NULL,
-					 maturity_input="length",
-					 M=0.27, 
-					 h=0.7,
-					 binwidth=1,
-					 CVlen=0.1,
-					 SigmaR=0.737,
-					 SigmaF=0.1,
-					 SigmaC=0.1,
-					 SigmaI=0.1,
-					 R0=1,
-					 qcoef=1e-5,
-					 start_ages=0,
-					 rho=0.43,
-					 nseasons=1,
-					 nfleets=2)
-
 # lh <- create_lh_list(vbk=0.21, 
 # 					 linf=65, 
 # 					 t0=-0.01,
 # 					 lwa=0.0245, 
 # 					 lwb=2.79, 
-# 					 S50=c(20), 
-# 					 S95=c(26), 
+# 					 S50=c(20,30), 
+# 					 S95=c(26,36), 
 # 					 selex_input="length",
-# 					 selex_type=c("logistic"),
+# 					 selex_type=c("logistic","logistic"),
 # 					 M50=34,
 # 					 M95=NULL,
 # 					 maturity_input="length",
 # 					 M=0.27, 
+# 					 h=0.7,
 # 					 binwidth=1,
 # 					 CVlen=0.1,
 # 					 SigmaR=0.737,
@@ -67,7 +41,33 @@ lh <- create_lh_list(vbk=0.21,
 # 					 start_ages=0,
 # 					 rho=0.43,
 # 					 nseasons=1,
-# 					 nfleets=1)
+# 					 nfleets=2)
+
+lh <- create_lh_list(vbk=0.21, 
+					 linf=65, 
+					 t0=-0.01,
+					 lwa=0.0245, 
+					 lwb=2.79, 
+					 S50=c(20), 
+					 S95=c(26), 
+					 selex_input="length",
+					 selex_type=c("logistic"),
+					 M50=34,
+					 M95=NULL,
+					 maturity_input="length",
+					 M=0.27, 
+					 binwidth=1,
+					 CVlen=0.1,
+					 SigmaR=0.737,
+					 SigmaF=0.1,
+					 SigmaC=0.1,
+					 SigmaI=0.1,
+					 R0=1,
+					 qcoef=1e-5,
+					 start_ages=0,
+					 rho=0.43,
+					 nseasons=1,
+					 nfleets=1)
 
 ## by age
 p <- ggplot(lh$df %>% 
@@ -90,30 +90,30 @@ p <- ggplot(lh$df %>%
 ## Step 2: Setup data input
 ## ---------------------------------------------------
 ## Demonstrate data generation option
-## specify model path to save true population/generated data
-true <- generate_data(modpath=NULL,
-					  itervec=1, 
-					  Fdynamics=c("Constant","Endogenous"),
-					  Rdynamics="Constant",
-					  lh=lh,
-					  Nyears=20,
-					  Nyears_comp=c(20,10),
-					  comp_sample=500,
-					  init_depl=0.7,
-					  seed=2828,
-					  fleet_percentage=c(0.6,0.4),
-					  derive_quants=TRUE)
+# ## specify model path to save true population/generated data
 # true <- generate_data(modpath=NULL,
 # 					  itervec=1, 
-# 					  Fdynamics=c("Endogenous"),
+# 					  Fdynamics=c("Constant","Endogenous"),
 # 					  Rdynamics="Constant",
 # 					  lh=lh,
 # 					  Nyears=20,
-# 					  Nyears_comp=c(20),
-# 					  comp_sample=200,
+# 					  Nyears_comp=c(20,10),
+# 					  comp_sample=500,
 # 					  init_depl=0.7,
-# 					  seed=434,
-# 					  fleet_percentage=1)
+# 					  seed=2828,
+# 					  fleet_percentage=c(0.6,0.4),
+# 					  derive_quants=TRUE)
+true <- generate_data(modpath=NULL,
+					  itervec=1, 
+					  Fdynamics=c("Endogenous"),
+					  Rdynamics="Constant",
+					  lh=lh,
+					  Nyears=20,
+					  Nyears_comp=c(20),
+					  comp_sample=200,
+					  init_depl=0.7,
+					  seed=434,
+					  fleet_percentage=1)
 ## create data frame -- TO DO
 
 
@@ -177,11 +177,11 @@ inputs_all <- create_inputs(lh=lh, input_data=data_all)
 ##-------------------------
 ## template file
 # ##--------------------------
-src_dir <- file.path("C:\\merrill\\LIME\\src")
-setwd(src_dir)
-compile("LIME.cpp")
+# src_dir <- file.path("C:\\merrill\\LIME\\src")
+# setwd(src_dir)
+# compile("LIME.cpp")
 
-dyn.load( dynlib("LIME") )
+# dyn.load( dynlib("LIME") )
 
 
 ##--------------------------
@@ -198,7 +198,7 @@ res <- run_LIME(modpath=NULL,
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=0,
+				LFdist=1,
 				C_type=2,
 				est_more=FALSE,
 				fix_more=FALSE,
@@ -215,17 +215,6 @@ res <- run_LIME(modpath=NULL,
 				rewrite=TRUE,
 				simulation=FALSE)
 
-## run LIME - may take a few minutes
-## looking for outer mgc to minimize and ustep moving towards 1 for well-behaved model
-## specify model path to save results
-## length comp only
-# start <- Sys.time()
-# res <- run_LIME(modpath=NULL,
-# 				lh=lh,
-# 				input_data=data_LF,
-# 				est_sigma="log_sigma_R", 
-# 				data_avail="LC")
-# end <- Sys.time() - start
 
 ## check convergence
 check <- res$df
