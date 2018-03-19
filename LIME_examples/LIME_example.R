@@ -98,7 +98,8 @@ res <- run_LIME(modpath=NULL,
 				lh=lh,
 				input_data=data_LF,
 				est_sigma="log_sigma_R", 
-				data_avail="LC")
+				data_avail="LC",
+				newtonsteps=3)
 end <- Sys.time() - start
 
 ## check convergence
@@ -142,9 +143,9 @@ plot_output(Inputs=Inputs,
 Cw_t <- true$Cw_t ## (optional) catch data, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
 I_t <- true$I_t ## (optional) abundance index, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
 
-data_LF_Catch <- list("years"=years, "LF"=LF, "C_t"=Cw_t) ## length comp + catch
-data_LF_Index <- list("years"=years, "LF"=LF, "I_t"=I_t) ## length comp + index
-data_rich <- list("years"=years, "LF"=LF, "I_t"=I_t, "C_t"=Cw_t) ## length comp + index
+data_LF_Catch <- list("years"=true$years, "LF"=LF_matrix, "C_t"=Cw_t) ## length comp + catch
+data_LF_Index <- list("years"=true$years, "LF"=LF_matrix, "I_t"=I_t) ## length comp + index
+data_rich <- list("years"=true$years, "LF"=LF_matrix, "I_t"=I_t, "C_t"=Cw_t) ## length comp + index
 
 
 ## length comp + index + catch
@@ -154,7 +155,8 @@ res <- run_LIME(modpath=NULL,
 				input_data=data_rich,
 				est_sigma="log_sigma_R", 
 				data_avail="Index_Catch_LC",
-				C_opt=2) 
+				C_opt=2,
+				newtonsteps=3) 
 
 ## check convergence
 check <- res$df
@@ -168,10 +170,9 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
+plot_LCfits(LFlist=list("LF"=LF_matrix), 
 			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
+			Report=Report)
 
 
 ## plot model output
@@ -192,7 +193,8 @@ res <- run_LIME(modpath=NULL,
 				input_data=data_LF_Catch,
 				est_sigma="log_sigma_R", 
 				data_avail="Catch_LC",
-				C_opt=2)
+				C_opt=2,
+				newtonsteps=3)
 
 ## check convergence
 check <- res$df
@@ -206,10 +208,9 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
+plot_LCfits(LFlist=list("LF"=LF_matrix), 
 			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
+			Report=Report)
 
 
 ## plot model output
@@ -228,7 +229,8 @@ res <- run_LIME(modpath=NULL,
 				lh=lh,
 				input_data=data_LF_Index,
 				est_sigma="log_sigma_R", 
-				data_avail="Index_LC")
+				data_avail="Index_LC",
+				newtonsteps=3)
 
 ## check convergence
 check <- res$df
@@ -242,10 +244,9 @@ Report <- res$Report
 Sdreport <- res$Sdreport
 
 ## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
+plot_LCfits(LFlist=list("LF"=LF_matrix), 
 			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
+			Report=Report)
 
 
 ## plot model output
