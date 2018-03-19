@@ -22,7 +22,8 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
 
     nf <- Inputs$Data$n_f
     # nf <- 1
-    ns <- Inputs$Data$n_s
+    # ns <- Inputs$Data$n_s
+    ns <- 1
 
   all_years <- 1:Inputs$Data$n_t
   lc_years <- lapply(1:nf, function(x){
