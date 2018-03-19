@@ -99,13 +99,13 @@ if(all(is.null(Inputs))==FALSE){
 
 
 if("Fish" %in% plot){
-    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_y)*2)
+    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_t)*2)
     if("Fish" %in% names(set_ylim)) ylim <- set_ylim[["Fish"]]
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_y"),]
-      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_fy")]
+      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_t"),]
+      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_ft")]
       if(is.vector(sd_fleet)) sd_fleet <- as.matrix(sd_fleet)
       # sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
