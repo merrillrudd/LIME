@@ -17,7 +17,7 @@
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @param seed single seed or vector of seeds for each iteration
 #' @param mgt_type removals based on F (default) or catch
-#' @param fleet_percentage vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
+#' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
 #' @importFrom stats runif
 #' @importFrom TMB MakeADFun
 
@@ -38,7 +38,7 @@ generate_data <-
             derive_quants=FALSE, 
             seed, 
             mgt_type="F",
-            fleet_percentage=1){
+            fleet_proportions=1){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
@@ -58,7 +58,7 @@ generate_data <-
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_percentage=fleet_percentage)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions)
     }
 
   
@@ -70,7 +70,7 @@ generate_data <-
             seed_init <- iseed + add
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_percentage=fleet_percentage), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_proportions=fleet_proportions), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }

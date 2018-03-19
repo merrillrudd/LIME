@@ -14,7 +14,7 @@
 #' @param seed set seed for generating stochastic time series
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
 #' @param mgt_type removals based on F (default) or catch
-#' @param fleet_percentage vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
+#' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
 #' @importFrom stats rnorm
 #' @return named list of attributes of true population/data
 #' @export
@@ -30,7 +30,7 @@ sim_pop <-
            seed,
            sample_type = 'catch',
            mgt_type = 'F',
-           fleet_percentage) {
+           fleet_proportions) {
     ## SB_t = spawning biomass over time
     ## F_t = fishing mortality over time
     ## Cn_at = number of individuals that die from fishing mortality
@@ -193,7 +193,7 @@ sim_pop <-
 
       ## include relative catchability by fleet -- not necessarily due to gear efficiency but due to size of fleet in practice
       qE_ft <- t(sapply(1:nfleets, function(x){
-        return(E_ft[x,]*fleet_percentage[x])
+        return(E_ft[x,]*fleet_proportions[x])
       }))
 
       ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
@@ -309,7 +309,7 @@ sim_pop <-
           }
           ## include relative catchability by fleet
           qE_ft <- t(sapply(1:nfleets, function(x){
-            return(E_ft[x,]*fleet_percentage[x])
+            return(E_ft[x,]*fleet_proportions[x])
           }))   
 
           ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
@@ -642,6 +642,7 @@ sim_pop <-
       lh$Fmax <- Fmax
       lh$E_ft <- E_ft
       lh$I_ft <- I_ft
+      lh$fleet_proportions <- fleet_proportions
 
 
       return(lh)
