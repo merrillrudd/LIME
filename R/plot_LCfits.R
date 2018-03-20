@@ -25,6 +25,7 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
 	LCyrs <- lapply(1:nf, function(x){
 		rownames(LFlist[[x]])
 	})
+	lbhighs <- colnames(LFlist[[1]])
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
 	if(all(is.null(true_years))) true_years <- all_lc_years
 
@@ -74,7 +75,6 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
 			}
 		}
 
-		lbhighs <- seq_along(colnames(LFlist[[1]]))
 			xlabs <- pretty(seq_along(lbhighs))
 			plot_labs <- rep(NA, length(xlabs))
 			if(xlabs[1]!=0) warning("Should start length bin labels at 0")
