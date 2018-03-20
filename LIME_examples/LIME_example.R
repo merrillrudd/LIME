@@ -15,7 +15,8 @@ library(reshape2)
 
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
-# ##----------------------------------------------------------------
+##----------------------------------------------------------------
+## multiple fleets
 lh <- create_lh_list(vbk=0.21, 
 					 linf=65, 
 					 t0=-0.01,
@@ -43,6 +44,7 @@ lh <- create_lh_list(vbk=0.21,
 					 nseasons=1,
 					 nfleets=2)
 
+### single fleet
 # lh <- create_lh_list(vbk=0.21, 
 # 					 linf=65, 
 # 					 t0=-0.01,
@@ -90,7 +92,8 @@ p <- ggplot(lh$df %>%
 ## Step 2: Setup data input
 ## ---------------------------------------------------
 ## Demonstrate data generation option
-# ## specify model path to save true population/generated data
+## specify model path to save true population/generated data
+	## multiple fleets
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
 					  Fdynamics=c("Constant","Endogenous"),
@@ -102,6 +105,8 @@ true <- generate_data(modpath=NULL,
 					  init_depl=0.7,
 					  seed=132,
 					  fleet_proportions=c(0.6,0.4))
+
+## single fleet
 # true <- generate_data(modpath=NULL,
 # 					  itervec=1, 
 # 					  Fdynamics=c("Endogenous"),
@@ -185,11 +190,11 @@ rich <- run_LIME(modpath=NULL,
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=1,
+				LFdist=ifelse(inputs_all$nfleets==1,1,0),
 				C_type=2,
 				est_more=FALSE,
 				fix_more=FALSE,
-				mirror="log_theta",
+				mirror=NULL,
 				f_startval_ft=NULL,
 				rdev_startval_t=NULL,
 				est_selex_f=TRUE,
@@ -203,29 +208,6 @@ rich <- run_LIME(modpath=NULL,
 				simulation=FALSE,
 				est_totalF=FALSE,
 				prop_f=1)
-
-				modpath=NULL
-				input=inputs_all
-				data_avail="Index_Catch_LC"
-				Fpen=1
-				SigRpen=1
-				SigRprior=c(0.737,0.3)
-				LFdist=1
-				C_type=2
-				est_more=FALSE
-				fix_more=FALSE
-				mirror="log_theta"
-				f_startval_ft=NULL
-				rdev_startval_t=NULL
-				est_selex_f=TRUE
-				randomR=TRUE
-				newtonsteps=3
-				F_up=10
-				S50_up=lh$linf
-				derive_quants=FALSE
-				itervec=NULL
-				rewrite=TRUE
-				simulation=FALSE
 
 ## check TMB inputs
 Inputs <- rich$Inputs
@@ -268,15 +250,17 @@ plot_output(Inputs=Inputs,
 ## Step 5: Check with length data only
 ## ---------------------------------------------------
 
-## length only -- non-convergence
-# inputs_LC$SigmaF <- 0.1
+## length only -- non-convergence even with multinomial
+## convergence requires estimating total F instead of F by fleet and lower SigmaF - higher penalty
+## estimating total F allows for estimation of separate selectivity - incorrect F by fleet, but correct selectivity and total F
+inputs_LC$SigmaF <- 0.1
 res <- run_LIME(modpath=NULL, 
 				input=inputs_LC,
 				data_avail="LC",
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=1,
+				LFdist=ifelse(inputs_LC$nfleets==1,1,0),
 				C_type=0,
 				est_more=FALSE,
 				fix_more=FALSE,

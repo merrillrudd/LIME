@@ -121,6 +121,7 @@ for(iter in 1:length(itervec)){
     }
     if(all(prop_f!=1)){
       checksum <- sum(prop_f) == 1
+      if(checksum) prop_f_inp <- prop_f
       if(checksum==FALSE) stop("prop_f must sum to 1 and be equal to nfleets, or set prop_f=1 to be equal across fleets")
     }
 
