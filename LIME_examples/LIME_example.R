@@ -185,11 +185,11 @@ rich <- run_LIME(modpath=NULL,
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=0,
+				LFdist=1,
 				C_type=2,
 				est_more=FALSE,
 				fix_more=FALSE,
-				mirror=NULL,
+				mirror="log_theta",
 				f_startval_ft=NULL,
 				rdev_startval_t=NULL,
 				est_selex_f=TRUE,
@@ -200,7 +200,32 @@ rich <- run_LIME(modpath=NULL,
 				derive_quants=FALSE,
 				itervec=NULL,
 				rewrite=TRUE,
-				simulation=FALSE)
+				simulation=FALSE,
+				est_totalF=FALSE,
+				prop_f=1)
+
+				modpath=NULL
+				input=inputs_all
+				data_avail="Index_Catch_LC"
+				Fpen=1
+				SigRpen=1
+				SigRprior=c(0.737,0.3)
+				LFdist=1
+				C_type=2
+				est_more=FALSE
+				fix_more=FALSE
+				mirror="log_theta"
+				f_startval_ft=NULL
+				rdev_startval_t=NULL
+				est_selex_f=TRUE
+				randomR=TRUE
+				newtonsteps=3
+				F_up=10
+				S50_up=lh$linf
+				derive_quants=FALSE
+				itervec=NULL
+				rewrite=TRUE
+				simulation=FALSE
 
 ## check TMB inputs
 Inputs <- rich$Inputs
@@ -244,14 +269,14 @@ plot_output(Inputs=Inputs,
 ## ---------------------------------------------------
 
 ## length only -- non-convergence
-inputs_LC$SigmaF <- 0.1
+# inputs_LC$SigmaF <- 0.1
 res <- run_LIME(modpath=NULL, 
 				input=inputs_LC,
 				data_avail="LC",
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=0,
+				LFdist=1,
 				C_type=0,
 				est_more=FALSE,
 				fix_more=FALSE,

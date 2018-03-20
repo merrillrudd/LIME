@@ -73,7 +73,7 @@ function(vbk,
         Frate=0.2, 
         start_ages=0, 
         rho=0, 
-        theta=10, 
+        theta=1, 
         nseasons=1, 
         nfleets=1){
             

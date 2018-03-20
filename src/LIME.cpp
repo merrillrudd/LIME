@@ -483,7 +483,7 @@ Type objective_function<Type>::operator() ()
   // Likelihood contribution from observations
   matrix<Type> log_pL_ft(n_fl,n_t);
   log_pL_ft.setZero();
-  vector<Type> neff(n_fl);
+  matrix<Type> neff(n_fl,n_t);
   neff.setZero();
   Type checklc;
     vector<Type> LFprob(n_lb);
@@ -496,19 +496,31 @@ Type objective_function<Type>::operator() ()
 
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
+
+      // for each new time step, set check if LC data exists to zero
       checklc = 0;
+
+      // for each new time step, set observed and predicted data in each length bin to zero
+      prob.setZero();
+      LFraw.setZero();
+
+      // read data for each length bin
       for(int l=0;l<n_lb;l++){
         prob(l) = plb(t,l,f);
         LFraw(l) = LF_tlf(t,l,f);
         checklc += LFraw(l);
       }
+
+      // if lengths were observed this year, calculate likelihood
       if(checklc > 0){
+        // multinomial
         if(LFdist==0){
           LFprob = n_LF_ft(f,t)*(LFraw/LFraw.sum());
           log_pL_ft(f,t) += dmultinom(LFprob, prob, true);
         }
+        // dirichlet-multinomial
         if(LFdist==1){
-          LFprob = (LFraw/LFraw.sum());
+          LFprob = LFraw/(LFraw.sum());
           for(int l=0;l<n_lb;l++){
             sum1(t) += lgamma(LFraw.sum()*LFprob(l)+1);
             sum2(t) += lgamma(LFraw.sum()*LFprob(l) + theta(f)*LFraw.sum()*prob(l)) - lgamma(theta(f)*LFraw.sum()*prob(l));
@@ -516,17 +528,22 @@ Type objective_function<Type>::operator() ()
           log_pL_ft(f,t) += lgamma(LFraw.sum()+1) - sum1(t) + lgamma(theta(f)*LFraw.sum()) - lgamma(LFraw.sum() + theta(f)*LFraw.sum()) + sum2(t);
         }
       }
+
     }
   }
 
   if(LFdist==1){
     for(int f=0;f<n_fl;f++){
       for(int t=0;t<n_t;t++){
+
+        LFraw.setZero();
+        checklc = 0;
         for(int l=0;l<n_lb;l++){
           LFraw(l) = LF_tlf(t,l,f);
+          checklc += LFraw(l);
         }
+        if(checklc > 0) neff(f,t) = (1 + theta(f)*LFraw.sum())/(1+theta(f));      
       }
-      neff(f) = (1 + theta(f)*LFraw.sum())/(1+theta(f));
     }
   }
 

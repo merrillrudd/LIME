@@ -194,6 +194,7 @@ for(iter in 1:length(itervec)){
         if(is.null(S50_up)) Upr[which(names(obj$par)=="log_S50_f")] <- log(input$linf)
         Upr[which(names(obj$par)=="log_F_ft")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
+        Upr[which(names(obj$par)=="log_theta")] <- log(10)
 
         Lwr <- rep(-Inf, length(obj$par))
         Lwr[match("log_CV_L",names(obj$par))] = log(0.001)
