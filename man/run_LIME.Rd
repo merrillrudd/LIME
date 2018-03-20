@@ -7,9 +7,10 @@
 run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
   SigRprior = c(0.737, 0.3), LFdist = 1, C_type = 0, est_more = FALSE,
   fix_more = FALSE, f_startval_ft = NULL, rdev_startval_t = NULL,
-  est_selex_f = TRUE, randomR = TRUE, newtonsteps = FALSE, F_up = 10,
-  S50_up = NULL, derive_quants = FALSE, itervec = NULL,
-  simulation = FALSE, rewrite = TRUE, mirror = NULL)
+  est_selex_f = TRUE, vals_selex_ft = -1, randomR = TRUE,
+  newtonsteps = FALSE, F_up = 10, S50_up = NULL, derive_quants = FALSE,
+  itervec = NULL, simulation = FALSE, rewrite = TRUE, mirror = NULL,
+  est_totalF = FALSE, prop_f = 1)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -38,11 +39,13 @@ run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
 
 \item{est_selex_f}{default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets}
 
+\item{vals_selex_ft}{input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity}
+
 \item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization; FALSE to turn off}
 
-\item{F_up}{upper bound of fishing mortality estimate; default=5}
+\item{F_up}{upper bound of fishing mortality estimate; default=10}
 
 \item{S50_up}{upper bound of length at 50 percent selectivity; default=NULL}
 
@@ -55,6 +58,10 @@ run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
 \item{rewrite}{default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE}
 
 \item{mirror}{vector of parameter names to mirror between fleets}
+
+\item{est_totalF}{TRUE estimate total F instead of by fleet}
+
+\item{prop_f}{proportion of catch from each fleet}
 }
 \value{
 prints how many iterations were run in model directory

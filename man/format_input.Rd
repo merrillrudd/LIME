@@ -5,8 +5,8 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
-  est_more, fix_more, f_startval_ft, rdev_startval_t, est_selex_f, randomR,
-  mirror)
+  est_more, fix_more, f_startval_ft, rdev_startval_t, est_selex_f,
+  vals_selex_ft, randomR, mirror, est_totalF, prop_f)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -33,9 +33,15 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
 
 \item{est_selex_f}{default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets}
 
+\item{vals_selex_ft}{input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity}
+
 \item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
 
 \item{mirror}{vector of parameter names to mirror between fleets}
+
+\item{est_totalF}{TRUE estimate total F instead of by fleet}
+
+\item{prop_f}{proportion of catch from each fleet}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map

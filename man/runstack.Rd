@@ -4,8 +4,8 @@
 \alias{runstack}
 \title{Predictive stacking}
 \usage{
-runstack(savedir, iter, seed, tmax, nodes, param, mean, cov, modname,
-  input_data, Fscenario, rewrite)
+runstack(savedir, iter, seed, lh, nodes, param, mean, cov, modname, input_data,
+  Fscenario, rewrite, binwidth = 1)
 }
 \arguments{
 \item{savedir}{directory to save results}
@@ -14,7 +14,7 @@ runstack(savedir, iter, seed, tmax, nodes, param, mean, cov, modname,
 
 \item{seed}{set seed}
 
-\item{tmax}{maximum age}
+\item{lh}{life history list, with elements contained as output from LIME::create_lh_list}
 
 \item{nodes}{matrix of nodes where each column is a different parameter and each row is a value from a distribution}
 
@@ -31,6 +31,8 @@ runstack(savedir, iter, seed, tmax, nodes, param, mean, cov, modname,
 \item{Fscenario}{fishing mortality scenario to generate data}
 
 \item{rewrite}{rewrite results?}
+
+\item{binwidth}{default=1cm, can change}
 }
 \value{
 prints how many iterations were run in model directory

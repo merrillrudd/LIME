@@ -6,7 +6,7 @@
 \usage{
 generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
   Nyears_comp, comp_sample, rewrite = TRUE, init_depl,
-  derive_quants = FALSE, seed, mgt_type = "F", fleet_percentage = 1)
+  derive_quants = FALSE, seed, mgt_type = "F", fleet_proportions = 1)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -37,7 +37,7 @@ generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
 
 \item{mgt_type}{removals based on F (default) or catch}
 
-\item{fleet_percentage}{vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.}
+\item{fleet_proportions}{vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.}
 }
 \value{
 print how many iterations were written into the model directory
