@@ -275,7 +275,7 @@ function(vbk,
     Outs$ML95 <- ML95
     Outs$Mat_a <- Mat_a
     Outs$Mat_l <- Mat_l
-    Outs$Fequil <- Fequil
+    Outs$Fequil <- Fequil/nseasons
     Outs$Frate <- Frate
     Outs$rho <- rho
     Outs$theta <- theta
