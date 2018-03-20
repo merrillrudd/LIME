@@ -15,7 +15,7 @@ library(reshape2)
 
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
-##----------------------------------------------------------------
+# ##----------------------------------------------------------------
 lh <- create_lh_list(vbk=0.21, 
 					 linf=65, 
 					 t0=-0.01,
@@ -112,7 +112,7 @@ true <- generate_data(modpath=NULL,
 # 					  comp_sample=200,
 # 					  init_depl=0.7,
 # 					  seed=132,
-# 					  fleet_percentage=1)
+# 					  fleet_proportions=1)
 
 
 ## plot simulated data
@@ -133,6 +133,9 @@ plot(x=1, y=1, type="n", ylim=c(0,max(true$I_ft)), xlim=c(1,length(true$SPR_t)),
 for(f in 1:lh$nfleets){
 	lines(true$I_ft[f,], lwd=2, lty=lty)
 }
+
+# plot(x=true$years, y=true$Cw_ft[1,], type="l", lwd=4, ylim=c(0, max(true$Cw_ft[1,])), col="forestgreen", xaxt="n", yaxt="n")
+# plot(x=true$years, y=true$I_ft[1,], type="l", lwd=4, ylim=c(0, max(true$I_ft[1,])), col="tomato", xaxt="n", yaxt="n")
 
 #######################################
 ## Length comp data input options
@@ -169,10 +172,10 @@ inputs_all <- create_inputs(lh=lh, input_data=data_all)
 ## Step 3: Run data-rich model
 ## ---------------------------------------------------
 
-src_dir <- file.path("C:\\merrill\\LIME\\src")
-setwd(src_dir)
-compile("LIME.cpp")
-dyn.load(dynlib("LIME"))
+# src_dir <- file.path("C:\\merrill\\LIME\\src")
+# setwd(src_dir)
+# compile("LIME.cpp")
+# dyn.load(dynlib("LIME"))
 
 
 ## dirichlet-multinomial not currently working for nfleets > 1
