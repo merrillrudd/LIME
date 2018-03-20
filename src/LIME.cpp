@@ -71,7 +71,10 @@ Type objective_function<Type>::operator() ()
     //mirror options
     DATA_INTEGER(mirror_theta);
     DATA_INTEGER(mirror_q);
-    // DATA_INTEGER(mirror_F);
+
+    // estimate total F instead of by fleet
+    DATA_INTEGER(est_totalF)
+    DATA_VECTOR(prop_f);
 
   // ======== Parameters =================================
     // Fixed, estimated parameters
@@ -160,7 +163,8 @@ Type objective_function<Type>::operator() ()
   matrix<Type> F_ft(n_fl,n_t); // number of total time steps
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
-      F_ft(f,t) = exp(log_F_ft(f,t));
+      if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,t));
+      if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,t)) * prop_f(f);
     }
   }
 
@@ -681,6 +685,7 @@ Type objective_function<Type>::operator() ()
   // REPORT( F_y );
   REPORT( N_t );
   REPORT( F_ft );
+  REPORT( prop_f );
   // REPORT( F_fy );
   REPORT( F_ta );
 

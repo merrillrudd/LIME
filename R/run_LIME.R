@@ -26,6 +26,8 @@
 #' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
 #' @param simulation is this a simulation? default FALSE means you are using real data (can set itervec=NULL)
 #' @param mirror vector of parameter names to mirror between fleets
+#' @param est_totalF TRUE estimate total F instead of by fleet
+#' @param prop_f proportion of catch from each fleet
 #' @importFrom TMB MakeADFun sdreport
 #' @importFrom TMBhelper Optimize
 #' @importFrom utils write.csv
@@ -58,7 +60,9 @@ run_LIME <- function(modpath,
                       itervec=NULL,
                       simulation=FALSE,
                       rewrite=TRUE,
-                      mirror=NULL){
+                      mirror=NULL,
+                      est_totalF=FALSE,
+                      prop_f=1){
 
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
@@ -112,8 +116,48 @@ for(iter in 1:length(itervec)){
     if(any(vals_selex_ft >= 0)){
       vals_selex_ft_new <- vals_selex_ft
     }
+    if(all(prop_f==1)){
+      prop_f_inp <- rep(1/input$nfleets, input$nfleets)
+    }
+    if(all(prop_f!=1)){
+      checksum <- sum(prop_f) == 1
+      if(checksum==FALSE) stop("prop_f must sum to 1 and be equal to nfleets, or set prop_f=1 to be equal across fleets")
+    }
 
-      TmbList <- format_input(input=input, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=SigRprior, LFdist=LFdist, C_type=C_type, est_more=est_more, fix_more=fix_more, f_startval_ft=f_startval_ft, rdev_startval_t=rdev_startval_t, est_selex_f=est_selex_f, vals_selex_ft=vals_selex_ft_new, randomR=randomR, mirror=mirror)
+      TmbList <- format_input(input=input, 
+                              data_avail=data_avail, 
+                              Fpen=Fpen, 
+                              SigRpen=SigRpen, 
+                              SigRprior=SigRprior, 
+                              LFdist=LFdist, 
+                              C_type=C_type, 
+                              est_more=est_more, 
+                              fix_more=fix_more, 
+                              f_startval_ft=f_startval_ft, 
+                              rdev_startval_t=rdev_startval_t, 
+                              est_selex_f=est_selex_f, 
+                              vals_selex_ft=vals_selex_ft_new, 
+                              randomR=randomR, 
+                              mirror=mirror,
+                              est_totalF=est_totalF,
+                              prop_f=prop_f_inp)
+      # input=input
+      #  data_avail=data_avail
+      #  Fpen=Fpen
+      #  SigRpen=SigRpen
+      #  SigRprior=SigRprior
+      #  LFdist=LFdist
+      #  C_type=C_type
+      #  est_more=est_more
+      #  fix_more=fix_more
+      #  f_startval_ft=f_startval_ft
+      #  rdev_startval_t=rdev_startval_t
+      #  est_selex_f=est_selex_f
+      #  vals_selex_ft=vals_selex_ft_new
+      #  randomR=randomR
+      #  mirror=mirror
+      #  est_totalF=est_totalF
+      #  fleet_proportions=fleet_proportions_inp
 
       if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
       if(is.null(modpath)) output$Inputs <- TmbList
@@ -156,7 +200,6 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
         Lwr[which(names(obj$par)=="log_S50_f")] = log(1)
-        Lwr[which(names(obj$par)=="log_F_ft")] <- log(0.001)
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
@@ -168,7 +211,7 @@ for(iter in 1:length(itervec)){
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
-          ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+          ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
                           "log_q_f"=log(obj_save$report()$q_f), 
                           "beta"=obj_save$report()$beta,
                           "log_sigma_R"=log(obj_save$report()$sigma_R),
@@ -197,7 +240,7 @@ for(iter in 1:length(itervec)){
               opt_save <- opt
               obj_save <- obj
               jnll_save <- jnll
-              ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+              ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
                           "log_q_f"=log(obj_save$report()$q_f), 
                           "beta"=obj_save$report()$beta,
                           "log_sigma_R"=log(obj_save$report()$sigma_R),
@@ -234,7 +277,7 @@ for(iter in 1:length(itervec)){
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
-                    ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                     ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
                           "log_q_f"=log(obj_save$report()$q_f), 
                           "beta"=obj_save$report()$beta,
                           "log_sigma_R"=log(obj_save$report()$sigma_R),
@@ -245,7 +288,7 @@ for(iter in 1:length(itervec)){
                           "log_sigma_I"=log(obj_save$report()$sigma_I),
                           "log_CV_L"=log(obj_save$report()$CV_L),
                           "log_theta"=log(obj_save$report()$theta),
-                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))    
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))       
                 }
                 if(is.null(jnll_save)==FALSE){
                     if(jnll<=jnll_save){
@@ -253,7 +296,7 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
-                    ParList <- list("log_F_ft"=log(obj_save$report()$F_ft), 
+                         ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
                           "log_q_f"=log(obj_save$report()$q_f), 
                           "beta"=obj_save$report()$beta,
                           "log_sigma_R"=log(obj_save$report()$sigma_R),

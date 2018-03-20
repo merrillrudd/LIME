@@ -18,7 +18,8 @@
 #' @param vals_selex_ft input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
 #' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
 #' @param mirror vector of parameter names to mirror between fleets
-#' 
+#' @param est_totalF TRUE estimate total F instead of by fleet
+#' @param prop_f proportion of catch from each fleet
 #' @return List, a tagged list of Data, Parameters, Random, Map
 #' @export
 format_input <- function(input, 
@@ -35,7 +36,9 @@ format_input <- function(input,
                         est_selex_f,
                         vals_selex_ft,
                         randomR,
-                        mirror){
+                        mirror,
+                        est_totalF,
+                        prop_f){
 
     with(input, {
 
@@ -102,7 +105,9 @@ format_input <- function(input,
                          # "n_s"=nseasons,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
-                         "mirror_q"=mirror_q_inp)   
+                         "mirror_q"=mirror_q_inp,
+                         "est_totalF"=ifelse(est_totalF==TRUE,1,0),
+                         "prop_f"=prop_f)   
         }
 
         ## index and length composition data
@@ -152,7 +157,9 @@ format_input <- function(input,
                          # "n_s"=nseasons,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
-                         "mirror_q"=mirror_q_inp)   
+                         "mirror_q"=mirror_q_inp,
+                         "est_totalF"=ifelse(est_totalF==TRUE,1,0),
+                         "prop_f"=prop_f)   
         }
 
 
@@ -203,7 +210,9 @@ format_input <- function(input,
                          # "n_s"=nseasons,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
-                         "mirror_q"=mirror_q_inp)      
+                         "mirror_q"=mirror_q_inp,
+                         "est_totalF"=ifelse(est_totalF==TRUE,1,0),
+                         "prop_f"=prop_f)      
         }
 
         ## length composition data only 
@@ -253,11 +262,20 @@ format_input <- function(input,
                          # "n_s"=nseasons,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
-                         "mirror_q"=mirror_q_inp)   
+                         "mirror_q"=mirror_q_inp,
+                         "est_totalF"=ifelse(est_totalF==TRUE,1,0),
+                         "prop_f"=prop_f)   
         }       
 
         ## set input parameters - regardless of data availability 
-        if(all(is.null(f_startval_ft))) f_startval_ft <- t(sapply(1:nfleets, function(x) rep(0.2, Nyears2)))
+        if(all(is.null(f_startval_ft)==FALSE)){
+            checkdim <- dim(f_startval_ft)
+            if(est_totalF==TRUE & checkdim[1]!=1 & checkdim[2]!=Nyears2) stop("if estimating total F, provide start values for only one fleet")
+        }
+        if(all(is.null(f_startval_ft))){
+            if(est_totalF==TRUE) f_startval_ft <- matrix(0.2, nrow=1, ncol=Nyears2)
+            if(est_totalF==FALSE) f_startval_ft <- t(sapply(1:nfleets, function(x) rep(0.2, Nyears2)))
+        }
         if(all(is.null(rdev_startval_t))) rdev_startval_t <- rep(0, Nyears2)
         Parameters <- list("log_F_ft"=log(f_startval_ft),
                         "log_q_f"=rep(log(qcoef), Data$n_fl),

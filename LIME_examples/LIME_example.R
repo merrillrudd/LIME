@@ -16,50 +16,24 @@ library(reshape2)
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
 ##----------------------------------------------------------------
-# lh <- create_lh_list(vbk=0.21, 
-# 					 linf=65, 
-# 					 t0=-0.01,
-# 					 lwa=0.0245, 
-# 					 lwb=2.79, 
-# 					 S50=c(20,30), 
-# 					 S95=c(26,36), 
-# 					 selex_input="length",
-# 					 selex_type=c("logistic","logistic"),
-# 					 M50=34,
-# 					 M95=NULL,
-# 					 maturity_input="length",
-# 					 M=0.27, 
-# 					 h=0.7,
-# 					 binwidth=1,
-# 					 CVlen=0.1,
-# 					 SigmaR=0.737,
-# 					 SigmaF=0.1,
-# 					 SigmaC=0.1,
-# 					 SigmaI=0.1,
-# 					 R0=1,
-# 					 qcoef=1e-5,
-# 					 start_ages=0,
-# 					 rho=0.43,
-# 					 nseasons=1,
-# 					 nfleets=2)
-
 lh <- create_lh_list(vbk=0.21, 
 					 linf=65, 
 					 t0=-0.01,
 					 lwa=0.0245, 
 					 lwb=2.79, 
-					 S50=c(20), 
-					 S95=c(26), 
+					 S50=c(20,30), 
+					 S95=c(26,36), 
 					 selex_input="length",
-					 selex_type=c("logistic"),
+					 selex_type=c("logistic","logistic"),
 					 M50=34,
 					 M95=NULL,
 					 maturity_input="length",
 					 M=0.27, 
+					 h=0.7,
 					 binwidth=1,
 					 CVlen=0.1,
 					 SigmaR=0.737,
-					 SigmaF=0.1,
+					 SigmaF=0.2,
 					 SigmaC=0.1,
 					 SigmaI=0.1,
 					 R0=1,
@@ -67,7 +41,33 @@ lh <- create_lh_list(vbk=0.21,
 					 start_ages=0,
 					 rho=0.43,
 					 nseasons=1,
-					 nfleets=1)
+					 nfleets=2)
+
+# lh <- create_lh_list(vbk=0.21, 
+# 					 linf=65, 
+# 					 t0=-0.01,
+# 					 lwa=0.0245, 
+# 					 lwb=2.79, 
+# 					 S50=c(20), 
+# 					 S95=c(26), 
+# 					 selex_input="length",
+# 					 selex_type=c("logistic"),
+# 					 M50=34,
+# 					 M95=NULL,
+# 					 maturity_input="length",
+# 					 M=0.27, 
+# 					 binwidth=1,
+# 					 CVlen=0.1,
+# 					 SigmaR=0.737,
+# 					 SigmaF=0.2,
+# 					 SigmaC=0.1,
+# 					 SigmaI=0.1,
+# 					 R0=1,
+# 					 qcoef=1e-5,
+# 					 start_ages=0,
+# 					 rho=0.43,
+# 					 nseasons=1,
+# 					 nfleets=1)
 
 ## by age
 p <- ggplot(lh$df %>% 
@@ -91,30 +91,28 @@ p <- ggplot(lh$df %>%
 ## ---------------------------------------------------
 ## Demonstrate data generation option
 # ## specify model path to save true population/generated data
-# true <- generate_data(modpath=NULL,
-# 					  itervec=1, 
-# 					  Fdynamics=c("Constant","Endogenous"),
-# 					  Rdynamics="Constant",
-# 					  lh=lh,
-# 					  Nyears=20,
-# 					  Nyears_comp=c(20,10),
-# 					  comp_sample=500,
-# 					  init_depl=0.7,
-# 					  seed=2828,
-# 					  fleet_percentage=c(0.6,0.4),
-# 					  derive_quants=TRUE)
 true <- generate_data(modpath=NULL,
 					  itervec=1, 
-					  Fdynamics=c("Endogenous"),
+					  Fdynamics=c("Constant","Endogenous"),
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20),
-					  comp_sample=200,
+					  Nyears_comp=c(20,10),
+					  comp_sample=400,
 					  init_depl=0.7,
-					  seed=434,
-					  fleet_percentage=1)
-## create data frame -- TO DO
+					  seed=132,
+					  fleet_proportions=c(0.6,0.4))
+# true <- generate_data(modpath=NULL,
+# 					  itervec=1, 
+# 					  Fdynamics=c("Endogenous"),
+# 					  Rdynamics="Constant",
+# 					  lh=lh,
+# 					  Nyears=20,
+# 					  Nyears_comp=c(20),
+# 					  comp_sample=200,
+# 					  init_depl=0.7,
+# 					  seed=132,
+# 					  fleet_percentage=1)
 
 
 ## plot simulated data
@@ -167,38 +165,24 @@ inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 inputs_all <- create_inputs(lh=lh, input_data=data_all)
 
-# saveRDS(data_all, "C:\\merrill\\data_multifleet_example.rds")
-# saveRDS(lh, "C:\\merrill\\lh_multifleet_example.rds")
-# saveRDS(true, "C:\\merrill\\true_multifleet_example.rds")
-
 ##----------------------------------------------------
-## Step 3: Run Model
+## Step 3: Run data-rich model
 ## ---------------------------------------------------
-##-------------------------
-## template file
-# ##--------------------------
-# src_dir <- file.path("C:\\merrill\\LIME\\src")
-# setwd(src_dir)
-# compile("LIME.cpp")
 
-# dyn.load( dynlib("LIME") )
+src_dir <- file.path("C:\\merrill\\LIME\\src")
+setwd(src_dir)
+compile("LIME.cpp")
+dyn.load(dynlib("LIME"))
 
 
-##--------------------------
-## build inputs and object
-##--------------------------
-## fix selectivity
-## fix log_theta
-## --- try estimating selectivity and fixing log_theta --> works!
-## only problem with log_theta
-
-res <- run_LIME(modpath=NULL, 
+## dirichlet-multinomial not currently working for nfleets > 1
+rich <- run_LIME(modpath=NULL, 
 				input=inputs_all,
 				data_avail="Index_Catch_LC",
 				Fpen=1,
 				SigRpen=1,
 				SigRprior=c(0.737,0.3),
-				LFdist=1,
+				LFdist=0,
 				C_type=2,
 				est_more=FALSE,
 				fix_more=FALSE,
@@ -210,17 +194,79 @@ res <- run_LIME(modpath=NULL,
 				newtonsteps=3,
 				F_up=10,
 				S50_up=lh$linf,
-				derive_quants=TRUE,
+				derive_quants=FALSE,
 				itervec=NULL,
 				rewrite=TRUE,
 				simulation=FALSE)
 
+## check TMB inputs
+Inputs <- rich$Inputs
+
+## Report file
+Report <- rich$Report
+
+## Standard error report
+Sdreport <- rich$Sdreport
+
+## derived reference points
+Derived <- rich$Derived
+
 
 ## check convergence
-check <- res$df
+hessian <- Sdreport$pdHess
+gradient <- rich$opt$max_gradient <= 0.001
+check <- hessian == TRUE & gradient == TRUE
 
-## check for other issues
-issues <- res$issues
+
+
+##----------------------------------------------------
+## Step 4: Plot fits
+## ---------------------------------------------------
+## plot length composition data
+plot_LCfits(LFlist=LF_list, 
+			Inputs=Inputs, 
+			Report=Report)
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			True=true, 
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("SPR" = c(0,1)))
+
+##----------------------------------------------------
+## Step 5: Check with length data only
+## ---------------------------------------------------
+
+## length only -- non-convergence
+inputs_LC$SigmaF <- 0.1
+res <- run_LIME(modpath=NULL, 
+				input=inputs_LC,
+				data_avail="LC",
+				Fpen=1,
+				SigRpen=1,
+				SigRprior=c(0.737,0.3),
+				LFdist=0,
+				C_type=0,
+				est_more=FALSE,
+				fix_more=FALSE,
+				mirror=NULL,
+				f_startval_ft=NULL,
+				rdev_startval_t=NULL,
+				est_selex_f=TRUE,
+				vals_selex_ft=-1,
+				randomR=TRUE,
+				newtonsteps=3,
+				F_up=10,
+				S50_up=lh$linf,
+				derive_quants=FALSE,
+				itervec=NULL,
+				rewrite=TRUE,
+				simulation=FALSE, 
+				est_totalF=TRUE,
+				prop_f=1)
 
 ## check TMB inputs
 Inputs <- res$Inputs
@@ -231,7 +277,14 @@ Report <- res$Report
 ## Standard error report
 Sdreport <- res$Sdreport
 
+## derived reference points
 Derived <- res$Derived
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- res$opt$max_gradient <= 0.001
+check <- hessian == TRUE & gradient == TRUE
+
 
 ##----------------------------------------------------
 ## Step 4: Plot fits
@@ -253,124 +306,3 @@ plot_output(Inputs=Inputs,
 
 
 
-
-##----------------------------------------------------------------------------
-## Step 5: Run with other data types - catch and abundance index examples
-## ---------------------------------------------------------------------------
-Cw_t <- true$Cw_t ## (optional) catch data, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
-I_t <- true$I_t ## (optional) abundance index, with elements of vector named with the year observed, e.g. 1:20 or 1998:2017 (can be any years within years to model)
-
-data_LF_Catch <- list("years"=years, "LF"=LF, "C_t"=Cw_t) ## length comp + catch
-data_LF_Index <- list("years"=years, "LF"=LF, "I_t"=I_t) ## length comp + index
-data_rich <- list("years"=years, "LF"=LF, "I_t"=I_t, "C_t"=Cw_t) ## length comp + index
-
-
-## length comp + index + catch
-## add option to specify catch in biomass (2) or numbers (1)
-res <- run_LIME(modpath=NULL,
-				lh=lh,
-				input_data=data_rich,
-				est_sigma="log_sigma_R", 
-				data_avail="Index_Catch_LC",
-				C_opt=2) 
-
-## check convergence
-check <- res$df
-## check for other issues
-issues <- res$issues
-## check TMB inputs
-Inputs <- res$Inputs
-## Report file
-Report <- res$Report
-## Standard error report
-Sdreport <- res$Sdreport
-
-## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
-			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
-
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			True=true, 
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
-
-
-
-## length comp + catch
-## add option to specify catch in biomass (2) or numbers (1)
-res <- run_LIME(modpath=NULL,
-				lh=lh,
-				input_data=data_LF_Catch,
-				est_sigma="log_sigma_R", 
-				data_avail="Catch_LC",
-				C_opt=2)
-
-## check convergence
-check <- res$df
-## check for other issues
-issues <- res$issues
-## check TMB inputs
-Inputs <- res$Inputs
-## Report file
-Report <- res$Report
-## Standard error report
-Sdreport <- res$Sdreport
-
-## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
-			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
-
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			True=true, 
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
-
-
-
-## length comp + index
-res <- run_LIME(modpath=NULL,
-				lh=lh,
-				input_data=data_LF_Index,
-				est_sigma="log_sigma_R", 
-				data_avail="Index_LC")
-
-## check convergence
-check <- res$df
-## check for other issues
-issues <- res$issues
-## check TMB inputs
-Inputs <- res$Inputs
-## Report file
-Report <- res$Report
-## Standard error report
-Sdreport <- res$Sdreport
-
-## plot length composition data
-plot_LCfits(LFlist=list("LF"=LF), 
-			Inputs=Inputs, 
-			Report=Report,
-			dim=c(5,2))
-
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			True=true, 
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1)))
