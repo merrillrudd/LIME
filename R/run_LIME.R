@@ -202,7 +202,6 @@ for(iter in 1:length(itervec)){
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
         Lwr[which(names(obj$par)=="log_S50_f")] = log(1)
-        Lwr[which(names(obj$par)=="log_Sdelta_f")] <- log(1)
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    

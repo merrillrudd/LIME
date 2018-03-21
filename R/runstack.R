@@ -262,6 +262,30 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 						if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".txt")))	
 					}
 
+					if(all(is.null(out$df))==FALSE){
+						if(gradient==FALSE){
+							## fix parameter with high final gradient
+							find_param <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
+							out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, fix_more=find_param)
+
+							## flag non-convergence or NAs
+							if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_node_", x, ".txt")))
+							if(all(is.null(out$df))==FALSE){
+								gradient <- out$opt$max_gradient<=0.001
+								pdHess <- out$Sdreport$pdHess
+								if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, ".txt")))
+								if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, ".txt")))
+								## save results if converged
+								if(gradient == TRUE & pdHess == TRUE){
+									unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
+									saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".txt")))
+								}	
+							}
+						}
+
+					}
+
+
 			 	# 	## if model doesn't converge:
 			 	# 	try <- 0
 					# while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
