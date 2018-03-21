@@ -321,7 +321,6 @@ sim_pop <-
           for(a in 1:length(ages)){
             F_at[a,t] <- sum(F_atf[a,t,])
           }
-
         }
 
 
@@ -388,60 +387,60 @@ sim_pop <-
       SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
 
 
-      Cn_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
-            if (nseasons == 1)
-              time_index <- x
-            if (nseasons > 1)
-              time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(Cn_ft[y,time_index])
-          }) #* exp(CatchDev - (SigmaC^2)/2)
-        }))
-      Cn_t <- colSums(Cn_ft)
-      Cw_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
-            if (nseasons == 1)
-              time_index <- x
-            if (nseasons > 1)
-              time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(Cw_ft[y,time_index])
-          }) #* exp(CatchDev - (SigmaC^2)/2)
-      }))
-      Cw_t <- colSums(Cw_ft)
+      # Cn_ft <- t(sapply(1:nfleets, function(y){
+      #     sapply(1:Nyears_real, function(x) {
+      #       if (nseasons == 1)
+      #         time_index <- x
+      #       if (nseasons > 1)
+      #         time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #       sum(Cn_ft[y,time_index])
+      #     }) #* exp(CatchDev - (SigmaC^2)/2)
+      #   }))
+      # Cn_t <- colSums(Cn_ft)
+      # Cw_ft <- t(sapply(1:nfleets, function(y){
+      #     sapply(1:Nyears_real, function(x) {
+      #       if (nseasons == 1)
+      #         time_index <- x
+      #       if (nseasons > 1)
+      #         time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #       sum(Cw_ft[y,time_index])
+      #     }) #* exp(CatchDev - (SigmaC^2)/2)
+      # }))
+      # Cw_t <- colSums(Cw_ft)
 
-      F_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
-            if (nseasons == 1)
-              time_index <- x
-            if (nseasons > 1)
-              time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(F_ft[y,time_index])
-          })
-      }))
+      # F_ft <- t(sapply(1:nfleets, function(y){
+      #     sapply(1:Nyears_real, function(x) {
+      #       if (nseasons == 1)
+      #         time_index <- x
+      #       if (nseasons > 1)
+      #         time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #       sum(F_ft[y,time_index])
+      #     })
+      # }))
 
-      R_t <- sapply(1:Nyears_real, function(x) {
-        if (nseasons == 1)
-          time_index <- x
-        if (nseasons > 1)
-          time_index <- (1:nseasons) + ((x - 1) * nseasons)
-        sum(R_t[time_index])
-      })
+      # R_t <- sapply(1:Nyears_real, function(x) {
+      #   if (nseasons == 1)
+      #     time_index <- x
+      #   if (nseasons > 1)
+      #     time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #   sum(R_t[time_index])
+      # })
 
-      TB_t <- sapply(1:Nyears_real, function(x) {
-        if (nseasons == 1)
-          time_index <- x
-        if (nseasons > 1)
-          time_index <- (1:nseasons) + ((x - 1) * nseasons)
-        sum(TB_t[time_index])
-      })
+      # TB_t <- sapply(1:Nyears_real, function(x) {
+      #   if (nseasons == 1)
+      #     time_index <- x
+      #   if (nseasons > 1)
+      #     time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #   sum(TB_t[time_index])
+      # })
 
-      SB_t <- sapply(1:Nyears_real, function(x) {
-        if (nseasons == 1)
-          time_index <- x
-        if (nseasons > 1)
-          time_index <- (1:nseasons) + ((x - 1) * nseasons)
-        sum(SB_t[time_index])
-      })
+      # SB_t <- sapply(1:Nyears_real, function(x) {
+      #   if (nseasons == 1)
+      #     time_index <- x
+      #   if (nseasons > 1)
+      #     time_index <- (1:nseasons) + ((x - 1) * nseasons)
+      #   sum(SB_t[time_index])
+      # })
 
       ## relative spawning biomass (depletion)
       D_t <- SB_t / SB0 
