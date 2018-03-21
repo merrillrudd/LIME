@@ -135,6 +135,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 				## save results if converged
 				if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
 			}
+		
 			 	# 	## if model doesn't converge:
 			 	# 	try <- 0
 					# while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt"))) | file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))){		
@@ -294,4 +295,4 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 
 	return(paste0("Ran iter ", iter, " in ", savedir))
 
-}
+}}
