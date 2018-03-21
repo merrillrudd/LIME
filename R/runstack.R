@@ -62,7 +62,8 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									S50=S50, S95=S95, selex_input="age",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
-									binwidth=binwidth))
+									binwidth=binwidth,
+									Fequil=1.1))
 
 			# p <- ggplot(plist$df %>% filter(By=="Age")) +
 			# 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
@@ -74,13 +75,13 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 		if(is.list(input_data)==FALSE & is.data.frame(input_data)==FALSE){
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
 				## use seed + 1000 to generate data
-				data <- generate_data(modpath=savedir, itervec=iter, 
-								Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
-								lh=plist, 
-								Nyears=20, Nyears_comp=20, comp_sample=200,
-								init_depl=c(0.10,0.90), 
-								seed=rep(seed+1000,iter),
-								rewrite=TRUE)
+					data <- generate_data(modpath=savedir, itervec=iter, 
+									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
+									lh=plist, 
+									Nyears=20, Nyears_comp=20, comp_sample=200,
+									init_depl=c(0.10,0.90), 
+									seed=rep(seed+1000,iter),
+									rewrite=TRUE)
 				# LFlist <- NULL
 				# for(f in 1:plist$nfleets){
 				# 	LFlist[[f]] <- data$LF[,,f]
