@@ -39,7 +39,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 		###################
 		## generate data
 		###################
-			## true values
+			## true values OR based on FishLife OR will be ignored if not generating data OR starting values
 			vbk_choose <- ifelse("K" %in% param, rlnorm(1, mean=mean["K"], sd=sqrt(cov["K","K"])), exp(mean["K"]))
 			M_choose <- ifelse("M" %in% param, rlnorm(1, mean=mean["M"], sd=sqrt(cov["M","M"])), exp(mean["M"]))
 			Linf_choose <- ifelse("Loo" %in% param, rlnorm(1, mean=mean["Loo"], sd=sqrt(cov["Loo","Loo"])), exp(mean["Loo"]))
@@ -64,11 +64,11 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									AgeMax=AgeMax,
 									binwidth=binwidth))
 
-			p <- ggplot(plist$df %>% filter(By=="Age")) +
-				geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
-				facet_grid(Variable~., scale="free_y") +
-				xlab("Age") +
-				guides(color=FALSE)
+			# p <- ggplot(plist$df %>% filter(By=="Age")) +
+			# 	geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) + 
+			# 	facet_grid(Variable~., scale="free_y") +
+			# 	xlab("Age") +
+			# 	guides(color=FALSE)
 			# ggsave(file.path(iterpath, "LH_info.png"), p)
 
 		if(is.list(input_data)==FALSE & is.data.frame(input_data)==FALSE){
@@ -106,16 +106,16 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			if(file.exists(file.path(iterpath,"res__FishLifeMeans.txt"))) unlink(file.path(iterpath, "res__FishLifeMeans.txt"), TRUE)	
 
 			## life history inputs
-			vbk_choose <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
-			M_choose <- ifelse("M" %in% param, exp(mean["M"]), , lh$M)
-			Linf_choose <- ifelse("Loo" %in% param, exp(mean["Loo"]), lh$linf)
+			vbk_inp <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
+			M_inp <- ifelse("M" %in% param, exp(mean["M"]), lh$M)
+			linf_inp <- ifelse("Loo" %in% param, exp(mean["Loo"]), lh$linf)
 			lhinp <- with(plist, 
 					create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_inp,
 									M50=M50, maturity_input="age",
 									S50=S50, S95=S95, selex_input="age",
-									SigmaF=0.1, SigmaR=SigmaR,
+									SigmaF=SigmaF, SigmaR=SigmaR,
 									AgeMax=AgeMax,
 									binwidth=binwidth))		
 
@@ -124,30 +124,41 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)	
 
 			## flag non-convergence or NAs
-			if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_FishLifeMeans.txt"))
 			if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_FishLifeMeans.txt"))
-
-			## save results if converged
-			if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
-
+			if(all(is.null(out$df))==FALSE){
+				if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_FishLifeMeans.txt"))
+				## save results if converged
+				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+			}
 			 		## if model doesn't converge:
 			 		try <- 0
-					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))){		
+					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt"))) | file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))){		
 						try <- try + 1
 						## change starting values for F to those estimated in previous, nonconverged run
-						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
-
+						if(all(is.null(out$df))==FALSE) lhinp$F_ft <- out$Report$F_ft
+						if(all(is.null(out$df))) lhinp$F_ft <- rnorm(length(input_data$years), mean=1, sd=0.2)
+						input <- create_inputs(lh=lhinp, input_data=input_data)
+						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft = input$F_ft)	
 						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
-						if(max(abs(out$df[,1]))<=0.001){
-							remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
-							saveRDS(out, file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+
+						if(max(abs(out$df[,1]))>0.001){
+							write("nonconvergence", file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+							if(file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))) unlink(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")), TRUE)
+						}
+
+						if(all(is.null(out$df))==FALSE){
+							if(max(abs(out$df[,1]))<=0.001){
+								remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+								saveRDS(out, file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+							}
 						}
 						if(try == 3){
-							if(max(abs(out$df[,1]))<=0.01){
-								remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")), TRUE)
-								saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
-								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
+							if(all(is.null(out$df))==FALSE){
+								if(max(abs(out$df[,1]))<=0.01){
+									remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")), TRUE)
+									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+									write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
+								}
 							}
 							saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans_NC.rds")))
 						}
@@ -197,7 +208,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 							}
 						}
 					}
-		}	
+				}	
 		}
 	
 

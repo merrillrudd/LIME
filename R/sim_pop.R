@@ -305,7 +305,7 @@ sim_pop <-
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
           for(i in 1:length(index)){
-            E_ft[index[i],t] <- (E_ft[index[i],t-1] * (SB_t[t-1] / (F40 * SB0/2)) ^ Frate)
+            E_ft[index[i],t] <- (E_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate)
           }
           ## include relative catchability by fleet
           qE_ft <- t(sapply(1:nfleets, function(x){
