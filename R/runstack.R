@@ -178,7 +178,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 
 			## input file and run model
 			input <- create_inputs(lh=plist, input_data=input_data)
-			input$SigmaF <- 0.1
+			# input$SigmaF <- 0.1
 			out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)	
 
 			## flag non-convergence or NAs
@@ -227,7 +227,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 										M=M_inp,
 										M50=M50, maturity_input="age",
 										S50=S50, S95=S95, selex_input="age",
-										SigmaF=0.1, SigmaR=SigmaR,
+										SigmaF=SigmaF, SigmaR=SigmaR,
 										AgeMax=AgeMax,
 										binwidth=binwidth))		
 
