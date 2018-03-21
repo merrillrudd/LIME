@@ -102,7 +102,8 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_FishLifeMeans.rds")))==FALSE){	
 
 			## remove any flags or results files if re-running
-			if(file.exists(file.path(iterpath,"nonconvergence_FishLifeMeans.txt"))) unlink(file.path(iterpath, "nonconvergence_FishLifeMeans.txt"), TRUE)
+			if(file.exists(file.path(iterpath,"pdHess_FishLifeMeans.txt"))) unlink(file.path(iterpath, "pdHess_FishLifeMeans.txt"), TRUE)
+			if(file.exists(file.path(iterpath,"highgradient_FishLifeMeans.txt"))) unlink(file.path(iterpath, "highgradient_FishLifeMeans.txt"), TRUE)
 			if(file.exists(file.path(iterpath,"modelNA_FishLifeMeans.txt"))) unlink(file.path(iterpath, "modelNA_FishLifeMeans.txt"), TRUE)
 			if(file.exists(file.path(iterpath,"res__FishLifeMeans.txt"))) unlink(file.path(iterpath, "res__FishLifeMeans.txt"), TRUE)	
 
@@ -127,43 +128,46 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			## flag non-convergence or NAs
 			if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_FishLifeMeans.txt"))
 			if(all(is.null(out$df))==FALSE){
-				if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_FishLifeMeans.txt"))
+				gradient <- out$opt$max_gradient<=0.001
+				pdHess <- out$Sdreport$pdHess
+				if(gradient==FALSE) write("highgradient", file.path(iterpath,"highgradient_FishLifeMeans.txt"))
+				if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, "pdHess_FishLifeMeans.txt"))
 				## save results if converged
-				if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+				if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
 			}
-			 		## if model doesn't converge:
-			 		try <- 0
-					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt"))) | file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))){		
-						try <- try + 1
-						## change starting values for F to those estimated in previous, nonconverged run
-						if(all(is.null(out$df))==FALSE) lhinp$F_ft <- out$Report$F_ft
-						if(all(is.null(out$df))) lhinp$F_ft <- rnorm(length(input_data$years), mean=1, sd=0.2)
-						input <- create_inputs(lh=lhinp, input_data=input_data)
-						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft = input$F_ft)	
-						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
+			 	# 	## if model doesn't converge:
+			 	# 	try <- 0
+					# while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt"))) | file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))){		
+					# 	try <- try + 1
+					# 	## change starting values for F to those estimated in previous, nonconverged run
+					# 	if(all(is.null(out$df))==FALSE) lhinp$F_ft <- out$Report$F_ft
+					# 	if(all(is.null(out$df))) lhinp$F_ft <- rnorm(length(input_data$years), mean=1, sd=0.2)
+					# 	input <- create_inputs(lh=lhinp, input_data=input_data)
+					# 	out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft = input$F_ft)	
+					# 	if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
 
-						if(max(abs(out$df[,1]))>0.001){
-							write("nonconvergence", file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
-							if(file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))) unlink(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")), TRUE)
-						}
+					# 	if(max(abs(out$df[,1]))>0.001){
+					# 		write("nonconvergence", file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+					# 		if(file.exists(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))) unlink(file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")), TRUE)
+					# 	}
 
-						if(all(is.null(out$df))==FALSE){
-							if(max(abs(out$df[,1]))<=0.001){
-								remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
-								saveRDS(out, file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
-							}
-						}
-						if(try == 3){
-							if(all(is.null(out$df))==FALSE){
-								if(max(abs(out$df[,1]))<=0.01){
-									remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")), TRUE)
-									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
-									write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
-								}
-							}
-							saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans_NC.rds")))
-						}
-					}
+					# 	if(all(is.null(out$df))==FALSE){
+					# 		if(max(abs(out$df[,1]))<=0.001){
+					# 			remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+					# 			saveRDS(out, file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")))
+					# 		}
+					# 	}
+					# 	if(try == 3){
+					# 		if(all(is.null(out$df))==FALSE){
+					# 			if(max(abs(out$df[,1]))<=0.01){
+					# 				remove <- unlink(file.path(iterpath, paste0("nonconvergence_FishLifeMeans.txt")), TRUE)
+					# 				saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+					# 				write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_FishLifeMeans.txt")))
+					# 			}
+					# 		}
+					# 		saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans_NC.rds")))
+					# 	}
+					# }
 		}	
 
 		## run at true values
@@ -171,8 +175,10 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_IterTrue.rds")))==FALSE){	
 			
 
+
 			## remove any flags or results files if re-running
-			if(file.exists(file.path(iterpath,"nonconvergence_IterTrue.txt"))) unlink(file.path(iterpath, "nonconvergence_IterTrue.txt"), TRUE)
+			if(file.exists(file.path(iterpath,"pdHess_IterTrue.txt"))) unlink(file.path(iterpath, "pdHess_IterTrue.txt"), TRUE)
+			if(file.exists(file.path(iterpath,"highgradient_IterTrue.txt"))) unlink(file.path(iterpath, "highgradient_IterTrue.txt"), TRUE)
 			if(file.exists(file.path(iterpath,"modelNA_IterTrue.txt"))) unlink(file.path(iterpath, "modelNA_IterTrue.txt"), TRUE)
 			if(file.exists(file.path(iterpath,"res__IterTrue.txt"))) unlink(file.path(iterpath, "res__IterTrue.txt"), TRUE)	
 
@@ -182,40 +188,49 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)	
 
 			## flag non-convergence or NAs
-			if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath,"nonconvergence_IterTrue.txt"))
 			if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
+			if(all(is.null(out$df))==FALSE){
+				gradient <- out$opt$max_gradient<=0.001
+				pdHess <- out$Sdreport$pdHess
+				if(gradient==FALSE) write("highgradient", file.path(iterpath,"highgradient_IterTrue.txt"))
+				if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
+				## save results if converged
+				if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
+			}
+			 # 		## if model doesn't converge:
+			 # 		try <- 0
+				# 	while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))){		
+				# 		try <- try + 1
+				# 		## change starting values for F to those estimated in previous, nonconverged run
+				# 		out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
+				# 		if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
 
-			## save results if converged
-			if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
-
-			 		## if model doesn't converge:
-			 		try <- 0
-					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))){		
-						try <- try + 1
-						## change starting values for F to those estimated in previous, nonconverged run
-						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
-
-						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_IterTrue.txt")))
-						if(max(abs(out$df[,1]))<=0.001){
-							remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
-							saveRDS(out, file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
-						}
-						if(try == 3){
-							if(max(abs(out$df[,1]))<=0.01){
-								remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")), TRUE)
-								saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
-								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_IterTrue.txt")))
-							}
-						}
-					}
-				}	
+				# 		if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_IterTrue.txt")))
+				# 		if(max(abs(out$df[,1]))<=0.001){
+				# 			remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
+				# 			saveRDS(out, file.path(iterpath, paste0("nonconvergence_IterTrue.txt")))
+				# 		}
+				# 		if(try == 3){
+				# 			if(max(abs(out$df[,1]))<=0.01){
+				# 				remove <- unlink(file.path(iterpath, paste0("nonconvergence_IterTrue.txt")), TRUE)
+				# 				saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
+				# 				write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_IterTrue.txt")))
+				# 			}
+				# 		}
+				# 	}
+				# }	
 		}
 	
 
 		## predictive stacking
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_", modname, ".rds")))==FALSE){
 			res <- lapply(1:nrow(nodes), function(x){
+
+			## remove any flags or results files if re-running
+			if(file.exists(file.path(iterpath,paste0("pdHess_node_", x, ".txt")))) unlink(file.path(iterpath, paste0("pdHess_node_", x, ".txt")), TRUE)
+			if(file.exists(file.path(iterpath,paste0("highgradient_node_", x, ".txt")))) unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
+			if(file.exists(file.path(iterpath,paste0("modelNA_node_", x, ".txt")))) unlink(file.path(iterpath,paste0( "modelNA_node_", x, ".txt")), TRUE)
+			if(file.exists(file.path(iterpath,paste0("res__node_", x, ".txt")))) unlink(file.path(iterpath,paste0( "res__node_", x, ".txt")), TRUE)	
 
 					## life history inputs -- nodes
 					vbk_inp <- ifelse("K" %in% param, exp(nodes[x,"K"]), exp(mean["K"]))
@@ -236,33 +251,37 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 					out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)	
 
 					## flag non-convergence or NAs
-			 		if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
-			 		if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
-
-			 		## save results if converged
-			 		if(max(abs(out$df[,1]))<=0.001) saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
-
-			 		## if model doesn't converge:
-			 		try <- 0
-					while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
-						try <- try + 1
-						## change starting values for F to those estimated in previous, nonconverged run
-						out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
-						if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
-
-						if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
-						if(max(abs(out$df[,1]))<=0.001){
-							remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
-							saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
-						}
-						if(try == 3){
-							if(max(abs(out$df[,1]))<=0.01){
-								remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)
-								saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
-								write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_", modname, "node", x, ".txt")))
-							}
-						}
+					if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_node_", x, ".txt")))
+					if(all(is.null(out$df))==FALSE){
+						gradient <- out$opt$max_gradient<=0.001
+						pdHess <- out$Sdreport$pdHess
+						if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, ".txt")))
+						if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, ".txt")))
+						## save results if converged
+						if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".txt")))	
 					}
+
+			 	# 	## if model doesn't converge:
+			 	# 	try <- 0
+					# while(try <= 3 & file.exists(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))){		
+					# 	try <- try + 1
+					# 	## change starting values for F to those estimated in previous, nonconverged run
+					# 	out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=out$Report$F_ft)	
+					# 	if(max(abs(out$df[,1]))>0.001) write("nonconvergence", file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
+
+					# 	if(all(is.null(out$df))) write("modelNA", file.path(iterpath, paste0("modelNA_", modname, "node", x, ".txt")))
+					# 	if(max(abs(out$df[,1]))<=0.001){
+					# 		remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")))
+					# 		saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+					# 	}
+					# 	if(try == 3){
+					# 		if(max(abs(out$df[,1]))<=0.01){
+					# 			remove <- unlink(file.path(iterpath, paste0("nonconvergence_", modname, "node", x, ".txt")), TRUE)
+					# 			saveRDS(out, file.path(iterpath, paste0("res_", modname, "node", x, ".txt")))
+					# 			write("convergence threshold 0.01", file.path(iterpath, paste0("minimal_convergence_", modname, "node", x, ".txt")))
+					# 		}
+					# 	}
+					# }
 				return(out)
 
 			})
