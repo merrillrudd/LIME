@@ -484,10 +484,10 @@ plot_output(Inputs=Inputs,
 
 
 
-# src_dir <- file.path("C:\\merrill\\LIME\\src")
-# setwd(src_dir)
-# compile("LIME.cpp")
-# dyn.load(dynlib("LIME"))
+src_dir <- file.path("C:\\merrill\\LIME\\src")
+setwd(src_dir)
+compile("LIME.cpp")
+dyn.load(dynlib("LIME"))
 
 ##----------------------------------------------------
 ## Check increasing bin width
