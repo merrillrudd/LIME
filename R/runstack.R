@@ -146,6 +146,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.txt")))
+									write("fixed theta high", file.path(iterpath, "fixed_theta_high.txt"))
 								}	
 							}						
 						}
@@ -168,6 +169,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.txt")))
+									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], ".txt"))))
 								}	
 							}
 						}
@@ -222,7 +224,8 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_IterTrue.txt")))
-								}	
+									write("fixed theta high", file.path(iterpath, "fixed_theta_high.txt"))
+								}
 							}						
 						}
 
@@ -244,6 +247,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_IterTrue.txt")))
+									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], ".txt"))))
 								}	
 							}
 						}
@@ -314,6 +318,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_node_", x, ".txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".txt")))
+									write("fixed theta high", file.path(iterpath, "fixed_theta_high.txt"))
 								}	
 							}						
 						}
@@ -336,6 +341,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_node_", x, ".txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".txt")))
+									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], ".txt"))))
 								}	
 							}
 						}
