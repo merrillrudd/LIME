@@ -318,7 +318,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_node_", x, ".txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".rds")))
-									write("fixed theta high", file.path(iterpath, paste0("fixed_theta_high_node_", x, ".txt"))
+									write("fixed theta high", file.path(iterpath, paste0("fixed_theta_high_node_", x, ".txt")))
 								}	
 							}						
 						}
