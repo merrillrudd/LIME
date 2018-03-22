@@ -125,10 +125,13 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			}
 
 					## check and rerun in case of nonconvergence
-					if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					try <- 0
+					while(try < 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
+						try <- try + 1
+						print(try)
 						if(out$Report$theta > 50){
 							input$theta <- 50
 							out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, fix_more="log_theta")
@@ -146,9 +149,56 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))
-									write("fixed theta high", file.path(iterpath, "fixed_theta_high_FishLifeMeans.txt"))
+									write("fixed theta high", file.path(iterpath, paste0("fixed_theta_high_FishLifeMeans.txt")))
 								}	
 							}						
+						}
+
+						if(pdHess==FALSE){
+							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
+							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
+							if(find_param_est == "log_S50_f"){
+								input$SL50 <- out$Report$S50
+								input$SL95 <- out$Report$S95 * 1.3
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)
+
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_FishLifeMeans.txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_FishLifeMeans.txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_FishLifeMeans.txt"))))
+									}	
+								}
+							}
+							if(find_param_est == "log_F_ft"){
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+							
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_FishLifeMeans.txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_FishLifeMeans.txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_FishLifeMeans.txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_FishLifeMeans.txt"))))
+									}	
+								}
+							}
 						}
 
 						if(gradient==FALSE){
@@ -169,7 +219,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_FishLifeMeans.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_FishLifeMeans.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))
-									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_FishLifeMeans", ".txt"))))
+									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_FishLifeMeans.txt"))))
 								}	
 							}
 						}
@@ -203,10 +253,13 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 				}
 
 					## check and rerun in case of nonconvergence
-					if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					try <- 0
+					while(try < 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
+						try <- try + 1
+						print(try)
 						if(out$Report$theta > 50){
 							input$theta <- 50
 							out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, fix_more="log_theta")
@@ -224,9 +277,56 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))
-									write("fixed theta high", file.path(iterpath, "fixed_theta_high_IterTrue.txt"))
-								}
+									write("fixed theta high", file.path(iterpath, paste0("fixed_theta_high_IterTrue.txt")))
+								}	
 							}						
+						}
+
+						if(pdHess==FALSE){
+							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
+							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
+							if(find_param_est == "log_S50_f"){
+								input$SL50 <- out$Report$S50
+								input$SL95 <- out$Report$S95 * 1.3
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)
+
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_IterTrue.txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_IterTrue.txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_IterTrue.txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_IterTrue.txt"))))
+									}	
+								}
+							}
+							if(find_param_est == "log_F_ft"){
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+							
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_IterTrue.txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_IterTrue.txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_IterTrue.txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_IterTrue.txt"))))
+									}	
+								}
+							}
 						}
 
 						if(gradient==FALSE){
@@ -247,7 +347,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									unlink(file.path(iterpath,paste0( "pdHess_IterTrue.txt")), TRUE)
 									unlink(file.path(iterpath,paste0( "highgradient_IterTrue.txt")), TRUE)
 									saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))
-									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_IterTrue", ".txt"))))
+									ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_IterTrue.txt"))))
 								}	
 							}
 						}
@@ -297,10 +397,13 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 					}
 
 					## check and rerun in case of nonconvergence
-					if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					try <- 0
+					while(try < 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
+						try <- try + 1
+						print(try)
 						if(out$Report$theta > 50){
 							input$theta <- 50
 							out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, fix_more="log_theta")
@@ -321,6 +424,53 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 									write("fixed theta high", file.path(iterpath, paste0("fixed_theta_high_node_", x, ".txt")))
 								}	
 							}						
+						}
+
+						if(pdHess==FALSE){
+							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
+							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
+							if(find_param_est == "log_S50_f"){
+								input$SL50 <- out$Report$S50
+								input$SL95 <- out$Report$S95 * 1.3
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3)
+
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_node_", x, ".txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, ".txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, ".txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_node_", x, ".txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_node_", x, ".txt"))))
+									}	
+								}
+							}
+							if(find_param_est == "log_F_ft"){
+								out <- run_LIME(modpath=NULL, input=input, data_avail="LC", rewrite=TRUE, newtonsteps=3, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+							
+								## flag non-convergence or NAs
+								if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_node_", x, ".txt")))
+								if(all(is.null(out$df))==FALSE){
+									gradient <- out$opt$max_gradient<=0.001
+									pdHess <- out$Sdreport$pdHess
+									if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, ".txt")))
+									if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, ".txt")))
+									## save results if converged
+									if(gradient == TRUE & pdHess == TRUE){
+										## remove flags if they exist
+										unlink(file.path(iterpath,paste0( "pdHess_node_", x, ".txt")), TRUE)
+										unlink(file.path(iterpath,paste0( "highgradient_node_", x, ".txt")), TRUE)
+										saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".rds")))
+										ignore <- sapply(1:length(find_param), function(x) write("fixed high gradient parameter", file.path(iterpath, paste0("fixed_", find_param[x], "_node_", x, ".txt"))))
+									}	
+								}
+							}
 						}
 
 						if(gradient==FALSE){
