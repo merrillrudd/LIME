@@ -350,7 +350,7 @@ runstack <- function(savedir, iter, seed, lh, nodes, param, mean, cov, modname, 
 			})
 			saveRDS(res, file.path(iterpath, paste0("res_", modname, ".rds")))
 			files <- list.files(path=file.path(iterpath))
-			remove <- files[grepl(paste0("res_", modname, "node"), files)]
+			remove <- files[grepl(paste0("res_node"), files)]
 			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
 		}
 	
