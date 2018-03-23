@@ -50,7 +50,7 @@ get_converged <- function(results, max_gradient=0.001){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_sigma_R" %in% find_param_est){
-								input$SigmaR <- out$Report$sigma_R
+								input$SigmaR <- min(2, out$Report$sigma_R)
 								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more="log_sigma_R")
 								
 								## check_convergence
@@ -108,10 +108,5 @@ get_converged <- function(results, max_gradient=0.001){
 						}
 					}
 
-	outs <- NULL
-	outs$out <- out
-	outs$gradient <- gradient
-	outs$pdHess <- pdHess
-	outs$isNA <- isNA
-	return(outs)
+	return(out)
 }
