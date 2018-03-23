@@ -102,9 +102,10 @@ for(iter in 1:length(itervec)){
     Sdreport <- NA
     ParList <- NA  
     df <- NULL
-    # if(inits$SigmaR > 0.05) SigRpen <- 0
-    # if(inits$SigmaR <= 0.05) SigRpen <- 1
+    if("log_sigma_R" %in% fix_more) SigRpen <- 0
     output <- NULL
+    output$input <- input
+    output$data_avail <- data_avail
 
     if(all(vals_selex_ft < 0)){
       vals_selex_ft_new <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
