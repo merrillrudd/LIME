@@ -4,15 +4,12 @@
 \alias{runstack}
 \title{Predictive stacking}
 \usage{
-runstack(savedir, iter, seed, lh, nodes, param, mean, cov, modname, input_data,
-  Fscenario, rewrite, binwidth = 1)
+runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
+  max_gradient = 0.001, rewrite = TRUE, input_data = NULL,
+  simulation = FALSE, iter = NULL, seed = NULL, Fscenario = NULL)
 }
 \arguments{
 \item{savedir}{directory to save results}
-
-\item{iter}{iteration of generated data}
-
-\item{seed}{set seed}
 
 \item{lh}{life history list, with elements contained as output from LIME::create_lh_list}
 
@@ -26,13 +23,21 @@ runstack(savedir, iter, seed, lh, nodes, param, mean, cov, modname, input_data,
 
 \item{modname}{model name to save in directory}
 
-\item{input_data}{for LIME use with real data (not simulated)}
+\item{data_avail}{data available to model, default = "LC", can adjust to "Catch_LC", "Index_LC", or "Index_Catch_LC"}
 
-\item{Fscenario}{fishing mortality scenario to generate data}
+\item{max_gradient}{maximum final gradient criterion, default = 0.001}
 
 \item{rewrite}{rewrite results?}
 
-\item{binwidth}{default=1cm, can change}
+\item{input_data}{for LIME use with real data (not simulated)}
+
+\item{simulation}{is this a simulation? Default = FALSE}
+
+\item{iter}{iteration of generated data}
+
+\item{seed}{set seed}
+
+\item{Fscenario}{fishing mortality scenario to generate data}
 }
 \value{
 prints how many iterations were run in model directory
