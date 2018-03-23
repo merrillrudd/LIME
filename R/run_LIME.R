@@ -76,25 +76,21 @@ for(iter in 1:length(itervec)){
     if(simulation==FALSE & is.null(modpath)) iterpath <- NULL
 
     if(rewrite==FALSE & is.null(modpath)==FALSE){
-      if(file.exists(file.path(iterpath, "Sdreport.rds"))) next
-      if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
-      if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
+      if(file.exists(file.path(iterpath, "LIME_output.rds"))) next
     }
 
     if(rewrite==TRUE & is.null(modpath)==FALSE){
-      if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) unlink(file.path(iterpath, "NAs_final_gradient.txt"), TRUE)
-      if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) unlink(file.path(iterpath, "high_final_gradient.txt"), TRUE)
-      if(file.exists(file.path(iterpath, "model_NA.txt"))) unlink(file.path(iterpath, "model_NA.txt"), TRUE)
+      if(file.exists(file.path(iterpath, "LIME_output.rds"))) unlink(file.path(iterpath, "LIME_output.rds"), TRUE)
     }
 
     if(simulation==TRUE & is.null(modpath)==FALSE){
       stop("Need to edit code for multifleet")
       # sim <- readRDS(file.path(iterpath, "True.rds"))
-      # f_inits <- sim$F_t
-      # f_inits <- NULL
+      # f_inits <- sim$F_ft
+      # # f_inits <- NULL
       # if(C_type==0) C_t_input <- NULL
-      # if(C_type==1) C_t_input <- sim$Cn_t
-      # if(C_type==2) C_t_input <- sim$Cw_t
+      # if(C_type==1) C_t_input <- sim$Cn_ft
+      # if(C_type==2) C_t_input <- sim$Cw_ft
       # if(LFdist==0) obs_input <- sim$obs_per_year
       # if(LFdist==1) obs_input <- rep(0, sim$Nyears)
       # true_nt <- sim$Nyears/sim$nseasons
@@ -108,7 +104,7 @@ for(iter in 1:length(itervec)){
     df <- NULL
     # if(inits$SigmaR > 0.05) SigRpen <- 0
     # if(inits$SigmaR <= 0.05) SigRpen <- 1
-    if(is.null(modpath)) output <- NULL
+    output <- NULL
 
     if(all(vals_selex_ft < 0)){
       vals_selex_ft_new <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
@@ -160,8 +156,7 @@ for(iter in 1:length(itervec)){
       #  est_totalF=est_totalF
       #  fleet_proportions=fleet_proportions_inp
 
-      if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
-      if(is.null(modpath)) output$Inputs <- TmbList
+      output$Inputs <- TmbList
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
@@ -324,12 +319,10 @@ for(iter in 1:length(itervec)){
 
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
-        if(is.null(modpath)==FALSE) saveRDS(Report, file.path(iterpath, "Report.rds"))  
-        if(is.null(modpath)) output$Report <- Report
+        output$Report <- Report
 
         Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
-        if(is.null(modpath)==FALSE) saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
-        if(is.null(modpath)) output$Sdreport <- Sdreport
+        output$Sdreport <- Sdreport
 
 
 
@@ -342,21 +335,15 @@ for(iter in 1:length(itervec)){
 #   polygon( y=FUN(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),], log=TRUE), x=c(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE), rev(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
 
       ## can calculate derived quants later if you want
-      if(is.null(modpath)==FALSE) saveRDS(obj_save, file.path(iterpath, "TMB_obj.rds"))
-      if(is.null(modpath)==FALSE) saveRDS(opt_save, file.path(iterpath, "TMB_opt.rds"))
-      if(is.null(modpath)) output$obj <- obj_save
-      if(is.null(modpath)) output$opt <- opt_save
+      output$obj <- obj_save
+      output$opt <- opt_save
 
       if(derive_quants==TRUE){
           Derived = calc_derived_quants( Obj=obj_save, lh=lh )
-          if(is.null(modpath)==FALSE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
-          if(is.null(modpath)) output$Derived <- Derived
+          output$Derived <- Derived
       }
 
-        if(is.null(modpath)==FALSE) saveRDS(df, file.path(iterpath, "check_convergence.rds"))
-
-        if(iter==1 & is.null(modpath)==FALSE) write.csv(df, file.path(modpath, "df.csv"))  
-        if(iter==1 & is.null(modpath)) output$df <- df
+        output$df <- df
 
         rm(Report)
         rm(Sdreport)
@@ -368,8 +355,7 @@ for(iter in 1:length(itervec)){
         rm(obj_save)
   }
 
-
-if(is.null(modpath)==FALSE) return(paste0(max(itervec), " iterates run in ", modpath))
-if(is.null(modpath)) return(output)
+  if(is.null(modpath)==FALSE) saveRDS(output, file.path(iterpath, "LIME_output.rds"))
+  return(output)
 
 }
