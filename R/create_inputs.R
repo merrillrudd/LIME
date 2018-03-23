@@ -41,12 +41,12 @@ create_inputs <- function(lh, input_data){
             lows <- highs - bw
             time <- dat_input$years
             if(max_bin > max(bins_dim)){
-                LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))            
+                LF <- array(0, dim=c(length(time), length(highs), dat_input$nfleets))            
                 rownames(LF) <- time
                 colnames(LF) <- highs
                 for(f in 1:dat_input$nfleets){
                     LFsub <- length_raw[,,f]
-                    LF[which(rownames(LFsub) %in% rownames(LF)),,f] <- LFsub
+                    LF[which(rownames(LFsub) %in% rownames(LF)),which(colnames(LFsub) %in% colnames(LF)),f] <- LFsub
                 }
             }
             if(max_bin <= max(bins_dim)) LF <- length_raw
@@ -60,6 +60,8 @@ create_inputs <- function(lh, input_data){
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
             time <- dat_input$years
+            check_dim <- dim(dat_input$LF)
+            if(check_dim[2]!=length(highs)) stop("Is your matrix cast as a data frame? Data frame input must be in long form, with column names 'Fleet', 'Time', and 'Value'")
             LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
             for(f in 1:dat_input$nfleets){
                 lfind <- length_raw %>% filter(Fleet==f)
