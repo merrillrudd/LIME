@@ -82,6 +82,7 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									M50=ML50, maturity_input="length",
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
+									AgeMax=AgeMax,
 									binwidth=binwidth,
 									Fequil=1.1,
 									theta=10))
@@ -145,6 +146,7 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									M50=ML50, maturity_input="length",
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF, SigmaR=SigmaR,
+									AgeMax=AgeMax,
 									binwidth=binwidth,
 									theta=10))		
 
@@ -191,12 +193,36 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 										M50=ML50, maturity_input="length",
 										S50=SL50, S95=SL95, selex_input="length",
 										SigmaF=SigmaF, SigmaR=SigmaR,
+										AgeMax=AgeMax,
 										binwidth=binwidth,
 										theta=10))			
+
+			plot_LCfits(LFlist=input_data$LF)
 
 			## input files and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3)		
+
+					  Fpen=1
+                      SigRpen=1
+                      SigRprior=c(0.737,0.3)
+                      LFdist=1
+                      C_type=0
+                      est_more=FALSE
+                      fix_more=FALSE
+                      f_startval_ft=NULL
+                      rdev_startval_t=NULL
+                      est_selex_f=TRUE
+                      vals_selex_ft=-1
+                      randomR=TRUE
+                      F_up=10
+                      S50_up=NULL
+                      derive_quants=FALSE
+                      itervec=NULL
+                      simulation=FALSE
+                      mirror=NULL
+                      est_totalF=FALSE
+                      prop_f=1
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
