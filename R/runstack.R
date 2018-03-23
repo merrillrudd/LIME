@@ -82,7 +82,6 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									M50=ML50, maturity_input="length",
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
-									AgeMax=AgeMax,
 									binwidth=binwidth,
 									Fequil=1.1,
 									theta=10))
@@ -146,7 +145,6 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									M50=ML50, maturity_input="length",
 									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF, SigmaR=SigmaR,
-									AgeMax=AgeMax,
 									binwidth=binwidth,
 									theta=10))		
 
@@ -193,7 +191,6 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 										M50=ML50, maturity_input="length",
 										S50=SL50, S95=SL95, selex_input="length",
 										SigmaF=SigmaF, SigmaR=SigmaR,
-										AgeMax=AgeMax,
 										binwidth=binwidth,
 										theta=10))			
 
