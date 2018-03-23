@@ -230,35 +230,35 @@ for(iter in 1:length(itervec)){
         }      
 
 
-        # ## loop to try to get opt to run
-        #   for(i in 1:5){
-        #     if(all(is.na(opt)) | is.na(jnll) | all(is.na(opt_save[["final_gradient"]]))){
-        #       obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
-        #                     random=TmbList[["Random"]], map=TmbList[["Map"]], 
-        #                     inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-        #         opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-        #         jnll <- obj$report()$jnll
-        #     }
-        #     if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
-        #       opt[["final_gradient"]] = obj$gr( opt$par )       
-        #       opt_save <- opt
-        #       obj_save <- obj
-        #       jnll_save <- jnll
-        #       ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
-        #                   "log_q_f"=log(obj_save$report()$q_f), 
-        #                   "beta"=obj_save$report()$beta,
-        #                   "log_sigma_R"=log(obj_save$report()$sigma_R),
-        #                   "log_S50_f"=log(obj_save$report()$S50),
-        #                   "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
-        #                   "log_sigma_F"=log(obj_save$report()$sigma_F),
-        #                   "log_sigma_C"=log(obj_save$report()$sigma_C),
-        #                   "log_sigma_I"=log(obj_save$report()$sigma_I),
-        #                   "log_CV_L"=log(obj_save$report()$CV_L),
-        #                   "log_theta"=log(obj_save$report()$theta),
-        #                   "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
-        #       break
-        #     }
-        #   }
+        ## loop to try to get opt to run
+          for(i in 1:5){
+            if(all(is.na(opt)) | is.na(jnll) | all(is.na(opt_save[["final_gradient"]]))){
+              obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
+                            random=TmbList[["Random"]], map=TmbList[["Map"]], 
+                            inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                jnll <- obj$report()$jnll
+            }
+            if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
+              opt[["final_gradient"]] = obj$gr( opt$par )       
+              opt_save <- opt
+              obj_save <- obj
+              jnll_save <- jnll
+              ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
+              break
+            }
+          }
           
 
         # ## if opt ran: 
