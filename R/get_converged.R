@@ -28,6 +28,8 @@ get_converged <- function(results, max_gradient=0.001){
 
 					## check and rerun in case of nonconvergence, try maximum 3 times
 					try <- 0
+					fix_more <- FALSE
+					est_selex_f <- TRUE
 					while(try < 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
@@ -36,7 +38,9 @@ get_converged <- function(results, max_gradient=0.001){
 						print(try)
 						if(out$Report$theta > 50){
 							input$theta <- 50
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more="log_theta")
+							if(all(fix_more == FALSE)) fix_more <- "log_theta"
+							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 							
 							## check_convergence
 							isNA <- all(is.null(out$df))
@@ -49,9 +53,11 @@ get_converged <- function(results, max_gradient=0.001){
 						if(pdHess==FALSE){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
+							if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
+							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
 							if("log_sigma_R" %in% find_param_est){
 								input$SigmaR <- min(2, out$Report$sigma_R)
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more="log_sigma_R")
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 								
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -66,9 +72,12 @@ get_converged <- function(results, max_gradient=0.001){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_S50_f" %in% find_param_est){
-								input$SL50 <- out$Report$S50
-								input$SL95 <- out$Report$S95 * 1.3
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3)
+								if(try == 1){
+									input$SL50 <- out$Report$S50
+									input$SL95 <- out$Report$S95 * 1.3									
+								}
+								if(try > 1) est_selex_f <- FALSE
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -83,7 +92,14 @@ get_converged <- function(results, max_gradient=0.001){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+								if(try == 1) input$SigmaF <- 0.1
+								if(try > 1){
+									input$SL50 <- out$Report$S50
+									input$SL95 <- out$Report$S95
+									est_selex_f <- FALSE
+								}
+								input$SigmaF <- 0.1
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -96,8 +112,9 @@ get_converged <- function(results, max_gradient=0.001){
 
 						if(gradient==FALSE){
 							## fix parameter with high final gradient
-							find_param <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=find_param)
+							if(all(fix_more == FALSE)) fix_more <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
+							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
