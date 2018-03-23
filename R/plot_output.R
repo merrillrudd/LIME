@@ -18,7 +18,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("Fish" = c(0,1), "SPR" = c(0,1))){
+plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("SPR" = c(0,1))){
 
     nf <- Inputs$Data$n_f
     # nf <- 1
