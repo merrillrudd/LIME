@@ -232,7 +232,7 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 				}	
 
 				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out)
+					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0("node_", x))
 				}
 
 				## flag non-convergence or NAs

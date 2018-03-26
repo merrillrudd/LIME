@@ -5,13 +5,15 @@
 #' @author M.B. Rudd
 #' @param results list of LIME results from `run_LIME`
 #' @param  max_gradient maximum gradient, default=0.001
+#' @param saveFlagsDir directory to save flags for what was changed to get model converged
+#' @param saveFlagsName name of model or node to save flags for what was changed or get model converged
 
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-get_converged <- function(results, max_gradient=0.001){
+get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveFlagsName=FALSE){
 
 		## differentiate results input from results output
 		out <- results
@@ -133,7 +135,9 @@ get_converged <- function(results, max_gradient=0.001){
 									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
-								}	
+								}
+								## switch it back in case models need to be run again
+								input$SigmaF <- 0.2	
 							}							
 						}
 
@@ -154,6 +158,13 @@ get_converged <- function(results, max_gradient=0.001){
 								}	
 						}
 					}
+
+		## save flags if model converged
+		if(isNA==FALSE & (gradient == TRUE & pdHess == TRUE)){
+			if(all(fix_more!=FALSE)) saveRDS(fix_more, file.path(saveFlagsDir, paste0(saveFlagsName, "_fix_more.rds")))
+			if(est_selex_f==FALSE) saveRDS(out$Report$S_fl, file.path(saveFlagsDir, paste0(saveFlagsName, "_fixed_selectivity.rds")))
+			if(out_save$Inputs$Parameters$log_sigma_F != results$Inputs$Parameters$log_sigma_F) saveRDS(out$Report$sigma_F, file.path(saveFlagsDir, paste0(saveFlagsName, "_adjustSigmaF.rds")))
+		}
 
 	return(out)
 }
