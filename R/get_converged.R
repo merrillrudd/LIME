@@ -15,6 +15,7 @@ get_converged <- function(results, max_gradient=0.001){
 
 		## differentiate results input from results output
 		out <- results
+		out_save <- results
 		if(all(is.null(out$df))) stop("Model from results list is NA, check model inputs and structure.")
 
 		## model inputs for re-running that won't change between runs
@@ -40,11 +41,12 @@ get_converged <- function(results, max_gradient=0.001){
 							input$theta <- 50
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
 							if(all(fix_more == FALSE)) fix_more <- "log_theta"
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
-							
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)							
 							## check_convergence
 							isNA <- all(is.null(out$df))
+							if(isNA) out <- out_save
 							if(isNA==FALSE){
+								out_save <- out
 								gradient <- out$opt$max_gradient <= max_gradient
 								pdHess <- out$Sdreport$pdHess
 							}						
@@ -62,7 +64,9 @@ get_converged <- function(results, max_gradient=0.001){
 								
 								## check_convergence
 								isNA <- all(is.null(out$df))
+								if(isNA) out <- out_save
 								if(isNA==FALSE){
+									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
@@ -82,7 +86,9 @@ get_converged <- function(results, max_gradient=0.001){
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
+								if(isNA) out <- out_save
 								if(isNA==FALSE){
+									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
@@ -102,7 +108,9 @@ get_converged <- function(results, max_gradient=0.001){
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
+								if(isNA) out <- out_save
 								if(isNA==FALSE){
+									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
@@ -120,7 +128,9 @@ get_converged <- function(results, max_gradient=0.001){
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
+								if(isNA) out <- out_save
 								if(isNA==FALSE){
+									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
@@ -136,7 +146,9 @@ get_converged <- function(results, max_gradient=0.001){
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
+								if(isNA) out <- out_save
 								if(isNA==FALSE){
+									out_save <- out
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
