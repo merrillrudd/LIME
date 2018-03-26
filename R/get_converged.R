@@ -33,7 +33,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 					try <- 0
 					fix_more <- FALSE
 					est_selex_f <- TRUE
-					while(try < 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					while(try < 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
@@ -161,9 +161,17 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 
 		## save flags if model converged
 		if(isNA==FALSE & (gradient == TRUE & pdHess == TRUE)){
+		  if(saveFlagsDir!=FALSE){
 			if(all(fix_more!=FALSE)) saveRDS(fix_more, file.path(saveFlagsDir, paste0(saveFlagsName, "_fix_more.rds")))
 			if(est_selex_f==FALSE) saveRDS(out$Report$S_fl, file.path(saveFlagsDir, paste0(saveFlagsName, "_fixed_selectivity.rds")))
-			if(out_save$Inputs$Parameters$log_sigma_F != results$Inputs$Parameters$log_sigma_F) saveRDS(out$Report$sigma_F, file.path(saveFlagsDir, paste0(saveFlagsName, "_adjustSigmaF.rds")))
+			if(out$Inputs$Parameters$log_sigma_F != results$Inputs$Parameters$log_sigma_F) saveRDS(out$Report$sigma_F, file.path(saveFlagsDir, paste0(saveFlagsName, "_adjustSigmaF.rds")))
+		  }
+		  if(saveFlagsDir==FALSE){
+		 	out$flags <- NULL
+			if(all(fix_more!=FALSE)) out$flags <- c(out$flags, "fix_more")
+			if(est_selex_f==FALSE) out$flags <- c(out$flags, "fixed_selectivity")
+			if(out$Inputs$Parameters$log_sigma_F != results$Inputs$Parameters$log_sigma_F) out$flags <- c(out$flags, "adjustSigmaF")
+		  }
 		}
 
 	return(out)
