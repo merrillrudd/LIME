@@ -124,7 +124,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
 
-								input$SigmaF <- 0.1
+								if(try==1) input$SigmaF <- 0.1
+								if(try>1) input$SigmaF <- 0.05
 
 								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 							
@@ -146,7 +147,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							if(all(fix_more == FALSE)) fix_more <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
 							fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
