@@ -4,12 +4,17 @@
 \alias{get_converged}
 \title{Check convergence and re-run for common issues}
 \usage{
-get_converged(results, max_gradient = 0.001)
+get_converged(results, max_gradient = 0.001, saveFlagsDir = FALSE,
+  saveFlagsName = FALSE)
 }
 \arguments{
 \item{results}{list of LIME results from `run_LIME`}
 
 \item{max_gradient}{maximum gradient, default=0.001}
+
+\item{saveFlagsDir}{directory to save flags for what was changed to get model converged}
+
+\item{saveFlagsName}{name of model or node to save flags for what was changed or get model converged}
 }
 \value{
 prints how many iterations were run in model directory
