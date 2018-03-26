@@ -92,7 +92,6 @@ get_converged <- function(results, max_gradient=0.001){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
-								input$SigmaF <- 0.1
 
 								if(try > 1){
 									input$SL50 <- out$Report$S50
@@ -108,7 +107,6 @@ get_converged <- function(results, max_gradient=0.001){
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
-								input$SigmaF <- 0.2
 							}							
 						}
 
