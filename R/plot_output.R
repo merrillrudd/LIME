@@ -104,8 +104,8 @@ if("Fish" %in% plot){
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_t"),]
-      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="F_ft")]
+      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),]
+      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_ft")]
       if(is.vector(sd_fleet)) sd_fleet <- as.matrix(sd_fleet)
       # sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
@@ -121,11 +121,11 @@ if("Fish" %in% plot){
       }
 
     for(f in 1:nf){
-      lines(x=xY, y=sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf),1], lwd=2, col=cols[f])
-      points(x=xLC[[f]], y=sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf)[xLC[[f]]],1], col=cols[f], pch=19, cex=2, xpd=NA)
+      lines(x=xY, y=exp(sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf),1]), lwd=2, col=cols[f])
+      points(x=xLC[[f]], y=exp(sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf)[xLC[[f]]],1]), col=cols[f], pch=19, cex=2, xpd=NA)
     }
     lines(x=xY, y=sd_total[,1], lwd=2, col=col_total)
-    points(x=unique(unlist(xLC)), y=sd_total[unique(unlist(xLC)),1], lwd=2, col=col_total, pch=19, cex=2, xpd=NA)
+    points(x=unique(unlist(xLC)), y=exp(sd_total[unique(unlist(xLC)),1]), lwd=2, col=col_total, pch=19, cex=2, xpd=NA)
   }
 
   if(all(is.null(Inputs))==FALSE){  

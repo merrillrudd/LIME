@@ -630,6 +630,7 @@ Type objective_function<Type>::operator() ()
     vector<Type> lTB_t(n_t);
     vector<Type> lR_t(n_t);
     vector<Type> lF_t(n_t);
+    matrix<Type> lF_ft(n_fl,n_t);
     matrix<Type> lC_ft(n_fl,n_t);
     matrix<Type> lI_ft(n_fl,n_t);
     vector<Type> lD_t(n_t);
@@ -647,6 +648,7 @@ Type objective_function<Type>::operator() ()
         if(C_type==1) lC_ft(f,t) = log(Cn_ft(f,t));
         if(C_type==2) lC_ft(f,t) = log(Cw_ft(f,t));
         lI_ft(f,t) = log(I_ft_hat(f,t));
+        lF_ft(f,t) = log(F_ft(f,t));
       }
     }
 
@@ -666,6 +668,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( ML_ft_hat );
   ADREPORT( lSB_t );
   ADREPORT( lF_t );
+  ADREPORT( lF_ft );
   // ADREPORT( lF_y );
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
