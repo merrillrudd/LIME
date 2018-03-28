@@ -105,7 +105,7 @@ if("Fish" %in% plot){
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
       sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),]
-      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_ft")]
+      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="log_F_ft"),]
       if(is.vector(sd_fleet)) sd_fleet <- as.matrix(sd_fleet)
       # sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
@@ -117,14 +117,18 @@ if("Fish" %in% plot){
 
       # index <- seq(f, nrow(sd), by=nf)
       if(all(is.na(Sdreport))==FALSE){
-        polygon( y=read_sdreport(sd_total, log=FALSE), x=c(which(is.na(sd_total[,2])==FALSE), rev(which(is.na(sd_total[,2])==FALSE))), col=paste0(col_total,"40"), border=NA)  
+        polygon( y=read_sdreport(sd_total, log=TRUE), x=c(which(is.na(sd_total[,2])==FALSE), rev(which(is.na(sd_total[,2])==FALSE))), col=paste0(col_total,"40"), border=NA)  
       }
 
     for(f in 1:nf){
-      lines(x=xY, y=exp(sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf),1]), lwd=2, col=cols[f])
-      points(x=xLC[[f]], y=exp(sd_fleet[seq(from=f, to=nrow(sd_fleet), by=nf)[xLC[[f]]],1]), col=cols[f], pch=19, cex=2, xpd=NA)
+      if(is.null(nrow(sd_fleet))==FALSE){
+        if(nrow(sd_fleet)==length(xY)) index <- xY
+        if(nrow(sd_fleet) > length(xY)) index <- seq(from=f, to=nrow(sd_fleet), by=nf)
+        lines(x=xY, y=exp(sd_fleet[index,1]), lwd=2, col=cols[f])
+        points(x=xLC[[f]], y=exp(sd_fleet[index[xLC[[f]]],1]), col=cols[f], pch=19, cex=2, xpd=NA)
+      }
     }
-    lines(x=xY, y=sd_total[,1], lwd=2, col=col_total)
+    lines(x=xY, y=exp(sd_total[,1]), lwd=2, col=col_total)
     points(x=unique(unlist(xLC)), y=exp(sd_total[unique(unlist(xLC)),1]), lwd=2, col=col_total, pch=19, cex=2, xpd=NA)
   }
 
@@ -264,11 +268,11 @@ if("SB" %in% plot){
 if("Selex" %in% plot){
 
 
-    xlabs <- pretty(seq_along(lh$highs))
+    xlabs <- pretty(seq_along(Inputs$Data$lbhighs))
     plot_labs <- rep(NA, length(xlabs))
     if(xlabs[1]!=0) warning("Should start length bin labels at 0")
     plot_labs[1] <- 0
-    elabs <- as.numeric(lh$highs[xlabs][which(is.na(lh$highs[xlabs])==FALSE)])
+    elabs <- as.numeric(Inputs$Data$lbhighs[xlabs][which(is.na(Inputs$Data$lbhighs[xlabs])==FALSE)])
     plot_labs[2:(length(elabs)+1)] <- elabs
     if(is.na(plot_labs[length(plot_labs)])) plot_labs[length(plot_labs)] <- max(elabs) + elabs[1]
 
@@ -281,7 +285,7 @@ if("Selex" %in% plot){
     }
   }
 
-  mids <- lh$mids
+  mids <- Inputs$Data$lbmids
   if(all(is.null(Report))==FALSE){
     if(nf>1){
       colfn <- colorRampPalette(c("red","blue"))
