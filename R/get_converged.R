@@ -24,6 +24,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		input <- out$input
 		data_avail <- out$data_avail
 		C_type <- out$Inputs$Data$C_type
+		LFdist <- out$Inputs$Data$LFdist
+		est_totalF <- ifelse(out$Inputs$Data$est_totalF==0,FALSE,TRUE)
 
 		## identify convergence problems
 		gradient <- out$opt$max_gradient <= max_gradient
@@ -43,7 +45,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							input$theta <- 50
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
 							if(all(fix_more == FALSE)) fix_more <- "log_theta"
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)							
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)							
 							
 							## check_convergence
 							isNA <- all(is.null(out$df))
@@ -51,7 +53,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							## one more check if fixing theta high resulted in NA
 							if(isNA){
 								input$theta <- 1
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)	
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)	
 							}
 
 							## check_convergence
@@ -77,7 +79,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 								if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
 								if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
 
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 								
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -107,7 +109,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 									input$SigmaF <- 0.05
 								}
 
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(quantile(out$Report$F_ft,0.75), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(quantile(out$Report$F_ft,0.75), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -131,7 +133,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 									input$SL95 <- out$Report$S95 * 1.3									
 								}
 								if(try > 1) est_selex_f <- FALSE
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -150,7 +152,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
 							if(all(fix_more == FALSE)) fix_more <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
 							if(grepl("F_ft", fix_more)) fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 
 								## check_convergence
 								isNA <- all(is.null(out$df))

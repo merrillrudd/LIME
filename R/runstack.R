@@ -18,13 +18,15 @@
 #' @param iter iteration of generated data
 #' @param seed set seed
 #' @param Fscenario fishing mortality scenario to generate data
+#' @param C_type default = 0 (no catch data), 1=catch in numbers, 2= catch in biomass
+#' @param LFdist default = 1 dirichlet-multinomial, 0=multinomial
 
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="LC", max_gradient=0.001, rewrite=TRUE, input_data=NULL, simulation=FALSE, iter=NULL, seed=NULL, Fscenario=NULL){
+runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="LC", max_gradient=0.001, rewrite=TRUE, input_data=NULL, simulation=FALSE, iter=NULL, seed=NULL, Fscenario=NULL, C_type=0, LFdist=1){
 
 	## check inputs and find directories
 	if(simulation == TRUE){
@@ -85,7 +87,8 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									AgeMax=AgeMax,
 									binwidth=binwidth,
 									Fequil=1.1,
-									theta=10))
+									theta=10,
+									nfleets=nfleets))
 
 
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
@@ -106,7 +109,7 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 
 				## input file and run model
 				input <- create_inputs(lh=plist, input_data=input_data)
-				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3)
+				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
@@ -148,11 +151,12 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 									SigmaF=SigmaF, SigmaR=SigmaR,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
-									theta=10))		
+									theta=10,
+									nfleets=nfleets))		
 
 			## input file and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3)	
+			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)	
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
@@ -195,13 +199,14 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 										SigmaF=SigmaF, SigmaR=SigmaR,
 										AgeMax=AgeMax,
 										binwidth=binwidth,
-										theta=10))			
+										theta=10,
+										nfleets=nfleets))			
 
 			# plot_LCfits(LFlist=list("LF"=input_data$LF[,,1]))
 
 			## input files and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3)		
+			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
 
 					  # Fpen=1
        #                SigRpen=1
