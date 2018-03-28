@@ -59,8 +59,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_sigma_R" %in% find_param_est){
 								input$SigmaR <- min(2, out$Report$sigma_R)
-								if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
-								if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
+							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
+							if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
 
 								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 								
@@ -132,9 +132,9 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 
 						if(gradient==FALSE){
 							## fix parameter with high final gradient
-							if(all(fix_more == FALSE)) fix_more <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
-							fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
+							if(all(fix_more == FALSE)) fix_more <- as.character(out$df[,2][which(abs(out$df[,1])>=0.001)])
+							if(grepl("F_ft", fix_more)) fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
 							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 
 								## check_convergence
