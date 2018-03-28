@@ -40,10 +40,20 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 						try <- try + 1
 						print(try)
 						if(out$Report$theta > 50){
-							input$theta <- 10
+							input$theta <- 50
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
 							if(all(fix_more == FALSE)) fix_more <- "log_theta"
 							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)							
+							
+							## check_convergence
+							isNA <- all(is.null(out$df))
+							
+							## one more check if fixing theta high resulted in NA
+							if(isNA){
+								input$theta <- 1
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)	
+							}
+
 							## check_convergence
 							isNA <- all(is.null(out$df))
 							if(isNA) out <- out_save
@@ -51,7 +61,12 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 								out_save <- out
 								gradient <- out$opt$max_gradient <= max_gradient
 								pdHess <- out$Sdreport$pdHess
-							}						
+							}	
+							if(isNA==FALSE){
+								out_save <- out
+								gradient <- out$opt$max_gradient <= max_gradient
+								pdHess <- out$Sdreport$pdHess
+							}
 						}
 
 						if(pdHess==FALSE){
