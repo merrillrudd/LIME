@@ -33,7 +33,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 					try <- 0
 					fix_more <- FALSE
 					est_selex_f <- TRUE
-					while(try < 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					while(try <= 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
@@ -102,11 +102,19 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
 
+								if(try==1){
 									input$SL50 <- out$Report$S50
 									input$SL95 <- out$Report$S95
 									est_selex_f <- FALSE
+								}
+								if(try==2){
+									input$SigmaF <- 0.1
+								}
+								if(try==3){
+									input$SigmaF <- 0.05
+								}
 
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(quantile(out$Report$F_ft,0.75), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
@@ -116,29 +124,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 									gradient <- out$opt$max_gradient <= max_gradient
 									pdHess <- out$Sdreport$pdHess
 								}	
-							}							
-						}
-
-						if(pdHess==FALSE){
-							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
-							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
-							if("log_F_ft" %in% find_param_est){
-
-								if(try==1) input$SigmaF <- 0.1
-								if(try>1) input$SigmaF <- 0.05
-
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
-							
-								## check_convergence
-								isNA <- all(is.null(out$df))
-								if(isNA) out <- out_save
-								if(isNA==FALSE){
-									out_save <- out
-									gradient <- out$opt$max_gradient <= max_gradient
-									pdHess <- out$Sdreport$pdHess
-								}
-								## switch it back in case models need to be run again
-								input$SigmaF <- 0.2	
+								input$SigmaF <- 0.2
 							}							
 						}
 
