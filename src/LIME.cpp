@@ -671,9 +671,9 @@ Type objective_function<Type>::operator() ()
   ADREPORT( SPR_t );
   ADREPORT( S50_f );
   ADREPORT( S_fl );
-  ADREPORT( F_ft );
+  // ADREPORT( F_ft );
   // ADREPORT( F_fy );
-  ADREPORT( F_t );
+  // ADREPORT( F_t );
   // ADREPORT( F_y );
 
   // Parameters
