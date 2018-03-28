@@ -40,7 +40,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 						try <- try + 1
 						print(try)
 						if(out$Report$theta > 50){
-							input$theta <- 50
+							input$theta <- 10
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
 							if(all(fix_more == FALSE)) fix_more <- "log_theta"
 							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)							
@@ -59,8 +59,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_sigma_R" %in% find_param_est){
 								input$SigmaR <- min(2, out$Report$sigma_R)
-							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
-							if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
+								if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
+								if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
 
 								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_selex_f=est_selex_f)
 								
