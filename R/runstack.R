@@ -189,7 +189,7 @@ runstack <- function(savedir,
 				}
 
 				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="FishLifeMeans")
+					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_FishLifeMeans"))
 				}
 
 				## flag non-convergence or NAs
@@ -248,7 +248,7 @@ runstack <- function(savedir,
 				}	
 
 				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0("node_", x))
+					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_node_", x))
 				}
 
 				## flag non-convergence or NAs
