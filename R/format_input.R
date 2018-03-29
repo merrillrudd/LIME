@@ -12,6 +12,7 @@
 #' @param C_type  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param est_more list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param fix_more default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
+#' @param est_F_ft default=TRUE, otherwise 0 for off and 1 for on
 #' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
@@ -31,6 +32,7 @@ format_input <- function(input,
                         C_type,
                         est_more, 
                         fix_more,
+                        est_F_ft,
                         f_startval_ft, 
                         rdev_startval_t,
                         est_selex_f,
@@ -55,6 +57,22 @@ format_input <- function(input,
 
             mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
             mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
+
+        if(all(est_F_ft == TRUE)){
+            indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
+        }
+        if(all(est_F_ft == TRUE)==FALSE){
+            indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
+            for(i in 1:nfleets){
+                sub <- est_F_ft[i,]
+                off <- which(sub == 0)
+                new <- sapply(1:length(off), function(x){
+                    good <- which(sub == 1)
+                    return(good[which(good > off[x])][1])
+                })
+                indexF_ft[i,off] <- indexF_ft[i,new]
+            }
+        }
 
 
         ## data-rich model
@@ -106,6 +124,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
+                         "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }
@@ -158,6 +177,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
+                         "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }
@@ -211,6 +231,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
+                         "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)      
         }
@@ -263,6 +284,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
+                         "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }       
@@ -375,6 +397,14 @@ format_input <- function(input,
             if("log_theta" %in% mirror){
                 Map[["log_theta"]] <- c(Parameters$log_theta[1], rep(NA, (length(Parameters$log_theta)-1)))
                 Map[["log_theta"]] <- factor(Map[["log_theta"]])
+            }
+
+            if(any(est_F_ft == 0)){
+                Map[["log_F_ft"]] <- Parameters$log_F_ft
+                for(i in 1:nfleets){
+                    Map[["log_F_ft"]][i,which(est_F_ft==0)] <- NA
+                }
+                Map[["log_F_ft"]] <- factor(Map[["log_F_ft"]])
             }
 
         if(length(Map)==0) Map <- NULL

@@ -13,6 +13,7 @@
 #' @param C_type  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
 #' @param est_more list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
 #' @param fix_more default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
+#' @param est_F_ft default=TRUE, otherwise 0 for off and 1 for on in matrix that matches fleets in rows and years in columns
 #' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
@@ -48,6 +49,7 @@ run_LIME <- function(modpath,
                       C_type=0,
                       est_more=FALSE,
                       fix_more=FALSE,
+                      est_F_ft=TRUE,
                       f_startval_ft=NULL,
                       rdev_startval_t=NULL,
                       est_selex_f=TRUE,
@@ -131,6 +133,7 @@ for(iter in 1:length(itervec)){
                               C_type=C_type, 
                               est_more=est_more, 
                               fix_more=fix_more, 
+                              est_F_ft=est_F_ft,
                               f_startval_ft=f_startval_ft, 
                               rdev_startval_t=rdev_startval_t, 
                               est_selex_f=est_selex_f, 
