@@ -208,27 +208,6 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
 
-					  # Fpen=1
-       #                SigRpen=1
-       #                SigRprior=c(0.737,0.3)
-       #                LFdist=1
-       #                C_type=0
-       #                est_more=FALSE
-       #                fix_more=FALSE
-       #                f_startval_ft=NULL
-       #                rdev_startval_t=NULL
-       #                est_selex_f=TRUE
-       #                vals_selex_ft=-1
-       #                randomR=TRUE
-       #                F_up=10
-       #                S50_up=NULL
-       #                derive_quants=FALSE
-       #                itervec=NULL
-       #                simulation=FALSE
-       #                mirror=NULL
-       #                est_totalF=FALSE
-       #                prop_f=1
-
 				## check_convergence
 				isNA <- all(is.null(out$df))
 				if(isNA==FALSE){
