@@ -68,7 +68,12 @@ format_input <- function(input,
                 off <- which(sub == 0)
                 new <- sapply(1:length(off), function(x){
                     good <- which(sub == 1)
-                    return(good[which(good > off[x])][1])
+                    if(off[x]>max(good)){
+                        return(max(good))
+                    }
+                    if(off[x]<max(good)){
+                        return(good[which(good > off[x])][1])
+                    }
                 })
                 indexF_ft[i,off] <- indexF_ft[i,new]
             }
