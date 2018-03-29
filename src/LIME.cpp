@@ -73,7 +73,7 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(mirror_q);
 
     // estimate total F instead of by fleet
-    DATA_MATRIX(indexF_ft); // which fishing mortality rate to use? indexed outside of TMB
+    DATA_IMATRIX(indexF_ft); // which fishing mortality rate to use? indexed outside of TMB
     DATA_INTEGER(est_totalF);
     DATA_VECTOR(prop_f);
 
