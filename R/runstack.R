@@ -7,26 +7,43 @@
 #' @param lh life history list, with elements contained as output from LIME::create_lh_list
 #' @param nodes matrix of nodes where each column is a different parameter and each row is a value from a distribution
 #' @param param parameters (column names for nodes)
-#' @param mean mean of each parameter value 
+#' @param mean means of each parameter value,
 #' @param cov covariance matrix across parameters
 #' @param modname model name to save in directory
 #' @param data_avail data available to model, default = "LC", can adjust to "Catch_LC", "Index_LC", or "Index_Catch_LC"
 #' @param max_gradient maximum final gradient criterion, default = 0.001
+#' @param C_type default = 0 (no catch data), 1=catch in numbers, 2= catch in biomass
+#' @param LFdist default = 1 dirichlet-multinomial, 0=multinomial
 #' @param rewrite rewrite results?
 #' @param input_data for LIME use with real data (not simulated)
 #' @param simulation is this a simulation? Default = FALSE
 #' @param iter iteration of generated data
 #' @param seed set seed
 #' @param Fscenario fishing mortality scenario to generate data
-#' @param C_type default = 0 (no catch data), 1=catch in numbers, 2= catch in biomass
-#' @param LFdist default = 1 dirichlet-multinomial, 0=multinomial
+
 
 #' @useDynLib LIME
 
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="LC", max_gradient=0.001, rewrite=TRUE, input_data=NULL, simulation=FALSE, iter=NULL, seed=NULL, Fscenario=NULL, C_type=0, LFdist=1){
+runstack <- function(savedir, 
+					lh, 
+					nodes, 
+					param, 
+					mean, 
+					cov, 
+					modname, 
+					data_avail="LC", 
+					max_gradient=0.001, 
+					C_type=0, 
+					LFdist=1,
+					rewrite=TRUE, 
+					input_data=NULL, 
+					simulation=FALSE, 
+					iter=NULL, 
+					seed=NULL, 
+					Fscenario=NULL){
 
 	## check inputs and find directories
 	if(simulation == TRUE){
@@ -35,16 +52,13 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 		if(is.null(Fscenario)) stop("Must specify Fscenario == harvestdyn or equil when simulation==TRUE")
 		if(all(is.null(input_data))==FALSE) warning("Ignoring input_data for simulation")
 
-		modpath <- file.path(savedir, modname)
-		dir.create(modpath, showWarnings=FALSE)
-
-		iterpath <- file.path(modpath, iter)
+		iterpath <- file.path(savedir, iter)
 		dir.create(iterpath, showWarnings=FALSE)
 	}
 	if(simulation == FALSE){
 		if(all(is.null(input_data))) stop("Must specify input data list with at least years and Length frequency matrix (array or list for multi-fleet)")
 		if(is.null(iter)==FALSE | is.null(seed)==FALSE | is.null(Fscenario)==FALSE) warning("Ignoring iter, seed, and Fscenario when simulation==FALSE")
-		iterpath <- file.path(savedir, modname)
+		iterpath <- file.path(savedir)
 		dir.create(iterpath, showWarnings=FALSE)
 	}
 
@@ -123,12 +137,21 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 				}
 
 				## flag non-convergence or NAs
-				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
+				if(all(is.null(out$df))){
+					write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
+					stop("non-convergence")
+				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
-					if(gradient==FALSE) write("highgradient", file.path(iterpath,"highgradient_IterTrue.txt"))
-					if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
+					if(gradient==FALSE){
+						write("highgradient", file.path(iterpath,"highgradient_IterTrue.txt"))
+						stop("non-convergence")
+					}
+					if(pdHess==FALSE){
+						write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
+						stop("non-convergence")
+					}
 					## save results if converged
 					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
 				}
@@ -170,14 +193,23 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 				}
 
 				## flag non-convergence or NAs
-				if(all(is.null(out$df))) write("model NA", file.path(iterpath, "modelNA_FishLifeMeans.txt"))
+				if(all(is.null(out$df))){
+					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_FishLifeMeans.txt")))
+					stop("non-convergence")
+				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
-					if(gradient==FALSE) write("highgradient", file.path(iterpath,"highgradient_FishLifeMeans.txt"))
-					if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, "pdHess_FishLifeMeans.txt"))
+					if(gradient==FALSE){
+						write("highgradient", file.path(iterpath, paste0(modname, "_highgradient_FishLifeMeans.txt")))
+						stop("non-convergence")
+					}
+					if(pdHess==FALSE){
+						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_FishLifeMeans.txt")))
+						stop("non-convergence")
+					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_FishLifeMeans.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_FishLifeMeans.rds")))	
 				}
 	}	
 	
@@ -220,21 +252,29 @@ runstack <- function(savedir, lh, nodes, param, mean, cov, modname, data_avail="
 				}
 
 				## flag non-convergence or NAs
-				if(all(is.null(out$df))) write("model NA", file.path(iterpath, paste0("modelNA_node_", x, ".txt")))
+				if(all(is.null(out$df))){
+					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_node_", x, ".txt")))
+					stop("non-convergence")
+				}
 				if(all(is.null(out$df))==FALSE){
-					gradient <- out$opt$max_gradient<=0.001
+					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
-					if(gradient==FALSE) write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, ".txt")))
-					if(pdHess==FALSE) write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, ".txt")))
-					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_node_", x, ".rds")))	
+					if(gradient==FALSE){
+						write("highgradient", file.path(iterpath,paste0(modname, "_highgradient_node_", x, ".txt")))
+						stop("non-convergence")
+					}
+					if(pdHess==FALSE){
+						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_node_", x, ".txt")))
+						stop("non-convergence")
+					}
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_node_", x, ".rds")))	
 				}
 					
 				return(out)
 		})
-			saveRDS(res, file.path(iterpath, paste0("res_stacking.rds")))
+			saveRDS(res, file.path(iterpath, paste0(modname, "_res_stacking.rds")))
 			files <- list.files(path=file.path(iterpath))
-			remove <- files[grepl(paste0("res_node"), files)]
+			remove <- files[grepl(paste0(modname,"_res_node"), files)]
 			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
 	}
 	

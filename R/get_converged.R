@@ -64,11 +64,6 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 								gradient <- out$opt$max_gradient <= max_gradient
 								pdHess <- out$Sdreport$pdHess
 							}	
-							if(isNA==FALSE){
-								out_save <- out
-								gradient <- out$opt$max_gradient <= max_gradient
-								pdHess <- out$Sdreport$pdHess
-							}
 						}
 
 						if(pdHess==FALSE){
