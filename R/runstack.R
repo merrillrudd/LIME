@@ -139,18 +139,15 @@ runstack <- function(savedir,
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
 					write("model NA", file.path(iterpath, "modelNA_IterTrue.txt"))
-					stop("non-convergence")
 				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 					if(gradient==FALSE){
 						write("highgradient", file.path(iterpath,"highgradient_IterTrue.txt"))
-						stop("non-convergence")
 					}
 					if(pdHess==FALSE){
 						write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
-						stop("non-convergence")
 					}
 					## save results if converged
 					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
@@ -195,18 +192,15 @@ runstack <- function(savedir,
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
 					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_FishLifeMeans.txt")))
-					stop("non-convergence")
 				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 					if(gradient==FALSE){
 						write("highgradient", file.path(iterpath, paste0(modname, "_highgradient_FishLifeMeans.txt")))
-						stop("non-convergence")
 					}
 					if(pdHess==FALSE){
 						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_FishLifeMeans.txt")))
-						stop("non-convergence")
 					}
 					## save results if converged
 					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_FishLifeMeans.rds")))	
@@ -252,18 +246,15 @@ runstack <- function(savedir,
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
 					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_node_", x, ".txt")))
-					stop("non-convergence")
 				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 					if(gradient==FALSE){
 						write("highgradient", file.path(iterpath,paste0(modname, "_highgradient_node_", x, ".txt")))
-						stop("non-convergence")
 					}
 					if(pdHess==FALSE){
 						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_node_", x, ".txt")))
-						stop("non-convergence")
 					}
 					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_node_", x, ".rds")))	
 				}

@@ -93,24 +93,24 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
 
+								# if(try==1){
+								# 	est_F_ft <- matrix(1, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft))
+								# 	for(i in 1:out$Inputs$Data$n_fl){
+								# 		sdf <- summary(out$Sdreport)[which(rownames(summary(out$Sdreport))=="log_F_ft"),]
+								# 		ff <- seq(i,by=i,length.out=ncol(out$Report$F_ft))
+								# 		rm <- which(is.na(sdf[ff,2]))
+								# 		est_F_ft[i,rm] <- 0 
+								# 	}
+								# }
 								if(try==1){
-									est_F_ft <- matrix(1, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft))
-									for(i in 1:out$Inputs$Data$n_fl){
-										sdf <- summary(out$Sdreport)[which(rownames(summary(out$Sdreport))=="log_F_ft"),]
-										ff <- seq(i,by=i,length.out=ncol(out$Report$F_ft))
-										rm <- which(is.na(sdf[ff,2]))
-										est_F_ft[i,rm] <- 0 
-									}
-								}
-								if(try==2){
 									input$SigmaF <- 0.1
 								}
-								if(try==3){
+								if(try==2){
 									input$SL50 <- out$Report$S50
 									input$SL95 <- out$Report$S95
 									est_selex_f <- FALSE
 								}
-								if(try==4){
+								if(try==3){
 									input$SigmaF <- 0.05
 								}
 
