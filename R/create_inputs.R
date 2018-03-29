@@ -33,9 +33,12 @@ create_inputs <- function(lh, input_data){
                 length_raw <- new
             }
             bins_dim <- seq(bw, by=bw, length=dim(length_raw)[2])
-            max_bin <- max(c(max(dat_input$highs), 
+            if(is.vector(length_raw[,,1])==FALSE ){
+                max_bin <- max(c(max(dat_input$highs), 
                             max(bins_dim), 
                             sapply(1:dat_input$nfleets, function(x) as.numeric(bins_dim[max(which(colSums(length_raw[,,x])>0))]))))
+            }
+            if(is.vector(length_raw[,,1])) stop("If only one year of length data, extend total years modeled back one year (and add row to length composition)")
             highs <- seq(bw, max_bin, by=bw)
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
