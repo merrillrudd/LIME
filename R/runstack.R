@@ -234,8 +234,6 @@ runstack <- function(savedir,
 										theta=10,
 										nfleets=nfleets))			
 
-			# plot_LCfits(LFlist=list("LF"=input_data$LF[,,1]))
-
 			## input files and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		

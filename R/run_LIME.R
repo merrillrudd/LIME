@@ -170,20 +170,6 @@ for(iter in 1:length(itervec)){
       ## first run
       obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]], inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
 
-        # check_id <- Check_Identifiable(obj)
-        # fix_f <- grep("Bad", check_id[which(check_id[,"Param"]=="log_F_t_input"),3])      
-        # good_f <- c(1:Nyears)[which(1:Nyears %in% fix_f == FALSE)] 
-        # TmbList$Map[["log_F_t_input"]] = 1:length(TmbList$Parameters[["log_F_t_input"]])
-        # TmbList$Map[["log_F_t_input"]][fix_f] <- NA
-        # TmbList$Map[["log_F_t_input"]] <- factor(TmbList$Map[["log_F_t_input"]])
-        # if(length(fix_f)>0){
-        #   TmbList$Data$fix_f <- fix_f
-        #   TmbList$Data$fill_f <- good_f[length(good_f)]
-        # }
-      # if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.1.rds"))
-      # obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-
-
       ## Settings
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
