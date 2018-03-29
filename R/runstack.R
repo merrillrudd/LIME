@@ -107,7 +107,7 @@ runstack <- function(savedir,
 
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
 				## use seed + 1000 to generate data
-					data <- generate_data(modpath=iterpath, itervec=iter, 
+					data <- generate_data(modpath=savedir, itervec=iter, 
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
 									Nyears=20, Nyears_comp=20, comp_sample=200,
