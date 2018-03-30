@@ -36,7 +36,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 					fix_more <- FALSE
 					est_selex_f <- TRUE
 					est_F_ft <- TRUE
-					while(try <= 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					while(try <= 4 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
@@ -93,28 +93,28 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
 
-								# if(try==1){
-								# 	est_F_ft <- matrix(1, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft))
-								# 	for(i in 1:out$Inputs$Data$n_fl){
-								# 		sdf <- summary(out$Sdreport)[which(rownames(summary(out$Sdreport))=="log_F_ft"),]
-								# 		ff <- seq(i,by=i,length.out=ncol(out$Report$F_ft))
-								# 		rm <- which(is.na(sdf[ff,2]))
-								# 		est_F_ft[i,rm] <- 0 
-								# 	}
-								# }
 								if(try==1){
-									input$SigmaF <- 0.1
+									est_F_ft <- matrix(1, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft))
+									for(i in 1:out$Inputs$Data$n_fl){
+										sdf <- summary(out$Sdreport)[which(rownames(summary(out$Sdreport))=="log_F_ft"),]
+										ff <- seq(i,by=i,length.out=ncol(out$Report$F_ft))
+										rm <- which(is.na(sdf[ff,2]))
+										est_F_ft[i,rm] <- 0 
+									}
 								}
 								if(try==2){
+									input$SigmaF <- 0.1
+								}
+								if(try==3){
 									input$SL50 <- out$Report$S50
 									input$SL95 <- out$Report$S95
 									est_selex_f <- FALSE
 								}
-								if(try==3){
+								if(try==4){
 									input$SigmaF <- 0.05
 								}
 
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f, f_startval_ft=matrix(quantile(out$Report$F_ft,0.75), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f)
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
