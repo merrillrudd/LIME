@@ -66,6 +66,27 @@ run_LIME <- function(modpath,
                       est_totalF=FALSE,
                       prop_f=1){
 
+                      # Fpen=1
+                      # SigRpen=1
+                      # SigRprior=c(0.737,0.3)
+                      # est_more=FALSE
+                      # est_F_ft=TRUE
+                      # # f_startval_ft=NULL
+                      # rdev_startval_t=NULL
+                      # est_selex_f=TRUE
+                      # vals_selex_ft=-1
+                      # randomR=TRUE
+                      # # newtonsteps=FALSE
+                      # F_up=10
+                      # S50_up=NULL
+                      # derive_quants=FALSE
+                      # # itervec=NULL
+                      # # simulation=FALSE
+                      # # rewrite=TRUE
+                      # mirror=NULL
+                      # est_totalF=FALSE
+                      # prop_f=1
+
       # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
 
   if(simulation==FALSE) itervec <- 1 
@@ -190,9 +211,9 @@ for(iter in 1:length(itervec)){
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
-        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
-        # if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
+        # if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+        # if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
+        if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
         # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
         jnll <- obj$report()$jnll   
         if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
