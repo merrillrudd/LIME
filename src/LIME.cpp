@@ -165,9 +165,11 @@ Type objective_function<Type>::operator() ()
   int index;
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
-        index = indexF_ft(f,t)-1;
-        if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,index));
-        if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,index)) * prop_f(f);
+        // index = indexF_ft(f,t)-1;
+        // if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,index));
+        // if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,index)) * prop_f(f);
+        if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,t));
+        if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,t)) * prop_f(f);
     }
   }
 
