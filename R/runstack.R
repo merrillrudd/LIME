@@ -244,15 +244,16 @@ runstack <- function(savedir,
 				## check_convergence
 				isNA <- all(is.null(out$df))
 				if(isNA==TRUE){
-					gradient <- FALSE
-					pdHess <- FALSE
+					## before entering loop, check:
+					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
+					isNA <- all(is.null(out$df))
 				}
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
+				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_node_", x))
 				}
 

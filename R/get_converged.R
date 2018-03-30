@@ -19,6 +19,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		out <- results
 		out_save <- results
 
+		if(all(is.null(out$df))) stop("model is NA - cannot start get_converged")
+
 		## model inputs for re-running that won't change between runs
 		input <- out$input
 		data_avail <- out$data_avail
@@ -26,19 +28,8 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		LFdist <- out$Inputs$Data$LFdist
 		est_totalF <- ifelse(out$Inputs$Data$est_totalF==0,FALSE,TRUE)
 
-		## before entering loop, check:
-		out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
-
-		if(all(is.null(out$df))==FALSE){
-			## identify convergence problems
 			gradient <- out$opt$max_gradient <= max_gradient
 			pdHess <- out$Sdreport$pdHess
-		}
-		if(all(is.null(out$df))){
-			isNA <- TRUE
-			gradient <- FALSE
-			pdHess <- FALSE
-		}
 
 					## check and rerun in case of nonconvergence, try to address multiple possible issues and rerun 2 times
 					try <- 0
