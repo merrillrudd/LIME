@@ -405,10 +405,11 @@ format_input <- function(input,
             }
 
             if(any(est_F_ft == 0)){
-                Map[["log_F_ft"]] <- Parameters$log_F_ft
+                fstart <- Parameters$log_F_ft + matrix(rnorm(length(Parameters$log_F_ft), 0, 2), nrow=nrow(Parameters$log_F_ft), ncol=ncol(Parameters$log_F_ft))
                 for(i in 1:nfleets){
-                    Map[["log_F_ft"]][i,which(est_F_ft==0)] <- NA
+                    fstart[i,which(est_F_ft[i,]==0)] <- NA
                 }
+                Map[["log_F_ft"]] <- fstart
                 Map[["log_F_ft"]] <- factor(Map[["log_F_ft"]])
             }
 
