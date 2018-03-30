@@ -58,26 +58,26 @@ format_input <- function(input,
             mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
             mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
 
-        if(all(est_F_ft == TRUE)){
-            indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
-        }
-        if(all(est_F_ft == TRUE)==FALSE){
-            indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
-            for(i in 1:nfleets){
-                sub <- est_F_ft[i,]
-                off <- which(sub == 0)
-                new <- sapply(1:length(off), function(x){
-                    good <- which(sub == 1)
-                    if(off[x]>max(good)){
-                        return(max(good))
-                    }
-                    if(off[x]<max(good)){
-                        return(good[which(good > off[x])][1])
-                    }
-                })
-                indexF_ft[i,off] <- indexF_ft[i,new]
-            }
-        }
+        # if(all(est_F_ft == TRUE)){
+        #     indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
+        # }
+        # if(all(est_F_ft == TRUE)==FALSE){
+        #     indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
+        #     for(i in 1:nfleets){
+        #         sub <- est_F_ft[i,]
+        #         off <- which(sub == 0)
+        #         new <- sapply(1:length(off), function(x){
+        #             good <- which(sub == 1)
+        #             if(off[x]>max(good)){
+        #                 return(max(good))
+        #             }
+        #             if(off[x]<max(good)){
+        #                 return(good[which(good > off[x])][1])
+        #             }
+        #         })
+        #         indexF_ft[i,off] <- indexF_ft[i,new]
+        #     }
+        # }
 
 
         ## data-rich model
@@ -129,7 +129,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
-                         "indexF_ft"=indexF_ft,
+                         # "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }
@@ -182,7 +182,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
-                         "indexF_ft"=indexF_ft,
+                         # "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }
@@ -236,7 +236,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
-                         "indexF_ft"=indexF_ft,
+                         # "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)      
         }
@@ -289,7 +289,7 @@ format_input <- function(input,
                          "n_y"=Nyears2,
                          "mirror_theta"=mirror_theta_inp,
                          "mirror_q"=mirror_q_inp,
-                         "indexF_ft"=indexF_ft,
+                         # "indexF_ft"=indexF_ft,
                          "est_totalF"=ifelse(est_totalF==TRUE,1,0),
                          "prop_f"=prop_f)   
         }       

@@ -162,7 +162,7 @@ Type objective_function<Type>::operator() ()
 
   // Transform vectors
   matrix<Type> F_ft(n_fl,n_t); // number of total time steps
-  int index;
+  // int index;
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){
         // index = indexF_ft(f,t)-1;
