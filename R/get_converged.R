@@ -26,17 +26,18 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		LFdist <- out$Inputs$Data$LFdist
 		est_totalF <- ifelse(out$Inputs$Data$est_totalF==0,FALSE,TRUE)
 
-		if(all(is.null(out$df))){
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
-		}
+		## before entering loop, check:
+		out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
 
-		if(all(is.null(out$df))){
-			stop("Reran with newtonsteps=FALSE, still NA")
-		}
 		if(all(is.null(out$df))==FALSE){
 			## identify convergence problems
 			gradient <- out$opt$max_gradient <= max_gradient
 			pdHess <- out$Sdreport$pdHess
+		}
+		if(all(is.null(out$df))){
+			isNA <- TRUE
+			gradient <- FALSE
+			pdHess <- FALSE
 		}
 
 					## check and rerun in case of nonconvergence, try to address multiple possible issues and rerun 2 times
@@ -44,12 +45,13 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 					fix_more <- FALSE
 					est_selex_f <- TRUE
 					est_F_ft <- TRUE
-					while(try <= 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					while(try <= 3 & all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
 						try <- try + 1
 						print(try)
+
 						if(out$Report$theta > 50){
 							input$theta <- 50
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
