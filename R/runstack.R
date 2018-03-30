@@ -127,14 +127,19 @@ runstack <- function(savedir,
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
+				if(isNA==TRUE){
+					gradient <- FALSE
+					pdHess <- FALSE
+				}
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
-				}
+				}	
 
-				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="IterTrue")
 				}
+
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
@@ -180,12 +185,16 @@ runstack <- function(savedir,
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
+				if(isNA==TRUE){
+					gradient <- FALSE
+					pdHess <- FALSE
+				}
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
-				}
+				}	
 
-				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_FishLifeMeans"))
 				}
 
@@ -234,12 +243,16 @@ runstack <- function(savedir,
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
+				if(isNA==TRUE){
+					gradient <- FALSE
+					pdHess <- FALSE
+				}
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(isNA==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_node_", x))
 				}
 

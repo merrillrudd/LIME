@@ -18,7 +18,6 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		## differentiate results input from results output
 		out <- results
 		out_save <- results
-		if(all(is.null(out$df))) stop("Model from results list is NA, check model inputs and structure.")
 
 		## model inputs for re-running that won't change between runs
 		input <- out$input
@@ -27,9 +26,18 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 		LFdist <- out$Inputs$Data$LFdist
 		est_totalF <- ifelse(out$Inputs$Data$est_totalF==0,FALSE,TRUE)
 
-		## identify convergence problems
-		gradient <- out$opt$max_gradient <= max_gradient
-		pdHess <- out$Sdreport$pdHess
+		if(all(is.null(out$df))){
+			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
+		}
+
+		if(all(is.null(out$df))){
+			stop("Reran with newtonsteps=FALSE, still NA")
+		}
+		if(all(is.null(out$df))==FALSE){
+			## identify convergence problems
+			gradient <- out$opt$max_gradient <= max_gradient
+			pdHess <- out$Sdreport$pdHess
+		}
 
 					## check and rerun in case of nonconvergence, try to address multiple possible issues and rerun 2 times
 					try <- 0
