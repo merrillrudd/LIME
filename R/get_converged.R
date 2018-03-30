@@ -36,7 +36,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 					fix_more <- FALSE
 					est_selex_f <- TRUE
 					est_F_ft <- TRUE
-					while(try <= 4 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+					while(try <= 3 & all(is.null(out_save$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 						## first check that theta is not estimated extremely high
 						## often a problem that theta is estimated very large, and high final gradient is on selectivity
 						## more important to estimate selectivity and fix theta at a high number
@@ -110,9 +110,9 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 									input$SL95 <- out$Report$S95
 									est_selex_f <- FALSE
 								}
-								if(try==4){
-									input$SigmaF <- 0.05
-								}
+								# if(try==4){
+								# 	input$SigmaF <- 0.05
+								# }
 
 								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f)
 							
