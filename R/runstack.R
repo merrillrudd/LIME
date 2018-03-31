@@ -161,7 +161,7 @@ runstack <- function(savedir,
 	}
 
 	## run at means from FishLife for ensemble parameters
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_FishLifeMeans.rds")))==FALSE){	
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_FishLifeMeans.rds")))==FALSE){	
 
 			## life history inputs
 			vbk_inp <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
@@ -218,7 +218,7 @@ runstack <- function(savedir,
 	
 
 	## predictive stacking
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_stacking.rds")))==FALSE){
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_stacking.rds")))==FALSE){
 		res <- lapply(1:nrow(nodes), function(x){
 
 			## life history inputs -- nodes
