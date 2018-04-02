@@ -105,7 +105,7 @@ if("Fish" %in% plot){
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
       sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),]
-      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="log_F_ft"),]
+      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_ft"),]
       if(is.vector(sd_fleet)) sd_fleet <- as.matrix(sd_fleet)
       # sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
