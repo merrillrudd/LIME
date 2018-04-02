@@ -87,7 +87,7 @@ runstack <- function(savedir,
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
-				SigmaF_inp <- 0.2
+				SigmaF_inp <- 0.1
 				SigmaR_inp <- 0.737
 				rho_inp <- 0.4
 				Fdynamics_inp <- "Endogenous"
