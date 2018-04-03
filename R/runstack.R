@@ -136,7 +136,7 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
+				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="IterTrue")
 				}
 
@@ -194,7 +194,7 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(isNA == TRUE | gradient == FALSE | pdHess == FALSE){
+				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_FishLifeMeans"))
 				}
 
