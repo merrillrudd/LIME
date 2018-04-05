@@ -6,11 +6,11 @@
 \usage{
 run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
   SigRprior = c(0.737, 0.3), LFdist = 1, C_type = 0, est_more = FALSE,
-  fix_more = FALSE, f_startval_ft = NULL, rdev_startval_t = NULL,
-  est_selex_f = TRUE, vals_selex_ft = -1, randomR = TRUE,
-  newtonsteps = FALSE, F_up = 10, S50_up = NULL, derive_quants = FALSE,
-  itervec = NULL, simulation = FALSE, rewrite = TRUE, mirror = NULL,
-  est_totalF = FALSE, prop_f = 1)
+  fix_more = FALSE, est_F_ft = TRUE, f_startval_ft = NULL,
+  rdev_startval_t = NULL, est_selex_f = TRUE, vals_selex_ft = -1,
+  randomR = TRUE, newtonsteps = 3, F_up = 10, S50_up = NULL,
+  derive_quants = FALSE, itervec = NULL, simulation = FALSE,
+  rewrite = TRUE, mirror = NULL, est_totalF = FALSE, prop_f = 1)
 }
 \arguments{
 \item{modpath}{model directory}
@@ -32,6 +32,8 @@ run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
 \item{est_more}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
 
 \item{fix_more}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
+
+\item{est_F_ft}{default=TRUE, otherwise 0 for off and 1 for on in matrix that matches fleets in rows and years in columns}
 
 \item{f_startval_ft}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
 

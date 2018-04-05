@@ -5,7 +5,7 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
-  est_more, fix_more, f_startval_ft, rdev_startval_t, est_selex_f,
+  est_more, fix_more, est_F_ft, f_startval_ft, rdev_startval_t, est_selex_f,
   vals_selex_ft, randomR, mirror, est_totalF, prop_f)
 }
 \arguments{
@@ -26,6 +26,8 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
 \item{est_more}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
 
 \item{fix_more}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
+
+\item{est_F_ft}{default=TRUE, otherwise 0 for off and 1 for on}
 
 \item{f_startval_ft}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
 

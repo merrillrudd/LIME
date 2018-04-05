@@ -5,8 +5,9 @@
 \title{Predictive stacking}
 \usage{
 runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
-  max_gradient = 0.001, rewrite = TRUE, input_data = NULL,
-  simulation = FALSE, iter = NULL, seed = NULL, Fscenario = NULL)
+  max_gradient = 0.001, C_type = 0, LFdist = 1, rewrite = TRUE,
+  input_data = NULL, simulation = FALSE, iter = NULL, seed = NULL,
+  Fscenario = NULL)
 }
 \arguments{
 \item{savedir}{directory to save results}
@@ -17,7 +18,7 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 
 \item{param}{parameters (column names for nodes)}
 
-\item{mean}{mean of each parameter value}
+\item{mean}{means of each parameter value,}
 
 \item{cov}{covariance matrix across parameters}
 
@@ -26,6 +27,10 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 \item{data_avail}{data available to model, default = "LC", can adjust to "Catch_LC", "Index_LC", or "Index_Catch_LC"}
 
 \item{max_gradient}{maximum final gradient criterion, default = 0.001}
+
+\item{C_type}{default = 0 (no catch data), 1=catch in numbers, 2= catch in biomass}
+
+\item{LFdist}{default = 1 dirichlet-multinomial, 0=multinomial}
 
 \item{rewrite}{rewrite results?}
 

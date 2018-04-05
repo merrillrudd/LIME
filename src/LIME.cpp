@@ -608,8 +608,8 @@ Type objective_function<Type>::operator() ()
     // F
     jnll_comp(5) = 0;
     if(Fpen==1){
-        // for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
-        for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
+        for(int y=1;y<n_y;y++) jnll_comp(5) -= dnorm(F_y(y), F_y(y-1), sigma_F, true);
+        // for(int t=1;t<n_t;t++) jnll_comp(5) -= dnorm(F_t(t), F_t(t-1), sigma_F, true);
     }
 
     // SigmaR
@@ -635,7 +635,7 @@ Type objective_function<Type>::operator() ()
     matrix<Type> lF_ft(n_fl,n_t);
     matrix<Type> lC_ft(n_fl,n_t);
     matrix<Type> lI_ft(n_fl,n_t);
-    matrix<Type> lSPR_t(n_t);
+    vector<Type> lSPR_t(n_t);
     vector<Type> lD_t(n_t);
     for(int t=0;t<n_t;t++){
       lN_t(t) = log(N_t(t));
@@ -644,6 +644,7 @@ Type objective_function<Type>::operator() ()
       lR_t(t) = log(R_t(t));
       lF_t(t) = log(F_t(t));
       lD_t(t) = log(D_t(t));
+      lSPR_t(t) = log(lSPR_t(t));
     }
     for(int f=0;f<n_fl;f++){
       for(int t=0;t<n_t;t++){
@@ -656,8 +657,8 @@ Type objective_function<Type>::operator() ()
     }
 
     vector<Type> lF_y(n_y);
-    for(int t=0;t<n_y;t++){
-      lF_y(t) = log(F_y(t));
+    for(int y=0;y<n_y;y++){
+      lF_y(y) = log(F_y(y));
     }
 
 
@@ -701,11 +702,11 @@ Type objective_function<Type>::operator() ()
    // State variables
   REPORT( R_t );
   REPORT( F_t );
-  // REPORT( F_y );
+  REPORT( F_y );
   REPORT( N_t );
   REPORT( F_ft );
   REPORT( prop_f );
-  // REPORT( F_fy );
+  REPORT( F_fy );
   REPORT( F_ta );
 
   // Predicted quantities
