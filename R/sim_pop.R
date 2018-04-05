@@ -473,6 +473,10 @@ sim_pop <-
       for(f in 1:nfleets){
         colnames(LF_tf[[f]]) <- highs
         colnames(LF0_tf[[f]]) <- highs
+        if(pool==TRUE){
+          rownames(LF_tf[[f]]) <- Nyears_real
+          rowname(LF0_tf[[f]]) <- Nyears_real
+        }
       }
 
 

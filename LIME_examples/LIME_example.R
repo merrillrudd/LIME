@@ -600,20 +600,8 @@ true <- generate_data(modpath=NULL,
 					  init_depl=0.7,
 					  seed=132,
 					  fleet_proportions=1,
-					  pool=FALSE)
+					  pool=TRUE)
 
-modpath=NULL,
-					  itervec=1, 
-					  Fdynamics=c("Constant"),
-					  Rdynamics="Constant",
-					  lh=lh,
-					  Nyears=20,
-					  Nyears_comp=20,
-					  comp_sample=200,
-					  init_depl=0.7,
-					  seed=132,
-					  fleet_proportions=1,
-					  pool=FALSE
 
 ## plot simulated data
 par(mfrow=c(3,2))
