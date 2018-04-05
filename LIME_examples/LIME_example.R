@@ -667,10 +667,6 @@ rich <- run_LIME(modpath=NULL,
 				data_avail="Index_Catch_LC",
 				C_type=2)
 
-modpath=NULL
-				input=inputs_all
-				data_avail="Index_Catch_LC"
-				C_type=2
 
 ## check TMB inputs
 Inputs <- rich$Inputs
@@ -686,5 +682,18 @@ hessian <- Sdreport$pdHess
 gradient <- rich$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+## plot length composition data and fits
+plot_LCfits(LFlist=LF_list, 
+			Inputs=Inputs, 
+			Report=Report)		
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			True=true, 
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("SPR" = c(0,1)))
 
 

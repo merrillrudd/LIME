@@ -137,7 +137,7 @@ if("Fish" %in% plot){
     })
   }
 
-  if(all(is.null(True))==FALSE) lines(True$F_t, lwd=2)
+  if(all(is.null(True))==FALSE) lines(True$F_y, lwd=2)
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
     par(new=TRUE)
     xxLC <- which(true_years %in% LBSPR$years)
@@ -163,6 +163,7 @@ if("Rec" %in% plot){
   if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lR_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
+      sd <- sd[seq(1,by=ns,length.out=Inputs$Data$n_y),]
       r_est <- exp(sd[,1])
 
       if("Rec" %in% names(set_ylim) == FALSE) ylim <- c(0, max(read_sdreport(sd, log=TRUE)))
@@ -170,10 +171,10 @@ if("Rec" %in% plot){
       
       plot(x=1, y=1, type="n", xaxt="n", xaxs="i", yaxs="i", ylim=ylim, cex.axis=2, ylab="Recruitment", xlab="Year", cex.lab=2, xlim=c(min(xY),max(xY)))    
         polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
-        lines(x=seq_along(all_years), y=r_est, lwd=2, col=col_total, ylim=ylim, xpd=NA)
+        lines(x=seq_along(xY), y=r_est, lwd=2, col=col_total, ylim=ylim, xpd=NA)
         points(x=unique(unlist(xLC)), y=r_est[unique(unlist(xLC))], col=col_total, pch=19, cex=2, xpd=NA)
         axis(1, cex.axis=2, at=ilab2, labels=lab)
-        if(all(is.null(True))==FALSE) lines(True$R_t, lwd=2)
+        if(all(is.null(True))==FALSE) lines(True$R_t[seq(1,by=ns,length.out=Inputs$Data$n_y)], lwd=2)
   }
 
 }
@@ -186,9 +187,9 @@ if("SPR" %in% plot){
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="SPR_t"),]
+      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lSPR_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
-      polygon( y=read_sdreport(sd, log=FALSE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
+      polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
       lines(x=seq_along(all_years), y=sd[,1], lwd=2, col=col_total)
       points(x=unique(unlist(xLC)), y=sd[unique(unlist(xLC)),1], pch=19, cex=2, xpd=NA, col=col_total)
     } 

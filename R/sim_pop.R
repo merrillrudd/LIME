@@ -341,6 +341,18 @@ sim_pop <-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
+
+          F_fy <- t(sapply(1:nfleets, function(y){
+              sapply(1:Nyears_real, function(x) {
+                if (nseasons == 1)
+                  time_index <- x
+                if (nseasons > 1)
+                  time_index <- (1:nseasons) + ((x - 1) * nseasons)
+                sum(F_ft[y,time_index])
+              })
+          }))
+          F_y <- colSums(F_fy)  
+
       if(pool==FALSE) N_t <- colSums(N_at[-1,])
       if(pool==TRUE){
           N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
@@ -367,7 +379,7 @@ sim_pop <-
                 sum(Cw_ft[y,time_index])
               }) #* exp(CatchDev - (SigmaC^2)/2)
           }))
-          Cw_t <- colSums(Cw_ft)    
+          Cw_t <- colSums(Cw_ft)     
 
           F_ft <- t(sapply(1:nfleets, function(y){
               sapply(1:Nyears_real, function(x) {
@@ -378,7 +390,7 @@ sim_pop <-
                 sum(F_ft[y,time_index])
               })
           }))
-          F_t <- colSums(F_ft)   
+          F_t <- colSums(F_ft)  
 
           R_t <- sapply(1:Nyears_real, function(x) {
             if (nseasons == 1)
@@ -388,6 +400,8 @@ sim_pop <-
             sum(R_t[time_index])
           })
       }
+
+
 
      
 
@@ -581,6 +595,7 @@ sim_pop <-
       lh$FishDev_f <- FishDev_f
       lh$SB0 <- SB0
       lh$F_ft <- F_ft
+      lh$F_fy <- F_fy
       lh$LF_tf <- LF_tf
       lh$LF0_tf <- LF0_tf
       lh$LF <- LF_tf
@@ -593,6 +608,7 @@ sim_pop <-
       lh$Cn_ft <- Cn_ft
       lh$Cw_ft <- Cw_ft 
       lh$F_t <- F_t
+      lh$F_y <- F_y
       lh$F40 <- F40
       lh$Fmax <- Fmax
       lh$I_ft <- I_ft

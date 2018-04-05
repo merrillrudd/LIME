@@ -636,7 +636,6 @@ Type objective_function<Type>::operator() ()
     matrix<Type> lF_fy(n_fl,n_y);
     matrix<Type> lC_ft(n_fl,n_t);
     matrix<Type> lI_ft(n_fl,n_t);
-    vector<Type> lSPR_t(n_t);
     vector<Type> lD_t(n_t);
     for(int t=0;t<n_t;t++){
       lN_t(t) = log(N_t(t));
@@ -645,7 +644,6 @@ Type objective_function<Type>::operator() ()
       lR_t(t) = log(R_t(t));
       lF_t(t) = log(F_t(t));
       lD_t(t) = log(D_t(t));
-      lSPR_t(t) = log(lSPR_t(t));
     }
     for(int f=0;f<n_fl;f++){
       for(int t=0;t<n_t;t++){
@@ -680,7 +678,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lF_y );
   ADREPORT( lF_fy);
   ADREPORT( lD_t );
-  ADREPORT( lSPR_t );
+  ADREPORT( SPR_t );
   ADREPORT( S50_f );
   ADREPORT( S_fl );
 
