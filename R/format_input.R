@@ -50,7 +50,7 @@ format_input <- function(input,
         }
         if(nseasons>1){
             Nyears2 <- ceiling(Nyears/nseasons)
-            S_yrs_inp <- years_i
+            S_yrs_inp <- unlist(lapply(1:Nyears2, function(x) rep(x, nseasons)))
         }
         selex_type_f <- sapply(1:nfleets, function(x) ifelse(selex_type[x]=="logistic",1, ifelse(selex_type[x]=="dome",2,0)))
         if(any(selex_type_f==0)) stop("specify selex_type in create_lh_list")
