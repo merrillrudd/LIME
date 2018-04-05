@@ -341,6 +341,7 @@ sim_pop <-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
+      if(pool==FALSE) N_t <- colSums(N_at[-1,])
       if(pool==TRUE){
           N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
           SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
