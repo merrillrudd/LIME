@@ -21,9 +21,7 @@
 plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("SPR" = c(0,1))){
 
     nf <- Inputs$Data$n_f
-    # nf <- 1
-    # ns <- Inputs$Data$n_s
-    ns <- 1
+    ns <- Inputs$Data$n_s
 
   all_years <- 1:Inputs$Data$n_t
   lc_years <- lapply(1:nf, function(x){
@@ -99,13 +97,13 @@ if(all(is.null(Inputs))==FALSE){
 
 
 if("Fish" %in% plot){
-    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_t)*2)
+    if("Fish" %in% names(set_ylim) ==FALSE) ylim <- c(0, max(Report$F_y)*2)
     if("Fish" %in% names(set_ylim)) ylim <- set_ylim[["Fish"]]
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),]
-      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_ft"),]
+      sd_total <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_y"),]
+      sd_fleet <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_fy"),]
       if(is.vector(sd_fleet)) sd_fleet <- as.matrix(sd_fleet)
       # sd[,2][which(is.na(sd[,2]))] <- 0
       # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
