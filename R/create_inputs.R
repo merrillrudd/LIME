@@ -117,7 +117,7 @@ create_inputs <- function(lh, input_data){
         if(length(years_o)>0) years_name <- years_o
         rownames(LF) <- years_name
         dat_input$LF <- LF
-        dat_input$years_i <- years_i
+        # dat_input$years_i <- years_i
 
         if(is.null(dat_input$Nyears)) dat_input$Nyears <- length(dat_input$years)
 
