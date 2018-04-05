@@ -183,18 +183,19 @@ if("SPR" %in% plot){
 
   if("SPR" %in% names(set_ylim) == FALSE) ylim <- c(0,1)
   if("SPR" %in% names(set_ylim)) ylim <- set_ylim[["SPR"]]
-  plot(x=1, y=1, type="n", xaxt="n", ylab="SPR", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))), ylim=ylim)
+  plot(x=1, y=1, type="n", xaxt="n", ylab="SPR", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(xY)), max(seq_along(xY))), ylim=ylim)
 
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
-      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lSPR_t"),]
+      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="SPR_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
-      polygon( y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
-      lines(x=seq_along(all_years), y=sd[,1], lwd=2, col=col_total)
+      sd <- sd[seq(1,by=ns,length.out=Inputs$Data$n_y),]  
+      polygon( y=read_sdreport(sd, log=FALSE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
+      lines(x=seq_along(xY), y=sd[,1], lwd=2, col=col_total)
       points(x=unique(unlist(xLC)), y=sd[unique(unlist(xLC)),1], pch=19, cex=2, xpd=NA, col=col_total)
     } 
   }
-  if(all(is.null(True))==FALSE) lines(True$SPR_t, lwd=2)
+  if(all(is.null(True))==FALSE) lines(True$SPR_t[seq(1,by=ns,length.out=Inputs$Data$n_y)], lwd=2)
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
     par(new=TRUE)
     xxLC <- which(true_years %in% LBSPR$years)
@@ -221,21 +222,23 @@ if("ML" %in% plot){
   if("ML" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$ML_ft_hat)*1.5)
   if("ML" %in% names(set_ylim)) ylim <- set_ylim[["ML"]]
   
-  plot(x=1,y=1, type="n", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))), ylim=ylim)
+  plot(x=1,y=1, type="n", xaxt="n", ylab="Mean length", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(xY)), max(seq_along(xY))), ylim=ylim)
 
   if(all(is.na(Sdreport))==FALSE){
     sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="ML_ft_hat"),]
     sd[,2][which(is.na(sd[,2]))] <- 0
+    sd <- sd[seq(1,by=ns,length.out=Inputs$Data$n_y),]  
     ML_obs <- lapply(1:nf, function(y){
       subLF <- Inputs$Data$LF_tlf[,,y]
-      sapply(1:nrow(subLF), function(x){
+      ml <- sapply(1:nrow(subLF), function(x){
         sum(subLF[x,]*Inputs$Data$lbmids)/sum(subLF[x,])
       })
+      return(ml[seq(1,by=ns,length.out=Inputs$Data$n_y)])
     })
     for(f in 1:nf){
       index <- seq(f,nrow(sd),by=nf)
       polygon(y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)
-      lines(x=seq_along(all_years), y=sd[index,1], lwd=2, col=cols[f])
+      lines(x=seq_along(xY), y=sd[index,1], lwd=2, col=cols[f])
       points(x=unique(unlist(xLC)), y=sd[index[unique(unlist(xLC))],1], pch=19, col=cols[f], xpd=NA, cex=2)
       lines(x=unique(unlist(xLC)), y=ML_obs[[f]], lwd=2, xpd=NA)
     }
@@ -249,18 +252,20 @@ if("SB" %in% plot){
   if("SB" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$D_t)*1.5)
   if("SB" %in% names(set_ylim)) ylim <- set_ylim[["SB"]]
 
-  plot(x=1, y=1, type="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(all_years)), max(seq_along(all_years))), ylim=ylim)
+  plot(x=1, y=1, type="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(xY)), max(seq_along(xY))), ylim=ylim)
 
   if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lD_t"),]
       sd[,2][which(is.na(sd[,2]))] <- 0
+      sd <- sd[seq(1,by=ns,length.out=Inputs$Data$n_y),]  
+
       polygon(y=read_sdreport(sd, log=TRUE), x=c(which(is.na(sd[,2])==FALSE), rev(which(is.na(sd[,2])==FALSE))), col=paste0(col_total, "40"), border=NA)
-      lines(x=seq_along(all_years), y=exp(sd[,1]), lwd=2, col=col_total)
+      lines(x=seq_along(xY), y=exp(sd[,1]), lwd=2, col=col_total)
       points(x=unique(unlist(xLC)), y=exp(sd[unique(unlist(xLC)),1]), pch=19, col=col_total, xpd=NA, cex=2)
 
   }
   axis(1, cex.axis=2, at=ilab2, labels=lab)
-  if(all(is.null(True))==FALSE) lines(True$D_t, lwd=2)
+  if(all(is.null(True))==FALSE) lines(True$D_t[seq(1,by=ns,length.out=Inputs$Data$n_y)], lwd=2)
 
 }
     
