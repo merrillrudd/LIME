@@ -600,7 +600,7 @@ true <- generate_data(modpath=NULL,
 					  init_depl=0.7,
 					  seed=132,
 					  fleet_proportions=1,
-					  pool=TRUE)
+					  pool=FALSE)
 
 
 ## plot simulated data
@@ -622,91 +622,69 @@ for(f in 1:lh$nfleets){
 	lines(true$I_ft[f,], lwd=2, lty=lty)
 }
 
-# #######################################
-# ## Length comp data input options
-# #######################################
-# ## Option 1: Length comp array
-# LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd dimension = fleets
+plot_LCfits(LFlist=c(true$LF0_tf, true$LF_tf))
 
-# ## Option 2: Length comp list
-# LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
+#######################################
+## Length comp data input options
+#######################################
+## Option 1: Length comp array
+LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd dimension = fleets
 
-# 	## plot length composition data using LF_list
-# 	plot_LCfits(LFlist=LF_list, ylim=c(0,0.15)) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+## Option 2: Length comp list
+LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
 
-# ## Option 3: Data frame
-# # LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
+	## plot length composition data using LF_list
+	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
-# ## example with length data only
-# data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
+## Option 3: Data frame
+# LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
 
-# ##if using multinomial distribution, must specify annual effective sample size by fleet
-# data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_per_year)
+## example with length data only
+data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
 
-# ## create model inputs with life history information and data
-# ## outputs length data as array
-# inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
+##if using multinomial distribution, must specify annual effective sample size by fleet
+data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_per_year)
 
-# #######################################
-# ## Other data type input options
-# #######################################
-# data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
-# inputs_all <- create_inputs(lh=lh, input_data=data_all)
+## create model inputs with life history information and data
+## outputs length data as array
+inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 
-# ## dirichlet-multinomial not currently working for nfleets > 1
-# rich <- run_LIME(modpath=NULL, 
-# 				input=inputs_all,
-# 				data_avail="Index_Catch_LC",
-# 				Fpen=1,
-# 				SigRpen=1,
-# 				SigRprior=c(0.737,0.3),
-# 				LFdist=0,
-# 				C_type=2,
-# 				est_more=FALSE,
-# 				fix_more=FALSE,
-# 				mirror=NULL,
-# 				f_startval_ft=NULL,
-# 				rdev_startval_t=NULL,
-# 				est_selex_f=TRUE,
-# 				randomR=TRUE,
-# 				newtonsteps=3,
-# 				F_up=10,
-# 				S50_up=lh$linf,
-# 				derive_quants=FALSE,
-# 				itervec=NULL,
-# 				rewrite=TRUE,
-# 				simulation=FALSE,
-# 				est_totalF=FALSE,
-# 				prop_f=1)
+#######################################
+## Other data type input options
+#######################################
+colnames(true$I_ft) <- colnames(true$Cw_ft) <- colnames(true$obs_per_year) <- 1:true$Nyears
+data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
+inputs_all <- create_inputs(lh=lh, input_data=data_all)
 
-# ## check TMB inputs
-# Inputs <- rich$Inputs
+##----------------------------------------------------
+## Step 3: Run model
+## ---------------------------------------------------
+#######################################
+## Data-rich test
+#######################################
+rich <- run_LIME(modpath=NULL, 
+				input=inputs_all,
+				data_avail="Index_Catch_LC",
+				C_type=2)
 
-# ## Report file
-# Report <- rich$Report
+modpath=NULL
+				input=inputs_all
+				data_avail="Index_Catch_LC"
+				C_type=2
 
-# ## Standard error report
-# Sdreport <- rich$Sdreport
+## check TMB inputs
+Inputs <- rich$Inputs
 
+## Report file
+Report <- rich$Report
 
-# ## check convergence
-# hessian <- Sdreport$pdHess
-# gradient <- rich$opt$max_gradient <= 0.001
-# check <- hessian == TRUE & gradient == TRUE
+## Standard error report
+Sdreport <- rich$Sdreport
 
-# ## plot length composition data
-# plot_LCfits(LFlist=LF_list, 
-# 			Inputs=Inputs, 
-# 			Report=Report,
-# 			ylim=c(0,0.2))
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- rich$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
 
-# ## plot model output
-# plot_output(Inputs=Inputs, 
-# 			Report=Report,
-# 			Sdreport=Sdreport, 
-# 			lh=lh,
-# 			True=true, 
-# 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-# 			set_ylim=list("SPR" = c(0,1)))
 
 
