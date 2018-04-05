@@ -475,7 +475,7 @@ sim_pop <-
         colnames(LF0_tf[[f]]) <- highs
         if(pool==TRUE){
           rownames(LF_tf[[f]]) <- 1:Nyears_real
-          rowname(LF0_tf[[f]]) <- 1:Nyears_real
+          rownames(LF0_tf[[f]]) <- 1:Nyears_real
         }
       }
 
