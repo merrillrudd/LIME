@@ -66,6 +66,29 @@ run_LIME <- function(modpath,
                       est_totalF=FALSE,
                       prop_f=1){
 
+                      # Fpen=1
+                      # SigRpen=1
+                      # SigRprior=c(0.737,0.3)
+                      # LFdist=1
+                      # est_more=FALSE
+                      # fix_more=FALSE
+                      # est_F_ft=TRUE
+                      # f_startval_ft=NULL
+                      # rdev_startval_t=NULL
+                      # est_selex_f=TRUE
+                      # vals_selex_ft=-1
+                      # randomR=TRUE
+                      # newtonsteps=3
+                      # F_up=10
+                      # S50_up=NULL
+                      # derive_quants=FALSE
+                      # itervec=NULL
+                      # simulation=FALSE
+                      # rewrite=TRUE
+                      # mirror=NULL
+                      # est_totalF=FALSE
+                      # prop_f=1
+
   if(simulation==FALSE) itervec <- 1 
   if(simulation==TRUE & is.null(itervec)) stop("Must specify number of iterations for simulation")    
 
@@ -140,23 +163,25 @@ for(iter in 1:length(itervec)){
                               mirror=mirror,
                               est_totalF=est_totalF,
                               prop_f=prop_f_inp)
-      # input=input
-      #  data_avail=data_avail
-      #  Fpen=Fpen
-      #  SigRpen=SigRpen
-      #  SigRprior=SigRprior
-      #  LFdist=LFdist
-      #  C_type=C_type
-      #  est_more=est_more
-      #  fix_more=fix_more
-      #  f_startval_ft=f_startval_ft
-      #  rdev_startval_t=rdev_startval_t
-      #  est_selex_f=est_selex_f
-      #  vals_selex_ft=vals_selex_ft_new
-      #  randomR=randomR
-      #  mirror=mirror
-      #  est_totalF=est_totalF
-      #  fleet_proportions=fleet_proportions_inp
+                            
+                             # input=input 
+                             #  data_avail=data_avail 
+                             #  Fpen=Fpen 
+                             #  SigRpen=SigRpen 
+                             #  SigRprior=SigRprior 
+                             #  LFdist=LFdist 
+                             #  C_type=C_type 
+                             #  est_more=est_more 
+                             #  fix_more=fix_more 
+                             #  est_F_ft=est_F_ft
+                             #  f_startval_ft=f_startval_ft 
+                             #  rdev_startval_t=rdev_startval_t 
+                             #  est_selex_f=est_selex_f 
+                             #  vals_selex_ft=vals_selex_ft_new 
+                             #  randomR=randomR 
+                             #  mirror=mirror 
+                             #  est_totalF=est_totalF 
+                             #  prop_f=prop_f_inp 
 
       output$Inputs <- TmbList
 
