@@ -341,49 +341,52 @@ sim_pop <-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
-      N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
-      SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
-      TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
-      SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
+      if(pool==TRUE){
+          N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
+          SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
+          TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
+          SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
 
-      Cn_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
-            if (nseasons == 1)
-              time_index <- x
-            if (nseasons > 1)
-              time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(Cn_ft[y,time_index])
-          }) #* exp(CatchDev - (SigmaC^2)/2)
-        }))
-      Cn_t <- colSums(Cn_ft)
-      Cw_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
-            if (nseasons == 1)
-              time_index <- x
-            if (nseasons > 1)
-              time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(Cw_ft[y,time_index])
-          }) #* exp(CatchDev - (SigmaC^2)/2)
-      }))
-      Cw_t <- colSums(Cw_ft)
+          Cn_ft <- t(sapply(1:nfleets, function(y){
+              sapply(1:Nyears_real, function(x) {
+                if (nseasons == 1)
+                  time_index <- x
+                if (nseasons > 1)
+                  time_index <- (1:nseasons) + ((x - 1) * nseasons)
+                sum(Cn_ft[y,time_index])
+              }) #* exp(CatchDev - (SigmaC^2)/2)
+            }))
+          Cn_t <- colSums(Cn_ft)
+          Cw_ft <- t(sapply(1:nfleets, function(y){
+              sapply(1:Nyears_real, function(x) {
+                if (nseasons == 1)
+                  time_index <- x
+                if (nseasons > 1)
+                  time_index <- (1:nseasons) + ((x - 1) * nseasons)
+                sum(Cw_ft[y,time_index])
+              }) #* exp(CatchDev - (SigmaC^2)/2)
+          }))
+          Cw_t <- colSums(Cw_ft)    
 
-      F_ft <- t(sapply(1:nfleets, function(y){
-          sapply(1:Nyears_real, function(x) {
+          F_ft <- t(sapply(1:nfleets, function(y){
+              sapply(1:Nyears_real, function(x) {
+                if (nseasons == 1)
+                  time_index <- x
+                if (nseasons > 1)
+                  time_index <- (1:nseasons) + ((x - 1) * nseasons)
+                sum(F_ft[y,time_index])
+              })
+          }))
+          F_t <- colSums(F_ft)   
+
+          R_t <- sapply(1:Nyears_real, function(x) {
             if (nseasons == 1)
               time_index <- x
             if (nseasons > 1)
               time_index <- (1:nseasons) + ((x - 1) * nseasons)
-            sum(F_ft[y,time_index])
+            sum(R_t[time_index])
           })
-      }))
-
-      R_t <- sapply(1:Nyears_real, function(x) {
-        if (nseasons == 1)
-          time_index <- x
-        if (nseasons > 1)
-          time_index <- (1:nseasons) + ((x - 1) * nseasons)
-        sum(R_t[time_index])
-      })
+      }
 
      
 
@@ -484,8 +487,7 @@ sim_pop <-
           ML_ft[f,t] <- vul_lengths / vul_pop
         }
       }
-      if (pool == TRUE)
-        ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
+      if (pool == TRUE) ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
 
       ## generated data
       # I_out <- data.frame("Variable"="Index", "By"="Time", "X"=c(sapply(1:ncol(I_ft), function(x) rep(x, nfleets))), "Value"=c(I_ft), "Fleet"=rep(1:nfleets, ncol(I_ft)))

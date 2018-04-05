@@ -595,42 +595,44 @@ true <- generate_data(modpath=NULL,
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20 * lh$nseasons),
+					  Nyears_comp=20,
 					  comp_sample=200,
 					  init_depl=0.7,
 					  seed=132,
-					  fleet_proportions=1)
+					  fleet_proportions=1,
+					  pool=FALSE)
 
-					  modpath=NULL
-					  itervec=1
-					  Fdynamics=c("Constant")
-					  Rdynamics="Constant"
-					  lh=lh
-					  Nyears=20
-					  Nyears_comp=c(20)
-					  comp_sample=200
-					  init_depl=0.7
-					  seed=132
-					  fleet_proportions=1
+modpath=NULL,
+					  itervec=1, 
+					  Fdynamics=c("Constant"),
+					  Rdynamics="Constant",
+					  lh=lh,
+					  Nyears=20,
+					  Nyears_comp=20,
+					  comp_sample=200,
+					  init_depl=0.7,
+					  seed=132,
+					  fleet_proportions=1,
+					  pool=FALSE
 
-# ## plot simulated data
-# par(mfrow=c(3,2))
-# plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
-# plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
-# plot(x=1,y=1,type="n", ylim=c(0,1), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
-# lty <- ifelse(lh$nfleets==1,1,2)
-# for(f in 1:lh$nfleets){
-# 	lines(true$F_ft[f,], lwd=2, lty=lty)
-# }
-# plot(true$D_t, type="l", ylim=c(0,2), lwd=2, xlab="Time", ylab="Relative spawning biomass")
-# plot(x=1, y=1, type="n", ylim=c(0,max(true$Cw_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Catch (biomass)")
-# for(f in 1:lh$nfleets){
-# 	lines(true$Cw_ft[f,], lwd=2, lty=lty)
-# }
-# plot(x=1, y=1, type="n", ylim=c(0,max(true$I_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Abundance index")
-# for(f in 1:lh$nfleets){
-# 	lines(true$I_ft[f,], lwd=2, lty=lty)
-# }
+## plot simulated data
+par(mfrow=c(3,2))
+plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
+plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
+plot(x=1,y=1,type="n", ylim=c(0,1), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
+lty <- ifelse(lh$nfleets==1,1,2)
+for(f in 1:lh$nfleets){
+	lines(true$F_ft[f,], lwd=2, lty=lty)
+}
+plot(true$D_t, type="l", ylim=c(0,2), lwd=2, xlab="Time", ylab="Relative spawning biomass")
+plot(x=1, y=1, type="n", ylim=c(0,max(true$Cw_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Catch (biomass)")
+for(f in 1:lh$nfleets){
+	lines(true$Cw_ft[f,], lwd=2, lty=lty)
+}
+plot(x=1, y=1, type="n", ylim=c(0,max(true$I_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Abundance index")
+for(f in 1:lh$nfleets){
+	lines(true$I_ft[f,], lwd=2, lty=lty)
+}
 
 # #######################################
 # ## Length comp data input options
