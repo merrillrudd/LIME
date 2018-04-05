@@ -65,7 +65,7 @@ Type objective_function<Type>::operator() ()
 
     // option for shorter time-step than years
     DATA_IVECTOR(S_yrs); // matching each time step with a year
-    // DATA_INTEGER(n_s); // number of time steps within a year
+    DATA_INTEGER(n_s); // number of time steps within a year
     DATA_INTEGER(n_y); // number of years
 
     //mirror options
@@ -161,29 +161,26 @@ Type objective_function<Type>::operator() ()
   // ========= By fleet  =============================
 
   // Transform vectors
-  matrix<Type> F_ft(n_fl,n_t); // number of total time steps
+  matrix<Type> F_fy(n_fl,n_y); // number of total time steps
   // int index;
   for(int f=0;f<n_fl;f++){
-    for(int t=0;t<n_t;t++){
-        // index = indexF_ft(f,t)-1;
-        // if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,index));
-        // if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,index)) * prop_f(f);
-        if(est_totalF==0) F_ft(f,t) = exp(log_F_ft(f,t));
-        if(est_totalF==1) F_ft(f,t) = exp(log_F_ft(0,t)) * prop_f(f);
+    for(int y=0;y<n_y;y++){
+        if(est_totalF==0) F_fy(f,y) = exp(log_F_ft(f,y));
+        if(est_totalF==1) F_fy(f,y) = exp(log_F_ft(0,y)) * prop_f(f);
     }
   }
 
   // redo seasonal to include option to estimate annual or seasonal F (mirror_F)
   //with high enough sample size, could estimate seasonal F
-  // matrix<Type> F_fy(n_fl,n_y); // annually
-  // int tmp;
-  // for(int f=0;f<n_fl;f++){
-  //   for(int t=0;t<n_t;t++){
-  //     tmp = S_yrs(t) - 1;
-  //     // match fishing mortality in the total number of time steps to the annual parameter F
-  //     F_ft(f,t) = F_fy(f,tmp)/n_s;
-  //   }
-  // }
+  matrix<Type> F_ft(n_fl,n_t); // annually
+  int tmp;
+  for(int f=0;f<n_fl;f++){
+    for(int t=0;t<n_t;t++){
+      tmp = S_yrs(t) - 1;
+      // match fishing mortality in the total number of time steps to the annual parameter F
+      F_ft(f,t) = F_fy(f,tmp)/n_s;
+    }
+  }
 
   //total F
   vector<Type> F_t(n_t);
@@ -193,13 +190,13 @@ Type objective_function<Type>::operator() ()
       F_t(t) += F_ft(f,t);
     }
   }
-  // vector<Type> F_y(n_y);
-  // F_y.setZero();
-  // for(int f=0;f<n_fl;f++){
-  //   for(int y=0;y<n_y;y++){
-  //     F_y(y) += F_fy(f,y);
-  //   }
-  // }
+  vector<Type> F_y(n_y);
+  F_y.setZero();
+  for(int f=0;f<n_fl;f++){
+    for(int y=0;y<n_y;y++){
+      F_y(y) += F_fy(f,y);
+    }
+  }
 
   //selectivity at length
   matrix<Type> S_fl(n_fl,n_lb);
@@ -638,6 +635,7 @@ Type objective_function<Type>::operator() ()
     matrix<Type> lF_ft(n_fl,n_t);
     matrix<Type> lC_ft(n_fl,n_t);
     matrix<Type> lI_ft(n_fl,n_t);
+    matrix<Type> lSPR_t(n_t);
     vector<Type> lD_t(n_t);
     for(int t=0;t<n_t;t++){
       lN_t(t) = log(N_t(t));
@@ -657,10 +655,10 @@ Type objective_function<Type>::operator() ()
       }
     }
 
-    // vector<Type> lF_y(n_y);
-    // for(int t=0;t<n_y;t++){
-    //   lF_y(t) = log(F_y(t));
-    // }
+    vector<Type> lF_y(n_y);
+    for(int t=0;t<n_y;t++){
+      lF_y(t) = log(F_y(t));
+    }
 
 
 
@@ -674,15 +672,11 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lSB_t );
   ADREPORT( lF_t );
   ADREPORT( lF_ft );
-  // ADREPORT( lF_y );
+  ADREPORT( lF_y );
   ADREPORT( lD_t );
-  ADREPORT( SPR_t );
+  ADREPORT( lSPR_t );
   ADREPORT( S50_f );
   ADREPORT( S_fl );
-  // ADREPORT( F_ft );
-  // ADREPORT( F_fy );
-  // ADREPORT( F_t );
-  // ADREPORT( F_y );
 
   // Parameters
   REPORT( q_f );
