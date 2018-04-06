@@ -191,7 +191,7 @@ sim_pop <-
       if(any(Fdynamics=="Endogenous")){
         index <- which(Fdynamics=="Endogenous")
         for(i in 1:length(index)){
-          F_ft[index[i],1] <- Finit * exp(FishDev_f[index[i],1])
+          F_ft[index[i],1] <- Finit
         }
       }
       if (any(Fdynamics == "None")){
@@ -270,12 +270,12 @@ sim_pop <-
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
           for(i in 1:length(index)){
-            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate)
+            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * exp(FishDev_f[index[i],t])
           }
-          ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
+          ## fishing mortality = include selectivity 
           for(i in 1:length(index)){
             for(a in 1:length(ages)){
-              F_atf[a,t,index[i]] <- Finit * S_fa[index[i],a] * exp(FishDev_f[index[i],t])
+              F_atf[a,t,index[i]] <- F_ft[index[i],t] * S_fa[index[i],a]
             }            
           }
           for(a in 1:length(ages)){
