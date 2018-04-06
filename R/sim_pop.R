@@ -102,12 +102,12 @@ sim_pop <-
           "pulse1" = rep(ifelse(choose==1, (R0 / 2), (R0 * 2)), floor(tyears / 3)),
           "pulse2" = rep(ifelse(choose==1, (R0 *2), (R0 / 2)), tyears - (2 * floor(tyears / 3)))
         ) * exp(RecDev_AR)
-        R_t[which(RecDev_AR==0)] <- 0
+        # R_t[which(RecDev_AR==0)] <- 0
       }
 
       if (Rdynamics == "Constant") {
         R_t <- (rep(R0, tyears)) * exp(RecDev_AR)
-        R_t[which(RecDev_AR==0)] <- 0
+        # R_t[which(RecDev_AR==0)] <- 0
       }
 
     ## with multi-seasons, currently spreading out recruitment across seasons in one year
