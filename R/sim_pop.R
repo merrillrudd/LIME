@@ -191,7 +191,7 @@ sim_pop <-
       if(any(Fdynamics=="Endogenous")){
         index <- which(Fdynamics=="Endogenous")
         for(i in 1:length(index)){
-          F_ft[index[i],1] <- Finit * exp(FishDev_f[index[i],])
+          F_ft[index[i],1] <- Finit * exp(FishDev_f[index[i],1])
         }
       }
       if (any(Fdynamics == "None")){
