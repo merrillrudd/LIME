@@ -50,7 +50,7 @@ sim_pop <-
       set.seed(seed)
     
       ## recruitment deviations
-      RecDev <- c(-(SigmaR^2)/2,rnorm(Nyears_real-1), mean = -(SigmaR ^ 2) / 2, sd = SigmaR)
+      RecDev <- c(0,rnorm(Nyears_real-1, mean = -(SigmaR ^ 2) / 2, sd = SigmaR))
     
       ## autocorrelated recruitment deviations
       RecDev_AR <- rep(NA, length(RecDev))
