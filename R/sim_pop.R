@@ -69,7 +69,7 @@ sim_pop <-
       ## fishing mortality deviations
       if(length(SigmaF)==1 & nfleets>1) SigmaF <- rep(SigmaF, nfleets)
       FishDev_f <- t(sapply(1:nfleets, function(x){
-        rnorm(tyears, mean = -(SigmaF[x] ^ 2) / 2, sd = SigmaF[x])
+        c(0, rnorm(tyears-1, mean = -(SigmaF[x] ^ 2) / 2, sd = SigmaF[x]))
       }))
     
       ## abundance index observation error
