@@ -227,8 +227,8 @@ Type objective_function<Type>::operator() ()
 
   // ============ equilibrium spawning biomass ===============
   Type SB0 = 0;
-  for(int a=1;a<n_a;a++){
-    SB0 += exp(beta) * exp(-M*Type(n_s)*Type(a)) * W_a(a) * Mat_a(a);
+  for(int a=0;a<n_a;a++){
+    SB0 += exp(beta) * exp(-M*Type(a+1)) * W_a(a) * Mat_a(a);
   }
   
   // // ============ joint F rate including selectivity ===========================
