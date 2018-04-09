@@ -270,7 +270,7 @@ sim_pop <-
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
           for(i in 1:length(index)){
-            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * fleet_proportions[index[i]] * exp(FishDev_f[index[i],t])
+            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * exp(FishDev_f[index[i],t])
           }
           ## fishing mortality = include selectivity 
           for(i in 1:length(index)){
