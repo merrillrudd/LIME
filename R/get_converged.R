@@ -94,7 +94,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
 							if("log_F_ft" %in% find_param_est){
 
-								if(try==1){
+								if(try==2){
 									est_F_ft <- matrix(1, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft))
 									for(i in 1:out$Inputs$Data$n_fl){
 										sdf <- summary(out$Sdreport)[which(rownames(summary(out$Sdreport))=="log_F_ft"),]
@@ -103,7 +103,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 										est_F_ft[i,rm] <- 0 
 									}
 								}
-								if(try==2){
+								if(try==1){
 									input$SigmaF <- 0.1
 								}
 								if(try==3){
@@ -115,7 +115,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 								# 	input$SigmaF <- 0.05
 								# }
 
-								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f)
+								out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f, f_startval_ft=matrix(out$Report$F_ft, nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 							
 								## check_convergence
 								isNA <- all(is.null(out$df))
