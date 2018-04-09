@@ -15,7 +15,7 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 
 \item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length}
 
-\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None. Input number to project forward using a specific F.}
+\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input number to project forward using a specific F.}
 
 \item{Rdynamics}{Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH}
 
