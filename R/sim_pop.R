@@ -6,7 +6,7 @@
 #' @param lh list of life history information, from create_lh_list
 #' @param Nyears number of years to simulate
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length
-#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Ramp, Increasing, or None. Input number to project forward using a specific F.
+#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input number to project forward using a specific F.
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample sample size of length composition data annually
@@ -578,7 +578,7 @@ sim_pop <-
     for(f in 1:nfleets){
       trueF <- F_ft[f,]
       diffF <- unlist(sapply(1:length(trueF), function(x){
-        if(x>1) trueF[x]-trueF[x-1]
+        if(x>1) abs((trueF[x]-trueF[x-1])/trueF[x-1])
       }))
       if(max(diffF)>0.05) lh$flag <- c(lh$flag, paste0("F grew more than 5% annually for fleet ", f))      
     }
