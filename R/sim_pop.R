@@ -259,8 +259,7 @@ sim_pop <-
       }
 
       ## unfished spawning biomass
-      # SB0 <- sum(R0/nseasons * exp(-M*nseasons * ages) * W_a * Mat_a)      
-      SB0 <- sum(R0/nseasons * exp(-M * (ages+1)) * W_a * Mat_a)      
+      SB0 <- sum(R0/nseasons * exp(-M*nseasons * ages) * W_a * Mat_a)      
 
 
       ##########################
