@@ -9,7 +9,6 @@
 #' @param lwb length-weight allometric parameter
 #' @param M value for natural mortality if there has been a study (default = NULL, calculated internally from vbk)
 #' @param AgeMax option to specify maximum age; default=NULL will calculate as the age at which 1 percent of individuals are left in the unfished condition
-#' @param F1 starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error. 
 #' @param S50 starting value for age or length at 50 percent selectivity (will be estimated in LIME method) -- can be vector for multiple fleets
 #' @param M50 age or length at 50 percent maturity
 #' @param S95 default=NULL for one-parameter logistic model; starting value for age or length at 95 percent selectivity -- can be vector for multiple fleets
