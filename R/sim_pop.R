@@ -179,19 +179,19 @@ sim_pop <-
       if(any(Fdynamics=="Constant")){
         index <- which(Fdynamics=="Constant")
         for(i in 1:length(index)){
-          F_ft[index[i],] <- Finit * exp(FishDev_f[index[i],])
+          F_ft[index[i],] <- Finit * fleet_proportions[index[i]] * exp(FishDev_f[index[i],])
         }
       }
       if(any(Fdynamics=="Oneway")){
         index <- which(Fdynamics=="Oneway")
         for(i in 1:length(index)){
-          F_ft[index[i],] <- c(seq(1,by=0.05,length=Nyears)) * Finit * exp(FishDev_f[index[i],])
+          F_ft[index[i],] <- c(seq(1,by=0.05,length=Nyears)) * Finit * fleet_proportions[index[i]] * exp(FishDev_f[index[i],])
         }
       }
       if(any(Fdynamics=="Endogenous")){
         index <- which(Fdynamics=="Endogenous")
         for(i in 1:length(index)){
-          F_ft[index[i],1] <- Finit
+          F_ft[index[i],1] <- Finit * fleet_proportions[index[i]]
         }
       }
       if (any(Fdynamics == "None")){
@@ -270,7 +270,7 @@ sim_pop <-
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
           for(i in 1:length(index)){
-            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * exp(FishDev_f[index[i],t])
+            F_ft[index[i],t] <- (F_ft[index[i],t-1] * (SB_t[t-1] / (Fequil * SB0/2)) ^ Frate) * fleet_proportions[index[i]] * exp(FishDev_f[index[i],t])
           }
           ## fishing mortality = include selectivity 
           for(i in 1:length(index)){
