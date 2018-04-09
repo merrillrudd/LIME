@@ -78,8 +78,6 @@ create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
 \item{nseasons}{specify number of sub-time periods per year; default=1 (instantaneous sampling)}
 
 \item{nfleets}{specify number of fleets - fleet-specific parameters can be length nfleets, or shared by specifying only one number}
-
-\item{F1}{starting value for initial fishing mortality. Default = 0.2, do not start at zero because this is used to set the initial values for estimating annual fishing mortality in log space, thus setting to zero would cause an error.}
 }
 \value{
 List, a tagged list of life history traits
