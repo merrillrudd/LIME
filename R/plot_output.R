@@ -229,7 +229,7 @@ if("ML" %in% plot){
     sd[,2][which(is.na(sd[,2]))] <- 0
     for(f in 1:nf){
       # sd <- sd[seq(f,by=nf,length.out=Inputs$Data$n_y),]  
-      sd <- sd[seq(f*ns,by=nf*ns,length.out=Inputs$Data$n_y),]  
+      sdf <- sd[seq(f*ns,by=nf*ns,length.out=Inputs$Data$n_y),]  
 
       ML_obs <- lapply(1:nf, function(y){
         subLF <- Inputs$Data$LF_tlf[,,y]
@@ -238,10 +238,9 @@ if("ML" %in% plot){
         })
         return(ml[seq(1,by=ns,length.out=Inputs$Data$n_y)])
       })
-      index <- seq(f,nrow(sd),by=nf)
-      polygon(y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)
-      lines(x=seq_along(xY), y=sd[index,1], lwd=2, col=cols[f])
-      points(x=unique(unlist(xLC)), y=sd[index[unique(unlist(xLC))],1], pch=19, col=cols[f], xpd=NA, cex=2)
+      polygon(y=read_sdreport(sdf, log=FALSE), x=c(which(is.na(sdf[,2])==FALSE), rev(which(is.na(sdf[,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)
+      lines(x=seq_along(xY), y=sdf[,1], lwd=2, col=cols[f])
+      points(x=which(is.na(ML_obs[[f]])==FALSE), y=sdf[unique(unlist(xLC))[which(is.na(ML_obs[[f]])==FALSE)],1], pch=19, col=cols[f], xpd=NA, cex=2)
       lines(x=unique(unlist(xLC)), y=ML_obs[[f]], lwd=2, xpd=NA)
     }
   }
