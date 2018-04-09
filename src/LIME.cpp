@@ -43,6 +43,7 @@ Type objective_function<Type>::operator() ()
 
     // Known values
     DATA_VECTOR(ages); // ages
+    DATA_VECTOR(match_ages); // annual ages
     DATA_VECTOR(L_a); // length-at-age
     DATA_VECTOR(W_a); // weight-at-age
     DATA_SCALAR(M); // natural mortality
@@ -226,9 +227,14 @@ Type objective_function<Type>::operator() ()
           
 
   // ============ equilibrium spawning biomass ===============
+  int n_a2;
+  n_a2 = match_ages.size();
   Type SB0 = 0;
   for(int a=0;a<n_a;a++){
-    SB0 += exp(beta) * exp(-M*Type(a+1)) * W_a(a) * Mat_a(a);
+    for(int a2=0;a2<n_a2;a++){
+      if(ages(a) == match_ages(a2)) SB0 += exp(beta) * exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
+    }
+    
   }
   
   // // ============ joint F rate including selectivity ===========================
