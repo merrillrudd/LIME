@@ -227,15 +227,17 @@ if("ML" %in% plot){
   if(all(is.na(Sdreport))==FALSE){
     sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="ML_ft_hat"),]
     sd[,2][which(is.na(sd[,2]))] <- 0
-    sd <- sd[seq(1,by=ns,length.out=Inputs$Data$n_y),]  
-    ML_obs <- lapply(1:nf, function(y){
-      subLF <- Inputs$Data$LF_tlf[,,y]
-      ml <- sapply(1:nrow(subLF), function(x){
-        sum(subLF[x,]*Inputs$Data$lbmids)/sum(subLF[x,])
-      })
-      return(ml[seq(1,by=ns,length.out=Inputs$Data$n_y)])
-    })
     for(f in 1:nf){
+      # sd <- sd[seq(f,by=nf,length.out=Inputs$Data$n_y),]  
+      sd <- sd[seq(f*ns,by=nf*ns,length.out=Inputs$Data$n_y),]  
+
+      ML_obs <- lapply(1:nf, function(y){
+        subLF <- Inputs$Data$LF_tlf[,,y]
+        ml <- sapply(1:nrow(subLF), function(x){
+          sum(subLF[x,]*Inputs$Data$lbmids)/sum(subLF[x,])
+        })
+        return(ml[seq(1,by=ns,length.out=Inputs$Data$n_y)])
+      })
       index <- seq(f,nrow(sd),by=nf)
       polygon(y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)
       lines(x=seq_along(xY), y=sd[index,1], lwd=2, col=cols[f])
