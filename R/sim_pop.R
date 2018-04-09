@@ -574,6 +574,16 @@ sim_pop <-
       # outdf <- rbind(I_out, Cn_out, Cw_out, Cn_total_out, Cw_total_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
       # outdf$Fleet <- as.factor(outdf$Fleet)
 
+    lh$flag <- NULL
+    for(f in 1:nfleets){
+      trueF <- F_ft[f,]
+      diffF <- unlist(sapply(1:length(trueF), function(x){
+        if(x>1) trueF[x]-trueF[x-1]
+      }))
+      if(max(diffF)>0.05) lh$flag <- c(lh$flag, paste0("F grew more than 5% annually for fleet ", f))      
+    }
+
+
 
       ## outputs
       # lh$dfsim <- outdf
