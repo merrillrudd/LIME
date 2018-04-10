@@ -84,13 +84,6 @@ sim_pop <-
         rnorm(tyears, mean = -(SigmaC[x] ^ 2) / 2, sd = SigmaC[x])
       }))
 
-      ## catch observation error
-      if(length(SigmaC)==1 & nfleets>1) SigmaC <- rep(SigmaC, nfleets)
-      CatchDev_f <- sapply(1:nfleets, function(x){
-        rnorm(tyears, mean = -(SigmaC[x] ^ 2) / 2, sd = SigmaC[x])
-      })
-
-
 
       #########################
       ## Setup recruitment
