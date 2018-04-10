@@ -227,6 +227,9 @@ Type objective_function<Type>::operator() ()
           
 
   // ============ equilibrium spawning biomass ===============
+  // sum up relative spawning biomass at the beginning of each year
+  // exp(beta)*Type(n_s) - estimates of beta were biased low due to spreading annual recruitment throughout the year
+  // -M * Type(n_s) use annual estimate of M, not seasonal
   int n_a2;
   n_a2 = match_ages.size();
   Type SB0 = 0;
