@@ -2,7 +2,7 @@
 % Please edit documentation in R/AgeToLengthComp.R
 \name{AgeToLengthComp}
 \alias{AgeToLengthComp}
-\title{Age-converted-to-length structure}
+\title{Age-converted-to-length structure for compositional data}
 \usage{
 AgeToLengthComp(lh, S_a, tyears, N_at, comp_sample, sample_type = "catch")
 }
