@@ -1,4 +1,4 @@
-#' Age-converted-to-length structure
+#' Age-converted-to-length structure for compositional data
 #'
 #' \code{AgeToLengthComp} Converts vulnerable numbers at age to length composition of catch
 #' @author M.B. Rudd
