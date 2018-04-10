@@ -43,7 +43,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 						try <- try + 1
 						print(try)
 
-						if(out$Report$theta > 50){
+						if(any(out$Report$theta > 50)){
 							input$theta <- 50
 							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_theta")
 							if(all(fix_more == FALSE)) fix_more <- "log_theta"
