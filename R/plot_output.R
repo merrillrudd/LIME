@@ -253,7 +253,7 @@ if("SB" %in% plot){
   if("SB" %in% names(set_ylim) == FALSE) ylim <- c(0, max(Report$D_t)*1.5)
   if("SB" %in% names(set_ylim)) ylim <- set_ylim[["SB"]]
 
-  plot(x=1, y=1, type="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(xY)), max(seq_along(xY))), ylim=ylim)
+  plot(x=1, y=1, type="n", xaxt="n", ylab="Relative spawning biomass", xlab="Year", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2, xlim=c(min(seq_along(xY)), max(seq_along(xY))), ylim=ylim)
 
   if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="lD_t"),]
