@@ -18,8 +18,17 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
+
+	if(all(is.null(Inputs))) LFlist=LFlist
+	if(all(is.null(Inputs))==FALSE){
+		LF_array <- Inputs$Data$LF_tlf
+		LFlist <- list()
+		for(i in 1:Inputs$Data$n_f){
+			LFlist[[f]] <- LF_array[,,i]
+		}
+	}
 
 	nf <- length(LFlist)
 	LCyrs <- lapply(1:nf, function(x){
@@ -57,11 +66,11 @@ plot_LCfits <- function(LFlist, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL,
     if(nf==1) cols <- "#228B22"
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
-	for(i in 1:length(all_lc_years)){
-		yr <- all_lc_years[i]
+	for(i in seq_along(all_lc_years)){
+		yr <- i
 		for(f in 1:nf){
 			if(f==1){
-				flcyrs <- LCyrs[[f]]
+				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"), border=NA, space=0)
 				lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				lines(pred2[which(flcyrs==yr),], col=gray(0.3), lwd=4)
