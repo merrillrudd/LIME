@@ -30,6 +30,7 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 
 			gradient <- out$opt$max_gradient <= max_gradient
 			pdHess <- out$Sdreport$pdHess
+			isNA <- ifelse(all(is.null(out$df)), TRUE, FALSE)
 
 					## check and rerun in case of nonconvergence, try to address multiple possible issues and rerun 2 times
 					try <- 0
