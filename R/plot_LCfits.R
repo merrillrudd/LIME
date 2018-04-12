@@ -26,7 +26,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 		LF_array <- Inputs$Data$LF_tlf
 		LFlist <- list()
 		for(i in 1:Inputs$Data$n_f){
-			LFlist[[f]] <- LF_array[,,i]
+			LFlist[[i]] <- LF_array[,,i]
 		}
 	}
 
