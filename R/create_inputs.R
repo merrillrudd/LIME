@@ -48,7 +48,7 @@ create_inputs <- function(lh, input_data){
                 colnames(LF) <- highs
                 for(f in 1:dat_input$nfleets){
                     LFsub <- length_raw[,,f]
-                    LF[which(rownames(LFsub) %in% rownames(LF)),which(colnames(LFsub) %in% colnames(LF)),f] <- LFsub
+                    LF[which(rownames(LF) %in% rownames(LFsub)),which(colnames(LF) %in% colnames(LFsub)),f] <- LFsub
                 }
             }
             if(max_bin <= max(bins_dim)) LF <- length_raw
