@@ -53,7 +53,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	if(all(is.null(Report))){
 		pred <- NULL
 	}
-	if(all(is.null(LBSPR))==FALSE) pred2 <- t(LBSPR$pLF)
+	if(all(is.null(LBSPR))==FALSE) pred2 <- t(LBSPR@pLCatch)
 	if(all(is.null(LBSPR))) pred2 <- NULL
 
 
@@ -73,7 +73,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"), border=NA, space=0)
 				lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
-				lines(pred2[which(flcyrs==yr),], col=gray(0.3), lwd=4)
+				lines(pred2[which(flcyrs==yr),], col="#AA00AA", lwd=4)
 				box()
 			}
 			if(f>1 & yr %in% LCyrs[[f]]){
