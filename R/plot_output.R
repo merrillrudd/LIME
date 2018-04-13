@@ -36,13 +36,12 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
           LBSPR_outs$pLF <- LBSPR@pLCatch
           LBSPR_outs$SL50 <- LBSPR@Ests[,"SL50"]
           LBSPR_outs$SL95 <- LBSPR@Ests[,"SL95"]
-          LBSPR_outs$FM <- LBSPR@Ests[,"FM"]
-          LBSPR_outs$SPR <- LBSPR@Ests[,"SPR"]
-          LBSPR_outs$SPR_Var <- LBSPR@Vars[,"SPR"]
-          LBSPR_outs$SL50_Var <- LBSPR@Vars[,"SL50"]
-          LBSPR_outs$SL95_Var <- LBSPR@Vars[,"SL95"]
-          LBSPR_outs$FM_Var <- LBSPR@Vars[,"FM"]
-          LBSPR_outs$years <- LBSPR@Years
+          LBSPR_outs$FM<-LBSPR@FM
+          LBSPR_outs$SPR<-LBSPR@SPR
+          LBSPR_outs$FM_smooth <- LBSPR@Ests[,"FM"]
+          LBSPR_outs$SPR_smooth <- LBSPR@Ests[,"SPR"]
+          LBSPR_outs$var_FM <- LBSPR@Vars[,"FM"] 
+          LBSPR_outs$var_SPR <- LBSPR@Vars[,"SPR"]
 
           LBSPR <- LBSPR_outs
         }
@@ -139,23 +138,11 @@ if("Fish" %in% plot){
 
   if(all(is.null(True))==FALSE) lines(True$F_y, lwd=2)
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
-    par(new=TRUE)
-    xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="", ylab="", ylim=ylim, xaxt="n", yaxt="n", lwd=2, col=gray(0.3), type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)))
-    index <- which(is.na(LBSPR$FM_Var)==FALSE)
-    ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$FM_Var[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$FM_Var[index[x]]), lwd=4, col=paste0(gray(0.3),"40")))
-    # lines(x=xxLC, y=LBSPR$Smooth[,"FM"]*(lh$M*lh$nseasons), lwd=2, col=gray(0.3))
+    points(x=xLC[[f]], LBSPR$FM*(lh$M*lh$nseasons),col="#AA00AA", pch=19, cex=2)
+    index <- which(is.na(LBSPR$var_FM)==FALSE)
+    ignore <- sapply(1:length(xLC[[1]]), function(x) segments(x0=xLC[[1]][x],x1=xLC[[1]][x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$var_FM[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$var_FM[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
+    lines(x=xLC[[1]], y=LBSPR$FM_smooth*(lh$M*lh$nseasons), col="#AA00AA", lw=2)
   }
-  if(all(is.null(LBSPR))==FALSE & all(is.null(Report))){
-    xxLC <- which(true_years %in% LBSPR$years)
-    ylim <- c(0, max(LBSPR$FM*(lh$M*lh$nseasons))*1.5)
-    plot(x=xxLC, LBSPR$FM*(lh$M*lh$nseasons), xaxs="i", yaxs="i", xlab="Year", ylab="Fishing mortality", cex.lab=2, ylim=ylim, xaxt="n", yaxt="n", lwd=2, col=gray(0.3), type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)))
-    index <- which(is.na(LBSPR$FM_Var)==FALSE)
-    ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$FM_Var[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$FM_Var[index[x]]), lwd=4, col=paste0(gray(0.3),"40")))
-    axis(2, cex.axis=2)
-    # lines(x=xxLC, y=LBSPR$Smooth[,"FM"]*(lh$M*lh$nseasons), lwd=2, col=gray(0.3))
-  }
-    axis(1, cex.axis=2, at=ilab, labels=lab)
 }
 
 if("Rec" %in% plot){
@@ -196,20 +183,11 @@ if("SPR" %in% plot){
     } 
   }
   if(all(is.null(True))==FALSE) lines(True$SPR_t[seq(1,by=ns,length.out=Inputs$Data$n_y)], lwd=2)
-  if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
-    par(new=TRUE)
-    xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="", ylab="", ylim=c(0,1), xaxt="n", yaxt="n", lwd=2, col=gray(0.3), type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)))
-    index <- which(is.na(LBSPR$SPR_Var)==FALSE)
-    ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$SPR_Var[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$SPR_Var[index[x]]), lwd=4, col=paste0(gray(0.3),"40")))
-    lines(x=xxLC, y=LBSPR$Smooth[,"SPR"], lwd=2, col=gray(0.3))
-  }
-  if(all(is.null(Report))){
-    xxLC <- which(true_years %in% LBSPR$years)
-    plot(x=xxLC, LBSPR$SPR, xaxs="i", yaxs="i", xlab="Year", ylab="SPR", ylim=c(0,1), xaxt="n", cex.axis=2, lwd=2, col=gray(0.3), type="p", pch=19, cex=2, xlim=c(min(xY),max(xY)), cex.lab=2)
-    index <- which(is.na(LBSPR$SPR_Var)==FALSE)
-    ignore <- sapply(1:length(xxLC), function(x) segments(x0=xxLC[x],x1=xxLC[x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$SPR_Var[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$SPR_Var[index[x]]), lwd=4, col=paste0(gray(0.3),"40")))
-    lines(x=xxLC, y=LBSPR$Smooth[,"SPR"], lwd=2, col=gray(0.3))    
+  if(all(is.null(LBSPR))==FALSE){
+    points(x=xLC[[1]], LBSPR$SPR, col="#AA00AA", pch=19, cex=2)
+    index <- which(is.na(LBSPR$var_SPR)==FALSE)
+    ignore <- sapply(1:length(xLC[[1]]), function(x) segments(x0=xLC[[1]][x],x1=xLC[[1]][x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$var_SPR[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$var_SPR[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
+    lines(x=xLC[[1]], y=LBSPR$SPR_smooth, lwd=2, col="#AA00AA")
   }
       abline(h=0.4, lwd=2, lty=2)
     abline(h=0.3, lwd=2, lty=3)
@@ -310,24 +288,14 @@ if("Selex" %in% plot){
       }
     }
   }
-  if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
-    for(i in 1:length(lc_years)){
+  if(all(is.null(LBSPR))==FALSE){
+    for(i in 1:length(xLC[[1]])){
       SL50 <- LBSPR$SL50[i]
       SL95 <- LBSPR$SL95[i]
       S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      lines(x=1:length(mids), y=S_l2, col=paste0(gray(0.3),"50"), lwd=2)
+      lines(x=1:length(mids), y=S_l2, col=paste0("#AA00AA","50"), lwd=2)
     }
-  # legend("bottomright", col=c("#228B22", gray(0.3), "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
-  }
-  if(all(is.null(LBSPR))==FALSE & all(is.null(Report))){
-    for(i in 1:length(lc_years)){
-      SL50 <- LBSPR$SL50[i]
-      SL95 <- LBSPR$SL95[i]
-      S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      if(i==1) plot(x=1:length(mids), y=S_l2, col=paste0(gray(0.3),"50"), lwd=2, ylim=c(0,1.1), type="l", xaxt="n", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
-      if(i>1) lines(x=1:length(mids), y=S_l2, col=paste0(gray(0.3),"50"), lwd=2)
-      # legend("bottomright", col=c(gray(0.3), "black", "black","black"), lwd=2, legend=c("LB-SPR", "SPR 40%", "SPR 30%"), cex=1.7, lty=c(1,2,3), pch=c(19,NA,NA))
-    }
+  # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
   }
   if(all(is.null(True))==FALSE) lines(True$S_l, lwd=2)
     axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
