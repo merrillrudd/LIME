@@ -69,6 +69,22 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 							}	
 						}
 
+						if(out$Report$sigma_R > 2){
+							if(all(fix_more != FALSE)) fix_more <- c(fix_more, "log_sigma_R")
+							if(all(fix_more == FALSE)) fix_more <- "log_sigma_R"
+
+							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f)							
+							
+							## check_convergence
+							isNA <- all(is.null(out$df))
+							if(isNA) out <- out_save
+							if(isNA==FALSE){
+								out_save <- out
+								gradient <- out$opt$max_gradient <= max_gradient
+								pdHess <- out$Sdreport$pdHess
+							}	
+						}
+
 						if(pdHess==FALSE){
 							find_param <- unique(rownames(summary(out$Sdreport))[which(is.na(summary(out$Sdreport)[,2]))])
 							find_param_est <- find_param[which(find_param %in% names(out$opt$par))]
