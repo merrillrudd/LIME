@@ -66,7 +66,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
     if(nf==1) cols <- "#228B22"
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
-	if(all(is.null(xlim))) xlim <- c(0,max(lbhighs))
+	if(all(is.null(xlim))) xlim <- c(0,length(lbhighs))
 	for(i in seq_along(all_lc_years)){
 		yr <- i
 		for(f in 1:nf){
