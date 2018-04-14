@@ -58,6 +58,12 @@ format_input <- function(input,
             mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
             mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
 
+            if(all(is.null(input$neff_ft))){
+                if(is.vector(LF[,,x])==FALSE) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
+                if(is.vector(LF[,,x])) n_inp <- t(sapply(1:nfleets), function(x) sum(LF[,,x]))
+            }
+            if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
+
         # if(all(est_F_ft == TRUE)){
         #     indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
         # }
@@ -97,9 +103,6 @@ format_input <- function(input,
             #     if(is.null(input$neff_ft)) n_inp <- sum(LF)
             #     if(is.null(input$neff_ft)==FALSE) n_inp <- input$neff_ft
             # }   
-            if(all(is.null(input$neff_ft))) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-            if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
-
             Data <- list("n_t"=dim(LF)[1],
                          "n_lb"=dim(LF)[2],
                          "n_fl"=dim(LF)[3],
@@ -151,8 +154,6 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)) n_inp <- sum(LF)
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
-            if(all(is.null(input$neff_ft))) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-            if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
 
             Data <- list("n_t"=dim(LF)[1],
                          "n_lb"=dim(LF)[2],
@@ -206,8 +207,6 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)) n_inp <- sum(LF)
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
-            if(all(is.null(input$neff_ft))) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-            if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
 
             Data <- list("n_t"=dim(LF)[1],
                          "n_lb"=dim(LF)[2],
@@ -260,8 +259,6 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)) n_inp <- sum(LF)
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
-            if(all(is.null(input$neff_ft))) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-            if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
 
             Data <- list("n_t"=dim(LF)[1],
                          "n_lb"=dim(LF)[2],
