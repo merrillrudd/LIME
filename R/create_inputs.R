@@ -25,6 +25,16 @@ create_inputs <- function(lh, input_data){
 
         if(is.array(dat_input$LF)){
             length_raw <- dat_input$LF
+            bins_dim <- as.numeric(colnames(length_raw))
+            if(bins_dim[1] != bw){
+                ## add zeros to the beginning of the length comps
+                add <- matrix(0, nrow=nrow(lf), ncol=length(seq(from=bw, to=min(bins)-bw, by=bw)))
+                colnames(add) <- seq(from=bw, to=min(bins)-bw, by=bw)             
+
+                length_raw <- cbind(add, length_raw)      
+                bins_dim <- as.numeric(colnames(length_raw))          
+            }
+
             if(is.matrix(length_raw)){
                 new <- array(NA, dim=c(dim(length_raw),1))
                 new[,,1] <- length_raw
@@ -32,11 +42,12 @@ create_inputs <- function(lh, input_data){
                 colnames(new) <- colnames(length_raw)
                 length_raw <- new
             }
-            bins_dim <- seq(bw, by=bw, length=dim(length_raw)[2])
-            if(is.vector(length_raw[,,1])) stop("If only one year of length data, extend total years modeled back one year (and add row to length composition)")
-            max_bin <- max(c(max(dat_input$highs), 
-                            max(bins_dim), 
-                            sapply(1:dat_input$nfleets, function(x) as.numeric(bins_dim[max(which(colSums(length_raw[,,x])>0))]))))
+            if(dim(length_raw)[1] > 1) max_bin <- max(c(max(dat_input$highs), 
+                                                        max(bins_dim), 
+                                                        sapply(1:dat_input$nfleets, function(x) as.numeric(bins_dim[max(which(colSums(length_raw[,,x])>0))]))))
+            if(dim(length_raw)[1] == 1) max_bin <- max(c(max(dat_input$highs),
+                                                        max(bins_dim),
+                                                        sapply(1:dat_input$nfleets, function(x) as.numeric(bins_dim[max(which(length_raw[,,x]>0))]))))
         
             highs <- seq(bw, max_bin, by=bw)
             mids <- seq(bw/2, max(highs), by=bw)
@@ -47,7 +58,9 @@ create_inputs <- function(lh, input_data){
                 rownames(LF) <- time
                 colnames(LF) <- highs
                 for(f in 1:dat_input$nfleets){
-                    LFsub <- length_raw[,,f]
+                    LFsub <- matrix(length_raw[,,f], nrow=nrow(length_raw), ncol=ncol(length_raw))
+                    colnames(LFsub) <- bins_dim
+                    rownames(LFsub) <- rownames(length_raw)
                     LF[which(rownames(LF) %in% rownames(LFsub)),which(colnames(LF) %in% colnames(LFsub)),f] <- LFsub
                 }
             }
@@ -87,8 +100,17 @@ create_inputs <- function(lh, input_data){
         }
 
         if(is.list(dat_input$LF)){
-            for(f in 1:length(length_raw)){
-                colnames(length_raw[[f]]) <- seq(bw, by=bw, length=ncol(length_raw[[f]]))
+            length_raw <- dat_input$LF
+            bins_dim <- as.numeric(colnames(length_raw[[1]]))
+            if(bins_dim[1] != bw){
+                ## add zeros to the beginning of the length comps
+                add <- matrix(0, nrow=nrow(lf), ncol=length(seq(from=bw, to=min(bins)-bw, by=bw)))
+                colnames(add) <- seq(from=bw, to=min(bins)-bw, by=bw)             
+
+                for(f in 1:length(length_raw)){
+                    length_raw[[f]] <- cbind(add, length_raw[[f]])      
+                }
+                bins_dim <- as.numeric(colnames(length_raw[[1]]))          
             }
             max_bin <- max(c(max(dat_input$highs), 
                             sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]])))), 
@@ -97,12 +119,14 @@ create_inputs <- function(lh, input_data){
             mids <- seq(bw/2, max(highs), by=bw)
             lows <- highs - bw
             time <- dat_input$years
-            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+            LF <- array(0, dim=c(length(time), length(highs), dat_input$nfleets))
             rownames(LF) <- time
             colnames(LF) <- highs
             for(f in 1:dat_input$nfleets){
                 LFsub <- length_raw[[f]]
-                LF[,,f] <- LFsub
+                colnames(LFsub) <- bins_dim
+                rownames(LFsub) <- rownames(length_raw[[f]])
+                LF[which(rownames(LF) %in% rownames(LFsub)),which(colnames(LF) %in% colnames(LFsub)),f] <- LFsub
             }
             dat_input$LF <- LF
         }
