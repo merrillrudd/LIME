@@ -60,7 +60,7 @@ format_input <- function(input,
 
             if(all(is.null(input$neff_ft))){
                 if(is.vector(LF[,,1])==FALSE) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-                if(is.vector(LF[,,1])) n_inp <- t(sapply(1:nfleets), function(x) sum(LF[,,x]))
+                if(is.vector(LF[,,1])) n_inp <- t(sapply(1:nfleets, function(x) sum(LF[,,x])))
             }
             if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
 
