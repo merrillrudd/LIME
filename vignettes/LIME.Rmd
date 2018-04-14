@@ -6,53 +6,73 @@ date: "`r Sys.Date()`"
 output:
   pdf_document:
     toc: yes
-  html_document:
-    number_sections: yes
-    toc: yes
-    toc_float: yes
-vignette: |
-  %\VignetteIndexEntry{LIME: An R package for simulation andestimation using length data to account for variable fishing mortality and recruitment}  %\VignetteEngine{knitr::rmarkdown}  %\VignetteEncoding{UTF-8}
+    fig_caption: yes
+  # html_document:
+  #   number_sections: yes
+  #   toc: yes
+  #   toc_float: yes
+header-includes:
+  - \usepackage{float}
 ---
 
-# Introduction
-This package contains functions to run the Length-based Integrated Mixed Effects (LIME) fisheries stock assessment method. The LIME package can be used in two ways: 1) simulating the expected age-structured population dynamics, length composition, catch data, and an abundance index using LIME and 2) fitting to empirical length data at a minimum and any available catch and/or abundance index data to provide an estimate of the spawning potential ratio (SPR).
+```{r echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(fig.align="center", external=TRUE, echo=TRUE, warning=FALSE, fig.pos="H")
+```
 
-LIME has been developed for data-limited fisheries, where few data are available other than a representative sample of the size structure of the vulnerable portion of the population (i.e., the catch) and an understanding of the life history of the species. LIME relaxes the equilibrium assumptions of other length-based methods by estimating annual fishing mortality and recruitment variation (among other parameters), deriving annual recruitment as a random effect.
+# Introduction
+This package contains functions to run the Length-based Integrated Mixed Effects (LIME) fisheries stock assessment method. The LIME package can be used in two ways: 
+
+1. as an age-structured operating model to generate simulated length composition, catch data, and abundance indices based on single or multiple fleets and seasons, and
+2. as an estimation model by fitting to length composition data (at a minimum) to estimate annual fishing mortality, annual recruitment, relative spawning biomass, spawning potential ratio (SPR), and other derived outputs of an age-structured model. 
+
+## Length-based
+
+LIME was developed for data-limited fisheries, where few data are available other than a representative sample of the size structure of the vulnerable portion of the population (i.e., length composition data from the catch) and an understanding of the life history of the species. 
+
+## Integrated
+
+While length composition from the catch can hold information on fishing mortality, gear selectivity, and recruitment, with process and observation error it can be very difficult to tease apart the patterns and biological mechanisms from the noise. With additional information, such as even a few years of catch trends or an abundance index, analysts can include additional information to the LIME model to help tease apart these processes. For example, catch data is much more informative of the fishing mortality rate over time than the length composition data. Catch used alongside length composition data can help decrease bias and uncertainty in estimates of fishing mortality rates. 
+
+LIME also includes all years of data in the same analysis with a penalty on the annual fishing mortality rate to keep it from increasing or decreasing unrealistically between years. However, LIME assumes the selectivity curve is constant over time for each fleet. 
+
+## Mixed effects
+
+LIME relaxes the equilibrium assumptions of other length-based methods by estimating annual fishing mortality and recruitment variation (among other parameters), deriving annual recruitment as a random effect.
 
 See Rudd and Thorson (2017) in the reference list for full details of the model, including simulation testing to evaluate performance across life history types, population variability scenarios, and data availability scenarios, as well as violations of the model assumptions.  
+
 
 ## Bug Reports
 Please alert me to any bugs or issues by using [GitHub](https://github.com/merrillrudd/LIME/issues).
 
 Comments and suggestions for additional features are welcome and we can discuss via email  at mbrudd@uw.edu.
 
-Finally, please make sure you understand the data and the biological parameters (and how the model treats these) and critically evaluate any output of LIME. 
 
-# First Steps
+# Installation
 
 ## Installing the Package
-1) `devtools`: You can install the development version of the package from GitHub using the `devtools` package:
-```{r, eval=FALSE}
+1. `devtools`: You can install the development version of the package from GitHub using the `devtools` package:
+```{r install_devtools, eval=FALSE}
 install.packages("devtools", repos='http://cran.us.r-project.org')
 ```
 
-2) Follow the steps to install TMB:
+2. Follow the steps to install TMB:
 
-Windows: https://github.com/kaskr/adcomp/wiki/Windows-installation
+* Windows: https://github.com/kaskr/adcomp/wiki/Windows-installation
 
-Linux: https://github.com/kaskr/adcomp (See README)
+* Linux: https://github.com/kaskr/adcomp (See README)
 
-Mac: should be the same as Linux, please see contact info under Bug Reports if that doesn't work.
+* Mac: should be the same as Linux, please see contact info under Bug Reports if that doesn't work.
 
-3) Install required package `TMBhelper`:
-```{r, eval=FALSE}
+3. Install required package `TMBhelper`:
+```{r install_TMBhelper, eval=FALSE}
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 ```
 
 
-4) Install LIME:
-```{r, eval=FALSE}
-devtools::install_github("merrillrudd/LIME", build_vignettes=TRUE)
+4. Install LIME:
+```{r install_LIME, eval=FALSE}
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
 ```
 
 The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then start from the step that produced the error. Again, please use the contact info in Bug Reports if this doesn't work, as you may have discovered a new installation error... congratulations!
@@ -62,102 +82,167 @@ The installation may produce error messages requiring other packages. You can do
 library(LIME)
 ```
 
-# Simulation
-The LIME package can be used to generate the expected size composition, other age-structured outputs (e.g. abundance-at-age, catch-at-age, annual recruitment), SPR, and MSY for a given set of biological parameters and fishing mortality and recruitment patterns.
+# Step 1: Specify biological inputs and starting values
+The LIME package simulation and estimation features require the biological inputs (e.g. growth, natural mortality, maturity) and starting values for selectivity parameters in a list. Using `create_lh_list` will make sure all required elements are included within the list and in the required format. The `create_lh_list` function requires inputs for some parameters and includes default values for others.
 
-## Specify biological inputs and starting values
-The LIME package simulation and estimation features require the biological inputs and starting values for selectivity parameters in a list. Using `create_lh_list` will make sure all required elements are included within the list and in the required format. The `create_lh_list` function requires inputs for some parameters and includes default values for others.
-
-### Minimum inputs for `create_lh_list`
-
+## Minimum inputs for `create_lh_list`
 The user is required to input the following parameters to `create_lh_list` for simulation and estimation:
 
- **Minium inputs: Biology**
+**Minimum inputs: Biology**
 
- - von Bertalanffy asymptotic length (`linf`)
- - von Bertalanffy growth coefficient (`vbk`)
- - Annual natural mortality (`M`)
- - Length-weight scaling parameter (`lwa`)
- - Length-weight allometric parameter (`lwb`)
- - Length or age at 50% maturity (`M50`)
- - Whether `M50` input is in "length" or "age" (`maturity_input`)
- 
- **Minimum inputs: Exploitation**
+ - `linf`: von Bertalanffy asymptotic length
+ - `vbk`: von Bertalanffy growth coefficient
+ - `M`: Annual natural mortality rate
+ - `lwa`: Length-weight scaling parameter
+ - `lwb`: Length-weight allometric parameter
+ - `M50` Length or age at 50% maturity
+ - `maturity_input`: Whether `M50` input is in "length" or "age"
 
- - Length at 50% selectivity (`S50`)
- - Whether `S50` input is in "length" or "age" (`selex_input`)
- 
- **Assumptions using the default settings**
+**Minimum inputs: Exploitation**
 
- - Width of the length classes (`binwidth`) equal to 1
- - von Bertalanffy length at age=0 (`t0`) equal to -0.01
- - Selectivity is assumed to follow a logistic function.
- - If `M95` and `S95` are unspecified, their defaults are `NULL` and we assume one-parameter logistic maturity and/or selectivity. This results in close to knife-edge maturity or selectivity. 
- 
-### Other inputs for `create_lh_list`
+ - `S50`: Length or age at 50% selectivity
+ - `S95`: Length or age at 95% selectivity
+ - `selex_input`: Whether `S50` and `S95` are in "length" or "age"
 
- **Other inputs: Biology**
+## Other inputs for `create_lh_list` with default settings
 
- - Length or age at 95% maturity (`M95`): Default=`NULL` for one-parameter logistic maturity; specifying `M95` will use two-parameter logistic maturity curve. It is assumed `M95` should be input as length if `M50` is length, same for age.
- - Length at age=0 (`t0`): Default=-0.01, should be adjusted based on local studies or meta-analysis.
- - Equilibrium recruitment (`R0`): Default=1.0. Changing `R0` will change the scale of the population size. It is recommended to set an initial value of `R0` more appropriate to the expected population size if using catch data to estimate population size with LIME. 
- - Steepness (`h`): Default=1.0 such that the expected recruitment calculated in the Beverton-Holt stock-recruit curve is not affected by the level of spawning biomass. Setting `h` below 1.0 will lead to the expected annual recruitment as a function of the spawning biomass. LIME will still calculate recruitment deviates around this expected value of annual recruitment. 
- - Maximum age (`AgeMax`): Default= the age at which 1% of the population is still alive based on the specified natural mortality rate `M`. This age can be adjusted based on local evidence of maximum age.
- - Recruitment autocorrelation (`rho`): Used in simulation only. Default=0 (no recruitment autocorrelation). Changing the value of `rho` will add autocorrelation to the generated recruitment time series for a simulation study. 
- 
+**Other inputs: Biology**
+
+ - `M95`: Length or age at 95% maturity; default=NULL for one-parameter logistic maturity. `M95` will use two-parameter logistic maturity curve. It is assumed `M95` should be input as length if `M50` is length, same for age.
+ - `t0`: Length at age=0; Default=-0.01, should be adjusted based on local studies or meta-analysis.
+ - `R0`: Equilibrium recruitment; Default=1.0. Changing `R0` will change the scale of the population size. It is recommended to set an initial value of `R0` more appropriate to the expected population size if using catch data to estimate population size with LIME. 
+ - `h`: Steepness; Default=1.0 such that the expected recruitment calculated in the Beverton-Holt stock-recruit curve is not affected by the level of spawning biomass. Setting `h` below 1.0 will lead to the expected annual recruitment as a function of the spawning biomass. LIME will still calculate recruitment deviates around this expected value of annual recruitment. 
+ - `AgeMax`: Maximum age; Default=-log(0.01)/M, the age at which 1% of the population is still alive based on the specified natural mortality rate `M`. This age can be adjusted based on local evidence of maximum age.
+ - `rho`: Recruitment autocorrelation, used in simulation only; Default=0 (no recruitment autocorrelation). Changing the value of `rho` will add autocorrelation to the generated recruitment time series for a simulation study. 
+
+
  **Other inputs: Exploitation**
 
- - Length or age at 95% selectivity (`S95`): Default=`NULL` for one-parameter logistic selectivity; specifying `S95` will use two-parameter logistic selectivity curve. It is assumed `S95` should be input as length if `S50` is length, same for age.
- - Selectivity function (`selex_type`): Default=`logistic` using a one-parameter logistic selectivity curve if `S95` is not specified, or a two-parameter logistic curve if `S95` is specified. Alternate option=`dome` to generate a population exploited based on a dome-shaped selectivity curve. Dome-shaped selectivity cannot currently be estimated in LIME, but specifying dome-shaped selectivity in the `create_lh_list` function can generate an assumed dome-shaped curve to be fixed when using LIME for estimation. 
- - Dome-shaped selectivity right-hand standard deviation (`dome_sd`): Default=`NULL` for logistic selectivity, must be specified if `selex_type`=`dome`. The standard deviation of the normal distribution for the right side of the selectivity curve (after the logistic curve specified reaches 100% selectivity).
- - Catchability coefficient (`qcoef`): Estimated when using an abundance index, default=1e-5, starting value should be adjusted to a reasonable number based on the abundance index and starting value for the scaling parameter `R0`.
- - Dirichlet-multinomial parameter (`theta`): Default=10, a relatively large number coinciding with no variance inflation where the effective sample size will approach the input sample size (Thorson et al. 2017)
- - Number of seasons in a year (`nseasons`): Default=1 for annual length composition data and annual growth and mortality parameters. For short-lived species, it is helpful to use a shorter-than-annual time step to account for the growth of short-lived fish during one year, if length data is collected on time steps less than one year (e.g. month, `nseasons`=12).
+ - `S95`: Length or age at 95% selectivity; Default=`NULL` for one-parameter logistic selectivity; specifying `S95` will use two-parameter logistic selectivity curve. It is assumed `S95` should be input as length if `S50` is length, same for age.
+ - `selex_type`: Selectivity function type; Default=`logistic` using a one-parameter logistic selectivity curve if `S95` is not specified, or a two-parameter logistic curve if `S95` is specified. Alternate option=`dome` to generate a population exploited based on a dome-shaped selectivity curve. Dome-shaped selectivity cannot currently be estimated in LIME, but specifying dome-shaped selectivity in the `create_lh_list` function can generate an assumed dome-shaped curve to be fixed when using LIME for estimation. 
+ - `dome_sd`: Dome-shaped selectivity right-hand standard deviation; Default=`NULL` for logistic selectivity, must be specified if `selex_type="dome"`. The standard deviation of the normal distribution for the right side of the selectivity curve (after the logistic curve specified reaches 100% selectivity).
+ - `Fequil`: The proportion of spawning biomass relative to unfished spawning biomass at bioeconomic equilibrium, default=0.5.
+ - `Frate`: exponent determining the strength of coupling between effort and changes in biomass, default=0.2.
+ - `qcoef`: Catchability coefficient; default=1e-5. Estimated when using an abundance index, starting value should be adjusted to a reasonable number based on the abundance index and starting value for the scaling parameter `R0`.
+ - `theta`: Dirichlet-multinomial parameter; Default=1, a relative small value. With a larger `theta` (e.g. 10) there will be no variance inflation where the effective sample size will approach the input sample size (Thorson et al. 2017)
+ - `nseasons`: Number of seasons in a year; Default=1 for annual length composition data and annual growth and mortality parameters. For short-lived species, it is helpful to use a shorter-than-annual time step to account for the growth of short-lived fish during one year, if length data is collected on time steps less than one year (e.g. month, `nseasons`=12).
+ - `nfleets`: Number of fleets to be modeled in the fishery; default=1 for a single fleet. With `nfleets` greater than 1, the number of `S50`, `S95`, and `selex_type` values must match the value for `nfleets`. Example, `S50`=c(20,26), `S95`=c(25,35), `selex_type`=rep('logistic', `nfleets`)
 
  **Other inputs: Variation**
 
- - Coefficient of variation around the growth curve (`CVlen`): Default=0.1; Should be adjusted based on the expected variability in the age-length curve.
- - Recruitment standard deviation (`SigmaR`): Default=0.737, the median across all fish species (Thorson et al. 2014); Used for generating recruitment deviates in the simulation or as a starting value for its estimation using LIME. 
- - Fishing mortality standard deviation (`SigmaF`): Default=0.2; Used for generating fishing mortality deviates in the simulation or as the standard deviation of the fishing mortality penalty when estimating annual fishing mortality using LIME. 
- - Catch standard deviation (`SigmaC`): Default=0.2; Used as the fixed standard deviation in the lognormal likelihood when fitting LIME to catch data.
- - Index standard deviation (`SigmaI`): Default=0.2; Used as the fixed standard deviation in the lognormal likelihood when fitting LIME to index data.
-
+ - `CVlen`: Coefficient of variation around the growth curve; Default=0.1; Should be adjusted based on the expected variability in the age-length curve.
+ - `SigmaR`: Recruitment standard deviation; Default=0.737, the median across all fish species (Thorson et al. 2014); Used for generating recruitment deviates in the simulation or as a starting value for its estimation using LIME. 
+ - `SigmaF`: Fishing mortality standard deviation; Default=0.2; Used for generating fishing mortality deviates in the simulation or as the standard deviation of the fishing mortality penalty when estimating annual fishing mortality using LIME. 
+ - `SigmaC`: Catch standard deviation; Default=0.2; Used as the fixed standard deviation in the lognormal likelihood when fitting LIME to catch data.
+ - `SigmaI`: Index standard deviation; Default=0.2; Used as the fixed standard deviation in the lognormal likelihood when fitting LIME to index data.
 
 Now let's populate the `create_lh_list` function with example values.
-```{r}
-lh <- create_lh_list(vbk=0.21,
-                     linf=65,
-                     t0=-0.01,
-                     lwa=0.0245,
-                     lwb=2.79,
-                     M=0.27,
-                     M50=34,
-                     M95=NULL,
-                     maturity_input="length",
-                     S50=20,
-                     S95=26,
-                     selex_input="length",
-                     binwidth=1,
-                     CVlen=0.1,
-                     SigmaR=0.737,
-                     SigmaF=0.2,
-                     R0=1,
-                     rho=0.43,
-                     nseasons=1)
+```{r, tidy=TRUE}
+lh <- create_lh_list(vbk=0.21, 
+           linf=65, 
+           t0=-0.01,
+           lwa=0.0245, 
+           lwb=2.79, 
+           S50=c(20), 
+           S95=c(26), 
+           selex_input="length",
+           selex_type=c("logistic"),
+           M50=34,
+           maturity_input="length",
+           M=0.27, 
+           binwidth=1,
+           CVlen=0.1,
+           SigmaR=0.737,
+           SigmaF=0.2,
+           SigmaC=0.1,
+           SigmaI=0.1,
+           R0=1,
+           Frate=0.1,
+           Fequil=0.25,
+           qcoef=1e-5,
+           start_ages=0,
+           rho=0.43,
+           nseasons=1,
+           nfleets=1)
 ```
 
-### Plot the biological and selectivity inputs
-And then check out the biological parameters and selectivity we've created. Note that even though we input maturity and selectivity by length, `create_lh_list` converts to age and outputs both age (`lh$S_a`) and length (`lh$S_l`).
+```{r echo=FALSE}
+lh_mf <- with(lh, create_lh_list(vbk=vbk, 
+           linf=linf, 
+           t0=t0,
+           lwa=lwa, 
+           lwb=lwb, 
+           S50=c(20,30), 
+           S95=c(26,36), 
+           selex_input="length",
+           selex_type=c("logistic","logistic"),
+           M50=ML50,
+           M95=NULL,
+           maturity_input="length",
+           M=M, 
+           h=h,
+           binwidth=binwidth,
+           CVlen=CVlen,
+           SigmaR=SigmaR,
+           SigmaF=SigmaF,
+           SigmaC=SigmaC,
+           SigmaI=SigmaI,
+           R0=R0,
+           Frate=Frate,
+           qcoef=qcoef,
+           start_ages=0,
+           rho=rho,
+           nseasons=1,
+           nfleets=2))
+true_mf <- generate_data(modpath=NULL,
+            itervec=1, 
+            Fdynamics=c("Constant","Endogenous"),
+            Rdynamics="Constant",
+            lh=lh_mf,
+            Nyears=20,
+            Nyears_comp=c(20,10),
+            comp_sample=200,
+            init_depl=0.7,
+            seed=123,
+            fleet_proportions=c(0.6,0.4))
+```
 
-```{r, fig.height=6, fig.width=8, echo=FALSE, fig.cap="Example length-at-age, weight-at-age, maturity-at-length, and selectivity-at-length."}
+## Plot the biological and selectivity inputs
+Now we should check out the biological parameters and selectivity we've created. Note that even though we input maturity and selectivity by length, `create_lh_list` converts to age and outputs both selectivity-at-age by fleet (`lh$S_fa`) and selectivity-at-length by fleet (`lh$S_fl`).
+```{r, fig.height=6, fig.width=8, fig.cap="Example length-at-age, weight-at-age, maturity-at-length, and selectivity-at-length."}
 par(mfrow=c(2,2), mar=c(4,4,3,1))
 plot(lh$L_a, type="l", lwd=4, xlab="Age", ylab="Length (cm)")
 plot(lh$W_a, type="l", lwd=4, xlab="Age", ylab="Weight (g)")
 plot(lh$Mat_l, type="l", lwd=4, xlab="Length (cm)", ylab="Proportion mature")
-plot(lh$S_l, type="l", lwd=4, xlab="Length (cm)", ylab="Proportion selected to gear")
+
+# plot selectivity for the first (and only) fleet (first row)
+plot(lh$S_fl[1,], type="l", lwd=4, xlab="Length (cm)", ylab="Proportion selected to gear")
 ```
 
-## Generating data from the simulation model
+## Check time step regarding predicted growth
+
+Particularly for short-lived fish, it is possible that an annual time step is too coarse of a time scale to capture individual growth between years. For example, if a fish grows rapidly between ages 1 and 2, it is possible the probability of being a length given age will result in a negligible probability of being certain lengths. However, it is likely those lengths will be observed, and in this case LIME will not be able to fit the data well. 
+
+To check for this issue, we recommend plotting the probability of being in a length bin given age to make sure there is greater than negligible probability of observing all lengths. In this case, there is a small overlap between the distributions for age 1 and 2 fish, which should be enough to have an adequate model fit if fish are observed at approximately 17 cm. 
+
+For tips on what to do when there is a negligible probability of observing some lengths, see the ["Format data" section](##formatdata) in this document.
+
+
+```{r, tidy=TRUE}
+plba <- with(lh, age_length(highs, lows, L_a, CVlen))
+```
+```{r, echo=FALSE, fig.cap="Probability of being in a length bin given age (years)."}
+ramp <- colorRamp(c("purple4", "darkorange"))
+col_vec <- rgb( ramp(seq(0, 1, length = nrow(plba))), max = 255)
+matplot(t(plba[-1,]), type="l", lty=1, lwd=3, col=col_vec, xaxs="i", yaxs="i", ylim=c(0, 0.5), xlab="Length bin (cm)", ylab="Density")
+legend("topright", legend=lh$ages[seq(2,length(lh$ages),by=3)], col=col_vec[seq(2,length(lh$ages),by=3)],, lwd=3, title="Age")
+```
+
+# Step 2: Data inputs to LIME
+
+The first subsection on data formatting provides an overview of the simulation functions within the LIME package. To learn how to format data from your fishery, skip to the ["Format data" section](##formatdata).
+
+## Simulating data
 
 Using the life history list output from `create_lh_list`, we can simulate a population and generate data. 
 
@@ -166,454 +251,527 @@ The `generate_data` function has several settings for which the user is required
  - `modpath`: model path for saving simulated populations; can set as `NULL` to run within the R environment only without saving locally.
  - `itervec`: vector of iterations of simulated data; can be 1 to run only one iteration, or 1:100 to run 100 iterations of simulated populations.
  - `lh`: life history list, output from `create_lh_list`.
- - `Fdynamics`: Pattern for fishing mortality dynamics; options include `Constant`, `Ramp`, `Increasing`, `None`, or `Endogenous`.
- - `Rdynamics`: Pattern for recruitment dynamics; options include `Constant`, `AR` (for autocorrelated recruitment), `Pulsed`, `Pulsed_up`, or `BH` (for Beverton-Holt stock-recruit relationship).
+ - `Fdynamics`: Pattern for fishing mortality dynamics; options include `Constant`, `Oneway`, `Endogenous`, or `None`.
+ - `Rdynamics`: Pattern for recruitment dynamics; options include `Constant`, or `Pulsed`.
  - `Nyears`: number of years for your simulated population.
- - `Nyears_comp`: number of years to generate length data; e.g. if 10 years and `Nyears` is 20 years, will be the last 10 years in the 20 year time series.
- - `comp_sample`: nominal sample size of length data annually; e.g. 200 length measurements collected annually.
+ - `Nyears_comp`: number of years to generate length data; e.g. if 10 years and `Nyears` is 20 years, will be the last 10 years in the 20 year time series. Must correspond to the number of fleets, e.g. c(20,10) would mean 20 years of length data for fleet 1 and 10 years of length data for fleet 2.
+ - `comp_sample`: nominal sample size of length data annually; e.g. 200 length measurements collected annually. If there is more than 1 fleet and only 1 number is specified, that number will apply to all fleets (e.g. 200 samples in each fleet).
  - `init_depl`: initial depletion, or the proportion of the unfished population biomass in the first year of the population to be modeled. Specifying a single value indicates the initial depletion (e.g. 0.5) or two values indicates the lower and upper bounds of a uniform distribution for which the population simulation will randomly draw a depletion value (e.g. c(0.1,0.9)).
  -  `seed`: set a seed for random numbers for generating process deviations.
- 
+
 There are also several other settings not required but may be useful:
 
  - `rewrite`: default=TRUE to always re-simulated data. `rewrite`=FALSE may be useful to only simulate a new population if the `True.rds` output file already exists in the folder.
- - `derive_quants`: default=FALSE to save time, changing this argument to TRUE will calculate MSY-based reference points. 
  - `pool`: default=TRUE, meaning that if the number of seasons per year as specified in the `create_lh_list` function is more than 1, the length composition data collected in each time set is pooled together annually. `pool`=FALSE would mean the generated length composition data is on a time step shorter than 1 year (e.g. monthly if `nseasons`=12). The total sample size for the year will still be equal to `comp_sample`.
- - `mismatch`: default=FALSE, indicating that the length data, catch, and abundance index are all generated from the same years. `mismatch`=FALSE forces the length data to be collected in separate years from the catch and abundance index, overlapping only 1 year.
- - `mgt_type`: relevant if using  the LIME package to project forward a harvest control rule. If `Fdynamics` is input as numeric, `mgt_type` specifies whether `Fdynamics` is the fishing mortality rate to project forward (`mgt_type`='F', default) or catch in weight (`mgt_type`="catch").
 
 Now let's use `generate_data` to simulate 1 example population (itervec=1) to generate length, catch, and an abundance index. We won't specify a `modpath` so the simulated population will just be used locally in this vignette.
-```{r, echo=FALSE}
-set.seed(143)
-```
-```{r}
+
+```{r, tidy=TRUE}
 true <- generate_data(modpath=NULL,
-                      itervec=1,
-                      lh=lh,
-                      Fdynamics="Ramp",
-                      Rdynamics="AR",
-                      Nyears=20,
-                      Nyears_comp=20,
-                      comp_sample=200,
-                      init_depl=0.8,
-                      seed=1)
+            itervec=1, 
+            Fdynamics=c("Endogenous"),
+            Rdynamics="Constant",
+            lh=lh,
+            Nyears=20,
+            Nyears_comp=c(20),
+            comp_sample=200,
+            init_depl=0.7,
+            seed=123,
+            fleet_proportions=1)
 ```
-
-### Plot the simulated population
-
-```{r, fig.width=10, fig.height=6, echo=FALSE, fig.cap="True population: fishing mortality ramped (increasing then decreasing), autocorrelated recruitment, spawning potential ratio (SPR), mean length, spawning biomass, and relative spawning biomass."}
-par(mfrow=c(2,3))
-plot(true$F_t, type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true$F_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+```{r, fig.width=10, fig.height=6, tidy=TRUE, fig.cap="True population: fishing mortality mimicking an open access fishery, where effort is a function of spawning biomass, autocorrelated recruitment, spawning potential ratio (SPR), mean length, spawning biomass, and relative spawning biomass."}
+par(mfrow=c(3,2))
+plot(true$F_ft[1,], type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true$F_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$ML_t, type="l", lwd=4, xlab="Year", ylab="Mean length", ylim=c(0,max(true$ML_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$SB_t, type="l", lwd=4, xlab="Year", ylab="Spawning biomass", ylim=c(0,max(true$SB_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(true$D_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-```
-
-### Plot the generated data
-
-Each panel of length data is labeled with the year (1-20).
-
-```{r, fig.height=6, fig.width=8, echo=FALSE, fig.cap="Generated length composition data, labeled by years 1-20."}
-plot_LCfits(LFlist=list("LF"=true$LF))
-```
-
-```{r, fig.height=3, fig.width=10, echo=FALSE, fig.cap="Generated catch and abundance index over time."}
-par(mfrow=c(1,2))
-plot(true$Cw_t, type="l", lwd=4, xlab="Year", ylab="Catch (g)", ylim=c(0,max(true$Cw_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$I_t, type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true$I_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-```
-
-# Estimation
-
-Using LIME for estimation requires three vital steps:
-
- 1. Setup data correctly
- 2. Run the LIME model using TMB
- 3. Check convergence and plot output
- 4. Run sensitivities
-
-## Data setup
-
-It is very important that the data are set up correctly for the LIME estimation to run.
-
-### Length data
-
-A matrix with the time step (e.g. year) along the rows and length bins along the columns. 
-
- - Rows should be named with the year names. Only years with length data should be included. Years can be in true years (1998-2017) or indexed years (1-20) as long as there is consistency between items in the data list (see "Input List" below).
- - Columns should be named with the upper length bins. Columns should range from the first possible length bin (e.g. 1 for 1-cm length bins) to the last observed length bin. If there are no observations until 30cm, add a matrix of zeros for lengths 1,2,3,...29cm.  If the last observed length bin is less than 1.5 times the asymptotic length (linf), LIME will internally add a matrix of zeros to be able to account for potentially larger fish than were observed.
- 
-```{r}
-## years with length data -- rename with your own years with length data
-length_years <- rownames(true$LF)
-
-## length bins -- rename with your upper length bins
-length_bins <- colnames(true$LF)
-
-## matrix with length frequency data
-LF <- true$LF
-
-## set rownames as years
-rownames(LF) <- length_years
-
-## set colnames as length bins
-colnames(LF) <- length_bins
-
-## first six years of length data
-head(LF)
-```
-
-It is possible length data exist for 10 years only, but either 1) catch or abundance index data are available for years prior to length data or 2) the first few years of length data hold information on recruitment from years prior. 
-
-In the scenario that you have ten years of length data but want to model over 20 years, just make sure the years of length data are labeled with the correct year in terms of the overall model:
-```{r}
-## years with length data, shortened
-years_short <- 11:20
-
-LF_short <- LF[years_short,]
-rownames(LF_short) <- years_short
-
-LF_short
-```
-
-### Catch and index data
-
-Vectors with each observation named with the time step (e.g. year) it was observed. Years can be in true years (1998-2017) or indexed years (1-20) as long as there is consistency between items in the data list (see "Input List" below).
-
-Setup for the catch data:
-```{r}
-## catch years
-catch_years <- names(true$Cw_t)
-
-## catch in weight
-C_t <- true$Cw_t
-names(C_t) <- catch_years
-
-C_t
-
-```
-
-Same setup for the abundance index:
-```{r}
-## index years
-index_years <- names(true$I_t)
-
-## catch in weight
-I_t <- true$I_t
-names(I_t) <- index_years
-
-I_t
-
+plot(true$Cw_ft[1,], type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(true$Cw_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 ```
 
 
-### Input list
+The `LIME` package includes the `plot_LCfits` function which can first be used to plot the length frequency data, and later used to plot the model fits to the length frequency data. The `plot_LCfits` function requires the length frequency data in list form, where each element of the list is the length frequency data for a single fleet, structured as a matrix with years along the rows and length bins along the column. 
 
-LIME requires data in an list form, with a minimum:
-
- - `years`: the total, inclusive years to model. 
-    - If length data is available for years 1-5 and 10-20, `years` should be a vector 1-20. 
-    - Years can be in true years (1998-2017) or indexed years (1-20) as long as there is consistency between the length, catch, and/or index data. For example, if length data years are labeled 1998-2017, `years` should be 1998-2017 (or may start before 1998 if length data are informative for a few years prior to the first year of data). 
-    
- - `LF`: the length frequency matrix. See "Length data" section above for formatting details.
-    - Rows labeled with years.
-    - Columns labeled with upper length bins.
- 
-With the minium inputs, the data list should look like:  
-```{r}
-## years with length data, make sure they are numbers and not characters
-length_years <- as.numeric(rownames(LF))
-
-## total years
-total_years <- min(length_years):max(length_years)
-
-data_list <- list("years"=total_years, "LF"=LF)
+The following code converts the length frequency array `true_LF` output from the `generate_data` function into a list to use in the `plot_LCfits` function:
+```{r, fig.height=6, fig.width=8, tidy=TRUE, fig.cap="Generated length composition data, labeled by years 1-20."}
+plot_LCfits(LFlist=list("LF"=true$LF[,,1]))
 ```
 
 
-If catch and/or an abundance index are available, these should also be included in the data input list. See "Catch and index data" section above for formatting details. 
- 
- - `C_t`: catch data, in numbers or weight (to be specified later)
- - `I_t`: abundance index.
- 
+## Format data
 
-```{r}
-## years with catch data, make sure they are numbers and not characters
-catch_years <- as.numeric(names(C_t))
+LIME requires data input in a specific format:
 
-## years with index data, make sure they are numbers and not characters
-index_years <- as.numeric(names(I_t))
+### Length composition data
 
-## find minimum year across all data types
-min_yr <- min(c(length_years, catch_years, index_years))
+**Option 1: Matrix**
 
-## find maximum year across all data types
-max_yr <- max(c(length_years, catch_years, index_years))
+With only one fleet, length composition data can be in a length frequency matrix, with years along the rows and length bins along the columns. Here are 5 years as an example:
 
-total_years <- min_yr:max_yr
-
-data_list <- list("years"=total_years, "LF"=LF, "C_t"=C_t, "I_t"=I_t)
-data_list
+```{r echo=FALSE}
+LF_mat <- true$LF[,,1]
+LF_mat[1:5,]
 ```
 
-Remember to plot your data to make sure they look right. See above section "Plot generated data" where we already checked the generated data used for the vignette.
+**Option 2: Array**
 
-## Run LIME
+The length composition data can be an array of matrices (one for each fleet). Columns should be named with the upper end of the length bin and rows should be named with the year. 
 
-Now we can use `run_LIME` to run the LIME assessment. LIME uses Template Model Builder (TMB) to calculate recruitment deviations as random effects and standard errors (Kristensen et al. 2016). However, the LIME package has the model pre-compiled, so all you really need are the TMB and TMBhelper packages downloaded and the `run_LIME` function. 
-
-The function `run_LIME` has several required inputs:
-
- - `modpath`: model path for saving LIME output; can set as `NULL` to run within the R environment only without saving locally.
- - `lh`: life history list, output from `create_lh_list`.
- - `input_data`: list of data inputs, output above called `data_list`.
- - `est_sigma`: vector of variance parameters to estimate, must match parameter names. Estimate recruitment standard deviation with `log_sigma_R`. Another desired option may be including the coefficient of variation around the growth curve, `log_CV_L`. Other options include the catch or index standard deviations: `log_sigma_C`, `log_sigma_I`. Concatenate to estimate multiple variance parameters: e.g. c(`log_sigma_R`,`log_CV_L`). If not included in `est_sigma`, parameter will be fixed at the starting value set in `create_lh_list`.
- - `data_avail`: Types of data included, must at least include "LC"" as length data is the minimum data input. May also include "Catch" or "Index" if included, separated by an underscore, e.g. "LC", "Catch_LC", "Index_LC", or "Index_Catch_LC".
- 
-There are many other settings and tools included as arguments to `run_LIME`:
-
-**Fixing parameters**
-
- - `fix_param`: default=FALSE, or can specify a non-time-varying parameter name (must match name from model). Many parameters are automatically fixed unless specific data scenarios arise. Non-time-varying parameters that could be fixed using this argument include:
-   - `log_q_I`: log catchability coefficient, automatically fixed to starting value from `create_lh_list` unless using an abundance index.
-   - `beta`: log equilibrium recruitment, automatically fixed to starting value from `create_lh_list` unless using catch data.
-   - `logS50`: log length at 50% selectivity, automatically estimated unless specified in `fix_param`.
-   - `logSdelta`: log difference between length at 95% and 50% selectivity, automatically estimated unless specified in `fix_param`.
-   - `log_theta`: log Dirichlet-multinomial parameter related to effective sample size, automatically estimated unless specified in `fix_param`.
- - `fix_param_t`: default=FALSE, or can fix some time-varying values with the name as the first item in the list and the years as a vector in the second item of the list.
-   - to fix years 1-10 of fishing mortality rates: `fix_param_t`=list(param="log_F_t_input", years=1:10)
-   - to fix years 1-10 of recruitment deviations: `fix_param_t`=list(param="Nu_input", years=1:10)
- - `S_l_input`: default=-1 to estimate selectivity parameters or use input values. Fix the selectivity curve to specific values by inputting a vector of selectivity-at-length. The objective of this setting is to explore the impact of dome-shaped selectivity or exploring other shapes besides the one- or two-parameter logistic curves.
- - `randomR`: default=TRUE to derive recruitment deviations as random effects. Change to FALSE to turn off random effect on recruitment.
- - `param_adjust`: vector of parameter names, as a simple way to change the starting or input values for some parameters than creating a new list with `create_lh_list`
-   - full list includes: `SigmaR`, `SigmaF`, `SigmaC`, `SigmaI`, `CVlen`, `M`, `linf`, `vbk`, `ML50`. 
-   - Other parameters require new life history list with `create_lh_list`
- - `val_adjust`: adjusted values in the order listed by parameter names in `param_adjust`
- 
-**Other settings**
-
- - `rewrite`: default=TRUE to run LIME assessment, change to FALSE to avoid re-running LIME if output already exists in the directory.
- - `C_opt`: default=0 when not including catch data. 1= input catch in numbers, 2= input catch in biomass.
- - `newtonsteps`: specify number of newton steps to take after optimization; default=3 to help with optimization; 0 will turn this feature off.
- - `F_up`: upper bound of fishing mortality parameters, default=10
- - `S50_up`: upper bound of length at 50% selectivity, default=NULL
- - `LFdist`: default=1 to use dirichlet-multinomial likelihood function to fit length comp data, other option 0= multinomial likelihood using nominal sample size of length data.
- - `derive_quants`: default=FALSE due to longer run time, can set to TRUE to output additional derived quantities, including MSY-based reference points when catch data included.
- - `theta_type`: default=1 to estimate single theta related to effective sample size for all years of length comp. 0=estimate annual theta for each year of length data.
- - `Fpen`: penalty on fishing mortality; default=1 ON, 0=OFF
- - `SigRpen`: penalty on recruitment standard deviation; default=1 ON, 0=OFF
-
-
-**Settings related to simulation**
-
- - `f_true`: default=FALSE for starting values of fishing mortality rates at 1.0. change to TRUE to start at the true values from the simulation.
- - `itervec`: default=NULL, for use in simulation study to run multiple iterations within the same set of model run settings.
- - `simulation`: default=FALSE, change to TRUE if using LIME in the context of a simulation study, to require `itervec` specification.
-
-
-Here is an example to run LIME with default settings, with a "data-rich" scenario including 20 years of length, catch, and abundance index data.
-```{r, results="hide", warning=FALSE}
-res_rich <- run_LIME(modpath=NULL,
-                     lh=lh,
-                     input_data=data_list,
-                     est_sigma="log_sigma_R",
-                     data_avail="Index_Catch_LC",
-                     C_opt=2)
+One fleet, first five years:
+```{r echo=FALSE}
+LF_array <- true$LF
+LF_array_sub <- array(LF_array[1:5,,1], dim=c(5, ncol(LF_array[,,1]), 1))
+colnames(LF_array_sub) <- colnames(LF_mat)
+rownames(LF_array_sub) <- rownames(LF_mat)[1:5]
+LF_array_sub
 ```
 
-Let's compare results from the data-rich scenario when we exclude catch data by changing the `data_avail` argument:
-```{r, results="hide", warning=FALSE}
-res_nocatch <- run_LIME(modpath=NULL,
-                        lh=lh,
-                        input_data=data_list,
-                        est_sigma="log_sigma_R",
-                        data_avail="Index_LC")
+With two fleets, we add a second matrix to the array. If data are not available in the same years for both fleets, include inclusive years for all fleets with no observations in the years with no data. 
+
+Two fleets, first five years, with no data the first two years for the second fleet:
+```{r echo=FALSE}
+LF_array_mf <- true_mf$LF
+LF_array_sub_mf <- array(LF_array_mf[1:5,,], dim=c(5, ncol(LF_array_mf[,,1]), 2))
+colnames(LF_array_sub_mf) <- colnames(LF_mat)
+rownames(LF_array_sub_mf) <- rownames(LF_mat)[1:5]
+LF_array_sub_mf
+```
+
+**Option 2: List**
+
+The length composition data could also be a list of matrices (one for each fleet).
+
+Two fleets, first five years:
+```{r echo=FALSE}
+LF_list <- lapply(1:2, function(x) LF_array_sub_mf[,,x])
+LF_list
 ```
 
 
-Now let's run LIME with length data only:
-```{r, results="hide", warning=FALSE}
-res_length <- run_LIME(modpath=NULL,
-                       lh=lh,
-                       input_data=data_list,
-                       est_sigma="log_sigma_R",
-                       data_avail="LC")
+### Catch and abundance index
+
+Time series data (catch and abundance index) should me in matrix form with fleets along the rows and years along the columns. Rows and columns do not need to be explicitly named with fleet number or year, but the number of years should match the total number of years modeled. If data are not available in any given year there should be a negative place-holder. 
+
+With one fleet, the catch or abundance index time series should still be in matrix form rather than a vector (the model will be looking for the first row, for the one and only fleet).
+
+Catch, one fleet:
+```{r echo=FALSE}
+true$Cw_ft
 ```
 
-Finally, let's run LIME with only 10 years of length data, but continue modeling 20 years:
-```{r, results="hide", warning=FALSE}
-
-## new data list
-data_list_short <- list("years"=total_years, "LF"=LF_short)
-
-res_length_short <- run_LIME(modpath=NULL,
-                       lh=lh,
-                       input_data=data_list_short,
-                       est_sigma="log_sigma_R",
-                       data_avail="LC")
+Abundance index, one fleet:
+```{r echo=FALSE}
+true$I_ft
 ```
 
+With multiple fleets, the catch and abundance index will have multiple rows. Any missing data will have a negative place-holder.
 
-
-
-## Check convergence and plot output
-
-All models we ran estimate 20 years of annual fishing mortality (`log_F_t_input`), recruitment standard deviation (`log_sigma_R`), selectivity parameters (`logS50` and `logSdelta`), and the Dirichlet-multinomial theta parameter (`log_theta`). 
-
-Some other parameters are estimated if an abundance index or catch data are included. 
-
-Before we use any of the above output, we need to check the model convergence. We assess model convergence based on if the absolute value of the final gradient of each parameter is less than 0.001. 
-```{r, include=FALSE}
-colnames(res_rich$df) <- colnames(res_nocatch$df) <- colnames(res_length$df) <- c("Final gradient", "Parameter", "Estimate", "Transformed estimate")
-```
-Data-rich scenario, includes default estimated parameters as well as catchability coefficient (`log_q_I`) and equilibrium recruitment (`beta`):
-```{r}
-res_rich$df[,1:2]
+Catch, two fleets:
+```{r echo=FALSE}
+Cw_ft <- true_mf$Cw_ft
+Cw_ft[2,1:10] <- -999
+Cw_ft
 ```
 
-Index and length scenario, includes default estimated parameters as well as catchability coefficient:
-```{r}
-res_nocatch$df[,1:2]
+Abundance index, two fleets:
+```{r echo=FALSE}
+I_ft <- true_mf$I_ft
+I_ft[2,1:10] <- -999
+I_ft
 ```
 
-Length only scenarios (20 years and 10 years), include default estimated parameters only.
-```{r}
-res_length$df[,1:2]
-```
+### Data input
 
-10 years of length:
-```{r}
-res_length_short$df[,1:2]
+**Observations**
+
+LIME requires inputing observed data in a list form, including:
+
+ - `years`: inclusive years to be modeled
+ - `LF`: length frequency data in matrix, array, or list form
+ - `neff_ft`: effective sample size to use in case of multinomial distribution (otherwise use Dirichlet-multinomial to estimate effective sample size, or assume nominal sample size = effective sample size if not included)
+ - `I_ft`: Index of abundance by fleet and time (if applicable)
+ - `C_ft`: Catch by fleet and time (if applicable) in numbers or biomass (to be specified later) 
+
+```{r, tidy=TRUE}
+data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 ```
 
 
+**Life history and starting values**
 
-Once we have confirmed each model has converged, we can explore model output. The black lines indicate the true value of fishing mortality, recruitment, SPR, and selectivity. Blue lines indicate the maximum likelihood estimates, blue points indicate a year with data, and blue shading indicates 95% confidence intervals. 
+LIME includes a function `create_inputs` which checks the length frequency data and includes all input data, life history information, and starting values in a list together to input into LIME.
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Results from data-rich scenario"}
-plot_output(Inputs=res_rich$Inputs, Report=res_rich$Report, Sdreport=res_rich$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
+`create_inputs` requires:
+
+ - `lh`: life history and starting values list output from `create_lh_inputs`
+ - `input_data`: input data list described in [Data input](**Datainput) section above. 
+
+```{r, tidy=TRUE}
+inputs_all <- create_inputs(lh=lh, input_data=data_all)
 ```
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Results from including index and length"}
-plot_output(Inputs=res_nocatch$Inputs, Report=res_nocatch$Report, Sdreport=res_nocatch$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-```
+# Step 3: Run LIME
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Results including length only"}
-plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-```
+## Estimated parameters
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Results including 10 years of length data only"}
-plot_output(Inputs=res_length_short$Inputs, Report=res_length_short$Report, Sdreport=res_length_short$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-```
+LIME is set up to estimate certain parameters and fix others by default. 
+
+LIME estimates by default:
+
+ - `log_F_ft`: matrix of fishing mortality estimates in log-space by fleet (rows) over time (columns)
+ - `log_sigma_R`: recruitment standard deviation in log-space
+ - `log_S50_f`: length at 50% selectivity in log space, one for each fleet
+ - `log_Sdelta_f`: difference between length at 95% selectivity and length at 50% selectivity in log-space, so that length at 95% selectivity can never be less than length at 50% selectivity, one for each fleet
+ - `Nu_input`: temporal variation in recruitment, treated as random effect
+
+Parameters estimated by default under certain conditions:
+
+ - `log_theta`: Dirichlet-multinomial parameter relating to effective sample size (only estimated if using Dirichlet-multinomial to fit to length composition data, where `run_LIME` argument `LFdist=1`)
+ - `beta`: equilibrium recruitment in log-space, serves as population scaling parameter (only estimated if fitting to catch data, `run_LIME` argument `data_avail` must include "Catch")
+ - `log_q_f`: catchability coefficient in log-space, one for each fleet (only estimated if fitting to an index, `run_LIME` argument `data_avail` must include "Index")
+
+Other parameters that could be estimated but are fixed by default:
+
+ - `log_sigma_C`: observation error on catch, fixed at log(0.2)
+ - `log_sigma_I`: observation error on abundance index, fixed at log(0.2)
+ - `log_CV_L`: coefficient of variation on predicted age-length curve, fixed at log(0.1)
+
+## `run_LIME` function
+
+The function `run_LIME` used to run LIME models has many settings, but hopefully most models will keep the defaults and use only a few arguments.
+
+Basic inputs to `run_LIME`:
+
+ - `modpath`: model path to save results and flags; default=NULL to save in R environment locally
+ - `input`: list output from `create_inputs`
+ - `data_avail`: what data types will LIME fit to? "LC"= length composition only, "Index_LC"= index and length comps, "Catch_LC"= catch and length comps, and "Index_Catch_LC" = index, catch, and length comps. 
+
+If fitting to catch data, the user must specify:
+
+ - `C_type`: default=0 (no catch data), 1 for catch in numbers, 2 for catch in biomass
+
+Additional settings in `run_LIME`:
+
+ - `LFdist`: which distribution to fit to length frequency data? default=1 to use Dirichlet-multinomial and estimate additional parameter related to effective sample size, multinomial = 0
+ - `est_more`: additional parameters to estimate that are fixed by default (see [Estimated parameters](##estimatedparameters) section)
+ - `fix_more`: additional parameters to fix that are estimated by default (see [Estimated parameters](##estimatedparameters) section) 
+ - `est_F_ft`: which F parameters to estimate? default=TRUE to estimate all. Otherwise, a matrix with fleets as rows and years along columns, with a 1 where the F parameter should be estimated and a 0 where the F parameter should be fixed at the starting value.
+ - `f_startval_ft`: starting values for fishing mortality, default=NULL to start at 0.2 for all years and fleets. Otherwise, matrix of starting values for F where fleets are along the rows and years along the columns (e.g. can input the estimated F values from the previous run with Report$F_ft).
+ - `rdev_startval_t`: starting values for recruitment deviations over time. default=NULL to start at 0 for all years. Otherwise, specify vector of recruitment deviations for all years to be modeled (e.g. can start at simulated truth and turn off estimation for debugging)
+ - `est_selex_f`: estimate selectivity parameters? default=TRUE to estimate selectivity parameters for all fleets. Turn off selectivity estimation for all or a single fleet with FALSE (e.g. estimate selectivity parameters for fleet 1 but not fleet 2 with c(TRUE, FALSE))
+ - `vals_selex_ft`: input selectivity-at-length (columns) by fleet (rows). default= matrix of negative values to estimate selectivity. Otherwise, input selectivity and set `est_selex_f`=FALSE. This is how one would go about fixing the selectivity curve to a dome shape.
+ - `randomR`: default=TRUE treats recruitment deviations as a random effect. FALSE turns the random effect off.
+ - `newtonsteps`: number of extra Newton steps to take after optimization to help convergence, default=3; FALSE to turn off. Note: it seems with TMB that bounding parameters does not work when using newtonsteps. If a parameter is estimated outside of a reasonable bound, I recommend setting newtonsteps=FALSE.
+ - `F_up`: upper bound on fishing mortality estimate
+ - `S50_up`: upper bound on length at 50% selectivity
+ - `Fpen`: penalty on fishing mortality to avoid fishing mortality being estimated at drastically different values between years; default=1 on, otherwise 0=off.
+ - `SigRpen`: penalty on sigmaR, default=1 on, otherwise off=0.
+ - `SigRprior`: vector with prior info for normally distributed sigmaR penalty, first term is the mean and second term is the standard deviation; default =c(0.737, 0.3)
+ - `derive_quants`: if TRUE, derive MSYbased reference points, default=FALSE
+ - `est_totalF`: TRUE will estimate total fishing mortality across all fleets (number of parameters = number of years), not by fleet (where number of parameters would = number of years * number of fleets). default=FALSE estimates F by year and fleet.
+ - `prop_f`: proportion of catch from each fleet, must sum to 1.0. When `est_totalF`=TRUE, must assume how much of the catch comes from each fleet (e.g. c(0.5,0.5), c(0.6,0.4), etc.)
+ - `mirror`: vector of parameter names matching those in [Estimated parameters](##estimatedparameters) section to mirror between fleets (estimating one parameter instead of the same number of fleets)
+ - `rewrite`: default=TRUE to rewrite LIME output (LIME_output.rds) in the directory `modpath`. FALSE is useful for simulation testing if the process was stopped midway through 100 iterations, so a function can skip iterations with output.
+
+ Settings in `run_LIME` associated with simulation-testing:
+
+  - `simulation`: default=FALSE, but if TRUE, sets working directory in the iteration directory, not the general `modpath`
+  - `itervec`: vector of iterations for simulation, e.g. 1:100. default=NULL for stock assessment application with real data (1 iteration)
 
 
-## Check sensitivites
+## Example: Data-rich model run
 
-**Biological inputs**
+Here's the best-case scenario for running LIME: 20 years of length composition, catch, and an abundance index, with a typical 200 samples of length measurements per year, assuming the life history information is known without error. 
 
-The most straightforward way to test LIME sensitivity to input parameters is to create alternate life history/input lists using `create_lh_list`. For example, if we want to test the impact of a 25% larger asympototic length, we could create a new list:
-
-```{r}
-lh_alt <- create_lh_list(vbk=0.21,
-                     linf=65*1.25,
-                     t0=-0.01,
-                     lwa=0.0245,
-                     lwb=2.79,
-                     M=0.27,
-                     M50=34,
-                     M95=NULL,
-                     maturity_input="length",
-                     S50=20,
-                     S95=26,
-                     selex_input="length",
-                     binwidth=1,
-                     CVlen=0.1,
-                     SigmaR=0.737,
-                     SigmaF=0.2,
-                     R0=1,
-                     rho=0.43,
-                     nseasons=1)
-```
-
-Then re-run the assessment with the new life history list, for example with length data only:
-
-```{r, results="hide", warning=FALSE}
-res_alt <- run_LIME(modpath=NULL,
-                    lh=lh_alt,
-                    input_data=data_list,
-                    est_sigma="log_sigma_R",
-                    data_avail="LC")
-```
-
-Then check how the larger asymptotic length impacts the assessment results:
-```{r}
-plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-plot_output(Inputs=res_alt$Inputs, Report=res_alt$Report, Sdreport=res_alt$Sdreport, lh=lh_alt, True=true, plot=c("Fish","Rec","SPR","Selex"), set_ylim=list("F"=c(0,1), "R"=c(0,5)))
-```
-
-
-**Selectivity model**
-
-Users may also want to fix the selectivity curve, either based on previous studies or to examine the impact of dome-shaped selectivity. Here is an example where we create an input list with an assumed function for dome-shaped selectivity:
-
-```{r}
-lh_dome <- create_lh_list(vbk=0.21,
-                     linf=65,
-                     t0=-0.01,
-                     lwa=0.0245,
-                     lwb=2.79,
-                     M=0.27,
-                     M50=34,
-                     M95=NULL,
-                     maturity_input="length",
-                     S50=20,
-                     S95=26,
-                     selex_input="length",
-                     selex_type="dome",
-                     dome_sd=15,
-                     binwidth=1,
-                     CVlen=0.1,
-                     SigmaR=0.737,
-                     SigmaF=0.2,
-                     R0=1,
-                     rho=0.43,
-                     nseasons=1)
-```
+Here we specify `C_type=2` because the catch data specified in `data_all` in the [Data input](###datainput) section was catch in weight, not numbers.
 
 ```{r, echo=FALSE}
-par(mfrow=c(1,1))
-plot(lh$S_l, lwd=4, type="l", xlab="Length (cm)", ylab="Proportion selected to gear", xaxs="i", yaxs="i", cex.lab=1.5, cex.axis=1.5, xpd=NA)
-lines(lh_dome$S_l, col="red", lwd=4, lty=2)
-legend("bottomright", lwd=2, lty=c(1,2), col=c("black","red"), legend=c("Logistic","Dome"), title="Selectivity model")
+start <- Sys.time()
+```
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+rich <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="Index_Catch_LC",
+                  C_type=2)
+```
+```{r, echo=FALSE}
+end <- Sys.time() - start
+end
 ```
 
-Then use the `S_l_input` argument to re-run the assessment with the fixed dome-shaped selectivity curve. This assessment will not estimate selectivity parameters.
+The time difference above shows the run time of the data-rich case on the machine that compiled this document. The run time will vary depending on the machine, but hopefully this gives a ballpark of how long it takes to run a model with approximately 20 years and three data types.
 
-```{r, results="hide", warning=FALSE}
-res_dome <- run_LIME(modpath=NULL,
-                    lh=lh,
-                    input_data=data_list,
-                    est_sigma="log_sigma_R",
-                    data_avail="LC",
-                    S_l_input=lh_dome$S_l)
+The object `rich` contains several elements of LIME output:
+
+ - `Inputs`: List of Data, Parameters, Map, and Random elements that are input directly to the LIME.cpp program. The goal is to help the user check the exact values and structure that went in to the LIME optimization using TMB. 
+ - `Report`: Report file of maximum likelihood estimates and derived values of population parameters from the LIME model run.
+ - `Sdreport`: Standard errors of all estimated parameters and derived values of population parameters which are specified in the LIME.cpp file.
+ - `obj`: the TMB object
+ - `opt`: the optimization results from TMBhelper::Optimize
+ - `df`: a data frame of final gradients for each estimated parameter
+ - `input`: input data list created using `create_inputs` function. This is used when re-running the model using the function `get_converged`.
+ - `data_avail`: the data types available. This is used when re-running the model using the function `get_converged`. 
+
+### Check convergence
+
+General convergence criteria for LIME models includes:
+
+1. Final gradient of all estimated parameters is within +/- 0.001
+2. Hessian matrix is positive definite
+
+We can check this for any model run using the following code:
+```{r, tidy=TRUE}
+gradient <- rich$opt$max_gradient <= 0.001
+hessian <- rich$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
 ```
 
-Then check how the assumed dome-shaped selectivity curve impacts assessment results:
-```{r}
-plot_output(Inputs=res_length$Inputs, Report=res_length$Report, Sdreport=res_length$Sdreport, lh=lh, True=true, plot=c("Fish","Rec","SPR","Selex"))
-plot_output(Inputs=res_dome$Inputs, Report=res_dome$Report, Sdreport=res_dome$Sdreport, lh=lh_dome, True=true, plot=c("Fish","Rec","SPR","Selex"))
+Because both the hessian and gradient checks passed, we assume that the program found the global minimum of the negative log likelihood surface and can move on to examine results. 
+
+### Plot results
+
+The `LIME` package includes functions to plot length composition model fits and other results.
+
+First, we need to get the length frequency data into a list. Here's some code to do this with the standardized LIME output:
+```{r, tidy=TRUE}
+## use lapply to loop over the number of fleets, found in Inputs$Data$n_f
+## for each fleet x, return matrix of length data Inputs$Data$LF_tlf[,,x]
+LF_list <- lapply(1:rich$Inputs$Data$n_f, function(x){
+  return(rich$Inputs$Data$LF_tlf[,,x])
+})
+```
+
+The code above outputs a list of length frequency data with length equal to number of fleets
+```{r,tidy=TRUE}
+length(LF_list)
+```
+
+For each element of the list, the dimensions of each matrix have years along the rows and number of length bins along the columns
+```{r,tidy=TRUE}
+dim(LF_list[[1]])
+```
+
+LIME model fits to length frequency data:
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the data-rich LIME model run."}
+plot_LCfits(LFlist=LF_list,
+            Inputs=rich$Inputs,
+            Report=rich$Report)
+```
+
+LIME estimates of key population parameters:
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) for the data-rich case."}
+plot_output(Inputs=rich$Inputs,
+            Report=rich$Report,
+            Sdreport=rich$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,1),"SPR"=c(0,1)))
 ```
 
 
+## Example: Length data only
 
-# References
+This is the scenario for which LIME was developed: integrating multiple years of length data to account for time-varying fishing mortality and recruitment. The big change from the data-rich case in the code is to make sure `data_avail="LC"` and `C_type` is set to zero or removed from the function call (because the default is zero). We can still use the `inputs_all` list that includes the index and catch data, but as long as `data_avail="LC"` the model will not include the other data types. 
 
-Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H., and Bell, B. 2016. TMB: Automatic Differentiation and Laplace Approximation. Journal of Statistical Software. 
+```{r, echo=FALSE}
+start <- Sys.time()
+```
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+lc_only <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="LC")
+```
+```{r, echo=FALSE}
+end <- Sys.time() - start
+end
+```
 
-Rudd, M.B. and Thorson, J.T. 2017. Accounting for variable recruitment and fishing mortality in length-based stock assessments for data-limited fisheries. Canadian Journal of Fisheries and Aquatic Sciences. https://doi.org/10.1139/cjfas-2017-0143
+Note the time difference is shorter than the data-rich case. 
 
-Thorson, J.T., Jensen, O.P, and Zipkin, E.F. 2014. How variable is recruitment for exploited marine fishes? A hierarchical model for testing life history theory. Canadian Journal of Fisheries and Aquatic Sciences 71(7):973-983.
+### Check convergence
 
-Thorson, J.T. Johnson, K.F., Methot, R.D., and Taylor, I.G. 2017. Model-based estimates of effective sample size in stock assessment models using the Dirichlet-multinomial distribution. Fisheries Research 192:84-93.
+
+```{r, tidy=TRUE}
+gradient <- lc_only$opt$max_gradient <= 0.001
+hessian <- lc_only$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+#### Plot results
+
+
+We can use the same LF_list as was calculated in the data-rich case, but compare the LIME model fits from the model that excluded catch and abundance index:
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the LIME model run with length composition data only."}
+plot_LCfits(LFlist=LF_list,
+            Inputs=lc_only$Inputs,
+            Report=lc_only$Report)
+```
+
+Model fits with length data only are of course much less accurate and with higher uncertainty than the data-rich case:
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) with length composition data only."}
+plot_output(Inputs=lc_only$Inputs,
+            Report=lc_only$Report,
+            Sdreport=lc_only$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
+```
+
+The model meets convergence criteria but the fishing mortality rate estimates jump around between years more than is realistic. To attempt to curb this behavior, it is possible to decrease the standard deviation for fishing mortality which will serve to penalize estimates of fishing mortality that stray too far from the previous year.
+
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+inputs_all$SigmaF <- 0.1
+lc_only2 <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="LC")
+
+gradient <- lc_only2$opt$max_gradient <= 0.001
+hessian <- lc_only2$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) with length composition data only, with lower SigmaF."}
+plot_output(Inputs=lc_only2$Inputs,
+            Report=lc_only2$Report,
+            Sdreport=lc_only2$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
+```
+
+
+## Example: Length and catch data
+
+This is the scenario most similar to the ideas behind catch-curve stock reduction analysis (CCSRA). CCSRA used catch and age composition data to estimate stock status. LIME can use catch and length composition, which is much easier to collect than ages. With accurate assumptions about life history information, the combination of catch and length data can be very informative of stock status.
+
+```{r, echo=FALSE}
+start <- Sys.time()
+```
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+catch_lc <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="Catch_LC",
+                  C_type=2)
+```
+```{r, echo=FALSE}
+end <- Sys.time() - start
+end
+```
+
+
+### Check convergence
+
+
+```{r, tidy=TRUE}
+gradient <- catch_lc$opt$max_gradient <= 0.001
+hessian <- catch_lc$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+#### Plot results
+
+Model fits including catch data with length composition data:
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the LIME model run with catch and length data."}
+plot_LCfits(LFlist=LF_list,
+            Inputs=catch_lc$Inputs,
+            Report=catch_lc$Report)
+```
+
+Including catch data improves estimates of population parameters over length data only.
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) with catch and length data."}
+plot_output(Inputs=catch_lc$Inputs,
+            Report=catch_lc$Report,
+            Sdreport=catch_lc$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
+```
+
+# Multiple fleets
+
+## Example: Two fleets with logistic selectivity
+
+### Step 1: Biological inputs and starting values
+
+With multiple fleets, all biological inputs are the same as with a single fleet. However, we must specify selectivity for each fleet. In this case, both selectivities are logistic. 
+```{r, tidy=TRUE}
+lh_mf1 <- with(lh, create_lh_list(vbk=vbk, 
+           linf=linf, 
+           t0=t0,
+           lwa=lwa, 
+           lwb=lwb, 
+           S50=c(20,30), 
+           S95=c(26,36), 
+           selex_input="length",
+           selex_type=c("logistic","logistic"),
+           M50=ML50,
+           M95=NULL,
+           maturity_input="length",
+           M=M, 
+           h=h,
+           binwidth=binwidth,
+           CVlen=CVlen,
+           SigmaR=SigmaR,
+           SigmaF=SigmaF,
+           SigmaC=SigmaC,
+           SigmaI=SigmaI,
+           R0=R0,
+           Frate=Frate,
+           qcoef=qcoef,
+           start_ages=0,
+           rho=rho,
+           nseasons=1,
+           nfleets=2))
+```
+```{r, echo=FALSE}
+plot(lh_mf1$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity")
+lines(lh_mf1$S_fl[2,], type="l", lwd=2, col="steelblue")
+```
+
+### Step 2: Data inputs
+
+## Example: Two fleets, one with dome-shaped selectivity
+
+Here is another example where fleet 1 has logistic selectivity but fleet 2 has dome-shaped selectivity:
+```{r, tidy=TRUE}
+lh_mf2 <- with(lh, create_lh_list(vbk=vbk, 
+           linf=linf, 
+           t0=t0,
+           lwa=lwa, 
+           lwb=lwb, 
+           S50=c(20,30), 
+           S95=c(26,36), 
+           dome_sd=c(NA,10),
+           selex_input="length",
+           selex_type=c("logistic","dome"),
+           M50=ML50,
+           M95=NULL,
+           maturity_input="length",
+           M=M, 
+           h=h,
+           binwidth=binwidth,
+           CVlen=CVlen,
+           SigmaR=SigmaR,
+           SigmaF=SigmaF,
+           SigmaC=SigmaC,
+           SigmaI=SigmaI,
+           R0=R0,
+           Frate=Frate,
+           qcoef=qcoef,
+           start_ages=0,
+           rho=rho,
+           nseasons=1,
+           nfleets=2))
+```
+```{r, echo=FALSE}
+plot(lh_mf2$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity")
+lines(lh_mf2$S_fl[2,], type="l", lwd=2, col="tomato")
+```
+
+
+# Multiple seasons
+
+# Addressing convergence issues

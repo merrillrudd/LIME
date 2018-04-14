@@ -4,7 +4,7 @@
 \alias{plot_LCfits}
 \title{plot length composition data and model fits}
 \usage{
-plot_LCfits(LFlist, Inputs = NULL, Report = NULL, LBSPR = NULL,
+plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
   ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE,
   true_years = NULL)
 }
