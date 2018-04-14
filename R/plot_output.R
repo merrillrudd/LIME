@@ -18,7 +18,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("SPR" = c(0,1))){
+plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh, true_years=NULL, True=NULL, plot=c("Fish","Rec","SPR","ML","SB","Selex"), set_ylim=list("SPR" = c(0,1)), legend=FALSE){
 
     nf <- Inputs$Data$n_f
     ns <- Inputs$Data$n_s
@@ -26,7 +26,9 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
   all_years <- 1:Inputs$Data$n_t
   lc_years <- lapply(1:nf, function(x){
     sub <- Inputs$Data$LF_tlf[,,x]
-    return(which(rowSums(sub) > 0))
+    if(is.vector(sub) & sum(sub)>0) out <- all_years
+    if(is.matrix(sub)) out <- which(rowSums(sub) > 0)
+    return(out)
   })
   if(all(is.null(true_years))) true_years <- all_years
 
@@ -301,7 +303,7 @@ if("Selex" %in% plot){
     axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
 }
 
-if(nf > 1){
+if(nf > 1 & legend==TRUE){
   legend("bottomright", col=c("#228B22", cols), legend=c("Total", sapply(1:nf, function(x) paste0("Fleet ", x))), lty=1, lwd=2)  
 }
 
