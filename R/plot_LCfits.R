@@ -89,7 +89,10 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 				par(new=TRUE)
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim)
-				if(sum(LFlist[[f]][which(flcyrs==yr),])>0) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
+				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
+					if(length(Tyrs)>1) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
+					if(length(Tyrs)==1) lines(pred[[f]], col=cols[f], lwd=4)
+				}
 			}
 		}
 
