@@ -26,8 +26,12 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 		LF_array <- Inputs$Data$LF_tlf
 		LFlist <- list()
 		for(i in 1:Inputs$Data$n_f){
-			LFlist[[i]] <- LF_array[,,i]
+			LFlist[[i]] <- matrix(LF_array[,,i], nrow=nrow(LF_array), ncol=ncol(LF_array))
+			colnames(LFlist[[i]]) <- colnames(LF_array)
+			rownames(LFlist[[i]]) <- rownames(LF_array)
 		}
+		bins <- as.numeric(colnames(LF_array))
+		bw <- bins[1]
 	}
 
 	nf <- length(LFlist)
@@ -53,7 +57,10 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	if(all(is.null(Report))){
 		pred <- NULL
 	}
-	if(all(is.null(LBSPR))==FALSE) pred2 <- t(LBSPR@pLCatch)
+	if(all(is.null(LBSPR))==FALSE){
+		pred2 <- t(LBSPR@pLCatch)
+		rownames(pred2) <- which(rowSums(LFlist[[1]]) > 0)
+	}
 	if(all(is.null(LBSPR))) pred2 <- NULL
 
 
@@ -73,13 +80,13 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			if(f==1){
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim, col=paste0(cols[1],"50"), border=NA, space=0)
-				lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
-				lines(pred2[which(flcyrs==yr),], col="#AA00AA", lwd=4)
+					lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
+					lines(pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
 				box()
 			}
-			if(f>1 & yr %in% LCyrs[[f]]){
+			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
-				flcyrs <- LCyrs[[f]]
+				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 			}
