@@ -18,7 +18,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL,xlim=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))) LFlist=LFlist
@@ -34,7 +34,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	LCyrs <- lapply(1:nf, function(x){
 		rownames(LFlist[[x]])
 	})
-	lbhighs <- colnames(LFlist[[1]])
+	lbhighs <- as.numeric(colnames(LFlist[[1]]))
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
 	if(all(is.null(true_years))) true_years <- all_lc_years
 
@@ -66,12 +66,13 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
     if(nf==1) cols <- "#228B22"
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
+	if(all(is.null(xlim))) xlim <- c(0,max(lbhighs))
 	for(i in seq_along(all_lc_years)){
 		yr <- i
 		for(f in 1:nf){
 			if(f==1){
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"), border=NA, space=0)
+				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim, col=paste0(cols[1],"50"), border=NA, space=0)
 				lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				lines(pred2[which(flcyrs==yr),], col="#AA00AA", lwd=4)
 				box()
@@ -79,7 +80,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			if(f>1 & yr %in% LCyrs[[f]]){
 				par(new=TRUE)
 				flcyrs <- LCyrs[[f]]
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 			}
 		}
