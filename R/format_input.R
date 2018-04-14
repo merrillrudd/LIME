@@ -59,8 +59,8 @@ format_input <- function(input,
             mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
 
             if(all(is.null(input$neff_ft))){
-                if(is.vector(LF[,,x])==FALSE) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
-                if(is.vector(LF[,,x])) n_inp <- t(sapply(1:nfleets), function(x) sum(LF[,,x]))
+                if(is.vector(LF[,,1])==FALSE) n_inp <- t(sapply(1:nfleets, function(x) rowSums(LF[,,x])))
+                if(is.vector(LF[,,1])) n_inp <- t(sapply(1:nfleets), function(x) sum(LF[,,x]))
             }
             if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
 
