@@ -55,7 +55,7 @@ create_inputs <- function(lh, input_data){
             if(max_bin > (max(bins_dim) + (bw/2))){
                 LF <- array(0, dim=c(length(time), length(highs), dat_input$nfleets))            
                 rownames(LF) <- time
-                colnames(LF) <- highs
+                colnames(LF) <- mids
                 for(f in 1:dat_input$nfleets){
                     LFsub <- matrix(length_raw[,,f], nrow=nrow(length_raw), ncol=ncol(length_raw))
                     colnames(LFsub) <- bins_dim
@@ -101,17 +101,17 @@ create_inputs <- function(lh, input_data){
         if(is.list(dat_input$LF)){
             length_raw <- dat_input$LF
             bins_dim <- as.numeric(colnames(length_raw[[1]]))
-            if(bins_dim[1] != bw){
-                ## add zeros to the beginning of the length comps
-                bins_pre <- rev(seq(from=min(bins)-bw, to=bw, by=-bw))
-                add <- matrix(0, nrow=nrow(lf), ncol=length(bins_pre))
-                colnames(add) <- bins_pre           
+            # if(bins_dim[1] != bw){
+            #     ## add zeros to the beginning of the length comps
+            #     bins_pre <- rev(seq(from=min(bins)-bw, to=bw, by=-bw))
+            #     add <- matrix(0, nrow=nrow(lf), ncol=length(bins_pre))
+            #     colnames(add) <- bins_pre           
 
-                for(f in 1:length(length_raw)){
-                    length_raw[[f]] <- cbind(add, length_raw[[f]])      
-                }
-                bins_dim <- as.numeric(colnames(length_raw[[1]]))          
-            }
+            #     for(f in 1:length(length_raw)){
+            #         length_raw[[f]] <- cbind(add, length_raw[[f]])      
+            #     }
+            #     bins_dim <- as.numeric(colnames(length_raw[[1]]))          
+            # }
             max_bin <- max(c(sapply(1:length(length_raw), function(x) max(as.numeric(colnames(length_raw[[x]]))) + (bw/2)), 
                             sapply(1:length(length_raw), function(x) as.numeric(colnames(length_raw[[x]])[max(which(colSums(length_raw[[x]])>0))]) + (bw/2))))
             mids <- seq(bins_dim[1], max_bin - (bw/2), by=bw)
@@ -120,7 +120,7 @@ create_inputs <- function(lh, input_data){
             time <- dat_input$years
             LF <- array(0, dim=c(length(time), length(highs), dat_input$nfleets))
             rownames(LF) <- time
-            colnames(LF) <- highs
+            colnames(LF) <- mids
             for(f in 1:dat_input$nfleets){
                 LFsub <- length_raw[[f]]
                 colnames(LFsub) <- bins_dim

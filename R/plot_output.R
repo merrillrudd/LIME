@@ -252,16 +252,6 @@ if("SB" %in% plot){
     
 if("Selex" %in% plot){
 
-
-    xlabs <- pretty(seq_along(Inputs$Data$lbhighs))
-    plot_labs <- rep(NA, length(xlabs))
-    if(xlabs[1]!=0) warning("Should start length bin labels at 0")
-    plot_labs[1] <- 0
-    elabs <- as.numeric(Inputs$Data$lbhighs[xlabs][which(is.na(Inputs$Data$lbhighs[xlabs])==FALSE)])
-    plot_labs[2:(length(elabs)+1)] <- elabs
-    if(is.na(plot_labs[length(plot_labs)])) plot_labs[length(plot_labs)] <- max(elabs) + elabs[1]
-
-
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_fl"),]
@@ -279,14 +269,14 @@ if("Selex" %in% plot){
     if(nf==1) cols <- "#228B22"
 
     for(f in 1:nf){
-      if(f==1) plot(x=1:length(mids), y=Report$S_fl[f,], lwd=2, col=cols[f], ylim=c(0, 1.1), type="l", xaxt="n", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
-      if(f>1) lines(x=1:length(mids), y=Report$S_fl[f,], lwd=2, col=cols[f])
+      if(f==1) plot(x=mids, y=Report$S_fl[f,], lwd=2, col=cols[f], ylim=c(0, 1.1), type="l", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
+      if(f>1) lines(x=mids, y=Report$S_fl[f,], lwd=2, col=cols[f])
       if(nf > 1) lty <- f+1
       if(nf ==1) lty <- 1
       if(all(is.null(True))==FALSE) lines(True$S_fl[f,], lwd=2, lty=lty)
       if(all(is.na(Sdreport))==FALSE){
         index <- seq(f,nrow(sd),by=nf)
-        polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(which(is.na(sd[index,2])==FALSE), rev(which(is.na(sd[index,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)  
+        polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(mids[which(is.na(sd[index,2])==FALSE)], rev(mids[which(is.na(sd[index,2])==FALSE)])), col=paste0(cols[f],"40"), border=NA)  
       }
     }
   }
@@ -295,12 +285,12 @@ if("Selex" %in% plot){
       SL50 <- LBSPR$SL50[i]
       SL95 <- LBSPR$SL95[i]
       S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      lines(x=1:length(mids), y=S_l2, col=paste0("#AA00AA","50"), lwd=2)
+      lines(x=mids, y=S_l2, col=paste0("#AA00AA","50"), lwd=2)
     }
   # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
   }
   if(all(is.null(True))==FALSE) lines(True$S_l, lwd=2)
-    axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
+    # axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
 }
 
 if(nf > 1 & legend==TRUE){
