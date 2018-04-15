@@ -1,7 +1,7 @@
 rm(list=ls())
 
 ## Packages
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="multifleet")
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="master")
 library(LIME)
 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
@@ -25,8 +25,12 @@ lf <- matrix(data[,2], nrow=1, ncol=nrow(data))
 rownames(lf) <- "2016"
 colnames(lf) <- bins
 
-## plot length composition
-plot_LCfits(LFlist=list("LF"=lf), ylim=c(0,0.2))
+bw <- bins[2] - bins[1]
+add_bin <- seq(by=bw, from=bw, to=min(bins)-bw)
+add <- matrix(0, nrow=1, ncol=length(add_bin))
+colnames(add) <- add_bin
+
+lf <- cbind(add, lf)
 
 ##----------------------------------------------------------------
 ## Step 2: Specify biological inputs and parameter starting values
@@ -41,21 +45,20 @@ lh <- create_lh_list(vbk=0.117,
 					 M95=34,
 					 maturity_input="length",
 					 M=0.119, 
-					 h=0.65,
-					 S50=20, ## starting value
-					 S95=27, ## starting value
+					 S50=26, ## starting value
+					 S95=34, ## starting value
 					 selex_input="length",
 					 selex_type=c("logistic"),
 					 CVlen=0.1,
 					 SigmaR=0.5,
 					 SigmaF=0.1,
-					 binwidth=2,
-					 nfleets=1)
+					 binwidth=2)
 
-ggplot(lh$df %>% dplyr::filter(By=="Age")) + 
-geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) +
-facet_wrap(~Variable, scale="free_y") +
-xlab("Age")
+
+# ggplot(lh$df %>% dplyr::filter(By=="Age")) + 
+# geom_line(aes(x=X, y=Value, color=Fleet), lwd=2) +
+# facet_wrap(~Variable, scale="free_y") +
+# xlab("Age")
 
 ##----------------------------------------------------------------
 ## Step 3: Run LIME
@@ -66,7 +69,14 @@ data_list <- list("years"=2016, "LF"=lf)
 
 input_data <- create_inputs(lh=lh, input_data=data_list)
 
-res <- run_LIME(modpath=NULL, input=input_data, data_avail="LC")
+LFlist <- list()
+LFlist[[1]] <- matrix(input_data$LF[,,1], nrow=1)
+colnames(LFlist[[1]]) <- input_data$highs
+rownames(LFlist[[1]]) <- 1
+
+plot_LCfits(LFlist=LFlist, ylim=c(0,0.2), true_years=input_data$years)
+
+res <- run_LIME(modpath=NULL, lh=lh, input_data=data_list, data_avail="LC", est_sigma="log_sigma_F")
 
 ## check TMB inputs
 Inputs <- res$Inputs
@@ -108,8 +118,8 @@ plot_output(Inputs=Inputs,
 			Sdreport=Sdreport, 
 			lh=lh,
 			plot=c("Selex"))
-abline(v=lh$linf/bw, lwd=2, lty=2, col="red")
-abline(v=sum((Inputs$Data$LF_tlf[,,1] * Inputs$Data$lbmids))/sum(Inputs$Data$LF_tlf[,,1]) / bw, lwd=2, lty=2, col="blue")
+abline(v=lh$linf, lwd=2, lty=2, col="red")
+abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
 legend("topleft", legend=c("Selectivity", "Mean length in catch", "Linf"), col=c("#00AA00", "blue", "red"), lty=c(1,2,2), lwd=2)
 
 ##----------------------------------------------------------------
@@ -119,23 +129,24 @@ library(LBSPR)
 
 LB_pars <- new("LB_pars")
 LB_pars@MK <- 1
-LB_pars@Linf <- lh$linf
-LB_pars@L50 <- lh$ML50 
-LB_pars@L95 <- lh$ML95
+LB_pars@Linf <- 38
+LB_pars@L50 <- 32 
+LB_pars@L95 <- 34
+LB_pars@CVLinf <- 0.1
+LB_pars@FecB <- 3
+LB_pars@Mpow <- 0
 LB_pars@Walpha <- lh$lwa
 LB_pars@Wbeta <- lh$lwb
 LB_pars@BinWidth <- lh$binwidth
-LB_pars@Steepness <- lh$h
-LB_pars@R0 <- 1
-LB_pars@L_units<-"cm"
+# LB_pars@L_units<-"cm"
 LB_lengths <- new("LB_lengths")
-LB_lengths@LMids <- lh$mids
-LB_lengths@LData <- t(data_list$LF)
-LB_lengths@Years <- as.numeric(rownames(data_list$LF))
-LB_lengths@NYears <- as.numeric(length(rownames(data_list$LF)))
+LB_lengths@LMids <- data[,1]
+LB_lengths@LData <- matrix(data[,2], ncol=1)
+LB_lengths@Years <- 2016
+LB_lengths@NYears <- 1
 
 
-lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, yrs=NA, Control=list(modtype="GTG"))
+lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype="GTG"))
 
 spr2 <- lbspr_res@SPR
 spr2
@@ -162,8 +173,8 @@ plot_output(Inputs=Inputs,
 			LBSPR=lbspr_res,
 			lh=lh,
 			plot=c("Selex"))
-abline(v=lh$linf/bw, lwd=2, lty=2, col="red")
-abline(v=sum((Inputs$Data$LF_tlf[,,1] * Inputs$Data$lbmids))/sum(Inputs$Data$LF_tlf[,,1]) / bw, lwd=2, lty=2, col="blue")
+abline(v=lh$linf, lwd=2, lty=2, col="red")
+abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
 legend("topleft", legend=c("LIME Selectivity", "LBSPR Selectivity", "Mean length in catch", "Linf"), col=c("#00AA00", "#AA00AA", "blue", "red"), lty=c(1,1,2,2), lwd=2)
 
 ##----------------------------------------------------------------
@@ -203,8 +214,8 @@ lh2 <- create_lh_list(vbk=0.117,
 					 maturity_input="length",
 					 M=0.119, 
 					 h=0.65,
-					 S50=c(20,25),
-					 S95=c(27,30), 
+					 S50=c(20,20),
+					 S95=c(27,29), 
 					 selex_input="length",
 					 selex_type=c("logistic","logistic"),
 					 CVlen=0.1,
@@ -275,6 +286,6 @@ plot_output(Inputs=Inputs,
 			lh=lh2,
 			LBSPR=lbspr_res,
 			plot=c("Selex"))
-abline(v=lh$linf/bw, lwd=2, lty=2, col="red")
-abline(v=sum((Inputs$Data$LF_tlf[,,1] * Inputs$Data$lbmids))/sum(Inputs$Data$LF_tlf[,,1]) / bw, lwd=2, lty=2, col="blue")
+abline(v=lh$linf, lwd=2, lty=2, col="red")
+abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
 legend("topleft", legend=c("LIME Fleet 1", "LIME Fleet 2", "LBSPR Selectivity", "Mean length in catch", "Linf"), col=c("red", "blue", "#AA00AA", "blue", "red"), lty=c(1,1,1,2,2), lwd=2)
