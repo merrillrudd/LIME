@@ -21,7 +21,11 @@
 plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL,xlim=NULL){
 	# dev.new()
 
-	if(all(is.null(Inputs))) LFlist=LFlist
+	if(all(is.null(Inputs))){
+		LFlist=LFlist
+		bins <- as.numeric(colnames(LFlist[[1]]))
+		bw <- bins[2] - bins[1]
+	}
 	if(all(is.null(Inputs))==FALSE){
 		LF_array <- Inputs$Data$LF_tlf
 		LFlist <- list()
@@ -73,13 +77,12 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
     if(nf==1) cols <- "#228B22"
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
-	if(all(is.null(xlim))) xlim <- c(0,length(lbhighs))
 	for(i in seq_along(all_lc_years)){
 		yr <- i
 		for(f in 1:nf){
 			if(f==1){
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim, col=paste0(cols[1],"50"), border=NA, space=0)
+				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=c(0,max(lbhighs)/bw), col=paste0(cols[1],"50"), border=NA, space=0)
 				if(length(Tyrs)>1)	lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(pred[[f]], col=cols[1], lwd=4)
 					lines(pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
@@ -88,7 +91,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, xlim=xlim)
+				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xlim=c(0,max(lbhighs)/bw), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
 					if(length(Tyrs)>1) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 					if(length(Tyrs)==1) lines(pred[[f]], col=cols[f], lwd=4)
