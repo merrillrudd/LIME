@@ -474,11 +474,11 @@ Type objective_function<Type>::operator() ()
       }
       if((a>0) & (a<(n_a-1))){
         Na0(t,a) = Na0(t,a-1)*exp(-M);
-        Naf(t,a) = Naf(t,a-1)*exp(-M-F_t(t));
+        Naf(t,a) = Naf(t,a-1)*exp(-M-F_ta(t,a));
       }
       if(a==(n_a-1)){
         Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M-F_t(t)))/(1-exp(-M-F_t(t)));
+        Naf(t,a) = (Naf(t,a-1)*exp(-M-F_ta(t,a)))/(1-exp(-M-F_ta(t,a)));
       }
 
       if(a>0){
