@@ -18,7 +18,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL,xlim=NULL){
+plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -77,37 +77,38 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
     if(nf==1) cols <- "#228B22"
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
+		xlim <- c(min(bins), max(bins))
 	for(i in seq_along(all_lc_years)){
 		yr <- i
 		for(f in 1:nf){
 			if(f==1){
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"), border=NA, space=0)
-				if(length(Tyrs)>1)	lines(pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
-				if(length(Tyrs)==1) lines(pred[[f]], col=cols[1], lwd=4)
-					lines(pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
+				plot(x=bins, y=as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), type="h", lwd=25, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
+				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
+				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
+					lines(x=bins, y=pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
 				box()
 			}
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				barplot(as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), border=NA, space=0, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+				plot(x=bins, y=as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), type="h", lwd=25, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
-					if(length(Tyrs)>1) lines(pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
-					if(length(Tyrs)==1) lines(pred[[f]], col=cols[f], lwd=4)
+					if(length(Tyrs)>1) lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
+					if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[f], lwd=4)
 				}
 			}
 		}
 
-			xlabs <- pretty(seq_along(lbhighs))
-			plot_labs <- rep(NA, length(xlabs))
-			if(xlabs[1]!=0) warning("Should start length bin labels at 0")
-			plot_labs[1] <- 0
-			elabs <- as.numeric(lbhighs[xlabs][which(is.na(lbhighs[xlabs])==FALSE)])
-			plot_labs[2:(length(elabs)+1)] <- elabs
-			if(is.na(plot_labs[length(plot_labs)])) plot_labs[length(plot_labs)] <- max(elabs) + elabs[1]	
+			# xlabs <- pretty(seq_along(bins))
+			# plot_labs <- rep(NA, length(xlabs))
+			# if(xlabs[1]!=0) warning("Should start length bin labels at 0")
+			# plot_labs[1] <- 0
+			# elabs <- as.numeric(lbhighs[xlabs][which(is.na(lbhighs[xlabs])==FALSE)])
+			# plot_labs[2:(length(elabs)+1)] <- elabs
+			# if(is.na(plot_labs[length(plot_labs)])) plot_labs[length(plot_labs)] <- max(elabs) + elabs[1]	
 
-			if(i %% dim[1] == 0 | i==length(all_lc_years)) axis(1, at=xlabs, labels=plot_labs, cex.axis=2)
+			if(i %% dim[1] == 0 | i==length(all_lc_years)) axis(1, cex.axis=2)
 			if(i %in% 1:dim[1]) axis(2, at=pretty(ylim), las=2, cex.axis=2)
 			if(all(is.null(true_years))==FALSE & length(true_years)!=length(true_years)){
 				mtext(side=3, true_years[i], font=2, cex=2, line=-2)
