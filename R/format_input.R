@@ -103,7 +103,7 @@ format_input <- function(input,
             #     if(is.null(input$neff_ft)) n_inp <- sum(LF)
             #     if(is.null(input$neff_ft)==FALSE) n_inp <- input$neff_ft
             # }   
-            Data <- list("n_t"=dim(LF)[1],
+            Data <- list("n_t"=Nyears,
                          "n_lb"=dim(LF)[2],
                          "n_fl"=dim(LF)[3],
                          "n_a"=length(ages),
@@ -156,7 +156,7 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
 
-            Data <- list("n_t"=dim(LF)[1],
+            Data <- list("n_t"=Nyears,
                          "n_lb"=dim(LF)[2],
                          "n_fl"=dim(LF)[3],
                          "n_a"=length(ages),
@@ -210,7 +210,7 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
 
-            Data <- list("n_t"=dim(LF)[1],
+            Data <- list("n_t"=Nyears,
                          "n_lb"=dim(LF)[2],
                          "n_fl"=dim(LF)[3],
                          "n_a"=length(ages),
@@ -263,7 +263,7 @@ format_input <- function(input,
             #     if(is.null(input$obs_per_year)==FALSE) n_inp <- input$obs_per_year
             # }  
 
-            Data <- list("n_t"=dim(LF)[1],
+            Data <- list("n_t"=Nyears,
                          "n_lb"=dim(LF)[2],
                          "n_fl"=dim(LF)[3],
                          "n_a"=length(ages),
