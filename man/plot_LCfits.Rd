@@ -6,7 +6,7 @@
 \usage{
 plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
   ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE,
-  true_years = NULL, xlim = NULL)
+  true_years = NULL)
 }
 \arguments{
 \item{LFlist}{list of length frequency matrices}
