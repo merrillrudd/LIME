@@ -122,9 +122,8 @@ Type objective_function<Type>::operator() ()
   vector<Type> Sdelta_f(n_fl);
   vector<Type> S95_f(n_fl);
   for(int f=0;f<n_fl;f++){
-    S50_f(f) = exp(log_S50_f(f)) * linf;
-    Sdelta_f(f) = exp(log_Sdelta_f(f)) * linf;
-    S95_f(f) = S50_f(f) + Sdelta_f(f);
+    S50_f(f) = invlogit(log_S50_f(f)) * linf;
+    S95_f(f) = S50_f(f) + (invlogit(log_Sdelta_f(f)) * linf);
   }
 
   // dirichlet-multinomial parameter

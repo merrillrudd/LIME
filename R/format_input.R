@@ -324,9 +324,9 @@ format_input <- function(input,
                         "log_q_f"=rep(log(qcoef), Data$n_fl),
                         "beta"=log(R0),
                         "log_sigma_R"=log(SigmaR),
-                        "log_S50_f"=log(0.5),
-                        "log_Sdelta_f"=log(0.1),
-                        "log_sigma_F"=log(SigmaF),
+                        "log_S50_f"=qlogis(SL50/linf), ## logit
+                        "log_Sdelta_f"=qlogis((SL95-SL50)/linf), ## logit
+                        "log_sigma_F"=log(SigmaF), 
                         "log_sigma_C"=log(SigmaC),
                         "log_sigma_I"=log(SigmaI),
                         "log_CV_L"=log(CVlen),
