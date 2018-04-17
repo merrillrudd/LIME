@@ -8,7 +8,7 @@ run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
   SigRprior = c(0.737, 0.3), LFdist = 1, C_type = 0, est_more = FALSE,
   fix_more = FALSE, est_F_ft = TRUE, f_startval_ft = NULL,
   rdev_startval_t = NULL, est_selex_f = TRUE, vals_selex_ft = -1,
-  randomR = TRUE, newtonsteps = 3, F_up = 10, S50_up = NULL,
+  Rdet = FALSE, newtonsteps = 3, F_up = 10, S50_up = NULL,
   derive_quants = FALSE, itervec = NULL, simulation = FALSE,
   rewrite = TRUE, mirror = NULL, est_totalF = FALSE, prop_f = 1)
 }
@@ -43,7 +43,7 @@ run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
 
 \item{vals_selex_ft}{input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity}
 
-\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
+\item{Rdet}{default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization; FALSE to turn off}
 
