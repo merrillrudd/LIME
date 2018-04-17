@@ -62,6 +62,9 @@ Type objective_function<Type>::operator() ()
     DATA_IVECTOR(selex_type_f); //0 =fixed, 1=estimated
     DATA_VECTOR(vals_selex_ft);
 
+    // option for deterministic or stochastic recruitment
+    DATA_INTEGER(Rdet);
+
     // option for likelihood distribution for length comps
     DATA_INTEGER(LFdist); // 0=multinomial, 1=dirichlet-multinomial
 
@@ -75,7 +78,6 @@ Type objective_function<Type>::operator() ()
     DATA_INTEGER(mirror_q);
 
     // estimate total F instead of by fleet
-    // DATA_IMATRIX(indexF_ft); // which fishing mortality rate to use? indexed outside of TMB
     DATA_INTEGER(est_totalF);
     DATA_VECTOR(prop_f);
 
@@ -271,7 +273,8 @@ Type objective_function<Type>::operator() ()
   // ============ initialize =============  
   vector<Type> R_t(n_t); //recruitment
   R_t.setZero();
-  R_t(0) = exp(beta) * exp(Nu_input(0) - pow(sigma_R,2)/Type(2));
+  if(Rdet==0) R_t(0) = exp(beta) * exp(Nu_input(0) - pow(sigma_R,2)/Type(2));
+  if(Rdet==1) R_t(0) = exp(beta);
 
   //over time by age
   matrix<Type> N_ta(n_t,n_a); // abundance
@@ -351,7 +354,8 @@ Type objective_function<Type>::operator() ()
   // ============ project forward in time =============  
   for(int t=1;t<n_t;t++){
     // Recruitment
-    R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(S_yrs(t)-1) - pow(sigma_R,2)/Type(2));
+    if(Rdet==0) R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(S_yrs(t)-1) - pow(sigma_R,2)/Type(2));
+    if(Rdet==1) R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1)));
     
     // Age-structured dynamics
     for(int a=0;a<n_a;a++){
@@ -621,9 +625,12 @@ Type objective_function<Type>::operator() ()
   // ------ likelihood components ----------//
   // ============ Probability of random effects =============
   jnll_comp(0) = 0;
-  for(int y=0;y<n_y;y++){
-    jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
+  if(Rdet==0){
+    for(int y=0;y<n_y;y++){
+      jnll_comp(0) -= dnorm(Nu_input(y), Type(0.0), sigma_R, true);
+    }    
   }
+
 
   // ============ Probability of data =============
   jnll_comp(1) = 0;
