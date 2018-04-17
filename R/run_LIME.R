@@ -336,7 +336,7 @@ for(iter in 1:length(itervec)){
 
         if(length(TmbList$Random) > 0) Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
         if(length(TmbList$Random) == 0) Sdreport <- tryCatch(sdreport(obj_save), error=function(x) NA)
-        output$Sdreport <- Sdreport
+              output$Sdreport <- Sdreport
 
 
 
