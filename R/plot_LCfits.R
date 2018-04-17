@@ -40,7 +40,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 
 	nf <- length(LFlist)
 	LCyrs <- lapply(1:nf, function(x){
-		rownames(LFlist[[x]])
+		rownames(LFlist[[x]])[which(rowSums(LFlist[[x]]) > 0)]
 	})
 	lbhighs <- as.numeric(colnames(LFlist[[1]]))
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
@@ -78,12 +78,12 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
 		xlim <- c(min(bins), max(bins))
-	for(i in seq_along(all_lc_years)){
-		yr <- i
+	for(i in 1:length(all_lc_years)){
+		yr <- seq_along(all_lc_years[i])
 		for(f in 1:nf){
 			if(f==1){
-				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				plot(x=bins, y=as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), type="h", lwd=25, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
+				flcyrs <- as.numeric(LCyrs[[f]])
+				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=10, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
 				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
 					lines(x=bins, y=pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
@@ -92,7 +92,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				plot(x=bins, y=as.numeric(LFlist[[f]][which(flcyrs==yr),]/sum(LFlist[[f]][which(flcyrs==yr),])), type="h", lwd=25, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=10, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
 					if(length(Tyrs)>1) lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 					if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[f], lwd=4)

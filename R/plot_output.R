@@ -44,6 +44,9 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
           LBSPR_outs$SPR_smooth <- LBSPR@Ests[,"SPR"]
           LBSPR_outs$var_FM <- LBSPR@Vars[,"FM"] 
           LBSPR_outs$var_SPR <- LBSPR@Vars[,"SPR"]
+          LBSPR_outs$years <- LBSPR@Years
+
+          xLC_lbspr <- which(true_years %in% LBSPR@Years)
 
           LBSPR <- LBSPR_outs
         }
@@ -140,10 +143,10 @@ if("Fish" %in% plot){
 
   if(all(is.null(True))==FALSE) lines(True$F_y, lwd=2)
   if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
-    points(x=xLC[[f]], LBSPR$FM*(lh$M*lh$nseasons),col="#AA00AA", pch=19, cex=2)
+    points(x=xLC_lbspr, LBSPR$FM*(lh$M*lh$nseasons),col="#AA00AA", pch=19, cex=2, xpd=NA)
     index <- which(is.na(LBSPR$var_FM)==FALSE)
-    ignore <- sapply(1:length(xLC[[1]]), function(x) segments(x0=xLC[[1]][x],x1=xLC[[1]][x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$var_FM[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$var_FM[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
-    lines(x=xLC[[1]], y=LBSPR$FM_smooth*(lh$M*lh$nseasons), col="#AA00AA", lw=2)
+    ignore <- sapply(1:length(xLC_lbspr), function(x) segments(x0=xLC_lbspr[x],x1=xLC_lbspr[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$var_FM[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$var_FM[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
+    lines(x=xLC_lbspr, y=LBSPR$FM_smooth*(lh$M*lh$nseasons), col="#AA00AA", lw=2)
   }
 }
 
@@ -186,10 +189,10 @@ if("SPR" %in% plot){
   }
   if(all(is.null(True))==FALSE) lines(True$SPR_t[seq(1,by=ns,length.out=Inputs$Data$n_y)], lwd=2)
   if(all(is.null(LBSPR))==FALSE){
-    points(x=xLC[[1]], LBSPR$SPR, col="#AA00AA", pch=19, cex=2)
+    points(x=xLC_lbspr, LBSPR$SPR, col="#AA00AA", pch=19, cex=2, xpd=NA)
     index <- which(is.na(LBSPR$var_SPR)==FALSE)
-    ignore <- sapply(1:length(xLC[[1]]), function(x) segments(x0=xLC[[1]][x],x1=xLC[[1]][x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$var_SPR[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$var_SPR[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
-    lines(x=xLC[[1]], y=LBSPR$SPR_smooth, lwd=2, col="#AA00AA")
+    ignore <- sapply(1:length(xLC_lbspr), function(x) segments(x0=xLC_lbspr[x],x1=xLC_lbspr[x],y0=LBSPR$SPR[index[x]]-1.96*sqrt(LBSPR$var_SPR[index[x]]), y1=LBSPR$SPR[index[x]]+1.96*sqrt(LBSPR$var_SPR[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
+    lines(x=xLC_lbspr, y=LBSPR$SPR_smooth, lwd=2, col="#AA00AA")
   }
       abline(h=0.4, lwd=2, lty=2)
     abline(h=0.3, lwd=2, lty=3)
@@ -220,8 +223,8 @@ if("ML" %in% plot){
       })
       polygon(y=read_sdreport(sdf, log=FALSE), x=c(which(is.na(sdf[,2])==FALSE), rev(which(is.na(sdf[,2])==FALSE))), col=paste0(cols[f],"40"), border=NA)
       lines(x=seq_along(xY), y=sdf[,1], lwd=2, col=cols[f])
-      points(x=which(is.na(ML_obs[[f]])==FALSE), y=sdf[unique(unlist(xLC))[which(is.na(ML_obs[[f]])==FALSE)],1], pch=19, col=cols[f], xpd=NA, cex=2)
-      lines(x=unique(unlist(xLC)), y=ML_obs[[f]], lwd=2, xpd=NA)
+      points(x=which(is.na(ML_obs[[f]])==FALSE), y=sdf[which(is.na(ML_obs[[f]])==FALSE),1], pch=19, col=cols[f], xpd=NA, cex=2)
+      lines(x=seq_along(xY), y=ML_obs[[f]], lwd=2, xpd=NA)
     }
   }
 
@@ -281,7 +284,7 @@ if("Selex" %in% plot){
     }
   }
   if(all(is.null(LBSPR))==FALSE){
-    for(i in 1:length(xLC[[1]])){
+    for(i in 1:length(xLC_lbspr)){
       SL50 <- LBSPR$SL50[i]
       SL95 <- LBSPR$SL95[i]
       S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
@@ -289,7 +292,7 @@ if("Selex" %in% plot){
     }
   # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
   }
-  if(all(is.null(True))==FALSE) lines(True$S_l, lwd=2)
+  if(all(is.null(True))==FALSE) lines(True$S_fl[1,], lwd=2)
     # axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
 }
 
