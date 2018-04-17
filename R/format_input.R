@@ -432,8 +432,8 @@ format_input <- function(input,
         if(length(Map)==0) Map <- NULL
 
 
-        if(Rdet==0) Random <- c("Nu_input")
-        if(Rdet==1) Random <- NULL
+        if(Rdet==0 | Rdet==FALSE) Random <- c("Nu_input")
+        if(Rdet==1 | Rdet==TRUE) Random <- NULL
         # if(REML==TRUE){
         #     Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
         #     Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
