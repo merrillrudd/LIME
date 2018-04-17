@@ -17,7 +17,7 @@
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
 #' @param vals_selex_ft input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
-#' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
+#' @param Rdet default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment
 #' @param mirror vector of parameter names to mirror between fleets
 #' @param est_totalF TRUE estimate total F instead of by fleet
 #' @param prop_f proportion of catch from each fleet
@@ -37,7 +37,7 @@ format_input <- function(input,
                         rdev_startval_t,
                         est_selex_f,
                         vals_selex_ft,
-                        randomR,
+                        Rdet,
                         mirror,
                         est_totalF,
                         prop_f){
@@ -63,6 +63,9 @@ format_input <- function(input,
                 if(is.vector(LF[,,1])) n_inp <- t(sapply(1:nfleets, function(x) sum(LF[,,x])))
             }
             if(all(is.null(input$neff_ft)==FALSE)) n_inp <- input$neff_ft
+
+        if(Rdet==FALSE) Rdet <- 0
+        if(Rdet==TRUE) Rdet <- 1
 
         # if(all(est_F_ft == TRUE)){
         #     indexF_ft <- matrix(1:Nyears2, nrow=nfleets, ncol=Nyears2)
@@ -128,6 +131,7 @@ format_input <- function(input,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
                          "vals_selex_ft"=vals_selex_ft,
+                         "Rdet"=Rdet,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
@@ -181,6 +185,7 @@ format_input <- function(input,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
                          "vals_selex_ft"=vals_selex_ft,
+                         "Rdet"=Rdet,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
@@ -235,6 +240,7 @@ format_input <- function(input,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
                          "vals_selex_ft"=vals_selex_ft,
+                         "Rdet"=Rdet,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
@@ -288,6 +294,7 @@ format_input <- function(input,
                          "SigRprior"=SigRprior,
                          "selex_type_f"=selex_type_f,
                          "vals_selex_ft"=vals_selex_ft,
+                         "Rdet"=Rdet,
                          "LFdist"=LFdist,
                          "S_yrs"=S_yrs_inp,
                          "n_s"=nseasons,
@@ -396,13 +403,13 @@ format_input <- function(input,
                 Map[["log_Sdelta_f"]] <- factor(Map[["log_Sdelta_f"]])                
             }
 
-            # if(randomR==FALSE){
-            #     Map[["log_sigma_R"]] <- NA
-            #     Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
+            if(Rdet==1){
+                Map[["log_sigma_R"]] <- NA
+                Map[["log_sigma_R"]] <- factor(Map[["log_sigma_R"]])
 
-            #     Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
-            #     Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
-            # }
+                Map[["Nu_input"]] <- rep(NA, length(Parameters$Nu_input))
+                Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
+            }
 
             if("log_theta" %in% mirror){
                 Map[["log_theta"]] <- c(Parameters$log_theta[1], rep(NA, (length(Parameters$log_theta)-1)))
@@ -421,8 +428,8 @@ format_input <- function(input,
         if(length(Map)==0) Map <- NULL
 
 
-        if(randomR==TRUE) Random <- c("Nu_input")
-        if(randomR==FALSE) Random <- NULL
+        if(Rdet==0) Random <- c("Nu_input")
+        if(Rdet==1) Random <- NULL
         # if(REML==TRUE){
         #     Random_vec <- c("Nu_input", "log_F_t_input", "log_q_I", "beta", "logS50") # 
         #     Random <- Random_vec[which(Random_vec %in% names(Map) == FALSE)]
