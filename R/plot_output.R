@@ -44,6 +44,8 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
           LBSPR_outs$SPR_smooth <- LBSPR@Ests[,"SPR"]
           LBSPR_outs$var_FM <- LBSPR@Vars[,"FM"] 
           LBSPR_outs$var_SPR <- LBSPR@Vars[,"SPR"]
+          LBSPR_outs$var_S50 <- LBSPR@Vars[,"SL50"]
+          LBSPR_outs$var_S95 <- LBSPR@Vars[,"SL95"]
           LBSPR_outs$years <- LBSPR@Years
 
           xLC_lbspr <- which(true_years %in% LBSPR@Years)
@@ -287,8 +289,14 @@ if("Selex" %in% plot){
     for(i in 1:length(xLC_lbspr)){
       SL50 <- LBSPR$SL50[i]
       SL95 <- LBSPR$SL95[i]
+      sd50 <- sqrt(LBSPR$var_S50[i])
+      sd95 <- sqrt(LBSPR$var_S95[i])
+
       S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      lines(x=mids, y=S_l2, col=paste0("#AA00AA","50"), lwd=2)
+      S_l2_low <- 1.0/(1+exp(-log(19)*(mids-(SL50-1.96*sd50))/((SL95-1.96*sd95)-(SL50-1.96*sd50)))) 
+      S_l2_up <- 1.0/(1+exp(-log(19)*(mids-(SL50+1.96*sd50))/((SL95+1.96*sd95)-(SL50+1.96*sd50)))) 
+      polygon(x=c(mids, rev(mids)), y=c(S_l2_low, rev(S_l2_up)), col="#AA00AA40", border=NA)
+      lines(x=mids, y=S_l2, col="#AA00AA", lwd=2)
     }
   # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
   }
