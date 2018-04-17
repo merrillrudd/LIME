@@ -47,8 +47,6 @@ Type objective_function<Type>::operator() ()
     DATA_VECTOR(L_a); // length-at-age
     DATA_VECTOR(W_a); // weight-at-age
     DATA_SCALAR(M); // natural mortality
-    DATA_SCALAR(linf); // asympototic length to help scale selectivity parameters
-    DATA_SCALAR(vbk); // von bert K to approximate LBSPR version
     DATA_SCALAR(h); // steepness
     DATA_VECTOR(Mat_a); // maturity-at-age
     DATA_VECTOR(lbhighs); // upper length bins
@@ -471,46 +469,27 @@ Type objective_function<Type>::operator() ()
   SBf_t.setZero();
   SPR_t.setZero();
 
-  // SPR mimicking calculation in LB-SPR
-  vector<Type> SB0_t2(n_t);
-  vector<Type> SBf_t2(n_t);
-  vector<Type> SPR_t2(n_t);
-  SB0_t2.setZero();
-  SBf_t2.setZero();
-  SPR_t2.setZero();
-  Type P = 0.0001;
-  matrix<Type> rAge(n_t,n_a);
-  matrix<Type> rLens(n_t,n_a);
-
   for(int t=0;t<n_t;t++){
     for(int a=0;a<n_a;a++){
       if(a==0){
         Na0(t,a) = 1;
         Naf(t,a) = 1;
-        rAge(t,a) = 0;
       }
       if((a>0) & (a<(n_a-1))){
         Na0(t,a) = Na0(t,a-1)*exp(-M);
         Naf(t,a) = Naf(t,a-1)*exp(-M-F_ta(t,a));
-        rAge(t,a) = Type(a)/Type(n_a);
       }
       if(a==(n_a-1)){
         Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
         Naf(t,a) = (Naf(t,a-1)*exp(-M-F_ta(t,a)))/(1-exp(-M-F_ta(t,a)));
-        rAge(t,a) = Type(a)/Type(n_a);
       }
 
-      rLens(t,a) = (1 - pow(P, (rAge(t,a))/(M/vbk)));
       if(a>0){
         SB0_t(t) += Na0(t,a)*Mat_a(a)*W_a(a);
         SBf_t(t) += Naf(t,a)*Mat_a(a)*W_a(a);
-
-        SB0_t2(t) += (Mat_a(a)*Na0(t,a)*pow(rLens(t,a),3));
-        SBf_t2(t) += (Mat_a(a)*Naf(t,a)*pow(rLens(t,a),3));
       }
     }
     SPR_t(t) = SBf_t(t)/SB0_t(t);
-    SPR_t2(t) = SBf_t2(t)/SB0_t2(t);
   }
 
 
@@ -717,7 +696,6 @@ Type objective_function<Type>::operator() ()
   ADREPORT( lF_fy);
   ADREPORT( lD_t );
   ADREPORT( SPR_t );
-  ADREPORT( SPR_t2 );
   ADREPORT( S50_f );
   ADREPORT( S_fl );
 
@@ -735,7 +713,6 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_I );
   REPORT( CV_L );
   REPORT( SPR_t );
-  REPORT( SPR_t2 );
   REPORT( SB0_t );
   REPORT( SBf_t );
 
