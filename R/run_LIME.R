@@ -18,7 +18,7 @@
 #' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
 #' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
 #' @param vals_selex_ft input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
-#' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
+#' @param Rdet default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment
 #' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
 #' @param F_up upper bound of fishing mortality estimate; default=10
 #' @param S50_up upper bound of length at 50 percent selectivity; default=NULL
@@ -54,7 +54,7 @@ run_LIME <- function(modpath,
                       rdev_startval_t=NULL,
                       est_selex_f=TRUE,
                       vals_selex_ft=-1,
-                      randomR=TRUE,
+                      Rdet=FALSE,
                       newtonsteps=3,
                       F_up=10,
                       S50_up=NULL,
@@ -77,7 +77,7 @@ run_LIME <- function(modpath,
                       # rdev_startval_t=NULL
                       # est_selex_f=TRUE
                       # vals_selex_ft=-1
-                      # randomR=TRUE
+                      # Rdet=FALSE
                       # newtonsteps=3
                       # F_up=10
                       # S50_up=NULL
@@ -159,7 +159,7 @@ for(iter in 1:length(itervec)){
                               rdev_startval_t=rdev_startval_t, 
                               est_selex_f=est_selex_f, 
                               vals_selex_ft=vals_selex_ft_new, 
-                              randomR=randomR, 
+                              Rdet=Rdet, 
                               mirror=mirror,
                               est_totalF=est_totalF,
                               prop_f=prop_f_inp)
