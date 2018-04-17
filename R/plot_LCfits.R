@@ -83,7 +83,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 		for(f in 1:nf){
 			if(f==1){
 				flcyrs <- as.numeric(LCyrs[[f]])
-				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=10, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
+				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
 				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
 					lines(x=bins, y=pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
@@ -92,7 +92,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
 				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
-				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=10, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
+				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
 				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
 					if(length(Tyrs)>1) lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 					if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[f], lwd=4)
