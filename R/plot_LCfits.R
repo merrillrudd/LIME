@@ -8,8 +8,6 @@
 #' @param Report LIME report file; default NULL if only plotting length data
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
 #' @param ylim ylim for plot; default NULL
-#' @param ML50 length at 50 percent maturity for comparison; default NULL
-#' @param SL50 length at 50 percent selectivity for comparison; default NULL
 #' @param dim dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
 #' @param true_years optional vector of true years to label years of length comp
@@ -18,7 +16,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, ML50=NULL, SL50=NULL, dim=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, dim=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -79,10 +77,9 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
 		xlim <- c(min(bins), max(bins))
 	for(i in 1:length(all_lc_years)){
-		yr <- seq_along(all_lc_years[i])
+		yr <- i
 		for(f in 1:nf){
 			if(f==1){
-				flcyrs <- as.numeric(LCyrs[[f]])
 				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
 				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
@@ -91,9 +88,8 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			}
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
 				par(new=TRUE)
-				flcyrs <- seq_along(as.numeric(LCyrs[[f]]))
 				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
-				if(sum(LFlist[[f]][which(flcyrs==yr),])>0){
+				if(sum(LFlist[[f]][yr,])>0){
 					if(length(Tyrs)>1) lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
 					if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[f], lwd=4)
 				}
@@ -116,11 +112,6 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			}
 			if(all(is.null(true_years))) mtext(side=3, line=-3, true_years[i], font=2, cex=2)
 			if(all(is.null(true_years))==FALSE) mtext(side=3, line=-2, true_years[i], font=2)
-			if(all(is.null(SL50))==FALSE){
-				if(length(SL50)==1) abline(v=SL50, lty=2, lwd=2)
-				if(length(SL50)>1) abline(v=SL50[i], lty=2, lwd=2)
-			}
-			if(all(is.null(ML50))==FALSE) abline(v=ML50, col="orange", lty=2, lwd=2)
 			if(n==TRUE) print_letter(xy=c(0.15,0.9), paste0("n = ", sum(obs[i,,])), cex=2)
 		}
 	mtext(side=1, "Length bin (cm)", outer=TRUE, line=4, cex=1.5)
