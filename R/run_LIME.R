@@ -327,14 +327,15 @@ for(iter in 1:length(itervec)){
         #     }
         #   }
         # }
-        if(all(is.na(opt_save))==FALSE)  df <- data.frame(opt_save$final_gradient, names(obj_save$par), opt_save$par, exp(opt_save$par))
+        if(all(is.na(opt_save))==FALSE)  df <- data.frame("gradient"=as.vector(opt_save$final_gradient), "parameter"=names(obj_save$par), "estimate"=opt_save$par, "transformed"=exp(opt_save$par))
 
 
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
         output$Report <- Report
 
-        Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
+        if(length(TmbList$Random) > 0) Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
+        if(length(TmbList$Random) == 0) Sdreport <- tryCatch(sdreport(obj_save), error=function(x) NA)
         output$Sdreport <- Sdreport
 
 
