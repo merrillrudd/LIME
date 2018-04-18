@@ -726,7 +726,7 @@ lh_mf1 <- with(lh, create_lh_list(vbk=vbk,
            nseasons=1,
            nfleets=2))
 
-true_mf <- generate_data(modpath=NULL,
+true_mf1 <- generate_data(modpath=NULL,
             itervec=1, 
             Fdynamics=c("Constant","Endogenous"),
             Rdynamics="Constant",
@@ -736,20 +736,20 @@ true_mf <- generate_data(modpath=NULL,
             comp_sample=200,
             init_depl=0.7,
             seed=123,
-            fleet_proportions=c(0.6,0.4))
+            fleet_proportions=c(0.5,0.5))
 ```
 ```{r, echo=FALSE}
 plot(lh_mf1$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity")
 lines(lh_mf1$S_fl[2,], type="l", lwd=2, col="steelblue")
 ```
-```{r, fig.width=10, fig.height=6, tidy=TRUE, fig.cap="True population: fishing mortality mimicking an open access fishery, where effort is a function of spawning biomass, autocorrelated recruitment, spawning potential ratio (SPR), mean length, spawning biomass, and relative spawning biomass."}
+```{r, fig.width=10, fig.height=6, tidy=TRUE, fig.cap="True population with two fleets, one with constant fishing mortality, and one with open access fishing."}
 par(mfrow=c(3,2))
-plot(true$F_ft[1,], type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true$F_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(true$D_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$Cw_ft[1,], type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(true$Cw_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
-plot(true$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$F_ft[1,], type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true_mf1$F_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true_mf1$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(true_mf1$D_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$Cw_ft[1,], type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(true_mf1$Cw_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true_mf1$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 ```
 
 

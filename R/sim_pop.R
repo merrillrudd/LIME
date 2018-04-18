@@ -16,8 +16,11 @@
 #' @param mgt_type removals based on F (default) or catch
 #' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
 #' @importFrom stats rnorm
+#' 
 #' @return named list of attributes of true population/data
+
 #' @export
+
 sim_pop <-
   function(lh,
            Nyears,
@@ -623,4 +626,4 @@ sim_pop <-
 
     }) ## end with function
 
-}}
+}
