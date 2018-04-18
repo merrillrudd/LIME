@@ -725,7 +725,10 @@ lh_mf1 <- with(lh, create_lh_list(vbk=vbk,
            rho=rho,
            nseasons=1,
            nfleets=2))
+```
 
+Using the simulation function for multiple fleets, we need to specify the fleet dynamics for each (`Fdynamics`), the number of years of length composition data for each (`Nyears_comp`), and the proportions of each fleet (`fleet_proportions`).
+```{r, tidy=TRUE}
 true_mf1 <- generate_data(modpath=NULL,
             itervec=1, 
             Fdynamics=c("Constant","Endogenous"),
@@ -750,6 +753,16 @@ plot(true_mf1$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs
 plot(true_mf1$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(true_mf1$D_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true_mf1$Cw_ft[1,], type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(true_mf1$Cw_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 plot(true_mf1$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true_mf1$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+```
+
+
+For now, use the multinomial distribution for multiple fleets, specifying `LFdist=0`.
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+rich <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="Index_Catch_LC",
+                  C_type=2,
+                  LFdist=0)
 ```
 
 
