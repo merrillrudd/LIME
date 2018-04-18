@@ -52,6 +52,7 @@ lh <- create_lh_list(vbk=0.117,
 					 SigmaR=0.5,
 					 SigmaF=0.1,
 					 binwidth=2,
+					 theta=10,
 					 nfleets=1)
 
 ggplot(lh$df %>% dplyr::filter(By=="Age")) + 
@@ -276,6 +277,8 @@ Sdreport <- res$Sdreport
 hessian <- Sdreport$pdHess
 gradient <- res$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
+
+
 
 	##----------------------------------------------------------------
 	## Step 4: Examine results
@@ -559,6 +562,7 @@ plot_output(Inputs=Inputs,
 			Report=Report,
 			Sdreport=Sdreport, 
 			lh=lh2,
+			LBSPR=lbspr_res,
 			true_years=years)
 abline(v=lh$linf, lwd=2, lty=2, col="red")
 abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
