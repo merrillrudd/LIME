@@ -59,7 +59,7 @@ Type objective_function<Type>::operator() ()
 
     // option for fixed time series for selectivity
     DATA_IVECTOR(selex_type_f); //0 =fixed, 1=estimated
-    DATA_VECTOR(vals_selex_ft);
+    DATA_MATRIX(vals_selex_ft);
 
     // option for deterministic or stochastic recruitment
     DATA_INTEGER(Rdet);
