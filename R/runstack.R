@@ -23,10 +23,9 @@
 
 #' @useDynLib LIME
 
-#' @return prints how many iterations were run in model directory
-#' 
+#' @return prints how many iterations were run in model directory 
 #' @export
-#' 
+
 runstack <- function(savedir, 
 					lh, 
 					nodes, 

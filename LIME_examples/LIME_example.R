@@ -599,7 +599,6 @@ Report <- catch_lc_mf$Report
 
 ## Standard error report
 Sdreport <- catch_lc_mf$Sdreport
->>>>>>> multifleet
 
 ## check convergence
 hessian <- Sdreport$pdHess

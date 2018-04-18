@@ -755,6 +755,13 @@ plot(true_mf1$Cw_ft[1,], type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,ma
 plot(true_mf1$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c(0,max(true_mf1$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
 ```
 
+```{r echo=FALSE}
+LF_array_mf <- true_mf1$LF
+LF_array_sub_mf <- array(LF_array_mf, dim=c(true_mf1$years, ncol(LF_array_mf[,,1]), 2))
+colnames(LF_array_sub_mf) <- colnames(LF_mat)
+rownames(LF_array_sub_mf) <- rownames(LF_mat)[1:5]
+```
+
 
 For now, use the multinomial distribution for multiple fleets, specifying `LFdist=0`.
 ```{r, tidy=TRUE, results="hide", echo=TRUE}
