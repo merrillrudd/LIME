@@ -621,9 +621,8 @@ sim_pop <-
       lh$I_ft <- I_ft
       lh$fleet_proportions <- fleet_proportions
 
+    }) ## end with function
 
       return(lh)
-
-    }) ## end with function
 
 }
