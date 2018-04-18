@@ -55,6 +55,7 @@ plot(lh$S_fl[1,], type="l", lwd=4, xlab="Length (cm)", ylab="Proportion selected
 plba <- with(lh, age_length(highs, lows, L_a, CVlen))
 ramp <- colorRamp(c("purple4", "darkorange"))
 col_vec <- rgb( ramp(seq(0, 1, length = nrow(plba))), max = 255)
+par(mfrow=c(1,1))
 matplot(t(plba[-1,]), type="l", lty=1, lwd=3, col=col_vec, xaxs="i", yaxs="i", ylim=c(0, 0.5), xlab="Length bin (cm)", ylab="Density")
 legend("topright", legend=lh$ages[seq(2,length(lh$ages),by=3)], col=col_vec[seq(2,length(lh$ages),by=3)],, lwd=3, title="Age")
 
@@ -75,8 +76,6 @@ true <- generate_data(modpath=NULL,
 					  init_depl=0.7,
 					  seed=123,
 					  fleet_proportions=1)
-
-true_f1s1 <- true
 
 ## plot simulated data
 par(mfrow=c(3,2))
@@ -108,9 +107,6 @@ LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element 
 
 	## plot length composition data using LF_list
 	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
-
-## Option 3: Data frame
-# LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
 
 ## example with length data only
 data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
@@ -192,23 +188,6 @@ hessian <- Sdreport$pdHess
 gradient <- lc_only$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
-## function get_converged runs suite of adjustments to get model converged 
-lc_only2 <- get_converged(results=lc_only)
-
-## check TMB inputs
-Inputs <- lc_only2$Inputs
-
-## Report file
-Report <- lc_only2$Report
-
-## Standard error report
-Sdreport <- lc_only2$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- lc_only2$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
 
 ## plot length composition data
 plot_LCfits(LFlist=LF_list, 
@@ -226,22 +205,22 @@ plot_output(Inputs=Inputs,
 
 ## but it looks like F is allowed to vary too much between years, so let's try adjusting SigmaF lower
 inputs_LC$SigmaF <- 0.1 ## adjusted down from 0.2
-lc_only3 <- run_LIME(modpath=NULL, 
+lc_only2 <- run_LIME(modpath=NULL, 
 				input=inputs_LC,
 				data_avail="LC")
 
 ## check TMB inputs
-Inputs <- lc_only3$Inputs
+Inputs <- lc_only2$Inputs
 
 ## Report file
-Report <- lc_only3$Report
+Report <- lc_only2$Report
 
 ## Standard error report
-Sdreport <- lc_only3$Sdreport
+Sdreport <- lc_only2$Sdreport
 
 ## check convergence
 hessian <- Sdreport$pdHess
-gradient <- lc_only3$opt$max_gradient <= 0.001
+gradient <- lc_only2$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
 ## plot length composition data
@@ -420,13 +399,11 @@ true <- generate_data(modpath=NULL,
 					  seed=123,
 					  fleet_proportions=c(0.6,0.4))
 
-true_f2s1 <- true
-
 ## plot simulated data
 par(mfrow=c(3,2))
 plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
 plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
-plot(x=1,y=1,type="n", ylim=c(0,max(true$F_ft)*1.2), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
+plot(x=1,y=1,type="n", ylim=c(0,max(true$F_y)*1.2), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
 lty <- ifelse(lh_mf$nfleets==1,1,2)
 for(f in 1:lh_mf$nfleets){
 	lines(true$F_ft[f,], lwd=2, lty=lty)
@@ -528,8 +505,7 @@ lc_only_mf <- run_LIME(modpath=NULL,
 				input=inputs_LC,
 				data_avail="LC",
 				LFdist=0,
-				est_totalF=TRUE,
-				prop_f = c(0.5,0.5))
+				est_totalF=TRUE)
 
 ## check TMB inputs
 Inputs <- lc_only_mf$Inputs
@@ -545,6 +521,27 @@ hessian <- Sdreport$pdHess
 gradient <- lc_only_mf$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+inputs_LC$SigmaF <- 0.1
+lc_only_mf2 <- run_LIME(modpath=NULL, 
+				input=inputs_LC,
+				data_avail="LC",
+				LFdist=0,
+				est_totalF=TRUE)
+
+## check TMB inputs
+Inputs <- lc_only_mf2$Inputs
+
+## Report file
+Report <- lc_only_mf2$Report
+
+## Standard error report
+Sdreport <- lc_only_mf2$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- lc_only_mf2$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
+
 
 ## plot length composition data
 plot_LCfits(LFlist=LF_list, 
@@ -558,7 +555,9 @@ plot_output(Inputs=Inputs,
 			lh=lh_mf,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" =c(0,2), "SPR" = c(0,1), "SB"=c(0,2)))		
+			set_ylim=list("Fish" =c(0,1), "SPR" = c(0,1), "SB"=c(0,2)))		
+
+
 
 #######################################
 ## Catch + length data
@@ -601,6 +600,7 @@ plot_output(Inputs=Inputs,
 #######################################
 ## Index + length data
 #######################################
+inputs_all$SigmaF <- 0.1
 index_lc_mf <- run_LIME(modpath=NULL, 
 				input=inputs_all,
 				data_avail="Index_LC",
@@ -659,7 +659,7 @@ lh_ms <- with(lh, create_lh_list(vbk=vbk,
 					 maturity_input="length",
 					 M=M, 
 					 h=h,
-					 binwidth=binwidth,
+					 binwidth=2,
 					 CVlen=CVlen,
 					 SigmaR=SigmaR,
 					 SigmaF=SigmaF,
@@ -689,8 +689,6 @@ true <- generate_data(modpath=NULL,
 					  fleet_proportions=1,
 					  pool=FALSE)
 
-true_f1s4 <- true
-
 ## plot simulated data
 par(mfrow=c(3,2))
 plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
@@ -710,7 +708,7 @@ for(f in 1:lh_ms$nfleets){
 	lines(true$I_ft[f,], lwd=2, lty=lty)
 }
 
-plot_LCfits(LFlist=c(true$LF0_tf, true$LF_tf))
+plot_LCfits(LFlist=c(true$LF0_tf, true$LF_tf), ylim=c(0,0.2))
 
 #######################################
 ## Length comp data input options
@@ -905,8 +903,6 @@ for(f in 1:lh$nfleets){
 	lines(true$I_ft[f,], lwd=2, lty=lty)
 }
 
-plot_LCfits(LFlist=c(true$LF0_tf, true$LF_tf))
-
 #######################################
 ## Length comp data input options
 #######################################
@@ -919,8 +915,6 @@ LF_list <- lapply(1:lh_mfms$nfleets, function(x) true$LF[,,x]) ##list with 1 ele
 	## plot length composition data using LF_list
 	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
-## Option 3: Data frame
-# LF_df <- true$dfsim %>% filter(Variable == "LengthComp") ## long-form data frame where "X" = year, "Value"=length measurement, and "Fleet"=discrete variables representing a fleet. 
 
 ## example with length data only
 data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
@@ -991,7 +985,7 @@ plot_LCfits(LFlist=LF_list,
 plot_output(Inputs=Inputs, 
 			Report=Report,
 			Sdreport=Sdreport, 
-			lh=lh,
+			lh=lh_mfms,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
 			set_ylim=list("SPR" = c(0,1)))
