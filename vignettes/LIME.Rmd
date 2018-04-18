@@ -72,7 +72,7 @@ devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 
 4. Install LIME:
 ```{r install_LIME, eval=FALSE}
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="multifleet")
 ```
 
 The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then start from the step that produced the error. Again, please use the contact info in Bug Reports if this doesn't work, as you may have discovered a new installation error... congratulations!
@@ -532,29 +532,9 @@ Because both the hessian and gradient checks passed, we assume that the program 
 
 The `LIME` package includes functions to plot length composition model fits and other results.
 
-First, we need to get the length frequency data into a list. Here's some code to do this with the standardized LIME output:
-```{r, tidy=TRUE}
-## use lapply to loop over the number of fleets, found in Inputs$Data$n_f
-## for each fleet x, return matrix of length data Inputs$Data$LF_tlf[,,x]
-LF_list <- lapply(1:rich$Inputs$Data$n_f, function(x){
-  return(rich$Inputs$Data$LF_tlf[,,x])
-})
-```
-
-The code above outputs a list of length frequency data with length equal to number of fleets
-```{r,tidy=TRUE}
-length(LF_list)
-```
-
-For each element of the list, the dimensions of each matrix have years along the rows and number of length bins along the columns
-```{r,tidy=TRUE}
-dim(LF_list[[1]])
-```
-
 LIME model fits to length frequency data:
 ```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the data-rich LIME model run."}
-plot_LCfits(LFlist=LF_list,
-            Inputs=rich$Inputs,
+plot_LCfits(Inputs=rich$Inputs,
             Report=rich$Report)
 ```
 
@@ -726,10 +706,123 @@ lh_mf1 <- with(lh, create_lh_list(vbk=vbk,
            nseasons=1,
            nfleets=2))
 ```
-```{r, echo=FALSE}
-plot(lh_mf1$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity")
-lines(lh_mf1$S_fl[2,], type="l", lwd=2, col="steelblue")
+
+Using the simulation function for multiple fleets, we need to specify the fleet dynamics for each (`Fdynamics`), the number of years of length composition data for each (`Nyears_comp`), and the proportions of each fleet (`fleet_proportions`).
+```{r, tidy=TRUE}
+true_mf1 <- generate_data(modpath=NULL,
+            itervec=1, 
+            Fdynamics=c("Constant","Endogenous"),
+            Rdynamics="Constant",
+            lh=lh_mf1,
+            Nyears=20,
+            Nyears_comp=c(20,10),
+            comp_sample=200,
+            init_depl=0.7,
+            seed=123,
+            fleet_proportions=c(0.6,0.4))
 ```
+```{r, echo=FALSE}
+library(RColorBrewer)
+cols <- brewer.pal(3, "Set1")
+plot(lh_mf1$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity", col=cols[1])
+lines(lh_mf1$S_fl[2,], type="l", lwd=2, col=cols[2])
+```
+```{r, fig.width=10, fig.height=6, tidy=TRUE, fig.cap="True population with two fleets, one with constant fishing mortality, and one with open access fishing."}
+par(mfrow=c(3,2))
+plot(true_mf1$F_y, type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true_mf1$F_y)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+for(i in 1:lh_mf1$nfleets){
+  lines(true_mf1$F_ft[i,], col=cols[i])
+}
+plot(true_mf1$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true_mf1$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf1$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(c(1,max(true_mf1$D_t)))), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(colSums(true_mf1$Cw_ft), type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(colSums(true_mf1$Cw_ft))*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+for(i in 1:lh_mf1$nfleets){
+  lines(true_mf1$Cw_ft[i,], col=cols[i])
+}
+plot(true_mf1$I_ft[1,], type="l", xlab="Year", ylab="Abundance index", ylim=c(0,max(true_mf1$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5, col=cols[1])
+lines(true_mf1$I_ft[2,], col=cols[2])
+```
+
+
+Move the generated data from an array to a list to plot the data.
+```{r, echo=FALSE}
+LF_list <- lapply(1:true_mf1$nfleets, function(x){
+  return(true_mf1$LF[,,x])
+})
+```
+
+```{r, fig.height=6, fig.width=8, tidy=TRUE, fig.cap="Generated length composition data, labeled by years 1-20."}
+plot_LCfits(LFlist=LF_list)
+```
+
+```{r, tidy=TRUE}
+data_mf1 <- list("years"=1:true_mf1$Nyears, "LF"=true_mf1$LF, "I_ft"=true_mf1$I_ft, "C_ft"=true_mf1$Cw_ft, "neff_ft"=true_mf1$obs_per_year)
+inputs_mf1 <- create_inputs(lh=lh_mf1, input_data=data_mf1)
+```
+
+
+For now, use the multinomial distribution for multiple fleets, specifying `LFdist=0`.
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+rich_mf1 <- run_LIME(modpath=NULL, 
+                  input=inputs_mf1,
+                  data_avail="Index_Catch_LC",
+                  C_type=2,
+                  LFdist=0)
+```
+
+Check that the data-rich model converges:
+```{r, tidy=TRUE}
+gradient <- rich_mf1$opt$max_gradient <= 0.001
+hessian <- rich_mf1$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the data-rich LIME model run with two fleets, both with logistic selectivity."}
+plot_LCfits(Inputs=rich_mf1$Inputs,
+            Report=rich_mf1$Report)
+```
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) for the data-rich case with two fleets each with logistic selectivity."}
+plot_output(Inputs=rich_mf1$Inputs,
+            Report=rich_mf1$Report,
+            Sdreport=rich_mf1$Sdreport,
+            lh=lh_mf1,
+            True=true_mf1,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("SPR"=c(0,1)))
+```
+
+With length data only, we need to estimate the total fishing mortality (as opposed to annual fishing mortality for each fleet). It's also useful to set the fishing mortality penalty to something relatively small to help the estimation.
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+inputs_mf1$SigmaF <- 0.1
+lc_mf1 <- run_LIME(modpath=NULL, 
+                  input=inputs_mf1,
+                  data_avail="LC",
+                  LFdist=0,
+                  est_totalF=TRUE)
+
+gradient <- lc_mf1$opt$max_gradient <= 0.001
+hessian <- lc_mf1$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for LIME model with length data only for two fleets, both with logistic selectivity."}
+plot_LCfits(Inputs=lc_mf1$Inputs,
+            Report=lc_mf1$Report)
+```
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) for the length-only case with two fleets each with logistic selectivity."}
+plot_output(Inputs=lc_mf1$Inputs,
+            Report=lc_mf1$Report,
+            Sdreport=lc_mf1$Sdreport,
+            lh=lh_mf1,
+            True=true_mf1,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("SPR"=c(0,1)))
+```
+
 
 ### Step 2: Data inputs
 
@@ -767,8 +860,118 @@ lh_mf2 <- with(lh, create_lh_list(vbk=vbk,
            nfleets=2))
 ```
 ```{r, echo=FALSE}
-plot(lh_mf2$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity")
-lines(lh_mf2$S_fl[2,], type="l", lwd=2, col="tomato")
+plot(lh_mf2$S_fl[1,], type="l", lwd=2, xlab="Length", ylab="Selectivity", col=cols[1])
+lines(lh_mf2$S_fl[2,], type="l", lwd=2, col=cols[2])
+```
+
+Simulate data:
+```{r, tidy=TRUE}
+true_mf2 <- generate_data(modpath=NULL,
+            itervec=1, 
+            Fdynamics=c("Constant","Endogenous"),
+            Rdynamics="Constant",
+            lh=lh_mf2,
+            Nyears=20,
+            Nyears_comp=c(20,10),
+            comp_sample=200,
+            init_depl=0.7,
+            seed=123,
+            fleet_proportions=c(0.6,0.4))
+```
+
+```{r, fig.width=10, fig.height=6, tidy=TRUE, fig.cap="True population with two fleets, one with constant fishing mortality, and one with open access fishing."}
+par(mfrow=c(3,2))
+plot(true_mf2$F_y, type="l", lwd=4, xlab="Year", ylab="Fishing mortality", ylim=c(0,max(true_mf2$F_y)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+for(i in 1:lh_mf2$nfleets){
+  lines(true_mf2$F_ft[i,], col=cols[i])
+}
+plot(true_mf2$R_t, type="l", lwd=4, xlab="Year", ylab="Recruitment", ylim=c(0,max(true_mf2$R_t)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf2$SPR_t, type="l", lwd=4, xlab="Year", ylab="SPR", ylim=c(0,1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(true_mf2$D_t, type="l", lwd=4, xlab="Year", ylab="Relative spawning biomass", ylim=c(0,max(c(1,max(true_mf2$D_t)))), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+plot(colSums(true_mf2$Cw_ft), type="l", lwd=4, xlab="Year", ylab="Catch", ylim=c(0,max(colSums(true_mf2$Cw_ft))*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5)
+for(i in 1:lh_mf1$nfleets){
+  lines(true_mf2$Cw_ft[i,], col=cols[i])
+}
+plot(true_mf2$I_ft[1,], type="l", xlab="Year", ylab="Abundance index", ylim=c(0,max(true_mf2$I_ft)*1.1), xaxs="i", yaxs="i", cex.axis=1.5, cex.lab=1.5, col=cols[1])
+lines(true_mf2$I_ft[2,], col=cols[2])
+```
+
+
+Move the generated data from an array to a list to plot the data.
+```{r, echo=FALSE}
+LF_list <- lapply(1:true_mf2$nfleets, function(x){
+  return(true_mf2$LF[,,x])
+})
+```
+
+```{r, fig.height=6, fig.width=8, tidy=TRUE, fig.cap="Generated length composition data, labeled by years 1-20."}
+plot_LCfits(LFlist=LF_list)
+```
+
+```{r, tidy=TRUE}
+data_mf2 <- list("years"=1:true_mf2$Nyears, "LF"=true_mf2$LF, "I_ft"=true_mf2$I_ft, "C_ft"=true_mf2$Cw_ft, "neff_ft"=true_mf2$obs_per_year)
+inputs_mf2 <- create_inputs(lh=lh_mf2, input_data=data_mf2)
+```
+
+
+For now, use the multinomial distribution for multiple fleets, specifying `LFdist=0`.
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+rich_mf2 <- run_LIME(modpath=NULL, 
+                  input=inputs_mf2,
+                  data_avail="Index_Catch_LC",
+                  C_type=2,
+                  vals_selex_ft = lh_mf2$S_fl,
+                  LFdist=0)
+
+gradient <- rich_mf2$opt$max_gradient <= 0.001
+hessian <- rich_mf2$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the data-rich LIME model run with two fleets, one with logistic and one dome-shaped selectivity."}
+plot_LCfits(Inputs=rich_mf2$Inputs,
+            Report=rich_mf2$Report)
+```
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) for the data-rich case with two fleets each with logistic selectivity."}
+plot_output(Inputs=rich_mf2$Inputs,
+            Report=rich_mf2$Report,
+            Sdreport=rich_mf2$Sdreport,
+            lh=lh_mf2,
+            True=true_mf2,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("SPR"=c(0,1)))
+```
+
+With length data only, we need to estimate the total fishing mortality (as opposed to annual fishing mortality for each fleet). It's also useful to set the fishing mortality penalty to something relatively small to help the estimation.
+```{r, tidy=TRUE, results="hide", echo=TRUE}
+inputs_mf1$SigmaF <- 0.08
+lc_mf1 <- run_LIME(modpath=NULL, 
+                  input=inputs_mf1,
+                  data_avail="LC",
+                  LFdist=0,
+                  est_totalF=TRUE)
+
+gradient <- lc_mf1$opt$max_gradient <= 0.001
+hessian <- lc_mf1$Sdreport$pdHess
+hessian==TRUE & gradient == TRUE
+```
+
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for LIME model with length data only for two fleets, both with logistic selectivity."}
+plot_LCfits(Inputs=lc_mf1$Inputs,
+            Report=lc_mf1$Report)
+```
+
+```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="LIME estimates of key population parameters (green) compared to the truth (black) for the length-only case with two fleets each with logistic selectivity."}
+plot_output(Inputs=lc_mf1$Inputs,
+            Report=lc_mf1$Report,
+            Sdreport=lc_mf1$Sdreport,
+            lh=lh_mf1,
+            True=true_mf1,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("SPR"=c(0,1)))
 ```
 
 
