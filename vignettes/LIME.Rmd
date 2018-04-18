@@ -674,8 +674,6 @@ plot_output(Inputs=catch_lc$Inputs,
 
 ## Example: Two fleets with logistic selectivity
 
-### Step 1: Biological inputs and starting values
-
 With multiple fleets, all biological inputs are the same as with a single fleet. However, we must specify selectivity for each fleet. In this case, both selectivities are logistic. 
 ```{r, tidy=TRUE}
 lh_mf1 <- with(lh, create_lh_list(vbk=vbk, 
