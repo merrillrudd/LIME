@@ -55,7 +55,7 @@ format_input <- function(input,
 
         selex_type_f <- rep(1,nfleets)
         for(i in 1:nfleets){
-            if(any(vals_selex_ft[i,] > 0)) selex_type_f <- 0
+            if(any(vals_selex_ft[i,] > 0)) selex_type_f[i] <- 0
         }
 
             mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
