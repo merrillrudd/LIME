@@ -219,6 +219,143 @@ abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
 legend("topleft", legend=c("LIME Selectivity", "LBSPR Selectivity", "Mean length in catch", "Linf"), col=c("#00AA00", "#AA00AA", "blue", "red"), lty=c(1,1,2,2), lwd=2)
 
 
+##---------------------------------------------------------------
+## *** LIME, Multiple years, single-fleet
+##----------------------------------------------------------------
+
+	##----------------------------------------------------------------
+	## Step 1: Weight length data
+	##----------------------------------------------------------------
+catch <- read.csv("Catch_multifleet.csv", header=TRUE)
+
+data_mymf <- read.csv("Length_multiyear_multifleet.csv", header=TRUE)
+
+years <- unique(data_mymf$Year)
+
+cldata <- full_join(data_mymf, catch)
+
+## observed samples by bin by year
+nsamps <- sum(cldata %>% select(grep("X", colnames(cldata))))
+
+## multiply observed number of fish in bins by catch, keep fleet information
+lweight1 <- ((cldata %>% select(grep("X", colnames(cldata)))) * cldata$Catch) %>% mutate(Fleet=cldata$Fleet)
+
+## add weighted lengths from each fleet
+lweight2 <- ((lweight1 %>% filter(Fleet==1)) + (lweight1 %>% filter(Fleet==2))) %>% select(-Fleet)
+
+## calculate proportions weighted by catch
+lweight3 <- matrix(t(sapply(1:length(years), function(x) as.numeric(lweight2[x,]/sum(lweight2[x,])))), nrow=length(years), ncol=length(bins))
+
+LF_new <- lweight3 * nsamps
+rownames(LF_new) <- years
+colnames(LF_new) <- bins
+
+plot_LCfits(LFlist=list("LF"=LF_new), ylim=c(0,0.3), dim=c(5,3))
+
+	##----------------------------------------------------------------
+	## Step 3: Run LIME
+	##----------------------------------------------------------------
+
+data_list <- list("years"=years, "LF"=LF_new)
+
+## use lh - single fleet
+input_data <- create_inputs(lh=lh, input_data=data_list)
+
+res <- run_LIME(modpath=NULL, input=input_data, data_avail="LC")
+
+## check TMB inputs
+Inputs <- res$Inputs
+
+## Report file
+Report <- res$Report
+
+## Standard error report
+Sdreport <- res$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- res$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
+
+	##----------------------------------------------------------------
+	## Step 4: Examine results
+	##----------------------------------------------------------------
+
+spr <- Report$SPR_t[length(Report$SPR_t)]
+
+## standard error
+sd_spr <- summary(Sdreport)[which(rownames(summary(Sdreport))=="SPR_t"),2][length(Report$SPR_t)]
+
+## lower confidence limit
+lcl_spr <- max(0,spr - 1.96 * sd_spr)
+
+## upper confidence limit
+ucl_spr <- min(1,spr + 1.96 * sd_spr)
+
+
+save <- rbind.data.frame(save, data.frame("model"="LIME", "run"="multiyear_singlefleet", "spr"=spr[length(spr)], "lcl_spr"=lcl_spr[length(spr)], "ucl_spr"=ucl_spr[length(spr)]))
+
+ggplot(save) +
+geom_point(aes(x=run, y=spr, color=model), cex=5) +
+geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
+scale_y_continuous(limits=c(0,1)) +
+xlab("Run") + ylab("SPR")
+
+plot_LCfits(Inputs=Inputs, Report=Report, ylim=c(0,0.25), true_years=years)
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			true_years=years)
+abline(v=lh$linf, lwd=2, lty=2, col="red")
+abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
+
+##---------------------------------------------------------------
+## *** LBSPR, Multiple years, single-fleet
+##----------------------------------------------------------------
+LB_lengths <- new("LB_lengths")
+LB_lengths@LMids <- bins
+LB_lengths@LData <- t(LF_new)
+LB_lengths@Years <- years
+LB_lengths@NYears <- length(years)
+
+
+lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+
+spr <- lbspr_res@SPR[length(lbspr_res@SPR)]
+
+sd_spr <- sqrt(lbspr_res@Vars[1,"SPR"])
+
+## lower confidence limit
+lcl_spr <- max(0,spr - 1.96 * sd_spr)
+
+## upper confidence limit
+ucl_spr <- spr + 1.96 * sd_spr
+
+save <- rbind.data.frame(save, data.frame("model"="LBSPR", "run"="multiyear_singlefleet", "spr"=spr, "lcl_spr"=lcl_spr, "ucl_spr"=ucl_spr))
+
+ggplot(save) +
+geom_point(aes(x=run, y=spr, color=model), cex=5) +
+geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
+scale_y_continuous(limits=c(0,NA)) +
+xlab("Run") + ylab("SPR")
+
+plot_LCfits(Inputs=Inputs, Report=Report, LBSPR=lbspr_res, ylim=c(0,0.25))
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			LBSPR=lbspr_res,
+			true_years=years)
+abline(v=lh$linf, lwd=2, lty=2, col="red")
+abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
+legend("topleft", legend=c("LIME Fleet 1", "LIME Fleet 2", "LBSPR Selectivity", "Mean length in catch", "Linf"), col=c("red", "blue", "#AA00AA", "blue", "red"), lty=c(1,1,1,2,2), lwd=2)
+
+
 ##----------------------------------------------------------------
 ## *** LIME, single year, multiple fleets
 ##----------------------------------------------------------------
@@ -227,15 +364,15 @@ legend("topleft", legend=c("LIME Selectivity", "LBSPR Selectivity", "Mean length
 	## Step 1: Read in length data
 	##----------------------------------------------------------------
 
-data2 <- read.csv("Length_multifleet.csv", header=TRUE)
+data_1ymf <- read.csv("Length_multifleet.csv", header=TRUE)
 
 ## identify length bins
-bins <- data2[,1]
+bins <- data_1ymf[,1]
 
 ## setup length frequency matrix
 LF <- list()
-LF[[1]] <- matrix(data2[,2], nrow=1, ncol=length(bins))
-LF[[2]] <- matrix(data2[,3], nrow=1, ncol=length(bins))
+LF[[1]] <- matrix(data_1ymf[,2], nrow=1, ncol=length(bins))
+LF[[2]] <- matrix(data_1ymf[,3], nrow=1, ncol=length(bins))
 rownames(LF[[1]]) <- rownames(LF[[2]]) <- "2016"
 colnames(LF[[1]]) <- colnames(LF[[2]]) <- bins
 
@@ -317,14 +454,13 @@ save <- rbind.data.frame(save, data.frame("model"="LIME", "run"="singleyear_mult
 ggplot(save) +
 geom_point(aes(x=run, y=spr, color=model), cex=5) +
 geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
-scale_y_continuous(limits=c(0,NA)) +
+scale_y_continuous(limits=c(0,1)) +
 xlab("Run") + ylab("SPR")
 
 ## plot length composition data and fits
 plot_LCfits(Inputs=Inputs, 
 			Report=Report,
 			ylim=c(0,0.3),
-			LBSPR=lbspr_res,
 			true_years=input_data$years)		
 
 ## plot model output
@@ -347,12 +483,9 @@ legend("topleft", legend=c("LIME Fleet 1", "LIME Fleet 2", "LBSPR Selectivity", 
 	##----------------------------------------------------------------
 	## Step 1: Read in length data
 	##----------------------------------------------------------------
-data3 <- read.csv("Length_multiyear_multifleet.csv", header=TRUE)
 
-years <- unique(data3$Year)
-
-LF1 <- as.matrix(data3 %>% filter(Fleet==1) %>% select(-c(Fleet, Year)))
-LF2 <- as.matrix(data3 %>% filter(Fleet==2) %>% select(-c(Fleet, Year)))
+LF1 <- as.matrix(data_mymf %>% filter(Fleet==1) %>% select(-c(Fleet, Year)))
+LF2 <- as.matrix(data_mymf %>% filter(Fleet==2) %>% select(-c(Fleet, Year)))
 
 LFmymf <- list()
 LFmymf[[1]] <- LF1
@@ -431,134 +564,5 @@ abline(v=lh$linf, lwd=2, lty=2, col="red")
 abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
 
 
-##---------------------------------------------------------------
-## *** LIME, Multiple years, single-fleet
-##----------------------------------------------------------------
-
-	##----------------------------------------------------------------
-	## Step 1: Weight length data
-	##----------------------------------------------------------------
-catch <- read.csv("Catch_multifleet.csv", header=TRUE)
-
-cldata <- full_join(data3, catch)
-
-## observed samples by bin by year
-nsamps <- sum(cldata %>% select(grep("X", colnames(cldata))))
-
-## multiply observed number of fish in bins by catch, keep fleet information
-lweight1 <- ((cldata %>% select(grep("X", colnames(cldata)))) * cldata$Catch) %>% mutate(Fleet=cldata$Fleet)
-
-## add weighted lengths from each fleet
-lweight2 <- ((lweight1 %>% filter(Fleet==1)) + (lweight1 %>% filter(Fleet==2))) %>% select(-Fleet)
-
-## calculate proportions weighted by catch
-lweight3 <- matrix(t(sapply(1:length(years), function(x) as.numeric(lweight2[x,]/sum(lweight2[x,])))), nrow=length(years), ncol=length(bins))
-
-LF_new <- lweight3 * nsamps
-rownames(LF_new) <- years
-colnames(LF_new) <- bins
-
-plot_LCfits(LFlist=list("LF"=LF_new), ylim=c(0,0.3), dim=c(5,3))
-
-	##----------------------------------------------------------------
-	## Step 3: Run LIME
-	##----------------------------------------------------------------
-
-data_list <- list("years"=years, "LF"=LF_new)
-
-## use lh - single fleet
-input_data <- create_inputs(lh=lh, input_data=data_list)
-
-res <- run_LIME(modpath=NULL, input=input_data, data_avail="LC")
-
-## check TMB inputs
-Inputs <- res$Inputs
-
-## Report file
-Report <- res$Report
-
-## Standard error report
-Sdreport <- res$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- res$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-	##----------------------------------------------------------------
-	## Step 4: Examine results
-	##----------------------------------------------------------------
-
-spr <- Report$SPR_t[length(Report$SPR_t)]
-
-## standard error
-sd_spr <- summary(Sdreport)[which(rownames(summary(Sdreport))=="SPR_t"),2][length(Report$SPR_t)]
-
-## lower confidence limit
-lcl_spr <- max(0,spr - 1.96 * sd_spr)
-
-## upper confidence limit
-ucl_spr <- min(1,spr + 1.96 * sd_spr)
-
-
-save <- rbind.data.frame(save, data.frame("model"="LIME", "run"="multiyear_singlefleet", "spr"=spr[length(spr)], "lcl_spr"=lcl_spr[length(spr)], "ucl_spr"=ucl_spr[length(spr)]))
-
-ggplot(save) +
-geom_point(aes(x=run, y=spr, color=model), cex=5) +
-geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
-scale_y_continuous(limits=c(0,NA)) +
-xlab("Run") + ylab("SPR")
-
-plot_LCfits(Inputs=Inputs, Report=Report, ylim=c(0,0.25), true_years=years)
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			true_years=years)
-abline(v=lh$linf, lwd=2, lty=2, col="red")
-abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
-
-
-LB_lengths <- new("LB_lengths")
-LB_lengths@LMids <- bins
-LB_lengths@LData <- t(LF_new)
-LB_lengths@Years <- years
-LB_lengths@NYears <- length(years)
-
-
-lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
-
-spr <- lbspr_res@SPR[length(lbspr_res@SPR)]
-
-sd_spr <- sqrt(lbspr_res@Vars[1,"SPR"])
-
-## lower confidence limit
-lcl_spr <- max(0,spr - 1.96 * sd_spr)
-
-## upper confidence limit
-ucl_spr <- spr + 1.96 * sd_spr
-
-save <- rbind.data.frame(save, data.frame("model"="LBSPR", "run"="multiyear_singlefleet", "spr"=spr, "lcl_spr"=lcl_spr, "ucl_spr"=ucl_spr))
-
-ggplot(save) +
-geom_point(aes(x=run, y=spr, color=model), cex=5) +
-geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
-scale_y_continuous(limits=c(0,NA)) +
-xlab("Run") + ylab("SPR")
-
-plot_LCfits(Inputs=Inputs, Report=Report, LBSPR=lbspr_res, ylim=c(0,0.25))
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			LBSPR=lbspr_res,
-			true_years=years)
-abline(v=lh$linf, lwd=2, lty=2, col="red")
-abline(v=Report$ML_ft[length(Report$ML_ft)], lwd=2, lty=2, col="blue")
-legend("topleft", legend=c("LIME Fleet 1", "LIME Fleet 2", "LBSPR Selectivity", "Mean length in catch", "Linf"), col=c("red", "blue", "#AA00AA", "blue", "red"), lty=c(1,1,1,2,2), lwd=2)
 
 
