@@ -6,7 +6,7 @@
 \usage{
 plot_output(Inputs = NULL, Report = NULL, Sdreport = NULL, LBSPR = NULL,
   lh, true_years = NULL, True = NULL, plot = c("Fish", "Rec", "SPR", "ML",
-  "SB", "Selex"), set_ylim = list(Fish = c(0, 1), SPR = c(0, 1)))
+  "SB", "Selex"), set_ylim = list(SPR = c(0, 1)), legend = FALSE)
 }
 \arguments{
 \item{Inputs}{LIME input file}

@@ -4,8 +4,9 @@
 \alias{plot_LCfits}
 \title{plot length composition data and model fits}
 \usage{
-plot_LCfits(LFlist, Inputs = NULL, Report = NULL, LBSPR = NULL,
-  ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE)
+plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
+  ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE,
+  true_years = NULL)
 }
 \arguments{
 \item{LFlist}{list of length frequency matrices}
@@ -25,6 +26,8 @@ plot_LCfits(LFlist, Inputs = NULL, Report = NULL, LBSPR = NULL,
 \item{dim}{dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot}
 
 \item{n}{if TRUE, will display sample size of length comp data; default FALSE}
+
+\item{true_years}{optional vector of true years to label years of length comp}
 }
 \value{
 figure with length composition data and model fits if Report or LBSPR are specified

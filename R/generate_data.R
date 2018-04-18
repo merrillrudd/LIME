@@ -13,18 +13,32 @@
 #' @param Nyears_comp number of years to generate length composition data
 #' @param comp_sample sample size of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
-#' @param mismatch default=FALSE, if TRUE, catch and index overlap with length comp only 1 year
 #' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
-#' @param nburn number of years burn-in for operating model, default=50
 #' @param seed single seed or vector of seeds for each iteration
 #' @param mgt_type removals based on F (default) or catch
+#' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
 #' @importFrom stats runif
 #' @importFrom TMB MakeADFun
 
 #' @return print how many iterations were written into the model directory
 #' @export
-generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE, Nyears, Nyears_comp, comp_sample, rewrite=TRUE, mismatch=FALSE, init_depl, derive_quants=FALSE, nburn=50, seed, mgt_type="F"){
+generate_data <- 
+    function(modpath, 
+            itervec, 
+            Fdynamics, 
+            Rdynamics, 
+            lh, 
+            pool=TRUE, 
+            Nyears, 
+            Nyears_comp, 
+            comp_sample, 
+            rewrite=TRUE, 
+            init_depl, 
+            derive_quants=FALSE, 
+            seed, 
+            mgt_type="F",
+            fleet_proportions=1){
 
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
@@ -44,8 +58,10 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
     if(length(init_depl)==1){
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=nburn, seed=iseed, mismatch=mismatch, mgt_type=mgt_type)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions)
     }
+
+  
     ## if we are choosing randomly from a range of initial depletion:
     if(length(init_depl)==2){
         DataList <- NA
@@ -54,7 +70,7 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
             seed_init <- iseed + add
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, nburn=50, seed=seed_init, mismatch=mismatch), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_proportions=fleet_proportions), error=function(e) NA)
             if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }
@@ -62,39 +78,39 @@ generate_data <- function(modpath, itervec, Fdynamics, Rdynamics, lh, pool=TRUE,
     }
     if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
-   
-    DataList_out <- DataList
-    if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
-    if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
-    rownames(DataList_out$LF) <- rownames(DataList$LF)
+    inits <- create_inputs(lh=lh, input_data=DataList)
+
+    # if(nrow(DataList$LF)==1) DataList_out$LF <- t(as.matrix(DataList$LF[,1:length(lh$mids)]))
+    # if(nrow(DataList$LF)>1) DataList_out$LF <- as.matrix(DataList$LF[,1:length(lh$mids)])
+    # rownames(DataList_out$LF) <- rownames(DataList$LF)
 
     if(derive_quants==TRUE){
         ## project the truth forward
-        inits <- create_inputs(lh=lh, input_data=DataList)
-        Inputs <- format_input(input=inits, data_avail="Index_Catch_LC", theta_type=0, Fpen=1, SigRpen=1, SigRprior=c(inits$SigmaR, 0.2), est_sigma="log_sigma_R", f_startval=DataList$F_t, LFdist=1, S_l_input=-1, randomR=TRUE, C_opt=2)
-        ParList <- Inputs$Parameters    
+        inits$C_ft <- DataList$Cw_ft
+        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=TRUE, randomR=TRUE, mirror=FALSE)
+        ParList <- TmbList$Parameters    
 
         # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
 
         obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
         Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
-        DataList_out$MSY <- Derived$MSY
-        DataList_out$Fmsy <- Derived$Fmsy
-        DataList_out$FFmsy <- Derived$FFmsy
-        DataList_out$SBBmsy <- Derived$SBBmsy
-        DataList_out$SBmsy <- Derived$SBmsy
-        DataList_out$F30 <- Derived$F30
-        DataList_out$FF30 <- Derived$FF30
-        DataList_out$F40 <- Derived$F40
-        DataList_out$FF40 <- Derived$FF40
-        DataList_out$TBmsy <- Derived$TBmsy
+        inits$MSY <- Derived$MSY
+        inits$Fmsy <- Derived$Fmsy
+        inits$FFmsy <- Derived$FFmsy
+        inits$SBBmsy <- Derived$SBBmsy
+        inits$SBmsy <- Derived$SBmsy
+        inits$F30 <- Derived$F30
+        inits$FF30 <- Derived$FF30
+        inits$F40 <- Derived$F40
+        inits$FF40 <- Derived$FF40
+        inits$TBmsy <- Derived$TBmsy
     }
 
-      if(is.null(modpath)==FALSE) saveRDS(DataList_out, file.path(iterpath, "True.rds"))
-      if(is.null(modpath)) return(DataList_out)
+      if(is.null(modpath)==FALSE) saveRDS(inits, file.path(iterpath, "True.rds"))
+      if(is.null(modpath)) return(inits)
       rm(DataList)
-      rm(DataList_out)
+    rm(inits)
       rm(iterpath)
 
 }

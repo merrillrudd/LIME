@@ -4,29 +4,31 @@
 #'
 #' @author M.B. Rudd
 #' @param modpath model directory
-#' @param lh list of life history information, from create_lh_list
-#' @param input_data tagged list of data inputs. Required: years = vector of years (true years or indices); LF = matrix of length frequency (years along rows and length bins along columns), obs_per_year = vector of sample size per year. Optional: I_t = vector of abundance index, named with years; C_t = vector of catch, named with years. 
-#' @param est_sigma list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
-#' @param data_avail types of data included, must at least include LC as length composition data is the minimum data input. May also include Catch or Index separated by underscore. For example, LC, Catch_LC, Index_Catch_LC.
+#' @param input tagged list of LIME inputs. Output from create_inputs.
+#' @param data_avail types of data included, must at least include LCX where X is the number of years of length composition data. May also include "Catch" or "Index" separated by underscore. For example, "LC10", "Catch_LC1", "Index_Catch_LC20".
+#' @param Fpen penalty on fishing mortality 0= off, 1=on
+#' @param SigRpen penalty on sigmaR, 0=off, 1=on
+#' @param SigRprior vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation
+#' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
+#' @param C_type  default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight. 
+#' @param est_more list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F
+#' @param fix_more default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
+#' @param est_F_ft default=TRUE, otherwise 0 for off and 1 for on in matrix that matches fleets in rows and years in columns
+#' @param f_startval_ft default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).
+#' @param rdev_startval_t default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)
+#' @param est_selex_f default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets
+#' @param vals_selex_ft input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity
+#' @param Rdet default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment
+#' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
+#' @param F_up upper bound of fishing mortality estimate; default=10
+#' @param S50_up upper bound of length at 50 percent selectivity; default=NULL
+#' @param derive_quants if TRUE, derive MSY-related reference points, default=FALSE
 #' @param itervec number of datasets to generate in a simulation study. default=NULL for real stock assessment application. 
 #' @param rewrite default=TRUE; if results already exist in the directory, should we rewrite them? TRUE or FALSE
-#' @param simulation is this a simulation? default TRUE, FALSE means you are using real data (can set itervec=NULL)
-#' @param param_adjust character or vector of parameter names to change input values
-#' @param val_adjust number or vector of numbers for corresponding parameter value changes
-#' @param f_start default=FALSE will make starting logF values =0; change to true and will use true values from simulation
-#' @param fix_param default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)
-#' @param fix_param_t default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed. 
-#' @param C_opt default=0, if no catch data is available, set to 0. If catch is in numbers, set to 1. if catch is in biomass, set to 2. 
-#' @param F_up upper bound of fishing mortality estimate; default=5
-#' @param S50_up upper bound of length at 50 percent selectivity; default=NULL
-#' @param LFdist likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial
-#' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
-#' @param S_l_input default=-1, use 1 or 2--parameter logistic selectivity function; alternatively can input fixed selectivity-at-length
-#' @param theta_type default=1, estimate single theta for all years of length comp; if 0, estimate annual theta
-#' @param randomR default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)
-#' @param Fpen penalty on fishing mortality; 0=OFF, 1=ON, default=1
-#' @param SigRpen penalty on sigmaR; 0=OFF, 1=ON, default=1
-#' @param newtonsteps number of extra newton steps to take after optimization; FALSE to turn off
+#' @param simulation is this a simulation? default FALSE means you are using real data (can set itervec=NULL)
+#' @param mirror vector of parameter names to mirror between fleets
+#' @param est_totalF TRUE estimate total F instead of by fleet
+#' @param prop_f proportion of catch from each fleet
 #' @importFrom TMB MakeADFun sdreport
 #' @importFrom TMBhelper Optimize
 #' @importFrom utils write.csv
@@ -37,9 +39,55 @@
 #' @return prints how many iterations were run in model directory
 #' 
 #' @export
-run_LIME <- function(modpath, lh, input_data, est_sigma, data_avail, itervec=NULL, rewrite=TRUE, simulation=FALSE, param_adjust=FALSE, val_adjust=FALSE, f_true=FALSE, fix_param=FALSE, fix_param_t=FALSE, C_opt=0, F_up=10, S50_up=NULL, LFdist=1, derive_quants=FALSE, S_l_input=-1, theta_type=1, randomR=TRUE, Fpen=1, SigRpen=1, newtonsteps=3){
+run_LIME <- function(modpath, 
+                      input,
+                      data_avail, 
+                      Fpen=1,
+                      SigRpen=1,
+                      SigRprior=c(0.737,0.3),
+                      LFdist=1,
+                      C_type=0,
+                      est_more=FALSE,
+                      fix_more=FALSE,
+                      est_F_ft=TRUE,
+                      f_startval_ft=NULL,
+                      rdev_startval_t=NULL,
+                      est_selex_f=TRUE,
+                      vals_selex_ft=-1,
+                      Rdet=FALSE,
+                      newtonsteps=3,
+                      F_up=10,
+                      S50_up=NULL,
+                      derive_quants=FALSE,
+                      itervec=NULL,
+                      simulation=FALSE,
+                      rewrite=TRUE,
+                      mirror=NULL,
+                      est_totalF=FALSE,
+                      prop_f=1){
 
-      # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))
+                      # Fpen=1
+                      # SigRpen=1
+                      # SigRprior=c(0.737,0.3)
+                      # LFdist=1
+                      # est_more=FALSE
+                      # fix_more=FALSE
+                      # est_F_ft=TRUE
+                      # f_startval_ft=NULL
+                      # rdev_startval_t=NULL
+                      # est_selex_f=TRUE
+                      # vals_selex_ft=-1
+                      # Rdet=FALSE
+                      # newtonsteps=3
+                      # F_up=10
+                      # S50_up=NULL
+                      # derive_quants=FALSE
+                      # itervec=NULL
+                      # simulation=FALSE
+                      # rewrite=TRUE
+                      # mirror=NULL
+                      # est_totalF=FALSE
+                      # prop_f=1
 
   if(simulation==FALSE) itervec <- 1 
   if(simulation==TRUE & is.null(itervec)) stop("Must specify number of iterations for simulation")    
@@ -51,82 +99,91 @@ for(iter in 1:length(itervec)){
     if(simulation==FALSE & is.null(modpath)) iterpath <- NULL
 
     if(rewrite==FALSE & is.null(modpath)==FALSE){
-      if(file.exists(file.path(iterpath, "Sdreport.rds"))) next
-      if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) next
-      if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) next
+      if(file.exists(file.path(iterpath, "LIME_output.rds"))) next
     }
 
     if(rewrite==TRUE & is.null(modpath)==FALSE){
-      if(file.exists(file.path(iterpath, "NAs_final_gradient.txt"))) unlink(file.path(iterpath, "NAs_final_gradient.txt"), TRUE)
-      if(file.exists(file.path(iterpath, "high_final_gradient.txt"))) unlink(file.path(iterpath, "high_final_gradient.txt"), TRUE)
-      if(file.exists(file.path(iterpath, "model_NA.txt"))) unlink(file.path(iterpath, "model_NA.txt"), TRUE)
+      if(file.exists(file.path(iterpath, "LIME_output.rds"))) unlink(file.path(iterpath, "LIME_output.rds"), TRUE)
     }
 
     if(simulation==TRUE & is.null(modpath)==FALSE){
-      sim <- readRDS(file.path(iterpath, "True.rds"))
-      if(f_true==TRUE) f_inits <- sim$F_t
-      if(f_true==FALSE) f_inits <- NULL
-      if(C_opt==0) C_t_input <- NULL
-      if(C_opt==1) C_t_input <- sim$C_t
-      if(C_opt==2) C_t_input <- sim$Cw_t
-      if(LFdist==0) obs_input <- sim$obs_per_year
-      if(LFdist==1) obs_input <- rep(0, sim$Nyears)
-      true_nt <- sim$Nyears/sim$nseasons
-      s_all <- as.vector(sapply(1:true_nt, function(x) rep(x,sim$nseasons)))
-      years_i <- s_all[as.numeric(rownames(sim$LF))]
-      input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "years_i"=years_i, "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
+      stop("Need to edit code for multifleet")
+      # sim <- readRDS(file.path(iterpath, "True.rds"))
+      # f_inits <- sim$F_ft
+      # # f_inits <- NULL
+      # if(C_type==0) C_t_input <- NULL
+      # if(C_type==1) C_t_input <- sim$Cn_ft
+      # if(C_type==2) C_t_input <- sim$Cw_ft
+      # if(LFdist==0) obs_input <- sim$obs_per_year
+      # if(LFdist==1) obs_input <- rep(0, sim$Nyears)
+      # true_nt <- sim$Nyears/sim$nseasons
+      # s_all <- as.vector(sapply(1:true_nt, function(x) rep(x,sim$nseasons)))
+      # years_i <- s_all[as.numeric(rownames(sim$LF))]
+      # input_data <- list("years"=1:sim$Nyears, "LF"=sim$LF, "years_i"=years_i, "I_t"=sim$I_t, "C_t"=C_t_input, "F_t"=f_inits)
     }
-    
-    lh_new <- lh
-      if("SigmaR" %in% param_adjust){
-        lh_new[["SigmaR"]] <- val_adjust[which(param_adjust=="SigmaR")]
-      }
-      if("SigmaF" %in% param_adjust){
-        lh_new[["SigmaF"]] <- val_adjust[which(param_adjust=="SigmaF")]
-      }
-      if("SigmaC" %in% param_adjust){
-        lh_new[["SigmaC"]] <- val_adjust[which(param_adjust=="SigmaC")]
-      }
-      if("SigmaI" %in% param_adjust){
-        lh_new[["SigmaI"]] <- val_adjust[which(param_adjust=="SigmaI")]
-      }
-      if("CVlen" %in% param_adjust){
-        lh_new[["CVlen"]] <- val_adjust[which(param_adjust=="CVlen")]
-      }
-      if("M" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=val_adjust[which(param_adjust=="M")], binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
-      }
-      if("linf" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh_new$vbk, linf=val_adjust[which(param_adjust=="linf")], t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
-      }      
-      if("vbk" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=val_adjust[which(param_adjust=="vbk")], linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=lh_new$ML50, M95=lh_new$ML95, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
-      }    
-      if("ML50" %in% param_adjust){
-        lh_new <- create_lh_list(vbk=lh_new$vbk, linf=lh_new$linf, t0=lh_new$t0, lwa=lh_new$lwa, lwb=lh_new$lwb, S50=lh_new$SL50, S95=lh_new$SL95, selex_input="length", M50=val_adjust[which(param_adjust=="ML50")], M95=NULL, maturity_input="length", M=lh_new$M*lh_new$nseasons, binwidth=lh_new$binwidth, CVlen=lh_new$CVlen, SigmaC=lh_new$SigmaC, SigmaI=lh_new$SigmaI, SigmaR=lh_new$SigmaR, SigmaF=lh_new$SigmaF, R0=lh_new$R0, h=lh_new$h, qcoef=lh_new$qcoef, F1=lh_new$F1, start_ages=lh_new$ages[1], rho=lh_new$rho, nseasons=lh_new$nseasons)
-      }  
-      if(all(param_adjust==FALSE)==FALSE){
-        if(any(param_adjust %in% c("CVlen", "SigmaI", "SigmaC", "SigmaF", "SigmaR", "M", "linf", "vbk", "ML50") == FALSE)) stop("cannot internally adjust some parameters. create new life history list before entering into LIME model")
-      }
       
-    ## check that inputs in right format    
-    inits <- create_inputs(lh=lh_new, input_data=input_data)
-    
-    Nyears <- inits$Nyears 
-    
     Sdreport <- NA
     ParList <- NA  
     df <- NULL
-    if(f_true==TRUE) Fpen <- 0
-    if(f_true==FALSE) Fpen <- 1
-    # if(inits$SigmaR > 0.05) SigRpen <- 0
-    # if(inits$SigmaR <= 0.05) SigRpen <- 1
-    if(is.null(modpath)) output <- NULL
+    if("log_sigma_R" %in% fix_more) SigRpen <- 0
+    output <- NULL
+    output$input <- input
+    output$data_avail <- data_avail
 
-      TmbList <- format_input(input=inits, data_avail=data_avail, Fpen=Fpen, SigRpen=SigRpen, SigRprior=c(inits$SigmaR, 0.353), est_sigma=est_sigma, f_startval=inits$F_t, fix_param=fix_param, fix_param_t=fix_param_t, C_opt=C_opt, LFdist=LFdist, S_l_input=S_l_input, theta_type=theta_type, randomR=randomR)
+    if(all(vals_selex_ft < 0)){
+      vals_selex_ft_new <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
+    }
+    if(any(vals_selex_ft >= 0)){
+      vals_selex_ft_new <- vals_selex_ft
+    }
+    if(all(prop_f==1)){
+      prop_f_inp <- rep(1/input$nfleets, input$nfleets)
+    }
+    if(all(prop_f!=1)){
+      checksum <- sum(prop_f) == 1
+      if(checksum) prop_f_inp <- prop_f
+      if(checksum==FALSE) stop("prop_f must sum to 1 and be equal to nfleets, or set prop_f=1 to be equal across fleets")
+    }
 
-      if(is.null(modpath)==FALSE) saveRDS(TmbList, file.path(iterpath, "Inputs.rds")) 
-      if(is.null(modpath)) output$Inputs <- TmbList
+      TmbList <- format_input(input=input, 
+                              data_avail=data_avail, 
+                              Fpen=Fpen, 
+                              SigRpen=SigRpen, 
+                              SigRprior=SigRprior, 
+                              LFdist=LFdist, 
+                              C_type=C_type, 
+                              est_more=est_more, 
+                              fix_more=fix_more, 
+                              est_F_ft=est_F_ft,
+                              f_startval_ft=f_startval_ft, 
+                              rdev_startval_t=rdev_startval_t, 
+                              est_selex_f=est_selex_f, 
+                              vals_selex_ft=vals_selex_ft_new, 
+                              Rdet=Rdet, 
+                              mirror=mirror,
+                              est_totalF=est_totalF,
+                              prop_f=prop_f_inp)
+                            
+                             # input=input 
+                             #  data_avail=data_avail 
+                             #  Fpen=Fpen 
+                             #  SigRpen=SigRpen 
+                             #  SigRprior=SigRprior 
+                             #  LFdist=LFdist 
+                             #  C_type=C_type 
+                             #  est_more=est_more 
+                             #  fix_more=fix_more 
+                             #  est_F_ft=est_F_ft
+                             #  f_startval_ft=f_startval_ft 
+                             #  rdev_startval_t=rdev_startval_t 
+                             #  est_selex_f=est_selex_f 
+                             #  vals_selex_ft=vals_selex_ft_new 
+                             #  randomR=randomR 
+                             #  mirror=mirror 
+                             #  est_totalF=est_totalF 
+                             #  prop_f=prop_f_inp 
+
+      output$Inputs <- TmbList
 
       if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
@@ -137,130 +194,149 @@ for(iter in 1:length(itervec)){
         opt_save[["final_gradient"]] <- NA
 
       ## first run
-      obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-
-        # check_id <- Check_Identifiable(obj)
-        # fix_f <- grep("Bad", check_id[which(check_id[,"Param"]=="log_F_t_input"),3])      
-        # good_f <- c(1:Nyears)[which(1:Nyears %in% fix_f == FALSE)] 
-        # TmbList$Map[["log_F_t_input"]] = 1:length(TmbList$Parameters[["log_F_t_input"]])
-        # TmbList$Map[["log_F_t_input"]][fix_f] <- NA
-        # TmbList$Map[["log_F_t_input"]] <- factor(TmbList$Map[["log_F_t_input"]])
-        # if(length(fix_f)>0){
-        #   TmbList$Data$fix_f <- fix_f
-        #   TmbList$Data$fill_f <- good_f[length(good_f)]
-        # }
-      # if(bb==1) saveRDS(TmbList, file.path(iterpath, "Inputs1.1.rds"))
-      # obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
-
+      obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]], inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
 
       ## Settings
         Upr = rep(Inf, length(obj$par))
         Upr[match("log_sigma_R",names(obj$par))] = log(2)
-        # Upr[match("logS95", names(obj$par))] = log(inits$AgeMax)
-        if(is.null(S50_up)) Upr[match("logS50", names(obj$par))] = log(inits$linf)
-        if(is.null(S50_up)==FALSE) Upr[match("logS50", names(obj$par))] <- log(S50_up)
-        Upr[match("logSdelta", names(obj$par))] <- log(inits$linf)
-        Upr[which(names(obj$par)=="log_F_t_input")] = log(F_up)
+        if(is.null(S50_up)==FALSE) Upr[which(names(obj$par)=="log_S50_f")] <- log(S50_up)
+        if(is.null(S50_up)) Upr[which(names(obj$par)=="log_S50_f")] <- log(input$linf)
+        Upr[which(names(obj$par)=="log_F_ft")] = log(F_up)
         Upr[match("log_sigma_F", names(obj$par))] <- log(2)
+        # Upr[which(names(obj$par)=="log_theta")] <- log(10)
+
         Lwr <- rep(-Inf, length(obj$par))
-        # Lwr[match("logS50", names(obj$par))] = log(0.1)
-        # Lwr[match("log_sigma_R",names(obj$par))] = log(0.001)
         Lwr[match("log_CV_L",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_C",names(obj$par))] = log(0.001)
         Lwr[match("log_sigma_I",names(obj$par))] = log(0.001) 
-        Lwr[match("logS50",names(obj$par))] = log(1)
+        Lwr[which(names(obj$par)=="log_S50_f")] = log(1)
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
         if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
         if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
+        # if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
+        # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
         jnll <- obj$report()$jnll   
         if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
           opt[["final_gradient"]] = obj$gr( opt$par ) 
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
+          ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
+                          "log_q_f"=log(obj_save$report()$q_f), 
+                          "beta"=obj_save$report()$beta,
+                          "log_sigma_R"=log(obj_save$report()$sigma_R),
+                          "log_S50_f"=log(obj_save$report()$S50),
+                          "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+                          "log_sigma_F"=log(obj_save$report()$sigma_F),
+                          "log_sigma_C"=log(obj_save$report()$sigma_C),
+                          "log_sigma_I"=log(obj_save$report()$sigma_I),
+                          "log_CV_L"=log(obj_save$report()$CV_L),
+                          "log_theta"=log(obj_save$report()$theta),
+                          "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
         }      
 
 
-        ## loop to try to get opt to run
-          for(i in 1:5){
-            if(all(is.na(opt)) | is.na(jnll) | all(is.na(opt_save[["final_gradient"]]))){
-              obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
-                            random=TmbList[["Random"]], map=TmbList[["Map"]], 
-                            inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-                jnll <- obj$report()$jnll
-            }
-            if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
-              opt[["final_gradient"]] = obj$gr( opt$par )       
-              opt_save <- opt
-              obj_save <- obj
-              jnll_save <- jnll
-              break
-            }
-          }
+        # ## loop to try to get opt to run
+        #   for(i in 1:5){
+        #     if(all(is.na(opt)) | is.na(jnll) | all(is.na(opt_save[["final_gradient"]]))){
+        #       obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
+        #                     random=TmbList[["Random"]], map=TmbList[["Map"]], 
+        #                     inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
+        #         opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+        #         jnll <- obj$report()$jnll
+        #     }
+        #     if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
+        #       opt[["final_gradient"]] = obj$gr( opt$par )       
+        #       opt_save <- opt
+        #       obj_save <- obj
+        #       jnll_save <- jnll
+        #       ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
+        #                   "log_q_f"=log(obj_save$report()$q_f), 
+        #                   "beta"=obj_save$report()$beta,
+        #                   "log_sigma_R"=log(obj_save$report()$sigma_R),
+        #                   "log_S50_f"=log(obj_save$report()$S50),
+        #                   "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+        #                   "log_sigma_F"=log(obj_save$report()$sigma_F),
+        #                   "log_sigma_C"=log(obj_save$report()$sigma_C),
+        #                   "log_sigma_I"=log(obj_save$report()$sigma_I),
+        #                   "log_CV_L"=log(obj_save$report()$CV_L),
+        #                   "log_theta"=log(obj_save$report()$theta),
+        #                   "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))
+        #       break
+        #     }
+        #   }
           
 
-        ## if opt ran: 
-        if(all(is.na(opt_save))==FALSE){  
+        # ## if opt ran: 
+        # if(all(is.na(opt_save))==FALSE){  
 
-          ## check convergence -- don't let it become NA after it has had a high final gradient
-          for(i in 1:5){
-            if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
-               if(max(abs(opt_save[["final_gradient"]]))>0.001){
-                obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
-                            random=TmbList[["Random"]], map=TmbList[["Map"]], 
-                            inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-                jnll <- obj$report()$jnll
-              }
-            }
-              if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
-                if(is.null(jnll_save)){
-                    opt[["final_gradient"]] = obj$gr( opt$par )       
-                    opt_save <- opt
-                    obj_save <- obj
-                    jnll_save <- jnll
-                }
-                if(is.null(jnll_save)==FALSE){
-                    if(jnll<=jnll_save){
-                        opt[["final_gradient"]] = obj$gr( opt$par )       
-                        opt_save <- opt
-                        obj_save <- obj
-                        jnll_save <- jnll
-                    }
-                }
-              }
-            if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
-              if(max(abs(opt_save[["final_gradient"]]))<=0.001) break
-            }
-          }
-        }
-        if(all(is.na(opt_save))==FALSE)  df <- data.frame(opt_save$final_gradient, names(obj_save$par), opt_save$par, exp(opt_save$par))
+        #   ## check convergence -- don't let it become NA after it has had a high final gradient
+        #   for(i in 1:5){
+        #     if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
+        #        if(max(abs(opt_save[["final_gradient"]]))>0.001){
+        #         obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
+        #                     random=TmbList[["Random"]], map=TmbList[["Map"]], 
+        #                     inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
+        #         opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= ParList, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+        #         jnll <- obj$report()$jnll
+        #       }
+        #     }
+        #       if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
+        #         if(is.null(jnll_save)){
+        #             opt[["final_gradient"]] = obj$gr( opt$par )       
+        #             opt_save <- opt
+        #             obj_save <- obj
+        #             jnll_save <- jnll
+        #              ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
+        #                   "log_q_f"=log(obj_save$report()$q_f), 
+        #                   "beta"=obj_save$report()$beta,
+        #                   "log_sigma_R"=log(obj_save$report()$sigma_R),
+        #                   "log_S50_f"=log(obj_save$report()$S50),
+        #                   "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+        #                   "log_sigma_F"=log(obj_save$report()$sigma_F),
+        #                   "log_sigma_C"=log(obj_save$report()$sigma_C),
+        #                   "log_sigma_I"=log(obj_save$report()$sigma_I),
+        #                   "log_CV_L"=log(obj_save$report()$CV_L),
+        #                   "log_theta"=log(obj_save$report()$theta),
+        #                   "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))       
+        #         }
+        #         if(is.null(jnll_save)==FALSE){
+        #             if(jnll<=jnll_save){
+        #                 opt[["final_gradient"]] = obj$gr( opt$par )       
+        #                 opt_save <- opt
+        #                 obj_save <- obj
+        #                 jnll_save <- jnll
+        #                  ParList <- list("log_F_ft"=log(obj_save$report()$F_ft),
+        #                   "log_q_f"=log(obj_save$report()$q_f), 
+        #                   "beta"=obj_save$report()$beta,
+        #                   "log_sigma_R"=log(obj_save$report()$sigma_R),
+        #                   "log_S50_f"=log(obj_save$report()$S50),
+        #                   "log_Sdelta_f"=log(obj_save$report()$S95 - obj_save$report()$S50),
+        #                   "log_sigma_F"=log(obj_save$report()$sigma_F),
+        #                   "log_sigma_C"=log(obj_save$report()$sigma_C),
+        #                   "log_sigma_I"=log(obj_save$report()$sigma_I),
+        #                   "log_CV_L"=log(obj_save$report()$CV_L),
+        #                   "log_theta"=log(obj_save$report()$theta),
+        #                   "Nu_input"=rep(0,length(TmbList$Parameters$Nu_input)))                     }
+        #         }
+        #       }
+        #     if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
+        #       if(max(abs(opt_save[["final_gradient"]]))<=0.001) break
+        #     }
+        #   }
+        # }
+        if(all(is.na(opt_save))==FALSE)  df <- data.frame("gradient"=as.vector(opt_save$final_gradient), "parameter"=names(obj_save$par), "estimate"=opt_save$par, "transformed"=exp(opt_save$par))
 
 
-        ## write error message in directory if opt wouldn't run
-          if(is.null(modpath)) output$issue <- NULL
-          if(all(is.null(opt_save)==FALSE)){
-            if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
-              if(max(abs(opt_save[["final_gradient"]]))>0.001){
-                if(is.null(modpath)==FALSE) write(opt_save[["final_gradient"]], file.path(iterpath, "high_final_gradient.txt"))
-                }
-              if(is.null(modpath)) output$issue <- c(output$issue, "high_final_gradient")
-              }
-          }
-          if(all(is.na(opt_save)) & is.null(modpath)==FALSE) write("model_NA", file.path(iterpath, "model_NA.txt"))
-          if(all(is.na(opt_save)) & is.null(modpath)) output$issue <- c(output$issue, "model_NA")
-        
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
-        if(is.null(modpath)==FALSE) saveRDS(Report, file.path(iterpath, "Report.rds"))  
-        if(is.null(modpath)) output$Report <- Report
+        output$Report <- Report
 
-        Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
-        if(is.null(modpath)==FALSE) saveRDS(Sdreport, file.path(iterpath, "Sdreport.rds"))
-        if(is.null(modpath)) output$Sdreport <- Sdreport
+        if(length(TmbList$Random) > 0) Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
+        if(length(TmbList$Random) == 0) Sdreport <- tryCatch(sdreport(obj_save), error=function(x) NA)
+              output$Sdreport <- Sdreport
 
 
 
@@ -273,21 +349,15 @@ for(iter in 1:length(itervec)){
 #   polygon( y=FUN(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),], log=TRUE), x=c(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE), rev(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
 
       ## can calculate derived quants later if you want
-      if(is.null(modpath)==FALSE) saveRDS(obj_save, file.path(iterpath, "TMB_obj.rds"))
-      if(is.null(modpath)==FALSE) saveRDS(opt_save, file.path(iterpath, "TMB_opt.rds"))
-      if(is.null(modpath)) output$obj <- obj_save
-      if(is.null(modpath)) output$opt <- opt_save
+      output$obj <- obj_save
+      output$opt <- opt_save
 
       if(derive_quants==TRUE){
-          Derived = calc_derived_quants( Obj=obj_save )
-          if(is.null(modpath)==FALSE) saveRDS(Derived, file.path(iterpath, "Derived_quants.rds"))
-          if(is.null(modpath)) output$Derived <- Derived
+          Derived = calc_derived_quants( Obj=obj_save, lh=lh )
+          output$Derived <- Derived
       }
 
-        if(is.null(modpath)==FALSE) saveRDS(df, file.path(iterpath, "check_convergence.rds"))
-
-        if(iter==1 & is.null(modpath)==FALSE) write.csv(df, file.path(modpath, "df.csv"))  
-        if(iter==1 & is.null(modpath)) output$df <- df
+        output$df <- df
 
         rm(Report)
         rm(Sdreport)
@@ -299,8 +369,7 @@ for(iter in 1:length(itervec)){
         rm(obj_save)
   }
 
-
-if(is.null(modpath)==FALSE) return(paste0(max(itervec), " iterates run in ", modpath))
-if(is.null(modpath)) return(output)
+  if(is.null(modpath)==FALSE) saveRDS(output, file.path(iterpath, "LIME_output.rds"))
+  return(output)
 
 }

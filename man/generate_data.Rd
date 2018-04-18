@@ -5,8 +5,8 @@
 \title{Generate data for simulation testing}
 \usage{
 generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
-  Nyears_comp, comp_sample, rewrite = TRUE, mismatch = FALSE, init_depl,
-  derive_quants = FALSE, nburn = 50, seed, mgt_type = "F")
+  Nyears_comp, comp_sample, rewrite = TRUE, init_depl,
+  derive_quants = FALSE, seed, mgt_type = "F", fleet_proportions = 1)
 }
 \arguments{
 \item{modpath}{directory to save generated data}
@@ -29,17 +29,15 @@ generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
 
 \item{rewrite}{TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.}
 
-\item{mismatch}{default=FALSE, if TRUE, catch and index overlap with length comp only 1 year}
-
 \item{init_depl}{default=0.4, can specify a different value or 2 values that indicate range from which to choose them}
 
 \item{derive_quants}{default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.}
 
-\item{nburn}{number of years burn-in for operating model, default=50}
-
 \item{seed}{single seed or vector of seeds for each iteration}
 
 \item{mgt_type}{removals based on F (default) or catch}
+
+\item{fleet_proportions}{vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.}
 }
 \value{
 print how many iterations were written into the model directory

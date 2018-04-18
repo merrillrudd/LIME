@@ -2,12 +2,14 @@
 % Please edit documentation in R/AgeToLengthComp.R
 \name{AgeToLengthComp}
 \alias{AgeToLengthComp}
-\title{Age-converted-to-length structure}
+\title{Age-converted-to-length structure for compositional data}
 \usage{
-AgeToLengthComp(lh, tyears, N_at, comp_sample, sample_type = "catch")
+AgeToLengthComp(lh, S_a, tyears, N_at, comp_sample, sample_type = "catch")
 }
 \arguments{
 \item{lh}{list of life history attributes, output of create_lh_list}
+
+\item{S_a}{flexiblity to set selectivity-at-age by fleet}
 
 \item{tyears}{number of years of data}
 

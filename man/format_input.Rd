@@ -4,9 +4,9 @@
 \alias{format_input}
 \title{TMB input formatting}
 \usage{
-format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
-  fix_param = FALSE, fix_param_t = FALSE, C_opt = 0, LFdist, S_l_input,
-  theta_type, randomR)
+format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
+  est_more, fix_more, est_F_ft, f_startval_ft, rdev_startval_t, est_selex_f,
+  vals_selex_ft, Rdet, mirror, est_totalF, prop_f)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -19,23 +19,31 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, est_sigma, f_startval,
 
 \item{SigRprior}{vector with prior info for sigmaR penalty, first term is the mean and second term is the standard deviation}
 
-\item{est_sigma}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
-
-\item{f_startval}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
-
-\item{fix_param}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
-
-\item{fix_param_t}{default=FALSE - fix certain parameters in time series (e.g. fishing mortality, recruitment deviations) list with first item the name of the parameter and second item the numbers in the time series to be fixed.}
-
-\item{C_opt}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
-
 \item{LFdist}{likelihood distribution for length composition data, default=0 for multinomial, alternate=1 for dirichlet-multinomial}
 
-\item{S_l_input}{input a vector specifying selectivity-at-length, or set less than 0 to use 1-parameter logistic function for selectivity}
+\item{C_type}{default=0, NO catch data available. Copt=1 means the catch is in numbers, Copt2 means the catch is in weight.}
 
-\item{theta_type}{if 0, estimate annual theta; if 1, estimate single theta for all years of length comp}
+\item{est_more}{list of variance parameters to estimate, must match parameter names: log_sigma_R, log_sigma_C, log_sigma_I, log_CV_L, log_sigma_F}
 
-\item{randomR}{default = TRUE, estimate recruitment as a random effect; if FALSE, turn off random effect on recruitment (do not derive deviations)}
+\item{fix_more}{default=FALSE - parameters are fixed depending on the data available. Can also list vector of parameter names to fix at their starting values (use param_adjust and val_adjust to set these adjustments)}
+
+\item{est_F_ft}{default=TRUE, otherwise 0 for off and 1 for on}
+
+\item{f_startval_ft}{default=NULL and F starting values are at 0 for all years. Can also specify vector of F starting values for all years to be modeled (can start at truth for debugging).}
+
+\item{rdev_startval_t}{default=NULL and Recruitment deviation starting values are at 0 for all years. Can also specify vector of recruitment deviation starting values for all years to be modeled (can start at truth for debugging)}
+
+\item{est_selex_f}{default=TRUE to estimate selectivity parameters, can set to FALSE for all or multiple fleets}
+
+\item{vals_selex_ft}{input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity}
+
+\item{Rdet}{default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment}
+
+\item{mirror}{vector of parameter names to mirror between fleets}
+
+\item{est_totalF}{TRUE estimate total F instead of by fleet}
+
+\item{prop_f}{proportion of catch from each fleet}
 }
 \value{
 List, a tagged list of Data, Parameters, Random, Map
