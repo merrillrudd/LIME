@@ -52,8 +52,11 @@ format_input <- function(input,
             Nyears2 <- ceiling(Nyears/nseasons)
             S_yrs_inp <- unlist(lapply(1:Nyears2, function(x) rep(x, nseasons)))
         }
-        selex_type_f <- sapply(1:nfleets, function(x) ifelse(selex_type[x]=="logistic",1, ifelse(selex_type[x]=="dome",2,0)))
-        if(any(selex_type_f==0)) stop("specify selex_type in create_lh_list")
+
+        selex_type_f <- rep(1,nfleets)
+        for(i in 1:nfleets){
+            if(any(vals_selex_ft[i,] > 0)) selex_type_f <- 0
+        }
 
             mirror_theta_inp <- ifelse("log_theta" %in% mirror, 1, 0)
             mirror_q_inp <- ifelse("log_q_f" %in% mirror, 1, 0)
