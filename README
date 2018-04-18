@@ -1,4 +1,6 @@
-# LIME
+Length-based integrated mixed effects (LIME) package 
+
+version 2.0.3 can account for multiple fleets. For questions, please consult the vignette located in the docs/ directory. With issues moving from the previous version to this version, please contact me at merrillrudd@gmail.com. 
 
 The length-based integrated mixed effects (LIME) model uses length data and biological information to estimate stock status. Key attributes of LIME include: 
 - Accounting for time-varying fishing mortality and recruitment
@@ -8,7 +10,7 @@ The length-based integrated mixed effects (LIME) model uses length data and biol
 - Fitting to multiple years of length composition data and/or catch and/or an abundance index time series, if available.
 - Estimation of spawning potential ratio reference points (and MSY-based reference points if there is information on scale, e.g. catch data)
 
-### Resources:
-  * **Wiki**: https://github.com/merrillrudd/LIME/wiki
-  * **Publication**: Rudd, MB and Thorson, JT. 2017. Accounting for variable recruitment and fishing mortality in length-based stock assessments for data-limited fisheries. Canadian Journal of Fisheries and Aquatic Sciences https://doi.org/10.1139/cjfas-2017-0143.
+Resources:
+  **Wiki**: https://github.com/merrillrudd/LIME/wiki
+  **Publication**: Rudd, MB and Thorson, JT. 2017. Accounting for variable recruitment and fishing mortality in length-based stock assessments for data-limited fisheries. Canadian Journal of Fisheries and Aquatic Sciences https://doi.org/10.1139/cjfas-2017-0143.
 
