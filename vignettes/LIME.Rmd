@@ -162,49 +162,9 @@ lh <- create_lh_list(vbk=0.21,
            qcoef=1e-5,
            start_ages=0,
            rho=0.43,
+           theta=10,
            nseasons=1,
            nfleets=1)
-```
-
-```{r echo=FALSE}
-lh_mf <- with(lh, create_lh_list(vbk=vbk, 
-           linf=linf, 
-           t0=t0,
-           lwa=lwa, 
-           lwb=lwb, 
-           S50=c(20,30), 
-           S95=c(26,36), 
-           selex_input="length",
-           selex_type=c("logistic","logistic"),
-           M50=ML50,
-           M95=NULL,
-           maturity_input="length",
-           M=M, 
-           h=h,
-           binwidth=binwidth,
-           CVlen=CVlen,
-           SigmaR=SigmaR,
-           SigmaF=SigmaF,
-           SigmaC=SigmaC,
-           SigmaI=SigmaI,
-           R0=R0,
-           Frate=Frate,
-           qcoef=qcoef,
-           start_ages=0,
-           rho=rho,
-           nseasons=1,
-           nfleets=2))
-true_mf <- generate_data(modpath=NULL,
-            itervec=1, 
-            Fdynamics=c("Constant","Endogenous"),
-            Rdynamics="Constant",
-            lh=lh_mf,
-            Nyears=20,
-            Nyears_comp=c(20,10),
-            comp_sample=200,
-            init_depl=0.7,
-            seed=123,
-            fleet_proportions=c(0.6,0.4))
 ```
 
 ## Plot the biological and selectivity inputs
@@ -317,7 +277,7 @@ LF_mat[1:5,]
 
 The length composition data can be an array of matrices (one for each fleet). Columns should be named with the upper end of the length bin and rows should be named with the year. 
 
-One fleet, first five years:
+First five years:
 ```{r echo=FALSE}
 LF_array <- true$LF
 LF_array_sub <- array(LF_array[1:5,,1], dim=c(5, ncol(LF_array[,,1]), 1))
@@ -326,24 +286,15 @@ rownames(LF_array_sub) <- rownames(LF_mat)[1:5]
 LF_array_sub
 ```
 
-With two fleets, we add a second matrix to the array. If data are not available in the same years for both fleets, include inclusive years for all fleets with no observations in the years with no data. 
-
-Two fleets, first five years, with no data the first two years for the second fleet:
-```{r echo=FALSE}
-LF_array_mf <- true_mf$LF
-LF_array_sub_mf <- array(LF_array_mf[1:5,,], dim=c(5, ncol(LF_array_mf[,,1]), 2))
-colnames(LF_array_sub_mf) <- colnames(LF_mat)
-rownames(LF_array_sub_mf) <- rownames(LF_mat)[1:5]
-LF_array_sub_mf
-```
 
 **Option 2: List**
 
 The length composition data could also be a list of matrices (one for each fleet).
 
-Two fleets, first five years:
+One fleet, first five years:
 ```{r echo=FALSE}
-LF_list <- lapply(1:2, function(x) LF_array_sub_mf[,,x])
+LF_list <- list()
+LF_list[[1]] <- LF_array_sub[,,1]
 LF_list
 ```
 
@@ -364,22 +315,6 @@ Abundance index, one fleet:
 true$I_ft
 ```
 
-With multiple fleets, the catch and abundance index will have multiple rows. Any missing data will have a negative place-holder.
-
-Catch, two fleets:
-```{r echo=FALSE}
-Cw_ft <- true_mf$Cw_ft
-Cw_ft[2,1:10] <- -999
-Cw_ft
-```
-
-Abundance index, two fleets:
-```{r echo=FALSE}
-I_ft <- true_mf$I_ft
-I_ft[2,1:10] <- -999
-I_ft
-```
-
 ### Data input
 
 **Observations**
@@ -393,7 +328,7 @@ LIME requires inputing observed data in a list form, including:
  - `C_ft`: Catch by fleet and time (if applicable) in numbers or biomass (to be specified later) 
 
 ```{r, tidy=TRUE}
-data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
+data_all <- list("years"=1:true$Nyears, "LF"=true$LF, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 ```
 
 
@@ -670,9 +605,118 @@ plot_output(Inputs=catch_lc$Inputs,
             set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
 ```
 
+# Turning off parameter estimation
+
+There may be non-convergence issues (apparent from either a high final gradient or non-positive definite Hessian matrix). Some first checks in these cases are to 1) see if the Dirichlet-multinomial theta parameter is estimated too high, in which case it can be fixed to a high value and not estimated:
+```{r, eval=FALSE, tidy=TRUE}
+inputs_all$theta <- 50
+check1 <- run_LIME(modpath=NULL,
+                  input=inputs_all,
+                  data_avail="LC",
+                  fix_more="log_theta")
+```
+
+Another option is to check if the recruitment standard deviation is estimated too high or too low, in which case it can be fixed at a reasonable value:
+```{r, eval=FALSE, tidy=TRUE}
+inputs_all$SigmaR <- 0.3
+check2 <- run_LIME(modpath=NULL,
+                  input=inputs_all,
+                  data_avail="LC",
+                  fix_more="log_sigma_R")
+```
+
+
+
+Some length datasets may not be informative enough to tease apart fishing mortality, recruitment deviations, and selectivity. In these cases it may be convenient or helpful to fix selectivity at the starting values:
+```{r,  tidy=TRUE, results="hide", echo=TRUE}
+check3 <- run_LIME(modpath=NULL, 
+                  input=inputs_all,
+                  data_avail="LC",
+                  est_selex_f=FALSE)
+
+plot_output(Inputs=check3$Inputs,
+            Report=check3$Report,
+            Sdreport=check3$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
+```
+
+It is also possible to fix selectivity in a shape that is not the 2-parameter logistic curve. For example, we can set up dome-shaped selectivity using the 2-parameter logistic function on the left side of the fully selected lengths, and a normal distribution on the right side of the fully selected lengths:
+```{r, tidy=TRUE}
+## create input list with dome-shaped selectivity
+lh_dome <- create_lh_list(vbk=0.21, 
+           linf=65, 
+           t0=-0.01,
+           lwa=0.0245, 
+           lwb=2.79, 
+           S50=c(20), 
+           S95=c(26), 
+           selex_input="length",
+           selex_type=c("dome"),
+           dome_sd=15,
+           M50=34,
+           maturity_input="length",
+           M=0.27, 
+           binwidth=1,
+           CVlen=0.1,
+           SigmaR=0.737,
+           SigmaF=0.2,
+           SigmaC=0.1,
+           SigmaI=0.1,
+           R0=1,
+           Frate=0.1,
+           Fequil=0.25,
+           qcoef=1e-5,
+           start_ages=0,
+           rho=0.43,
+           theta=10,
+           nseasons=1,
+           nfleets=1)
+
+## generate data with dome-shaped selectivity
+true_dome <- generate_data(modpath=NULL,
+            itervec=1, 
+            Fdynamics=c("Endogenous"),
+            Rdynamics="Constant",
+            lh=lh_dome,
+            Nyears=20,
+            Nyears_comp=20,
+            comp_sample=200,
+            init_depl=0.7,
+            seed=123)
+
+## create data list
+data_all <- list("years"=1:true_dome$Nyears, "LF"=true_dome$LF, "I_ft"=true_dome$I_ft, "C_ft"=true_dome$Cw_ft, "neff_ft"=true_dome$obs_per_year)
+
+inputs_dome <- create_inputs(lh=lh_dome, input_data=data_all)
+
+
+```
+
+```{r, fig.height=6, fig.width=8, fig.cap="Dome-shaped selectivity-at-length"}
+plot(lh_dome$S_fl[1,], type="l", lwd=4, xlab="Length (cm)", ylab="Proportion selected to gear")
+```
+
+```{r,  tidy=TRUE, results="hide", echo=TRUE}
+run_dome <- run_LIME(modpath=NULL, 
+                  input=inputs_dome,
+                  data_avail="LC",
+                  vals_selex_ft=inputs_dome)
+
+plot_output(Inputs=run_dome$Inputs,
+            Report=run_dome$Report,
+            Sdreport=run_dome$Sdreport,
+            lh=lh,
+            True=true,
+            plot=c("Fish","Rec","SPR","ML","SB","Selex"),
+            set_ylim=list("Fish"=c(0,0.5),"SPR"=c(0,1)))
+```
+
+
 # Multiple fleets
 
-## Example: Two fleets with logistic selectivity
 
 With multiple fleets, all biological inputs are the same as with a single fleet. However, we must specify selectivity for each fleet. In this case, both selectivities are logistic. 
 ```{r, tidy=TRUE}
@@ -822,7 +866,3 @@ plot_output(Inputs=lc_mf1$Inputs,
 ```
 
 
-
-# Multiple seasons
-
-# Addressing convergence issues

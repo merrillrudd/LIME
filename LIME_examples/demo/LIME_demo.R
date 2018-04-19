@@ -10,6 +10,9 @@ library(TMBhelper)
 library(ggplot2)
 library(dplyr)
 
+
+## From stock assessment: SPR resulting in B40% = 0.483
+## Depletion = 37%
 ##----------------------------------------------------------------
 ## *** LIME, single year, single fleet
 ##----------------------------------------------------------------
@@ -233,7 +236,12 @@ data_mymf <- read.csv("Length_multiyear_multifleet.csv", header=TRUE)
 
 years <- unique(data_mymf$Year)
 
+fleets <- unique(data_mymf$Fleet)
+
 cldata <- full_join(data_mymf, catch)
+
+## length comps
+lcomps <- cldata %>% select(grep("X", colnames(cldata)))
 
 ## observed samples by bin by year
 nsamps <- sum(cldata %>% select(grep("X", colnames(cldata))))
