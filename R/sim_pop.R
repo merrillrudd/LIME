@@ -379,7 +379,7 @@ sim_pop <-
           Cw_t <- colSums(Cw_ft)     
 
           F_ft <- t(sapply(1:nfleets, function(y){
-              sapply(1:Nyears_real, function(x) {
+              sapply(1:tyears_real, function(x) {
                 if (nseasons == 1)
                   time_index <- x
                 if (nseasons > 1)
