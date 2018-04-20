@@ -455,8 +455,8 @@ sim_pop <-
       LF_tf <- LF0_tf <- NULL
       if (pool == TRUE) {
         for(f in 1:nfleets){
-          LF_tf[[f]] <- LF0_tf[[f]] <- matrix(NA, nrow=tyears_real, ncol=ncol(LF[[1]]))
-         for (y in 1:tyears_real) {
+          LF_tf[[f]] <- LF0_tf[[f]] <- matrix(NA, nrow=tyears, ncol=ncol(LF[[1]]))
+         for (y in 1:tyears) {
             if (nseasons == 1) {
               LF_tf[[f]][y,] <- LF[[f]][y,]
               LF0_tf[[f]][y,] <- LF0[[f]][y,]
@@ -505,74 +505,6 @@ sim_pop <-
       }
       if (pool == TRUE) ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
 
-      ## generated data
-      # I_out <- data.frame("Variable"="Index", "By"="Time", "X"=c(sapply(1:ncol(I_ft), function(x) rep(x, nfleets))), "Value"=c(I_ft), "Fleet"=rep(1:nfleets, ncol(I_ft)))
-      # Cn_out <- data.frame("Variable"="Catch_numbers", "By"="Time", "X"=c(sapply(1:ncol(Cn_ft), function(x) rep(x, nfleets))), "Value"=c(Cn_ft), "Fleet"=rep(1:nfleets, ncol(Cn_ft)))
-      # Cw_out <- data.frame("Variable"="Catch_biomass", "By"="Time", "X"=c(sapply(1:ncol(Cw_ft), function(x) rep(x, nfleets))), "Value"=c(Cw_ft), "Fleet"=rep(1:nfleets, ncol(Cw_ft)))
-
-      # LFlong <- lapply(1:nfleets, function(z){
-      #   LFsub <- LF_tf[[z]]
-      #   LFlong <- melt(LFsub)
-      #   colnames(LFlong) <- c("X", "LengthBin", "Value")
-
-      #   tyears_vec <- unique(LFlong$X)[order(unique(LFlong$X))]
-      #   oyears <- (max(tyears_vec)-Nyears_comp[z] + 1):max(tyears_vec)
-      #   LFlonger <- lapply(1:nrow(LFlong), function(y){
-      #     if(LFlong$Value[y]>0){
-      #       len <- rep(LFlong$LengthBin[y], LFlong$Value[y])
-      #       out <- data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="LengthComp","Value"=len)
-      #       return(out)
-      #     }
-      #     if(LFlong$Value[y]==0) return(data.frame("By"="Time", "X"=LFlong$X[y], "Variable"="LengthComp", "Value"=0))
-      #   })
-      #   LF2 <- do.call(rbind, LFlonger) %>% mutate("Fleet"=z) %>% filter(X %in% oyears)
-      #   return(LF2)
-      # })
-      # LF_out <- do.call(rbind, LFlong) %>% 
-      #           filter(Value != 0)
-
-      # LF0long <- lapply(1:nfleets, function(z){
-      #   LF0sub <- LF0_tf[[z]]
-      #   LF0long <- melt(LF0sub)
-      #   colnames(LF0long) <- c("X", "LengthBin", "Value")
-
-      #   tyears_vec <- unique(LF0long$X)[order(unique(LF0long$X))]
-      #   oyears <- (max(tyears_vec)-Nyears_comp[z] + 1):max(tyears_vec)
-
-      #   LF0longer <- lapply(1:nrow(LF0long), function(y){
-      #     if(LF0long$Value[y]>0){
-      #       len <- rep(LF0long$LengthBin[y], LF0long$Value[y])
-      #       out <- data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="LengthComp","Value"=len)
-      #       return(out)
-      #     }
-      #     if(LF0long$Value[y]==0) return(data.frame("By"="Time", "X"=LF0long$X[y], "Variable"="LengthComp", "Value"=0))
-      #   })
-      #   LF02 <- do.call(rbind, LF0longer) %>% mutate("Fleet"=z) %>% filter(X %in% oyears)
-      #   return(LF02)
-      # })
-      # LF0_out <- do.call(rbind, LF0long) %>% 
-      #           filter(Value != 0)
-
-      ## population parameters
-      # Ff_out <- data.frame("Variable"="F", "By"="Time", "X"=c(sapply(1:ncol(F_ft), function(x) rep(x, nfleets))), "Value"=c(F_ft), "Fleet"=rep(1:nfleets, ncol(F_ft)))
-      # ML_out <- data.frame("Variable"="MeanLen", "By"="Time", "X"=c(sapply(1:ncol(ML_ft), function(x) rep(x, nfleets))), "Value"=c(ML_ft), "Fleet"=rep(1:nfleets, ncol(ML_ft)))
-
-      ## not fleet-specific
-      # R_out <- data.frame("Variable"="Recruitment", "By"="Time", "X"=1:length(R_t), "Value"=c(R_t), "Fleet"=0)
-      # N_out <- data.frame("Variable"="Numbers", "By"="Time", "X"=1:length(N_t), "Value"=c(N_t), "Fleet"=0)
-      # SB_out <- data.frame("Variable"="SpawningBiomass", "By"="Time", "X"=1:length(SB_t), "Value"=c(SB_t), "Fleet"=0)
-      # D_out <- data.frame("Variable"="RelativeSB", "By"="Time", "X"=1:length(D_t), "Value"=c(D_t), "Fleet"=0)
-      # F_out <- data.frame("Variable"="F", "By"="Time", "X"=1:length(F_t), "Value"=c(F_t), "Fleet"=0)
-      # Cn_total_out <- data.frame("Variable"="Catch_numbers", "By"="Time", "X"=1:length(Cn_t), "Value"=Cn_t, "Fleet"=0)
-      # Cw_total_out <- data.frame("Variable"="Catch_biomass", "By"="Time", "X"=1:length(Cw_t), "Value"=Cw_t, "Fleet"=0)
-      # SPR_out <- data.frame("Variable"="SPR", "By"="Time", "X"=1:length(SPR_t), "Value"=c(SPR_t), "Fleet"=0)
-      # TB_out <- data.frame("Variable"="TotalBiomass", "By"="Time", "X"=1:length(TB_t), "Value"=c(TB_t), "Fleet"=0)
-
-      # outdf <- rbind(I_out, Cn_out, Cw_out, Cn_total_out, Cw_total_out, LF_out, LF0_out, Ff_out, ML_out, R_out, N_out, SB_out, D_out, F_out, SPR_out, TB_out)
-      # outdf$Fleet <- as.factor(outdf$Fleet)
-
-      ## outputs
-      # lh$dfsim <- outdf
       lh$plb <- lapply(1:length(plb), function(x) plb[[x]][-c(1:nburn),])
       lh$plba <- plba
       lh$page <- lapply(1:length(page), function(x) page[[x]][-c(1:nburn),])
@@ -594,8 +526,35 @@ sim_pop <-
       lh$SB0 <- SB0
       lh$F_ft <- matrix(F_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
       lh$F_fy <- matrix(F_fy[,-c(1:nburn_real)], nrow=nfleets, ncol=Nyears_real)
-      lh$LF_tf <- LF_tf
-      lh$LF0_tf <- LF0_tf
+
+      LF_tfout <- lapply(1:nfleets, function(x){
+        if(pool==TRUE){
+          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=nfleets, ncol=Nyears_real)
+          colnames(sub) <- highs
+          rownames(sub) <- 1:Nyears_real
+        }
+        if(pool==FALSE){
+          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=nfleets, ncol=Nyears)
+          colnames(sub) <- highs
+          rownames(sub) <- 1:Nyears
+        }
+        return(sub)
+      })
+      LF0_tfout <- lapply(1:nfleets, function(x){
+        if(pool==TRUE){
+          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=nfleets, ncol=Nyears_real)
+          colnames(sub) <- highs
+          rownames(sub) <- 1:Nyears_real
+        }
+        if(pool==FALSE){
+          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=nfleets, ncol=Nyears)
+          colnames(sub) <- highs
+          rownames(sub) <- 1:Nyears
+        }
+        return(sub)
+      })
+      lh$LF_tf <- LF_tfout
+      lh$LF0_tf <- LF0_tfout
       lh$LF <- LF_tfout
       lh$ML_ft <- matrix(ML_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
       lh$R_t <- R_t[-c(1:nburn)]
