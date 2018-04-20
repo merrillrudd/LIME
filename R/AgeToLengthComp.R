@@ -20,7 +20,7 @@ AgeToLengthComp <-
            N_at,
            comp_sample,
            sample_type = 'catch') {
-    with(lh, {
+    # with(lh, {
       ################################################
       ## Probability being in a length bin given age
       ################################################
@@ -71,7 +71,7 @@ AgeToLengthComp <-
       Outs$page <- page
       Outs$LF <- LF
       return(Outs)
-    })
+    # })
 
 
   }
