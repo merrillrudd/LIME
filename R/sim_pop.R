@@ -399,9 +399,6 @@ sim_pop <-
       }
 
 
-
-     
-
       ## relative spawning biomass (depletion)
       D_t <- SB_t / SB0 
 
@@ -529,12 +526,12 @@ sim_pop <-
 
       LF_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=nfleets, ncol=Nyears_real)
+          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(highs))
           colnames(sub) <- highs
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=nfleets, ncol=Nyears)
+          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(highs))
           colnames(sub) <- highs
           rownames(sub) <- 1:Nyears
         }
@@ -542,12 +539,12 @@ sim_pop <-
       })
       LF0_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=nfleets, ncol=Nyears_real)
+          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(highs))
           colnames(sub) <- highs
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=nfleets, ncol=Nyears)
+          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(highs))
           colnames(sub) <- highs
           rownames(sub) <- 1:Nyears
         }
