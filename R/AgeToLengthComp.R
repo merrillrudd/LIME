@@ -28,7 +28,7 @@ AgeToLengthComp <-
         function(mnl, sdl)
           return(pnorm(highs, mnl, sdl) - pnorm(lows, mnl, sdl))
       vlprobs <- Vectorize(lbprobs, vectorize.args = c("mnl", "sdl"))
-      plba <- t(vlprobs(L_a, L_a * CVlen))
+      plba <- t(vlprobs(lh$L_a, lh$L_a * CVlen))
       plba <- plba / rowSums(plba)
 
       ################################################
