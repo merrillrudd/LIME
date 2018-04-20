@@ -7,19 +7,20 @@
 #' @param Mat_a from report file / true file for simulation
 #' @param W_a from report file / true file for simulation
 #' @param M from report file / true file for simulation
-#' @param F typically terminal estimated/true F, can be any year
+#' @param F proposed F to calculate reference point
+#' @param S_fa selectivity by fleet by age
 #' @param type "SPR" or "Biomass"
 #' @param ref FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
 #' @export
-calc_ref <- function(ages, Mat_a, W_a, M, F, ref=FALSE, type="SPR"){
+calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE, type="SPR"){
 
     ## calculate spawning biomass per recruit in fished and unfished condition
     ## a function of specified level of fishing mortality and ability to estimate selectivity parameters
-    Na0 <- calc_equil_abund(ages=ages, M=M, F=0, R0=1)
-    Naf <- calc_equil_abund(ages=ages, M=M, F=F, R0=1)
+    Na0 <- calc_equil_abund(ages=ages, M=M, F=0, S_fa=S_fa, R0=1)
+    Naf <- calc_equil_abund(ages=ages, M=M, F=F, S_fa=S_fa, R0=1)
 
         ## ignore recruits
     if(type=="SPR"){
