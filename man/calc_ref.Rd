@@ -4,7 +4,7 @@
 \alias{calc_ref}
 \title{Per recruit calculation and spawning potential ratio}
 \usage{
-calc_ref(ages, Mat_a, W_a, M, F, ref = FALSE, type = "SPR")
+calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, type = "SPR")
 }
 \arguments{
 \item{ages}{vector of ages}
@@ -15,7 +15,9 @@ calc_ref(ages, Mat_a, W_a, M, F, ref = FALSE, type = "SPR")
 
 \item{M}{from report file / true file for simulation}
 
-\item{F}{typically terminal estimated/true F, can be any year}
+\item{F}{proposed F to calculate reference point}
+
+\item{S_fa}{selectivity by fleet by age}
 
 \item{ref}{FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref}
 

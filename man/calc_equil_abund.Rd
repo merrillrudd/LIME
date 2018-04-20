@@ -4,7 +4,7 @@
 \alias{calc_equil_abund}
 \title{Calculate abundance at equilibrium}
 \usage{
-calc_equil_abund(ages, M, F, R0)
+calc_equil_abund(ages, M, F, S_fa, R0)
 }
 \arguments{
 \item{ages}{vector of ages}
@@ -12,6 +12,8 @@ calc_equil_abund(ages, M, F, R0)
 \item{M}{natural mortality}
 
 \item{F}{fishing mortality}
+
+\item{S_fa}{selectivity by fleet by age}
 
 \item{R0}{recruitment}
 }

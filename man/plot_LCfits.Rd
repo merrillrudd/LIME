@@ -5,8 +5,7 @@
 \title{plot length composition data and model fits}
 \usage{
 plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
-  ylim = NULL, ML50 = NULL, SL50 = NULL, dim = NULL, n = FALSE,
-  true_years = NULL)
+  ylim = NULL, dim = NULL, n = FALSE, true_years = NULL)
 }
 \arguments{
 \item{LFlist}{list of length frequency matrices}
@@ -18,10 +17,6 @@ plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
 \item{LBSPR}{LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL}
 
 \item{ylim}{ylim for plot; default NULL}
-
-\item{ML50}{length at 50 percent maturity for comparison; default NULL}
-
-\item{SL50}{length at 50 percent selectivity for comparison; default NULL}
 
 \item{dim}{dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot}
 

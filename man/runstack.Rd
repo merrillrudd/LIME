@@ -7,7 +7,7 @@
 runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
   max_gradient = 0.001, C_type = 0, LFdist = 1, rewrite = TRUE,
   input_data = NULL, simulation = FALSE, iter = NULL, seed = NULL,
-  Fscenario = NULL)
+  Fscenario = NULL, model = "LIME")
 }
 \arguments{
 \item{savedir}{directory to save results}
@@ -43,6 +43,8 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 \item{seed}{set seed}
 
 \item{Fscenario}{fishing mortality scenario to generate data}
+
+\item{model}{default="LIME", alternate = "LBSPR"}
 }
 \value{
 prints how many iterations were run in model directory
