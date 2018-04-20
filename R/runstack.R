@@ -20,6 +20,7 @@
 #' @param iter iteration of generated data
 #' @param seed set seed
 #' @param Fscenario fishing mortality scenario to generate data
+#' @param model default="LIME", alternate = "LBSPR"
 
 
 #' @useDynLib LIME
@@ -43,7 +44,8 @@ runstack <- function(savedir,
 					simulation=FALSE, 
 					iter=NULL, 
 					seed=NULL, 
-					Fscenario=NULL){
+					Fscenario=NULL,
+					model="LIME"){
 
 	## check inputs and find directories
 	if(simulation == TRUE){
@@ -87,9 +89,9 @@ runstack <- function(savedir,
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
-				SigmaF_inp <- 0.1
-				SigmaR_inp <- 0.737
-				rho_inp <- 0.4
+				SigmaF_inp <- lh$SigmaF
+				SigmaR_inp <- lh$SigmaR
+				rho_inp <- lh$rho
 				Fdynamics_inp <- "Endogenous"
 			}
 			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
@@ -101,6 +103,7 @@ runstack <- function(savedir,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
 									Fequil=1.1,
+									Frate=Frate,
 									theta=10,
 									nfleets=nfleets))
 
@@ -111,9 +114,10 @@ runstack <- function(savedir,
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
 									Nyears=20, Nyears_comp=20, comp_sample=200,
-									init_depl=c(0.10,0.90), 
+									init_depl=c(0.1,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
+
 			}
 			data <- readRDS(file.path(iterpath, "True.rds"))
 			input_data <- list("years"=data$years, "LF"=data$LF)
@@ -121,6 +125,7 @@ runstack <- function(savedir,
 		## run at true values
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_IterTrue.rds")))==FALSE){	
 
+			if(model=="LIME"){
 				## input file and run model
 				input <- create_inputs(lh=plist, input_data=input_data)
 				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)
@@ -155,9 +160,39 @@ runstack <- function(savedir,
 						write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
 					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue_LIME.rds")))	
 				}
 			}
+			if(model=="LBSPR"){
+				LB_lengths <- new("LB_lengths")
+				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
+				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@NYears <- 1				
+
+					##----------------------------------------------------------------
+					## Step 2: Specify biological inputs and parameter starting values
+					##----------------------------------------------------------------
+				LB_pars <- new("LB_pars")
+				LB_pars@MK <- plist$M/plist$vbk
+				LB_pars@Linf <- plist$linf
+				LB_pars@L50 <- plist$ML50
+				LB_pars@L95 <- plist$ML95
+				LB_pars@CVLinf <- 0.1
+				LB_pars@FecB <- 3
+				LB_pars@Mpow <- 0
+				LB_pars@Walpha <- plist$lwa
+				LB_pars@Wbeta <- plist$lwb
+				LB_pars@BinWidth <- plist$binwidth				
+				
+
+					##----------------------------------------------------------------
+					## Step 3: Run LBSPR
+					##----------------------------------------------------------------
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				saveRDS(lbspr_res, file.path(iterpath, paste0("res_IterTrue_LBSPR.rds")))	
+			}
+		}
 	}
 
 	## run at means from FishLife for ensemble parameters
@@ -179,6 +214,7 @@ runstack <- function(savedir,
 									theta=10,
 									nfleets=nfleets))		
 
+		if(model=="LIME"){
 			## input file and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)	
@@ -212,13 +248,43 @@ runstack <- function(savedir,
 						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_FishLifeMeans.txt")))
 					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_FishLifeMeans.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_FishLifeMeans_LIME.rds")))	
 				}
+		}
+		if(model=="LBSPR"){
+				LB_lengths <- new("LB_lengths")
+				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
+				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@NYears <- 1				
+
+					##----------------------------------------------------------------
+					## Step 2: Specify biological inputs and parameter starting values
+					##----------------------------------------------------------------
+				LB_pars <- new("LB_pars")
+				LB_pars@MK <- lhinp$M/lhinp$vbk
+				LB_pars@Linf <- lhinp$linf
+				LB_pars@L50 <- lhinp$ML50
+				LB_pars@L95 <- lhinp$ML95
+				LB_pars@CVLinf <- 0.1
+				LB_pars@FecB <- 3
+				LB_pars@Mpow <- 0
+				LB_pars@Walpha <- lhinp$lwa
+				LB_pars@Wbeta <- lhinp$lwb
+				LB_pars@BinWidth <- lhinp$binwidth				
+				
+
+					##----------------------------------------------------------------
+					## Step 3: Run LBSPR
+					##----------------------------------------------------------------
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				saveRDS(lbspr_res, file.path(iterpath, paste0("res_FishLifeMeans_LBSPR.rds")))	
+		}
 	}	
 	
 
 	## predictive stacking
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_stacking.rds")))==FALSE){
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_stacking_", model, ".rds")))==FALSE){
 		res <- lapply(1:nrow(nodes), function(x){
 
 			## life history inputs -- nodes
@@ -237,6 +303,7 @@ runstack <- function(savedir,
 										theta=10,
 										nfleets=nfleets))			
 
+		if(model=="LIME"){
 			## input files and run model
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
@@ -272,10 +339,40 @@ runstack <- function(savedir,
 					}
 					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_node_", x, ".rds")))	
 				}
+		}
+		if(model=="LBSPR"){
+				LB_lengths <- new("LB_lengths")
+				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
+				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@NYears <- 1				
+
+					##----------------------------------------------------------------
+					## Step 2: Specify biological inputs and parameter starting values
+					##----------------------------------------------------------------
+				LB_pars <- new("LB_pars")
+				LB_pars@MK <- lhinp$M/lhinp$vbk
+				LB_pars@Linf <- lhinp$linf
+				LB_pars@L50 <- lhinp$ML50
+				LB_pars@L95 <- lhinp$ML95
+				LB_pars@CVLinf <- 0.1
+				LB_pars@FecB <- 3
+				LB_pars@Mpow <- 0
+				LB_pars@Walpha <- lhinp$lwa
+				LB_pars@Wbeta <- lhinp$lwb
+				LB_pars@BinWidth <- lhinp$binwidth				
+				
+
+					##----------------------------------------------------------------
+					## Step 3: Run LBSPR
+					##----------------------------------------------------------------
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				out <- lbspr_res			
+		}
 					
 				return(out)
 		})
-			saveRDS(res, file.path(iterpath, paste0(modname, "_res_stacking.rds")))
+			saveRDS(res, file.path(iterpath, paste0(modname, "_res_stacking_", model, ".rds")))
 			files <- list.files(path=file.path(iterpath))
 			remove <- files[grepl(paste0(modname,"_res_node"), files)]
 			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
