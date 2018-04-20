@@ -44,7 +44,7 @@ AgeToLengthComp <-
       ################################################
       ## Probability of sampling a given length bin
       ################################################
-      plb <- matrix(ncol = length(highs), nrow = tyears)
+      plb <- matrix(ncol = length(lh$highs), nrow = tyears)
       for (y in 1:tyears)
         plb[y, ] <- page[y, ] %*% plba
       plb <- plb / rowSums(plb)
