@@ -123,7 +123,7 @@ runstack <- function(savedir,
 			input_data <- list("years"=data$years, "LF"=data$LF)
 
 		## run at true values
-		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_IterTrue.rds")))==FALSE){	
+		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_IterTrue_", model, ".rds")))==FALSE){	
 
 			if(model=="LIME"){
 				## input file and run model
@@ -160,7 +160,7 @@ runstack <- function(savedir,
 						write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
 					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue_LIME.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_IterTrue_LIME.rds")))	
 				}
 			}
 			if(model=="LBSPR"){
@@ -190,13 +190,13 @@ runstack <- function(savedir,
 					## Step 3: Run LBSPR
 					##----------------------------------------------------------------
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
-				saveRDS(lbspr_res, file.path(iterpath, paste0("res_IterTrue_LBSPR.rds")))	
+				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 			}
 		}
 	}
 
 	## run at means from FishLife for ensemble parameters
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_FishLifeMeans.rds")))==FALSE){	
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_FishLifeMeans_", model,".rds")))==FALSE){	
 
 			## life history inputs
 			vbk_inp <- ifelse("K" %in% param, exp(mean["K"]), lh$vbk)
@@ -278,7 +278,7 @@ runstack <- function(savedir,
 					## Step 3: Run LBSPR
 					##----------------------------------------------------------------
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
-				saveRDS(lbspr_res, file.path(iterpath, paste0("res_FishLifeMeans_LBSPR.rds")))	
+				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_FishLifeMeans_LBSPR.rds")))	
 		}
 	}	
 	
