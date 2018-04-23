@@ -107,7 +107,7 @@ runstack <- function(savedir,
 									Fequil=1.1,
 									Frate=Frate,
 									theta=10,
-									h=0.7,
+									h=h,
 									nfleets=nfleets))
 
 
@@ -134,7 +134,7 @@ runstack <- function(savedir,
 					LB_pars@SL50 <- plist$SL50
 					LB_pars@SL95 <- plist$SL95
 					LB_pars@R0 <- plist$R0
-					LB_pars@Steepness <- plist$h
+					LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 
             		init_depl_input <- runif(1,0.1,0.9)
             		LB_pars@SPR <- init_depl_input
@@ -234,7 +234,7 @@ runstack <- function(savedir,
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
-				LB_pars@Steepness <- plist$h
+				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
@@ -325,7 +325,7 @@ runstack <- function(savedir,
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
-				LB_pars@Steepness <- lhinp$h
+				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))			
@@ -417,7 +417,7 @@ runstack <- function(savedir,
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
-				LB_pars@Steepness <- lhinp$h
+				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
