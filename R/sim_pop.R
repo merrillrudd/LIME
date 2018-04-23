@@ -550,8 +550,8 @@ sim_pop <-
         }
         return(sub)
       })
-      lh$LF_tf <- LF_tfout
-      lh$LF0_tf <- LF0_tfout
+      lh$LF_tlf <- LF_tfout
+      lh$LF0_tlf <- LF0_tfout
       lh$LF <- LF_tfout
       lh$ML_ft <- matrix(ML_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
       lh$R_t <- R_t[-c(1:nburn)]
