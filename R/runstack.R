@@ -260,6 +260,7 @@ runstack <- function(savedir,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
 									theta=10,
+									h=h,
 									nfleets=nfleets))		
 
 		if(model=="LIME"){
@@ -351,6 +352,7 @@ runstack <- function(savedir,
 										AgeMax=AgeMax,
 										binwidth=binwidth,
 										theta=10,
+										h=h,
 										nfleets=nfleets))			
 
 		if(model=="LIME"){
