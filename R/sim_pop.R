@@ -480,8 +480,8 @@ sim_pop <-
         LF0_tf <- LF0
       }
       for(f in 1:nfleets){
-        colnames(LF_tf[[f]]) <- highs
-        colnames(LF0_tf[[f]]) <- highs
+        colnames(LF_tf[[f]]) <- mids
+        colnames(LF0_tf[[f]]) <- mids
         if(pool==TRUE){
           rownames(LF_tf[[f]]) <- 1:tyears_real
           rownames(LF0_tf[[f]]) <- 1:tyears_real
@@ -526,26 +526,26 @@ sim_pop <-
 
       LF_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(highs))
-          colnames(sub) <- highs
+          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(mids))
+          colnames(sub) <- mids
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(highs))
-          colnames(sub) <- highs
+          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(mids))
+          colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
         return(sub)
       })
       LF0_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(highs))
-          colnames(sub) <- highs
+          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(mids))
+          colnames(sub) <- mids
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(highs))
-          colnames(sub) <- highs
+          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(mids))
+          colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
         return(sub)
