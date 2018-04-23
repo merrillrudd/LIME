@@ -21,6 +21,7 @@
 #' @param seed set seed
 #' @param Fscenario fishing mortality scenario to generate data
 #' @param model default="LIME", alternate = "LBSPR"
+#' @param sim_model default="LIME", alterate = "LBSPR"
 
 
 #' @useDynLib LIME
@@ -45,7 +46,8 @@ runstack <- function(savedir,
 					iter=NULL, 
 					seed=NULL, 
 					Fscenario=NULL,
-					model="LIME"){
+					model="LIME",
+					sim_model="LIME"){
 
 	## check inputs and find directories
 	if(simulation == TRUE){
@@ -110,32 +112,75 @@ runstack <- function(savedir,
 
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
 				## use seed + 1000 to generate data
+				if(sim_model=="LIME"){
 					data <- generate_data(modpath=savedir, itervec=iter, 
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
-									Nyears=20, Nyears_comp=20, comp_sample=200,
+									Nyears=10, Nyears_comp=10, comp_sample=200,
 									init_depl=c(0.1,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
+				}
+				if(sim_model=="LBSPR"){
+					LB_pars <- new("LB_pars")
+					LB_pars@MK <- plist$M/plist$vbk
+					LB_pars@Linf <- plist$linf
+					LB_pars@L50 <- plist$ML50
+					LB_pars@L95 <- plist$ML95
+					LB_pars@Walpha <- plist$lwa
+					LB_pars@Wbeta <- plist$lwb
+					LB_pars@BinWidth <- plist$binwidth	
+					LB_pars@SL50 <- plist$SL50
+					LB_pars@SL95 <- plist$SL95
+					LB_pars@R0 <- plist$R0
+					LB_pars@Steepness <- 0.99
+
+            		init_depl_input <- runif(1,0.1,0.9)
+            		LB_pars@SPR <- init_depl_input
+
+            		sim <- LBSPRsim(LB_pars)
+            		simlf <- rmultinom(1, size=200, prob=sim@pLCatch)
+
+            		data <- list()
+            		data$LF <- t(simlf)
+            		colnames(data$LF) <- sim@LMids
+            		rownames(data$LF) <- 1
+            		data$mids <- sim@LMids
+            		data$SPR <- sim@SPR
+            		data$FM <- sim@FM
+            		data$D_t <- sim@SSB/sim@SSB0
+            		data$years <- 1
+            		data$SL50 <- sim@SL50
+            		data$SL95 <- sim@SL95
+            		data$S_fl <- matrix((1 /(1 + exp(-log(19)*(sim@LMids-sim@SL50)/(sim@SL95-sim@SL50)))), nrow=1)
+            		saveRDS(data, file.path(iterpath, "True.rds"))
+				}
 
 			}
 			data <- readRDS(file.path(iterpath, "True.rds"))
+			if(length(data$years)==1){
+				data$years <- 1:5
+				rownames(data$LF) <- 5
+			}
 			input_data <- list("years"=data$years, "LF"=data$LF)
 
 		## run at true values
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_IterTrue_", model, ".rds")))==FALSE){	
 
+			input <- create_inputs(lh=plist, input_data=input_data)
+
 			if(model=="LIME"){
 				## input file and run model
-				input <- create_inputs(lh=plist, input_data=input_data)
-				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)
+				if(nrow(input_data$LF)==1) Rdet <- TRUE
+				if(nrow(input_data$LF)>1) Rdet <- FALSE
+				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
 				if(isNA==TRUE){
-					gradient <- FALSE
-					pdHess <- FALSE
+					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 				}
+				isNA <- all(is.null(out$df))
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
@@ -165,9 +210,9 @@ runstack <- function(savedir,
 			}
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
-				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@LMids <- as.numeric(colnames(input$LF))
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
 				LB_lengths@NYears <- 1				
 
 					##----------------------------------------------------------------
@@ -183,12 +228,13 @@ runstack <- function(savedir,
 				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- plist$lwa
 				LB_pars@Wbeta <- plist$lwb
-				LB_pars@BinWidth <- plist$binwidth				
-				
+				LB_pars@BinWidth <- plist$binwidth	
+				LB_pars@SPR <- data$SPR[length(data$SPR)]
+				LB_pars@SL50 <- data$SL50
+				LB_pars@SL95 <- data$SL95
+				LB_pars@R0 <- 1
 
-					##----------------------------------------------------------------
-					## Step 3: Run LBSPR
-					##----------------------------------------------------------------
+
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 			}
@@ -253,9 +299,9 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
-				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@LMids <- as.numeric(colnames(input$LF))
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
 				LB_lengths@NYears <- 1				
 
 					##----------------------------------------------------------------
@@ -271,13 +317,14 @@ runstack <- function(savedir,
 				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
-				LB_pars@BinWidth <- lhinp$binwidth				
-				
+				LB_pars@BinWidth <- lhinp$binwidth	
+				LB_pars@SPR <- data$SPR[length(data$SPR)]
+				LB_pars@SL50 <- data$SL50
+				LB_pars@SL95 <- data$SL95
+				LB_pars@R0 <- 1
 
-					##----------------------------------------------------------------
-					## Step 3: Run LBSPR
-					##----------------------------------------------------------------
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))			
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_FishLifeMeans_LBSPR.rds")))	
 		}
 	}	
@@ -342,9 +389,9 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input_data$LF[,,1]))
-				LB_lengths@LData <- as.matrix(input_data$LF[nrow(input_data$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input_data$LF)[length(rownames(input_data$LF))])
+				LB_lengths@LMids <- as.numeric(colnames(input$LF))
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
 				LB_lengths@NYears <- 1				
 
 					##----------------------------------------------------------------
@@ -360,12 +407,13 @@ runstack <- function(savedir,
 				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
-				LB_pars@BinWidth <- lhinp$binwidth				
-				
+				LB_pars@BinWidth <- lhinp$binwidth	
+				LB_pars@SPR <- data$SPR[length(data$SPR)]
+				LB_pars@SL50 <- data$SL50
+				LB_pars@SL95 <- data$SL95
+				LB_pars@R0 <- 1
 
-					##----------------------------------------------------------------
-					## Step 3: Run LBSPR
-					##----------------------------------------------------------------
+
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
 				out <- lbspr_res			
 		}
