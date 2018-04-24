@@ -226,12 +226,11 @@ sim_pop <-
           N_at0[a, 1] <- R_t[1]
         }
         if (a > 1 & a < length(L_a)) {
-          N_at[a, 1] <- N_at[a - 1, 1] * exp(-M - F_at[a,1])
+          N_at[a, 1] <- N_at[a - 1, 1] * exp(-M - F_at[a-1,1])
           N_at0[a, 1] <- N_at0[a - 1, 1] * exp(-M)
         }
         if (a == length(L_a)) {
-          N_at[a, 1] <-
-            (N_at[a - 1, 1] * exp(-M - F_at[a,1])) / (1 - exp(-M - F_at[a,1]))
+          N_at[a, 1] <- (N_at[a - 1, 1] * exp(-M - F_at[a-1,1])) / (1 - exp(-M - F_at[a-1,1]))
           N_at0[a, 1] <- (N_at0[a - 1, 1] * exp(-M)) / (1 - exp(-M))
         }
       }

@@ -293,8 +293,8 @@ Type objective_function<Type>::operator() ()
   for(int a=0;a<n_a;a++){
     // Population abundance
     if(a==0) N_ta(0,a) = R_t(0);
-    if((a>=1) & (a<(n_a-1))) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_ta(0,a));
-    if(a==(n_a-1)) N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_ta(0,a))) / (1 - exp(-M - F_ta(0,a)));
+    if((a>=1) & (a<(n_a-1))) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_ta(0,a-1));
+    if(a==(n_a-1)) N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1)));
 
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a);
