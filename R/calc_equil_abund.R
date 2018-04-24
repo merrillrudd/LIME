@@ -24,8 +24,8 @@ calc_equil_abund <- function(ages, M, F, S_fa, R0){
 	Ftotal <- colSums(Fmat)
 
 	for(i in 2:length(ages)){
-		if(i<length(ages)) N_a[i] <- N_a[i-1]*exp(-M-Ftotal[i])
-		if(i==length(ages)) N_a[i] <- (N_a[i-1]*exp(-M-Ftotal[i]))/(1-exp(-M-Ftotal[i]))
+		if(i<length(ages)) N_a[i] <- N_a[i-1]*exp(-M-Ftotal[i-1])
+		if(i==length(ages)) N_a[i] <- (N_a[i-1]*exp(-M-Ftotal[i-1]))/(1-exp(-M-Ftotal[i-1]))
 	}
 	return(N_a)
 }
