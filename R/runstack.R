@@ -88,7 +88,7 @@ runstack <- function(savedir,
 				SigmaF_inp <- 0.001
 				SigmaR_inp <- 0.001
 				rho_inp <- 0
-				CVlen_inp <- 0.05
+				CVlen_inp <- 0.07
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
@@ -212,12 +212,12 @@ runstack <- function(savedir,
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
 				LB_lengths@LMids <- plist$mids
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				# LB_lengths@LData <- t(input$LF[,,1])
-				# LB_lengths@Years <- as.numeric(rownames(input$LF))
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				# LB_lengths@NYears <- nrow(input$LF[,,1])	
-				LB_lengths@NYears <- 1	
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				# LB_lengths@NYears <- 1	
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
@@ -304,14 +304,14 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- lhinp$mids
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				# LB_lengths@LData <- t(input$LF[,,1])
-				# LB_lengths@Years <- as.numeric(rownames(input$LF))
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				# LB_lengths@NYears <- nrow(input$LF[,,1])	
-				LB_lengths@NYears <- 1	
-				LB_lengths@L_units <- "cm"	
+				LB_lengths@LMids <- plist$mids
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				# LB_lengths@NYears <- 1	
+				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
@@ -397,13 +397,13 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- lhinp$mids
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				# LB_lengths@LData <- t(input$LF[,,1])
-				# LB_lengths@Years <- as.numeric(rownames(input$LF))
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				# LB_lengths@NYears <- nrow(input$LF[,,1])	
-				LB_lengths@NYears <- 1	
+				LB_lengths@LMids <- plist$mids
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				# LB_lengths@NYears <- 1	
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
