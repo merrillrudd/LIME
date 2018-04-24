@@ -233,7 +233,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("absel")))
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 			}
 		}
@@ -320,7 +320,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))			
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("absel")))			
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_FishLifeMeans_LBSPR.rds")))	
 		}
 	}	
@@ -408,7 +408,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("absel")))
 				out <- lbspr_res			
 		}
 					
