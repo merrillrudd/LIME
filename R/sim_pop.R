@@ -336,13 +336,6 @@ sim_pop <-
           ))
       SPR <- SPR_t[length(SPR_t)]
 
-      ## alternative calculation of SPR
-      P <- 0.0001
-      x <- seq(from=0, to=1, length.out=length(ages))
-      EL <- (1-P^(x/(M/vbk))) *  linf                   ## length at relative age
-      rLens <- EL/linf                                  ## relative length
-      SPR_alt <- sum(Mat_a * sum(calc_equil_abund(ages=ages, M=M, F=F_t[length(F_t)], S_fa=S_fa, R0=1)) * rLens^3)/sum(Mat_a * sum(calc_equil_abund(ages=ages, M=M, F=0, S_fa=S_fa, R0=1)) * rLens^3)
-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
@@ -567,7 +560,7 @@ sim_pop <-
       lh$SB_t <- SB_t[-c(1:nburn)]
       lh$D_t <- D_t[-c(1:nburn)]
       lh$SPR_t <- SPR_t[-c(1:nburn)]
-      lh$SPR_alt <- SPR_alt
+      lh$SPR <- SPR
       lh$Cn_ft <- matrix(Cn_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
       lh$Cw_ft <- matrix(Cw_ft[,-c(1:nburn)], nrow=nfleets,  ncol=Nyears) 
       lh$F_t <- F_t[-c(1:nburn)]
