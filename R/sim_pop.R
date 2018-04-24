@@ -364,7 +364,6 @@ sim_pop <-
           SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
           TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
           SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
-          SPR_alt <- SPR_alt[which(1:tyears %% nseasons == 0)]
 
           Cn_ft <- t(sapply(1:nfleets, function(y){
               sapply(1:Nyears_real, function(x) {
@@ -568,7 +567,7 @@ sim_pop <-
       lh$SB_t <- SB_t[-c(1:nburn)]
       lh$D_t <- D_t[-c(1:nburn)]
       lh$SPR_t <- SPR_t[-c(1:nburn)]
-      lh$SPR_alt <- SPR_alt[-c(1:nburn)]
+      lh$SPR_alt <- SPR_alt
       lh$Cn_ft <- matrix(Cn_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
       lh$Cw_ft <- matrix(Cw_ft[,-c(1:nburn)], nrow=nfleets,  ncol=Nyears) 
       lh$F_t <- F_t[-c(1:nburn)]
