@@ -85,8 +85,8 @@ runstack <- function(savedir,
 			M_choose <- ifelse("M" %in% param, rlnorm(1, mean=mean["M"], sd=sqrt(cov["M","M"])), exp(mean["M"]))
 			Linf_choose <- ifelse("Loo" %in% param, rlnorm(1, mean=mean["Loo"], sd=sqrt(cov["Loo","Loo"])), exp(mean["Loo"]))
 			if(Fscenario=="equil"){
-				SigmaF_inp <- 0.01
-				SigmaR_inp <- 0.01
+				SigmaF_inp <- 0.001
+				SigmaR_inp <- 0.001
 				rho_inp <- 0
 				Fdynamics_inp <- "Constant"
 			}
@@ -99,8 +99,8 @@ runstack <- function(savedir,
 			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_choose,
-									M50=ML50, maturity_input="length",
-									S50=SL50, S95=SL95, selex_input="length",
+									M50=M50, maturity_input="age",
+									S50=S50, S95=S95, selex_input="age",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
@@ -118,7 +118,7 @@ runstack <- function(savedir,
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
 									Nyears=10, Nyears_comp=10, comp_sample=200,
-									init_depl=c(0.1,0.9), 
+									init_depl=c(0.2,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
 				}
@@ -134,23 +134,25 @@ runstack <- function(savedir,
 					LB_pars@SL50 <- plist$SL50
 					LB_pars@SL95 <- plist$SL95
 					LB_pars@R0 <- plist$R0
+					LB_pars@BinMin <- 0
+					LB_pars@BinMax <- length(plist$mids)
 					LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 
-            		init_depl_input <- runif(1,0.1,0.9)
+            		init_depl_input <- runif(1,0.2,0.9)
             		LB_pars@SPR <- init_depl_input
 
             		sim <- LBSPRsim(LB_pars)
-            		simlf <- rmultinom(1, size=200, prob=sim@pLCatch)
+            		simlf <- rmultinom(10, size=200, prob=sim@pLCatch)
 
             		data <- list()
             		data$LF <- t(simlf)
             		colnames(data$LF) <- sim@LMids
-            		rownames(data$LF) <- 1
+            		rownames(data$LF) <- 1:10
             		data$mids <- sim@LMids
             		data$SPR <- sim@SPR
             		data$FM <- sim@FM
             		data$D_t <- sim@SSB/sim@SSB0
-            		data$years <- 1
+            		data$years <- 1:10
             		data$SL50 <- sim@SL50
             		data$SL95 <- sim@SL95
             		data$S_fl <- matrix((1 /(1 + exp(-log(19)*(sim@LMids-sim@SL50)/(sim@SL95-sim@SL50)))), nrow=1)
@@ -159,10 +161,6 @@ runstack <- function(savedir,
 
 			}
 			data <- readRDS(file.path(iterpath, "True.rds"))
-			if(length(data$years)==1){
-				data$years <- 1:5
-				rownames(data$LF) <- 5
-			}
 			input_data <- list("years"=data$years, "LF"=data$LF)
 
 		## run at true values
@@ -211,10 +209,13 @@ runstack <- function(savedir,
 			}
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input$LF))
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- 1				
+				LB_lengths@LMids <- plist$mids
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
@@ -227,14 +228,18 @@ runstack <- function(savedir,
 				LB_pars@Walpha <- plist$lwa
 				LB_pars@Wbeta <- plist$lwb
 				LB_pars@BinWidth <- plist$binwidth	
+				LB_pars@CVLinf <- 0.1
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- plist$R0
 				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
+				LB_pars@L_units <- "cm"
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, yrs=NA, Control=list("GTG"))
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
+
+				plot_LCfits(LFlist=list(data$LF_tlf[[1]]))
 			}
 		}
 	}
@@ -299,9 +304,11 @@ runstack <- function(savedir,
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
 				LB_lengths@LMids <- as.numeric(colnames(input$LF))
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- 1				
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
@@ -320,7 +327,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))			
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_FishLifeMeans_LBSPR.rds")))	
 		}
 	}	
@@ -387,9 +394,11 @@ runstack <- function(savedir,
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
 				LB_lengths@LMids <- as.numeric(colnames(input$LF))
-				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- 1				
+				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@Years <- as.numeric(rownames(input$LF))
+				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				LB_lengths@NYears <- nrow(input$LF[,,1])	
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
@@ -408,7 +417,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list(modtype=c("GTG")))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				out <- lbspr_res			
 		}
 					
