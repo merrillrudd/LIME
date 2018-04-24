@@ -304,12 +304,14 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input$LF))
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
-				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@LMids <- lhinp$mids
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				# LB_lengths@LData <- t(input$LF[,,1])
+				# LB_lengths@Years <- as.numeric(rownames(input$LF))
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				# LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@NYears <- 1	
+				LB_lengths@L_units <- "cm"	
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
@@ -395,12 +397,14 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input$LF))
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
-				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@LMids <- lhinp$mids
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				# LB_lengths@LData <- t(input$LF[,,1])
+				# LB_lengths@Years <- as.numeric(rownames(input$LF))
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				# LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@NYears <- 1	
+				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
 					## Step 2: Specify biological inputs and parameter starting values
