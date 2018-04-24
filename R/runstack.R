@@ -95,6 +95,7 @@ runstack <- function(savedir,
 				SigmaF_inp <- lh$SigmaF
 				SigmaR_inp <- lh$SigmaR
 				rho_inp <- lh$rho
+				CVlen_inp <- lh$CVlen_inp
 				Fdynamics_inp <- "Endogenous"
 			}
 			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
