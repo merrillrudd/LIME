@@ -227,7 +227,6 @@ runstack <- function(savedir,
 				LB_pars@Walpha <- plist$lwa
 				LB_pars@Wbeta <- plist$lwb
 				LB_pars@BinWidth <- plist$binwidth	
-				LB_pars@SPR <- data$SPR[length(data$SPR)]
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
@@ -312,13 +311,9 @@ runstack <- function(savedir,
 				LB_pars@Linf <- lhinp$linf
 				LB_pars@L50 <- lhinp$ML50
 				LB_pars@L95 <- lhinp$ML95
-				LB_pars@CVLinf <- 0.1
-				LB_pars@FecB <- 3
-				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
 				LB_pars@BinWidth <- lhinp$binwidth	
-				LB_pars@SPR <- data$SPR[length(data$SPR)]
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
@@ -404,13 +399,9 @@ runstack <- function(savedir,
 				LB_pars@Linf <- lhinp$linf
 				LB_pars@L50 <- lhinp$ML50
 				LB_pars@L95 <- lhinp$ML95
-				LB_pars@CVLinf <- 0.1
-				LB_pars@FecB <- 3
-				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
 				LB_pars@BinWidth <- lhinp$binwidth	
-				LB_pars@SPR <- data$SPR[length(data$SPR)]
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- 1
