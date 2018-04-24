@@ -224,9 +224,6 @@ runstack <- function(savedir,
 				LB_pars@Linf <- plist$linf
 				LB_pars@L50 <- plist$ML50
 				LB_pars@L95 <- plist$ML95
-				LB_pars@CVLinf <- 0.1
-				LB_pars@FecB <- 3
-				LB_pars@Mpow <- 0
 				LB_pars@Walpha <- plist$lwa
 				LB_pars@Wbeta <- plist$lwb
 				LB_pars@BinWidth <- plist$binwidth	
