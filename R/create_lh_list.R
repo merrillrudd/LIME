@@ -85,7 +85,7 @@ function(vbk,
     M <- M/nseasons
 
     ## length bins
-    mids <- seq((binwidth/2), linf*1.5, by=binwidth) 
+    mids <- seq((binwidth/2), linf*1.3, by=binwidth) 
     highs <- mids + (binwidth/2)
     lows <- mids - (binwidth)/2
 
