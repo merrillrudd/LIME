@@ -341,9 +341,7 @@ sim_pop <-
       x <- seq(from=0, to=1, length.out=length(ages))
       EL <- (1-P^(x/(M/vbk))) *  linf                   ## length at relative age
       rLens <- EL/linf                                  ## relative length
-      N0 <- (1-rLens)^(M/vbk)
-      Ns <- (1-rLens)^((M/vbk)+((M/vbk)*(F_t[length(F_t)]/M))*S_fa[1,])
-      SPR_alt <- sum(Mat_a * Ns * rLens^3)/sum(Mat_a * N0 * rLens^3)
+      SPR_alt <- sum(Mat_a * sum(calc_equil_abund(ages=ages, M=M, F=F_t[length(F_t)], S_fa=S_fa, R0=1)) * rLens^3)/sum(Mat_a * sum(calc_equil_abund(ages=ages, M=M, F=0, S_fa=S_fa, R0=1)) * rLens^3)
 
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
