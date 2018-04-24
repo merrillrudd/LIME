@@ -88,6 +88,7 @@ runstack <- function(savedir,
 				SigmaF_inp <- 0.001
 				SigmaR_inp <- 0.001
 				rho_inp <- 0
+				CVlen_inp <- 0.05
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
@@ -108,6 +109,7 @@ runstack <- function(savedir,
 									Frate=Frate,
 									theta=10,
 									h=h,
+									CVlen=CVlen_inp,
 									nfleets=nfleets))
 
 
@@ -118,7 +120,7 @@ runstack <- function(savedir,
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
 									Nyears=10, Nyears_comp=10, comp_sample=200,
-									init_depl=c(0.2,0.9), 
+									init_depl=c(0.3,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
 				}
@@ -210,11 +212,12 @@ runstack <- function(savedir,
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
 				LB_lengths@LMids <- plist$mids
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
-				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
+				# LB_lengths@LData <- t(input$LF[,,1])
+				# LB_lengths@Years <- as.numeric(rownames(input$LF))
+				LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
+				# LB_lengths@NYears <- nrow(input$LF[,,1])	
+				LB_lengths@NYears <- 1	
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
@@ -228,18 +231,15 @@ runstack <- function(savedir,
 				LB_pars@Walpha <- plist$lwa
 				LB_pars@Wbeta <- plist$lwb
 				LB_pars@BinWidth <- plist$binwidth	
-				LB_pars@CVLinf <- 0.1
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
 				LB_pars@R0 <- plist$R0
 				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 				LB_pars@L_units <- "cm"
 
-
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, yrs=NA, Control=list("GTG"))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("GTG"))
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 
-				plot_LCfits(LFlist=list(data$LF_tlf[[1]]))
 			}
 		}
 	}
@@ -262,6 +262,7 @@ runstack <- function(savedir,
 									binwidth=binwidth,
 									theta=10,
 									h=h,
+									CVlen=CVlen,
 									nfleets=nfleets))		
 
 		if(model=="LIME"){
@@ -352,6 +353,7 @@ runstack <- function(savedir,
 										binwidth=binwidth,
 										theta=10,
 										h=h,
+										CVlen=CVlen,
 										nfleets=nfleets))			
 
 		if(model=="LIME"){
