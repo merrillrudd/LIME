@@ -88,14 +88,14 @@ runstack <- function(savedir,
 				SigmaF_inp <- 0.001
 				SigmaR_inp <- 0.001
 				rho_inp <- 0
-				CVlen_inp <- 0.07
+				# CVlen_inp <- 0.07
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
 				SigmaF_inp <- lh$SigmaF
 				SigmaR_inp <- lh$SigmaR
 				rho_inp <- lh$rho
-				CVlen_inp <- lh$CVlen_inp
+				# CVlen_inp <- lh$CVlen
 				Fdynamics_inp <- "Endogenous"
 			}
 			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
@@ -106,11 +106,9 @@ runstack <- function(savedir,
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
-									Fequil=1.1,
-									Frate=Frate,
 									theta=10,
 									h=h,
-									CVlen=CVlen_inp,
+									# CVlen=CVlen_inp,
 									nfleets=nfleets))
 
 
@@ -169,7 +167,7 @@ runstack <- function(savedir,
 		## run at true values
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_IterTrue_", model, ".rds")))==FALSE){	
 
-			input <- create_inputs(lh=plist, input_data=input_data)
+			input <- create_inputs(lh=lh, input_data=input_data)
 
 			if(model=="LIME"){
 				## input file and run model
@@ -212,7 +210,7 @@ runstack <- function(savedir,
 			}
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- plist$mids
+				LB_lengths@LMids <- lh$mids
 				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
 				LB_lengths@LData <- t(input$LF[,,1])
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
@@ -225,17 +223,17 @@ runstack <- function(savedir,
 					## Step 2: Specify biological inputs and parameter starting values
 					##----------------------------------------------------------------
 				LB_pars <- new("LB_pars")
-				LB_pars@MK <- plist$M/plist$vbk
-				LB_pars@Linf <- plist$linf
-				LB_pars@L50 <- plist$ML50
-				LB_pars@L95 <- plist$ML95
-				LB_pars@Walpha <- plist$lwa
-				LB_pars@Wbeta <- plist$lwb
-				LB_pars@BinWidth <- plist$binwidth	
+				LB_pars@MK <- lh$M/lh$vbk
+				LB_pars@Linf <- lh$linf
+				LB_pars@L50 <- lh$ML50
+				LB_pars@L95 <- lh$ML95
+				LB_pars@Walpha <- lh$lwa
+				LB_pars@Wbeta <- lh$lwb
+				LB_pars@BinWidth <- lh$binwidth	
 				LB_pars@SL50 <- data$SL50
 				LB_pars@SL95 <- data$SL95
-				LB_pars@R0 <- plist$R0
-				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
+				LB_pars@R0 <- lh$R0
+				LB_pars@Steepness <- ifelse(lh$h==1, 0.99, lh$h)
 				LB_pars@L_units <- "cm"
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("GTG"))
@@ -256,8 +254,8 @@ runstack <- function(savedir,
 					create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 									lwa=lwa, lwb=lwb,
 									M=M_inp,
-									M50=ML50, maturity_input="length",
-									S50=SL50, S95=SL95, selex_input="length",
+									M50=M50, maturity_input="age",
+									S50=S50, S95=S95, selex_input="age",
 									SigmaF=SigmaF, SigmaR=SigmaR,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
@@ -266,9 +264,10 @@ runstack <- function(savedir,
 									CVlen=CVlen,
 									nfleets=nfleets))		
 
+			input <- create_inputs(lh=lhinp, input_data=input_data)
+
 		if(model=="LIME"){
 			## input file and run model
-			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)	
 
 				## check_convergence
@@ -305,7 +304,7 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- plist$mids
+				LB_lengths@LMids <- as.numeric(colnames(input$LF[,,1]))
 				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
 				LB_lengths@LData <- t(input$LF[,,1])
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
@@ -325,8 +324,8 @@ runstack <- function(savedir,
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
 				LB_pars@BinWidth <- lhinp$binwidth	
-				LB_pars@SL50 <- data$SL50
-				LB_pars@SL95 <- data$SL95
+				LB_pars@SL50 <- input$SL50
+				LB_pars@SL95 <- input$SL95
 				LB_pars@R0 <- lhinp$R0
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 
@@ -340,7 +339,7 @@ runstack <- function(savedir,
 	## predictive stacking
 	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_stacking_", model, ".rds")))==FALSE){
 		res <- lapply(1:nrow(nodes), function(x){
-
+		# for(x in 1:nrow(nodes)){
 			## life history inputs -- nodes
 			vbk_inp <- ifelse("K" %in% param, exp(nodes[x,"K"]), exp(mean["K"]))
 			M_inp <- ifelse("M" %in% param, exp(nodes[x,"M"]), exp(mean["M"]))
@@ -349,8 +348,8 @@ runstack <- function(savedir,
 				 		create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
 										lwa=lwa, lwb=lwb,
 										M=M_inp,
-										M50=ML50, maturity_input="length",
-										S50=SL50, S95=SL95, selex_input="length",
+										M50=M50, maturity_input="age",
+										S50=S50, S95=S95, selex_input="age",
 										SigmaF=SigmaF, SigmaR=SigmaR,
 										AgeMax=AgeMax,
 										binwidth=binwidth,
@@ -359,9 +358,10 @@ runstack <- function(savedir,
 										CVlen=CVlen,
 										nfleets=nfleets))			
 
+			input <- create_inputs(lh=lhinp, input_data=input_data)
+
 		if(model=="LIME"){
 			## input files and run model
-			input <- create_inputs(lh=lhinp, input_data=input_data)
 			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
 
 				## check_convergence
@@ -398,7 +398,7 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- plist$mids
+				LB_lengths@LMids <- as.numeric(colnames(input$LF[,,1]))
 				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
 				LB_lengths@LData <- t(input$LF[,,1])
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
@@ -418,8 +418,8 @@ runstack <- function(savedir,
 				LB_pars@Walpha <- lhinp$lwa
 				LB_pars@Wbeta <- lhinp$lwb
 				LB_pars@BinWidth <- lhinp$binwidth	
-				LB_pars@SL50 <- data$SL50
-				LB_pars@SL95 <- data$SL95
+				LB_pars@SL50 <- input$SL50
+				LB_pars@SL95 <- input$SL95
 				LB_pars@R0 <- lhinp$R0
 				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
 

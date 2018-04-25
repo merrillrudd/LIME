@@ -48,7 +48,7 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
           LBSPR_outs$var_S95 <- LBSPR@Vars[,"SL95"]
           LBSPR_outs$years <- LBSPR@Years
 
-          xLC_lbspr <- which(true_years %in% LBSPR@Years)
+          xLC_lbspr <- which(seq_along(true_years) %in% LBSPR@Years)
 
           LBSPR <- LBSPR_outs
         }
@@ -91,8 +91,8 @@ if(all(is.null(Inputs))){
 par(mfrow=dim, mar=c(4,5,2,2))
 
 if(all(is.null(Inputs))==FALSE){
-  F40 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, ref=0.4)$root, error=function(e) NA)
-  F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, ref=0.3)$root, error=function(e) NA)
+  F50 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, S_fa=Report$S_fa, ref=0.5)$root, error=function(e) NA)
+  F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, S_fa=Report$S_fa, ref=0.3)$root, error=function(e) NA)
 }
     col_total <- "#228B22"
     if(nf>1){
@@ -121,7 +121,9 @@ if("Fish" %in% plot){
 
       # index <- seq(f, nrow(sd), by=nf)
       if(all(is.na(Sdreport))==FALSE){
-        polygon( y=read_sdreport(sd_total, log=TRUE), x=c(which(is.na(sd_total[,2])==FALSE), rev(which(is.na(sd_total[,2])==FALSE))), col=paste0(col_total,"40"), border=NA)  
+        yvals <- read_sdreport(sd_total, log=TRUE)
+        yvals[which(is.finite(yvals)==FALSE)] <- max(yvals[-which(is.finite(yvals)==FALSE)])
+        polygon( y=yvals, x=c(which(is.na(sd_total[,2])==FALSE), rev(which(is.na(sd_total[,2])==FALSE))), col=paste0(col_total,"40"), border=NA)  
       }
 
     for(f in 1:nf){
@@ -138,7 +140,7 @@ if("Fish" %in% plot){
 
   if(all(is.null(Inputs))==FALSE){  
     makelines <- sapply(1:nf, function(x){
-      abline(h=F40[x]*ns, lwd=2, lty=2)
+      abline(h=F50[x]*ns, lwd=2, lty=2)
       abline(h=F30[x]*ns, lwd=2, lty=3)
     })
   }
@@ -257,6 +259,22 @@ if("SB" %in% plot){
     
 if("Selex" %in% plot){
 
+plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
+  if(all(is.null(LBSPR))==FALSE){
+    for(i in 1:length(xLC_lbspr)){
+      SL50 <- LBSPR$SL50[i]
+      SL95 <- LBSPR$SL95[i]
+      sd50 <- sqrt(LBSPR$var_S50[i])
+      sd95 <- sqrt(LBSPR$var_S95[i])
+
+      S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
+      S_l2_low <- 1.0/(1+exp(-log(19)*(mids-(SL50-1.96*sd50))/((SL95-1.96*sd95)-(SL50-1.96*sd50)))) 
+      S_l2_up <- 1.0/(1+exp(-log(19)*(mids-(SL50+1.96*sd50))/((SL95+1.96*sd95)-(SL50+1.96*sd50)))) 
+      polygon(x=c(mids, rev(mids)), y=c(S_l2_low, rev(S_l2_up)), col="#AA00AA40", border=NA)
+      lines(x=mids, y=S_l2, col="#AA00AA", lwd=2)
+    }
+  # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
+  }
   if(all(is.null(Sdreport))==FALSE){
     if(all(is.na(Sdreport))==FALSE){
       sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_fl"),]
@@ -274,8 +292,7 @@ if("Selex" %in% plot){
     if(nf==1) cols <- "#228B22"
 
     for(f in 1:nf){
-      if(f==1) plot(x=mids, y=Report$S_fl[f,], lwd=2, col=cols[f], ylim=c(0, 1.1), type="l", ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
-      if(f>1) lines(x=mids, y=Report$S_fl[f,], lwd=2, col=cols[f])
+      lines(x=mids, y=Report$S_fl[f,], lwd=2, col=cols[f])
       if(nf > 1) lty <- f+1
       if(nf ==1) lty <- 1
       if(all(is.null(True))==FALSE) lines(True$S_fl[f,], lwd=2, lty=lty)
@@ -285,21 +302,7 @@ if("Selex" %in% plot){
       }
     }
   }
-  if(all(is.null(LBSPR))==FALSE){
-    for(i in 1:length(xLC_lbspr)){
-      SL50 <- LBSPR$SL50[i]
-      SL95 <- LBSPR$SL95[i]
-      sd50 <- sqrt(LBSPR$var_S50[i])
-      sd95 <- sqrt(LBSPR$var_S95[i])
 
-      S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      S_l2_low <- 1.0/(1+exp(-log(19)*(mids-(SL50-1.96*sd50))/((SL95-1.96*sd95)-(SL50-1.96*sd50)))) 
-      S_l2_up <- 1.0/(1+exp(-log(19)*(mids-(SL50+1.96*sd50))/((SL95+1.96*sd95)-(SL50+1.96*sd50)))) 
-      polygon(x=c(mids, rev(mids)), y=c(S_l2_low, rev(S_l2_up)), col="#AA00AA40", border=NA)
-      lines(x=mids, y=S_l2, col="#AA00AA", lwd=2)
-    }
-  # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
-  }
   if(all(is.null(True))==FALSE) lines(True$S_fl[1,], lwd=2)
     # axis(1, cex.axis=2, at=xlabs, labels=plot_labs)
 }
