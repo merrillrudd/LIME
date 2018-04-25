@@ -167,12 +167,12 @@ runstack <- function(savedir,
 		## run at true values
 		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_IterTrue_", model, ".rds")))==FALSE){	
 
-			input <- create_inputs(lh=lh, input_data=input_data)
+			input <- create_inputs(lh=plist, input_data=input_data)
 
 			if(model=="LIME"){
 				## input file and run model
-				if(nrow(input_data$LF)==1) Rdet <- TRUE
-				if(nrow(input_data$LF)>1) Rdet <- FALSE
+				if(nrow(input$LF[,,1])==1) Rdet <- TRUE
+				if(nrow(input$LF[,,1])>1) Rdet <- FALSE
 				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 
 				## check_convergence
@@ -210,7 +210,7 @@ runstack <- function(savedir,
 			}
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- lh$mids
+				LB_lengths@LMids <- plist$mids
 				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
 				LB_lengths@LData <- t(input$LF[,,1])
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
@@ -223,17 +223,17 @@ runstack <- function(savedir,
 					## Step 2: Specify biological inputs and parameter starting values
 					##----------------------------------------------------------------
 				LB_pars <- new("LB_pars")
-				LB_pars@MK <- lh$M/lh$vbk
-				LB_pars@Linf <- lh$linf
-				LB_pars@L50 <- lh$ML50
-				LB_pars@L95 <- lh$ML95
-				LB_pars@Walpha <- lh$lwa
-				LB_pars@Wbeta <- lh$lwb
-				LB_pars@BinWidth <- lh$binwidth	
-				LB_pars@SL50 <- data$SL50
-				LB_pars@SL95 <- data$SL95
-				LB_pars@R0 <- lh$R0
-				LB_pars@Steepness <- ifelse(lh$h==1, 0.99, lh$h)
+				LB_pars@MK <- plist$M/plist$vbk
+				LB_pars@Linf <- plist$linf
+				LB_pars@L50 <- plist$ML50
+				LB_pars@L95 <- plist$ML95
+				LB_pars@Walpha <- plist$lwa
+				LB_pars@Wbeta <- plist$lwb
+				LB_pars@BinWidth <- plist$binwidth	
+				LB_pars@SL50 <- input$SL50
+				LB_pars@SL95 <- input$SL95
+				LB_pars@R0 <- plist$R0
+				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
 				LB_pars@L_units <- "cm"
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("GTG"))
