@@ -102,7 +102,7 @@ runstack <- function(savedir,
 									lwa=lwa, lwb=lwb,
 									M=M_choose,
 									M50=M50, maturity_input="age",
-									S50=S50, S95=S95, selex_input="age",
+									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
@@ -210,7 +210,7 @@ runstack <- function(savedir,
 			}
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- plist$mids
+				LB_lengths@LMids <- input$mids
 				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
 				LB_lengths@LData <- t(input$LF[,,1])
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
@@ -223,20 +223,20 @@ runstack <- function(savedir,
 					## Step 2: Specify biological inputs and parameter starting values
 					##----------------------------------------------------------------
 				LB_pars <- new("LB_pars")
-				LB_pars@MK <- plist$M/plist$vbk
-				LB_pars@Linf <- plist$linf
-				LB_pars@L50 <- plist$ML50
-				LB_pars@L95 <- plist$ML95
-				LB_pars@Walpha <- plist$lwa
-				LB_pars@Wbeta <- plist$lwb
-				LB_pars@BinWidth <- plist$binwidth	
+				LB_pars@MK <- input$M/input$vbk
+				LB_pars@Linf <- input$linf
+				LB_pars@L50 <- input$ML50
+				LB_pars@L95 <- input$ML95
+				LB_pars@Walpha <- input$lwa
+				LB_pars@Wbeta <- input$lwb
+				LB_pars@BinWidth <- input$binwidth	
 				LB_pars@SL50 <- input$SL50
 				LB_pars@SL95 <- input$SL95
-				LB_pars@R0 <- plist$R0
-				LB_pars@Steepness <- ifelse(plist$h==1, 0.99, plist$h)
+				LB_pars@R0 <- input$R0
+				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 				LB_pars@L_units <- "cm"
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("GTG"))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("absel"))
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 
 			}
@@ -255,7 +255,7 @@ runstack <- function(savedir,
 									lwa=lwa, lwb=lwb,
 									M=M_inp,
 									M50=M50, maturity_input="age",
-									S50=S50, S95=S95, selex_input="age",
+									S50=SL50, S95=SL95, selex_input="length",
 									SigmaF=SigmaF, SigmaR=SigmaR,
 									AgeMax=AgeMax,
 									binwidth=binwidth,
@@ -349,7 +349,7 @@ runstack <- function(savedir,
 										lwa=lwa, lwb=lwb,
 										M=M_inp,
 										M50=M50, maturity_input="age",
-										S50=S50, S95=S95, selex_input="age",
+										S50=SL50, S95=SL95, selex_input="length",
 										SigmaF=SigmaF, SigmaR=SigmaR,
 										AgeMax=AgeMax,
 										binwidth=binwidth,
