@@ -119,7 +119,7 @@ runstack <- function(savedir,
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
 									Nyears=10, Nyears_comp=10, comp_sample=200,
-									init_depl=c(0.3,0.9), 
+									init_depl=c(0.1,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
 				}
