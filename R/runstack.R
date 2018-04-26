@@ -317,17 +317,17 @@ runstack <- function(savedir,
 					## Step 2: Specify biological inputs and parameter starting values
 					##----------------------------------------------------------------
 				LB_pars <- new("LB_pars")
-				LB_pars@MK <- lhinp$M/lhinp$vbk
-				LB_pars@Linf <- lhinp$linf
-				LB_pars@L50 <- lhinp$ML50
-				LB_pars@L95 <- lhinp$ML95
-				LB_pars@Walpha <- lhinp$lwa
-				LB_pars@Wbeta <- lhinp$lwb
-				LB_pars@BinWidth <- lhinp$binwidth	
+				LB_pars@MK <- input$M/input$vbk
+				LB_pars@Linf <- input$linf
+				LB_pars@L50 <- input$ML50
+				LB_pars@L95 <- input$ML95
+				LB_pars@Walpha <- input$lwa
+				LB_pars@Wbeta <- input$lwb
+				LB_pars@BinWidth <- input$binwidth	
 				LB_pars@SL50 <- input$SL50
 				LB_pars@SL95 <- input$SL95
-				LB_pars@R0 <- lhinp$R0
-				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
+				LB_pars@R0 <- input$R0
+				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
@@ -411,17 +411,17 @@ runstack <- function(savedir,
 					## Step 2: Specify biological inputs and parameter starting values
 					##----------------------------------------------------------------
 				LB_pars <- new("LB_pars")
-				LB_pars@MK <- lhinp$M/lhinp$vbk
-				LB_pars@Linf <- lhinp$linf
-				LB_pars@L50 <- lhinp$ML50
-				LB_pars@L95 <- lhinp$ML95
-				LB_pars@Walpha <- lhinp$lwa
-				LB_pars@Wbeta <- lhinp$lwb
-				LB_pars@BinWidth <- lhinp$binwidth	
+				LB_pars@MK <- input$M/input$vbk
+				LB_pars@Linf <- input$linf
+				LB_pars@L50 <- input$ML50
+				LB_pars@L95 <- input$ML95
+				LB_pars@Walpha <- input$lwa
+				LB_pars@Wbeta <- input$lwb
+				LB_pars@BinWidth <- input$binwidth	
 				LB_pars@SL50 <- input$SL50
 				LB_pars@SL95 <- input$SL95
-				LB_pars@R0 <- lhinp$R0
-				LB_pars@Steepness <- ifelse(lhinp$h==1, 0.99, lhinp$h)
+				LB_pars@R0 <- input$R0
+				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
