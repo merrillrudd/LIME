@@ -45,6 +45,7 @@ generate_data <-
     for(iter in itervec){
 
         iseed <- seed[iter]
+        set.seed(iseed)
 
     if(is.null(modpath)==FALSE){
         iterpath <- file.path(modpath, iter)
@@ -59,6 +60,8 @@ generate_data <-
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
         DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions)
+        if(all(is.na(DataList))==FALSE) write(iseed, file.path(modpath, iter, paste0("init_depl_seed", iseed,".txt")))
+         
     }
 
   

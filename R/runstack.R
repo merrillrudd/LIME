@@ -236,7 +236,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 				LB_pars@L_units <- "cm"
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, Control=list("absel"))
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
 
 			}
