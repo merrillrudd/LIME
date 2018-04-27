@@ -142,9 +142,21 @@ create_inputs <- function(lh, input_data){
 
             dat_input$LF <- LF
         }
-        dat_input$highs <- highs
-        dat_input$mids <- mids
-        dat_input$lows <- lows
+
+        if(max(mids) < lh$linf){
+            add_vals <- seq(from=max(mids)+bw, to=lh$linf*1.3, by=bw)
+            LF_new <- array(0, dim=c(nrow(dat_input$LF), (ncol(dat_input$LF)+length(add_vals)), lh$nfleets))
+            for(i in 1:lh$nfleets){
+                LF_new[,1:ncol(dat_input$LF),i] <- dat_input$LF[,,i]
+            }
+            colnames(LF_new) <- c(colnames(dat_input$LF), add_vals)
+            rownames(LF_new) <- rownames(dat_input$LF)
+            dat_input$LF <- LF_new
+        }
+
+        dat_input$mids <- as.numeric(colnames(dat_input$LF))
+        dat_input$highs <- dat_input$mids + (bw/2)
+        dat_input$lows <- dat_input$mids - (bw/2)
 
         years_i <- seq_along(dat_input$years)
         years_o <- which(dat_input$years %in% as.numeric(rownames(LF)))
