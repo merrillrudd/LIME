@@ -76,7 +76,9 @@ runstack <- function(savedir,
 	}
 
 	## simulation only -- generate data and test run with true values
+	## should only be run at species level
 	if(simulation==TRUE){
+		if(rewrite==TRUE & grepl("Species", modname)==FALSE) stop("Simulated data run at non-species level")
 		set.seed(seed)
 		
 		###################
