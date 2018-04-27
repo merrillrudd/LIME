@@ -46,6 +46,7 @@ runstack <- function(savedir,
 					iter=NULL, 
 					seed=NULL, 
 					Fscenario=NULL,
+					Nyears=NULL,
 					model="LIME",
 					sim_model="LIME"){
 
@@ -54,6 +55,7 @@ runstack <- function(savedir,
 		if(is.null(iter)) stop("Must specify iteration number when simulation==TRUE")
 		if(is.null(seed)) stop("Must specify seed when simulation==TRUE")
 		if(is.null(Fscenario)) stop("Must specify Fscenario == harvestdyn or equil when simulation==TRUE")
+		if(is.null(Nyears)) stop("Must specify number of years when simulation==TRUE")
 		if(all(is.null(input_data))==FALSE) warning("Ignoring input_data for simulation")
 
 		iterpath <- file.path(savedir, iter)
@@ -61,7 +63,7 @@ runstack <- function(savedir,
 	}
 	if(simulation == FALSE){
 		if(all(is.null(input_data))) stop("Must specify input data list with at least years and Length frequency matrix (array or list for multi-fleet)")
-		if(is.null(iter)==FALSE | is.null(seed)==FALSE | is.null(Fscenario)==FALSE) warning("Ignoring iter, seed, and Fscenario when simulation==FALSE")
+		if(is.null(iter)==FALSE | is.null(seed)==FALSE | is.null(Fscenario)==FALSE | is.null(Nyears)==FALSE) warning("Ignoring iter, seed, and Fscenario when simulation==FALSE")
 		iterpath <- file.path(savedir)
 		dir.create(iterpath, showWarnings=FALSE)
 	}
@@ -118,7 +120,7 @@ runstack <- function(savedir,
 					data <- generate_data(modpath=savedir, itervec=iter, 
 									Fdynamics=Fdynamics_inp, Rdynamics="Constant", 
 									lh=plist, 
-									Nyears=10, Nyears_comp=10, comp_sample=200,
+									Nyears=Nyears, Nyears_comp=Nyears, comp_sample=200,
 									init_depl=c(0.1,0.9), 
 									seed=rep(seed+1000,iter),
 									rewrite=TRUE)
@@ -143,17 +145,17 @@ runstack <- function(savedir,
             		LB_pars@SPR <- init_depl_input
 
             		sim <- LBSPRsim(LB_pars)
-            		simlf <- rmultinom(10, size=200, prob=sim@pLCatch)
+            		simlf <- rmultinom(Nyears, size=200, prob=sim@pLCatch)
 
             		data <- list()
             		data$LF <- t(simlf)
             		colnames(data$LF) <- sim@LMids
-            		rownames(data$LF) <- 1:10
+            		rownames(data$LF) <- 1:Nyears
             		data$mids <- sim@LMids
             		data$SPR <- sim@SPR
             		data$FM <- sim@FM
             		data$D_t <- sim@SSB/sim@SSB0
-            		data$years <- 1:10
+            		data$years <- 1:Nyears
             		data$SL50 <- sim@SL50
             		data$SL95 <- sim@SL95
             		data$S_fl <- matrix((1 /(1 + exp(-log(19)*(sim@LMids-sim@SL50)/(sim@SL95-sim@SL50)))), nrow=1)
@@ -211,12 +213,9 @@ runstack <- function(savedir,
 			if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
 				LB_lengths@LMids <- input$mids
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@LData <- as.matrix(input$LF[,,1], ncol=Nyears)
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
-				# LB_lengths@NYears <- 1	
+				LB_lengths@NYears <- Nyears
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
@@ -304,13 +303,10 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input$LF[,,1]))
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@LMids <- input$mids
+				LB_lengths@LData <- as.matrix(input$LF[,,1], ncol=Nyears)
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
-				# LB_lengths@NYears <- 1	
+				LB_lengths@NYears <- Nyears
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
@@ -398,13 +394,10 @@ runstack <- function(savedir,
 		}
 		if(model=="LBSPR"){
 				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- as.numeric(colnames(input$LF[,,1]))
-				# LB_lengths@LData <- as.matrix(input$LF[nrow(input$LF),,1], ncol=1)
-				LB_lengths@LData <- t(input$LF[,,1])
+				LB_lengths@LMids <- input$mids
+				LB_lengths@LData <- as.matrix(input$LF[,,1], ncol=Nyears)
 				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				# LB_lengths@Years <- as.numeric(rownames(input$LF)[length(rownames(input$LF))])
-				LB_lengths@NYears <- nrow(input$LF[,,1])	
-				# LB_lengths@NYears <- 1	
+				LB_lengths@NYears <- Nyears
 				LB_lengths@L_units <- "cm"
 
 					##----------------------------------------------------------------
