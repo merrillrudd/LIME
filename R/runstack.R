@@ -4,7 +4,6 @@
 #'
 #' @author M.B. Rudd
 #' @param savedir directory to save results
-#' @param lh life history list, with elements contained as output from LIME::create_lh_list
 #' @param nodes matrix of nodes where each column is a different parameter and each row is a value from a distribution
 #' @param param parameters (column names for nodes)
 #' @param mean means of each parameter value,
@@ -31,7 +30,6 @@
 #' 
 #' @export
 runstack <- function(savedir, 
-					lh, 
 					nodes, 
 					param, 
 					mean, 
@@ -99,24 +97,21 @@ runstack <- function(savedir,
 				Fdynamics_inp <- "Constant"
 			}
 			if(Fscenario=="harvestdyn" | Fscenario==FALSE){
-				SigmaF_inp <- lh$SigmaF
-				SigmaR_inp <- lh$SigmaR
-				rho_inp <- lh$rho
+				SigmaF_inp <- 0.1
+				SigmaR_inp <- 0.737
+				rho_inp <- 0.4
 				# CVlen_inp <- lh$CVlen
 				Fdynamics_inp <- "Endogenous"
 			}
-			plist <- with(lh, create_lh_list(linf=Linf_choose, vbk=vbk_choose, t0=t0,
-									lwa=lwa, lwb=lwb,
+			plist <- create_lh_list(linf=Linf_choose, vbk=vbk_choose,
+									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 									M=M_choose,
 									M50=Lmat_choose, maturity_input="length",
 									S50=Lmat_choose, S95=Lmat_choose*1.3, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									AgeMax=Amax_choose,
-									binwidth=binwidth,
-									theta=10,
-									h=h,
-									# CVlen=CVlen_inp,
-									nfleets=nfleets))
+									binwidth=1,
+									theta=10)
 
 
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
@@ -253,19 +248,15 @@ runstack <- function(savedir,
 	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_Means_", model,".rds")))==FALSE){	
 
 			## life history inputs
-			lhinp <- with(lh, 
-					create_lh_list(linf=exp(mean["Loo"]), vbk=exp(mean["K"]), t0=t0,
-									lwa=lwa, lwb=lwb,
+			lhinp <- create_lh_list(linf=exp(mean["Loo"]), vbk=exp(mean["K"]),
+									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 									M=exp(mean["M"]),
 									M50=exp(mean["Lm"]), maturity_input="length",
 									S50=exp(mean["Lm"]), S95=exp(mean["Lm"])*1.3, selex_input="length",
-									SigmaF=SigmaF, SigmaR=SigmaR,
+									SigmaF=0.1, SigmaR=0.737,
 									AgeMax=exp(mean["tmax"]),
-									binwidth=binwidth,
-									theta=10,
-									h=h,
-									CVlen=CVlen,
-									nfleets=nfleets))		
+									binwidth=1,
+									theta=10)	
 
 		if(simulation==TRUE){
 			data <- readRDS(file.path(iterpath, "True.rds"))
@@ -353,19 +344,15 @@ runstack <- function(savedir,
 			linf_inp <- ifelse("Loo" %in% param, exp(nodes[x,"Loo"]), exp(mean["Loo"]))
 			Lmat_inp <- ifelse("Lm" %in% param, exp(nodes[x,"Lm"]), exp(mean["Lm"]))
 			Amax_inp <- ifelse("tmax" %in% param, exp(nodes[x,"tmax"]), exp(mean["tmax"]))
-			lhinp <- with(lh, 
-				 		create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
-										lwa=lwa, lwb=lwb,
+			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
+									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
 										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
-										SigmaF=SigmaF, SigmaR=SigmaR,
+										SigmaF=0.1, SigmaR=0.737,
 										AgeMax=Amax_inp,
-										binwidth=binwidth,
-										theta=10,
-										h=h,
-										CVlen=CVlen,
-										nfleets=nfleets))			
+										binwidth=1,
+										theta=10)			
 
 		if(simulation==TRUE){
 			data <- readRDS(file.path(iterpath, "True.rds"))
@@ -463,19 +450,15 @@ runstack <- function(savedir,
 			linf_inp <- ifelse("Loo" %in% param, exp(draws[x,"Loo"]), exp(mean["Loo"]))
 			Lmat_inp <- ifelse("Lm" %in% param, exp(draws[x,"Lm"]), exp(mean["Lm"]))
 			Amax_inp <- ifelse("tmax" %in% param, exp(draws[x,"tmax"]), exp(mean["tmax"]))
-			lhinp <- with(lh, 
-				 		create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
-										lwa=lwa, lwb=lwb,
+			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
+									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
 										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
-										SigmaF=SigmaF, SigmaR=SigmaR,
+										SigmaF=0.1, SigmaR=0.737,
 										AgeMax=Amax_inp,
-										binwidth=binwidth,
-										theta=10,
-										h=h,
-										CVlen=CVlen,
-										nfleets=nfleets))			
+										binwidth=1,
+										theta=10)			
 
 		if(simulation==TRUE){
 			data <- readRDS(file.path(iterpath, "True.rds"))
@@ -546,7 +529,7 @@ runstack <- function(savedir,
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 				LB_pars@BinMin <- 0
 				LB_pars@BinMax <- input$linf * 1.3
-				
+
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				out <- lbspr_res			
 		}
