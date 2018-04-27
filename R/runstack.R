@@ -239,6 +239,8 @@ runstack <- function(savedir,
 				LB_pars@R0 <- input$R0
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
 				LB_pars@L_units <- "cm"
+				LB_pars@BinMin <- 0
+				LB_pars@BinMax <- input$linf * 1.3
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				saveRDS(lbspr_res, file.path(iterpath, paste0("res_IterTrue_LBSPR.rds")))	
@@ -332,7 +334,8 @@ runstack <- function(savedir,
 				LB_pars@SL95 <- input$SL95
 				LB_pars@R0 <- input$R0
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
-
+				LB_pars@BinMin <- 0
+				LB_pars@BinMax <- input$linf * 1.3
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_Means_LBSPR.rds")))	
@@ -431,6 +434,8 @@ runstack <- function(savedir,
 				LB_pars@SL95 <- input$SL95
 				LB_pars@R0 <- input$R0
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
+				LB_pars@BinMin <- 0
+				LB_pars@BinMax <- input$linf * 1.3
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				out <- lbspr_res			
@@ -539,7 +544,9 @@ runstack <- function(savedir,
 				LB_pars@SL95 <- input$SL95
 				LB_pars@R0 <- input$R0
 				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
-
+				LB_pars@BinMin <- 0
+				LB_pars@BinMax <- input$linf * 1.3
+				
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 				out <- lbspr_res			
 		}
