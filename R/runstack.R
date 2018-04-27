@@ -445,7 +445,8 @@ runstack <- function(savedir,
 	}
 
 	## predictive stacking
-	if(MC!=FALSE & rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_MonteCarlo_", model, ".rds")))==FALSE){
+	if(MC!=FALSE){
+		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_MonteCarlo_", model, ".rds")))==FALSE){
 		draws <- rmvnorm(MC, mean=mean[which(names(mean) %in% param)], sigma=cov[which(rownames(cov) %in% param), which(colnames(cov) %in% param)])
 		names(draws) <- param
 
@@ -549,6 +550,7 @@ runstack <- function(savedir,
 			files <- list.files(path=file.path(iterpath))
 			remove <- files[grepl(paste0(modname,"_res_draw"), files)]
 			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
+		}
 	}
 
 	return(paste0("Ran iter ", iter, " in ", savedir))
