@@ -168,7 +168,7 @@ runstack <- function(savedir,
 			input_data <- list("years"=data$years, "LF"=data$LF)
 
 		## run at true values
-		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_IterTrue_", model, ".rds")))==FALSE){	
+		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_IterTrue_", model, ".rds")))==FALSE){	
 
 			input <- create_inputs(lh=plist, input_data=input_data)
 
@@ -208,7 +208,7 @@ runstack <- function(savedir,
 						write("Hessian not positive definite", file.path(iterpath, "pdHess_IterTrue.txt"))
 					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_IterTrue_LIME.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_IterTrue_LIME.rds")))	
 				}
 			}
 			if(model=="LBSPR"){
@@ -237,7 +237,7 @@ runstack <- function(savedir,
 				LB_pars@L_units <- "cm"
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
-				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_IterTrue_LBSPR.rds")))	
+				saveRDS(lbspr_res, file.path(iterpath, paste0("res_IterTrue_LBSPR.rds")))	
 
 			}
 		}
