@@ -264,6 +264,12 @@ runstack <- function(savedir,
 									CVlen=CVlen,
 									nfleets=nfleets))		
 
+		if(simulation==TRUE){
+			data <- readRDS(file.path(iterpath, "True.rds"))
+			input_data <- list("years"=data$years, "LF"=data$LF)
+		}
+
+
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 
 		if(model=="LIME"){
@@ -354,6 +360,12 @@ runstack <- function(savedir,
 										h=h,
 										CVlen=CVlen,
 										nfleets=nfleets))			
+
+		if(simulation==TRUE){
+			data <- readRDS(file.path(iterpath, "True.rds"))
+			input_data <- list("years"=data$years, "LF"=data$LF)
+		}
+
 
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 
