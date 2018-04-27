@@ -344,7 +344,7 @@ runstack <- function(savedir,
 			linf_inp <- ifelse("Loo" %in% param, exp(nodes[x,"Loo"]), exp(mean["Loo"]))
 			Lmat_inp <- ifelse("Lm" %in% param, exp(nodes[x,"Lm"]), exp(mean["Lm"]))
 			Amax_inp <- ifelse("tmax" %in% param, exp(nodes[x,"tmax"]), exp(mean["tmax"]))
-			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
+			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
@@ -450,7 +450,7 @@ runstack <- function(savedir,
 			linf_inp <- ifelse("Loo" %in% param, exp(draws[x,"Loo"]), exp(mean["Loo"]))
 			Lmat_inp <- ifelse("Lm" %in% param, exp(draws[x,"Lm"]), exp(mean["Lm"]))
 			Amax_inp <- ifelse("tmax" %in% param, exp(draws[x,"tmax"]), exp(mean["tmax"]))
-			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp, t0=t0,
+			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
