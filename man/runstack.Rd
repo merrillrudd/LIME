@@ -7,7 +7,8 @@
 runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
   max_gradient = 0.001, C_type = 0, LFdist = 1, rewrite = TRUE,
   input_data = NULL, simulation = FALSE, iter = NULL, seed = NULL,
-  Fscenario = NULL, model = "LIME", sim_model = "LIME")
+  Fscenario = NULL, Nyears = NULL, model = "LIME", sim_model = "LIME",
+  MC = FALSE)
 }
 \arguments{
 \item{savedir}{directory to save results}
@@ -47,6 +48,8 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 \item{model}{default="LIME", alternate = "LBSPR"}
 
 \item{sim_model}{default="LIME", alterate = "LBSPR"}
+
+\item{MC}{monte carlo =FALSE, or number for the number of draws}
 }
 \value{
 prints how many iterations were run in model directory
