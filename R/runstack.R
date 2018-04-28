@@ -270,7 +270,7 @@ runstack <- function(savedir,
 				## input file and run model
 				if(is.vector(input$LF[,,1])) Rdet <- TRUE
 				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
+				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
@@ -365,8 +365,9 @@ runstack <- function(savedir,
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 
 		if(model=="LIME"){
-			## input files and run model
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
+				if(is.vector(input$LF[,,1])) Rdet <- TRUE
+				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
+				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
@@ -471,8 +472,9 @@ runstack <- function(savedir,
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 
 		if(model=="LIME"){
-			## input files and run model
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist)		
+				if(is.vector(input$LF[,,1])) Rdet <- TRUE
+				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
+				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
 
 				## check_convergence
 				isNA <- all(is.null(out$df))

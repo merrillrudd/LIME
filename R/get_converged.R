@@ -170,22 +170,22 @@ get_converged <- function(results, max_gradient=0.001, saveFlagsDir=FALSE, saveF
 						}
 
 
-						if(gradient==FALSE){
-							## fix parameter with high final gradient
-							if(all(fix_more != FALSE)) fix_more <- c(fix_more, as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
-							if(all(fix_more == FALSE)) fix_more <- unique(as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
-							if(any(grepl("F_ft", fix_more))) fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
-							out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
+						# if(gradient==FALSE){
+						# 	## fix parameter with high final gradient
+						# 	if(all(fix_more != FALSE)) fix_more <- c(fix_more, as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
+						# 	if(all(fix_more == FALSE)) fix_more <- unique(as.character(out$df[,2][which(abs(out$df[,1])>=0.001)]))
+						# 	if(any(grepl("F_ft", fix_more))) fix_more <- fix_more[-which(grepl("F_ft", fix_more))]
+						# 	out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, C_type=C_type, est_totalF=est_totalF, LFdist=LFdist, rewrite=TRUE, newtonsteps=3, fix_more=unique(fix_more), est_F_ft=est_F_ft, est_selex_f=est_selex_f, f_startval_ft=matrix(mean(out$Report$F_ft), nrow=nrow(out$Report$F_ft), ncol=ncol(out$Report$F_ft)))
 
-								## check_convergence
-								isNA <- all(is.null(out$df))
-								if(isNA) out <- out_save
-								if(isNA==FALSE){
-									out_save <- out
-									gradient <- out$opt$max_gradient <= max_gradient
-									pdHess <- out$Sdreport$pdHess
-								}	
-						}
+						# 		## check_convergence
+						# 		isNA <- all(is.null(out$df))
+						# 		if(isNA) out <- out_save
+						# 		if(isNA==FALSE){
+						# 			out_save <- out
+						# 			gradient <- out$opt$max_gradient <= max_gradient
+						# 			pdHess <- out$Sdreport$pdHess
+						# 		}	
+						# }
 					}
 
 		## save flags if model converged
