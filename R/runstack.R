@@ -188,9 +188,9 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="IterTrue")
-				}
+				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="IterTrue")
+				# }
 
 
 				## flag non-convergence or NAs
@@ -283,9 +283,9 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_Means"))
-				}
+				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_Means"))
+				# }
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
@@ -381,9 +381,9 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_node_", x))
-				}
+				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_node_", x))
+				# }
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
@@ -488,9 +488,9 @@ runstack <- function(savedir,
 					pdHess <- out$Sdreport$pdHess
 				}	
 
-				if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
-					out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_draw_", x))
-				}
+				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
+				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_draw_", x))
+				# }
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
