@@ -223,7 +223,7 @@ for(iter in 1:length(itervec)){
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
-          ParList <- obj$env$last.par.best[-obj$env$random]
+          ParList <- obj$env$last.par.best
         }      
 
 
@@ -241,7 +241,7 @@ for(iter in 1:length(itervec)){
               opt_save <- opt
               obj_save <- obj
               jnll_save <- jnll
-              ParList <- obj$env$last.par.best[-obj$env$random]
+              ParList <- obj$env$last.par.best
               break
             }
           }
@@ -267,7 +267,7 @@ for(iter in 1:length(itervec)){
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
-                     ParList <- obj$env$last.par.best[-obj$env$random]       
+                     ParList <- obj$env$last.par.best
                 }
                 if(is.null(jnll_save)==FALSE){
                     if(jnll<=jnll_save){
@@ -275,7 +275,7 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
-                         ParList <- obj$env$last.par.best[-obj$env$random]                   }
+                         ParList <- obj$env$last.par.best              }
                 }
               }
             if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
