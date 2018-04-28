@@ -13,7 +13,7 @@ BugReports: https://github.com/merrillrudd/LIME/issues
 License: MIT + file LICENSE
 Depends:
     TMB,
-    TMBhelper
+    TMBhelper,
 Imports:
     dplyr,
     ggplot2,
