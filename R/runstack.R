@@ -83,12 +83,12 @@ runstack <- function(savedir,
 		###################
 		## generate data
 		###################
-			## true values OR based on FishLife OR will be ignored if not generating data OR starting values
-			vbk_choose <- ifelse("K" %in% param, rlnorm(1, mean=mean["K"], sd=sqrt(cov["K","K"])), exp(mean["K"]))
-			M_choose <- ifelse("M" %in% param, rlnorm(1, mean=mean["M"], sd=sqrt(cov["M","M"])), exp(mean["M"]))
-			Linf_choose <- ifelse("Loo" %in% param, rlnorm(1, mean=mean["Loo"], sd=sqrt(cov["Loo","Loo"])), exp(mean["Loo"]))
-			Lmat_choose <- ifelse("Lm" %in% param, rlnorm(1, mean=mean["Lm"], sd=sqrt(cov["Lm","Lm"])), exp(mean["Lm"]))
-			Amax_choose <- ifelse("tmax" %in% param, rlnorm(1, mean=mean["tmax"], sd=sqrt(cov["tmax","tmax"])), exp(mean["tmax"]))
+			lh_inp <- rmvnorm(1, mean=mean[param], sigma=cov[which(rownames(cov) %in% param), which(colnames(cov) %in% param)])
+			vbk_choose <- ifelse("K" %in% param, exp(lh_inp[,"K"]), exp(mean["K"]))
+			M_choose <- ifelse("M" %in% param, exp(lh_inp[,"M"]), exp(mean["M"]))
+			Linf_choose <- ifelse("Loo" %in% param, exp(lh_inp[,"Loo"]), exp(mean["Loo"]))
+			Lmat_choose <- ifelse("Lm" %in% param, exp(lh_inp[,"Lm"]), exp(mean["Lm"]))
+
 			if(Fscenario=="equil"){
 				SigmaF_inp <- 0.001
 				SigmaR_inp <- 0.001
@@ -107,7 +107,7 @@ runstack <- function(savedir,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 									M=M_choose,
 									M50=Lmat_choose, maturity_input="length",
-									S50=Lmat_choose, S95=Lmat_choose*1.3, selex_input="length",
+									S50=Lmat_choose, S95=Lmat_choose*1.2, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									# AgeMax=Amax_choose,
 									binwidth=1,
@@ -173,8 +173,8 @@ runstack <- function(savedir,
 
 			if(model=="LIME"){
 				## input file and run model
-				if(nrow(input$LF[,,1])==1) Rdet <- TRUE
-				if(nrow(input$LF[,,1])>1) Rdet <- FALSE
+				if(is.vector(input$LF[,,1])) Rdet <- TRUE
+				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
 				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 
 				## check_convergence
@@ -252,7 +252,7 @@ runstack <- function(savedir,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 									M=exp(mean["M"]),
 									M50=exp(mean["Lm"]), maturity_input="length",
-									S50=exp(mean["Lm"]), S95=exp(mean["Lm"])*1.3, selex_input="length",
+									S50=exp(mean["Lm"]), S95=exp(mean["Lm"])*1.2, selex_input="length",
 									SigmaF=0.1, SigmaR=0.737,
 									# AgeMax=exp(mean["tmax"]),
 									binwidth=1,
@@ -267,8 +267,10 @@ runstack <- function(savedir,
 			input <- create_inputs(lh=lhinp, input_data=input_data)
 
 		if(model=="LIME"){
-			## input file and run model
-			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)	
+				## input file and run model
+				if(is.vector(input$LF[,,1])) Rdet <- TRUE
+				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
+			out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
 
 				## check_convergence
 				isNA <- all(is.null(out$df))
@@ -348,7 +350,7 @@ runstack <- function(savedir,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
-										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
+										S50=Lmat_inp, S95=Lmat_inp*1.2, selex_input="length",
 										SigmaF=0.1, SigmaR=0.737,
 										# AgeMax=Amax_inp,
 										binwidth=1,
@@ -454,7 +456,7 @@ runstack <- function(savedir,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
-										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
+										S50=Lmat_inp, S95=Lmat_inp*1.2, selex_input="length",
 										SigmaF=0.1, SigmaR=0.737,
 										# AgeMax=Amax_inp,
 										binwidth=1,
