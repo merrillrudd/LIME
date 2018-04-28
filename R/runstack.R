@@ -413,7 +413,7 @@ runstack <- function(savedir,
 				LB_pars@MK <- input$M/input$vbk
 				LB_pars@Linf <- input$linf
 				LB_pars@L50 <- input$ML50
-				LB_pars@L95 <- input$ML95
+				LB_pars@L95 <- ifelse(is.na(input$ML95), input$linf, input$ML95)
 				LB_pars@Walpha <- input$lwa
 				LB_pars@Wbeta <- input$lwb
 				LB_pars@BinWidth <- input$binwidth	
