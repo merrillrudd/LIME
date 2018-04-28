@@ -109,7 +109,7 @@ runstack <- function(savedir,
 									M50=Lmat_choose, maturity_input="length",
 									S50=Lmat_choose, S95=Lmat_choose*1.3, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
-									AgeMax=Amax_choose,
+									# AgeMax=Amax_choose,
 									binwidth=1,
 									theta=10)
 
@@ -254,7 +254,7 @@ runstack <- function(savedir,
 									M50=exp(mean["Lm"]), maturity_input="length",
 									S50=exp(mean["Lm"]), S95=exp(mean["Lm"])*1.3, selex_input="length",
 									SigmaF=0.1, SigmaR=0.737,
-									AgeMax=exp(mean["tmax"]),
+									# AgeMax=exp(mean["tmax"]),
 									binwidth=1,
 									theta=10)	
 
@@ -350,7 +350,7 @@ runstack <- function(savedir,
 										M50=Lmat_inp, maturity_input="length",
 										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
 										SigmaF=0.1, SigmaR=0.737,
-										AgeMax=Amax_inp,
+										# AgeMax=Amax_inp,
 										binwidth=1,
 										theta=10)			
 
@@ -456,7 +456,7 @@ runstack <- function(savedir,
 										M50=Lmat_inp, maturity_input="length",
 										S50=Lmat_inp, S95=Lmat_inp*1.3, selex_input="length",
 										SigmaF=0.1, SigmaR=0.737,
-										AgeMax=Amax_inp,
+										# AgeMax=Amax_inp,
 										binwidth=1,
 										theta=10)			
 
