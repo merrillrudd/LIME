@@ -66,28 +66,28 @@ run_LIME <- function(modpath,
                       est_totalF=FALSE,
                       prop_f=1){
 
-                      Fpen=1
-                      SigRpen=1
-                      SigRprior=c(0.737,0.3)
-                      LFdist=1
-                      est_more=FALSE
-                      fix_more=FALSE
-                      est_F_ft=TRUE
-                      f_startval_ft=NULL
-                      rdev_startval_t=NULL
-                      est_selex_f=TRUE
-                      vals_selex_ft=-1
-                      Rdet=FALSE
-                      newtonsteps=3
-                      F_up=10
-                      S50_up=NULL
-                      derive_quants=FALSE
-                      itervec=NULL
-                      simulation=FALSE
-                      rewrite=TRUE
-                      mirror=NULL
-                      est_totalF=FALSE
-                      prop_f=1
+                      # Fpen=1
+                      # SigRpen=1
+                      # SigRprior=c(0.737,0.3)
+                      # LFdist=1
+                      # est_more=FALSE
+                      # fix_more=FALSE
+                      # est_F_ft=TRUE
+                      # f_startval_ft=NULL
+                      # rdev_startval_t=NULL
+                      # est_selex_f=TRUE
+                      # vals_selex_ft=-1
+                      # Rdet=FALSE
+                      # newtonsteps=3
+                      # F_up=10
+                      # S50_up=NULL
+                      # derive_quants=FALSE
+                      # itervec=NULL
+                      # simulation=FALSE
+                      # rewrite=TRUE
+                      # mirror=NULL
+                      # est_totalF=FALSE
+                      # prop_f=1
 
   if(simulation==FALSE) itervec <- 1 
   if(simulation==TRUE & is.null(itervec)) stop("Must specify number of iterations for simulation")    
@@ -185,7 +185,7 @@ for(iter in 1:length(itervec)){
 
       output$Inputs <- TmbList
 
-      if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
+      # if(all(is.na(ParList))) ParList <- TmbList[["Parameters"]]  
 
       ## create objects to save best results
         obj_save <- NULL
@@ -213,8 +213,8 @@ for(iter in 1:length(itervec)){
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
-        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, start=TmbList[["Parameters"]],newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, start=TmbList[["Parameters"]], loopnum=3, getsd=FALSE), error=function(e) NA)
+        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
         # if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
         # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
         jnll <- obj$report()$jnll   
@@ -223,11 +223,8 @@ for(iter in 1:length(itervec)){
           opt_save <- opt
           obj_save <- obj
           jnll_save <- obj_save$report()$jnll
-              ParList <- TmbList[["Parameters"]]
-              for(i in 1:length(ParList)){
-                if(names(ParList)[i] %in% names(obj$env$last.par.best)) ParList[[i]] <- obj$env$last.par.best[which(names(obj$env$last.par.best)==names(ParList)[i])]
-              }
-         }      
+          # ParList <- obj$env$last.par.best
+        }      
 
 
         ## loop to try to get opt to run
@@ -236,7 +233,7 @@ for(iter in 1:length(itervec)){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=TmbList[["Parameters"]],
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj,  upper=Upr, lower=Lwr, newtonsteps=newtonsteps, start=ParList, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
@@ -244,10 +241,6 @@ for(iter in 1:length(itervec)){
               opt_save <- opt
               obj_save <- obj
               jnll_save <- jnll
-              ParList <- TmbList[["Parameters"]]
-              for(i in 1:length(ParList)){
-                if(names(ParList)[i] %in% names(obj$env$last.par.best)) ParList[[i]] <- obj$env$last.par.best[which(names(obj$env$last.par.best)==names(ParList)[i])]
-              }
               break
             }
           }
@@ -263,7 +256,7 @@ for(iter in 1:length(itervec)){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=TmbList[["Parameters"]],
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start=ParList, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }
@@ -273,10 +266,6 @@ for(iter in 1:length(itervec)){
                     opt_save <- opt
                     obj_save <- obj
                     jnll_save <- jnll
-                    ParList <- TmbList[["Parameters"]]
-                    for(i in 1:length(ParList)){
-                      if(names(ParList)[i] %in% names(obj$env$last.par.best)) ParList[[i]] <- obj$env$last.par.best[which(names(obj$env$last.par.best)==names(ParList)[i])]
-                    }
                 }
                 if(is.null(jnll_save)==FALSE){
                     if(jnll<=jnll_save){
@@ -284,11 +273,6 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
-                       ParList <- TmbList[["Parameters"]]
-                        for(i in 1:length(ParList)){
-                          if(names(ParList)[i] %in% names(obj$env$last.par.best)) ParList[[i]] <- obj$env$last.par.best[which(names(obj$env$last.par.best)==names(ParList)[i])]
-                        }                 
-                     }
                 }
               }
             if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
