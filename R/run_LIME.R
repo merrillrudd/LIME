@@ -282,6 +282,8 @@ for(iter in 1:length(itervec)){
         }
         if(all(is.na(opt_save))==FALSE)  df <- data.frame("gradient"=as.vector(opt_save$final_gradient), "parameter"=names(obj_save$par), "estimate"=opt_save$par, "transformed"=exp(opt_save$par))
 
+        }
+
 
         ## Standard errors
         Report = tryCatch( obj_save$report(), error=function(x) NA)
