@@ -236,7 +236,7 @@ for(iter in 1:length(itervec)){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj,  upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
@@ -260,10 +260,10 @@ for(iter in 1:length(itervec)){
           for(i in 1:5){
             if(all(is.na(opt_save[["final_gradient"]])==FALSE)){
                if(max(abs(opt_save[["final_gradient"]]))>0.001){
-                obj <- MakeADFun(data=TmbList[["Data"]], parameters=TmbList[["Parameters"]],
+                obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList,
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= ParList, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::Optimize(obj=obj,  upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }
