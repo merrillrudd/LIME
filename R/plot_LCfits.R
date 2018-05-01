@@ -62,6 +62,28 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	if(all(is.null(LBSPR))==FALSE){
 		pred2 <- t(LBSPR@pLCatch)
 		rownames(pred2) <- which(rowSums(LFlist[[1]]) > 0)
+		colnames(pred2) <- LBSPR@LMids
+		LF2_new <- matrix(0, nrow=nrow(pred[[1]]), ncol=ncol(pred[[1]]))
+		colnames(LF2_new) <- bins
+		rownames(LF2_new) <- Tyrs
+		for(i in 1:nrow(LF2_new)){
+			if(Tyrs[i] %in% rownames(pred2)){
+				for(j in 1:ncol(LF2_new)){
+					for(k in 1:length(LBSPR@LMids)){
+						if(j==1){
+							if(LBSPR@LMids[k] <= bins[j]){	
+								LF2_new[i,j] <- pred2[which(rownames(pred2)==Tyrs[i]),k]
+							}
+						}
+						if(j>1){
+							if(LBSPR@LMids[k] <= bins[j] & LBSPR@LMids[k] >= bins[j-1]){
+								LF2_new[i,j] <- pred2[which(rownames(pred2)==Tyrs[i]),k]
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	if(all(is.null(LBSPR))) pred2 <- NULL
 
@@ -83,7 +105,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
 				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
-					lines(x=bins, y=pred2[which(rownames(pred2)==yr),], col="#AA00AA", lwd=4)
+					lines(x=bins, y=LF2_new[which(as.numeric(rownames(LF2_new))==yr),], col="#AA00AA", lwd=4)
 				box()
 			}
 			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
