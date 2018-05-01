@@ -48,7 +48,8 @@ plot_output <- function(Inputs=NULL, Report=NULL, Sdreport=NULL, LBSPR=NULL, lh,
           LBSPR_outs$var_S95 <- LBSPR@Vars[,"SL95"]
           LBSPR_outs$years <- LBSPR@Years
 
-          xLC_lbspr <- which(seq_along(true_years) %in% LBSPR@Years)
+          xLC_lbspr <- which(true_years %in% LBSPR@Years)
+          if(length(xLC_lbspr)==0) xLC_lbspr <- which(seq_along(true_years) %in% LBSPR@Years)
 
           LBSPR <- LBSPR_outs
         }
