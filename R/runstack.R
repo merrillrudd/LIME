@@ -83,7 +83,7 @@ runstack <- function(savedir,
 		###################
 		## generate data
 		###################
-			lh_inp <- rmvnorm(1, mean=mean[param], sigma=cov[which(rownames(cov) %in% param), which(colnames(cov) %in% param)])
+			lh_inp <- rmvnorm(1, mean=mean[c("Loo", "K","M","Lm")], sigma=cov[which(rownames(cov) %in% c("Loo", "K","M","Lm")), which(colnames(cov) %in% c("Loo", "K","M","Lm"))])
 
 			if(Fscenario=="equil"){
 				SigmaF_inp <- 0.001
