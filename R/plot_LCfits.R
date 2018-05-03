@@ -85,7 +85,10 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 			}
 		}
 	}
-	if(all(is.null(LBSPR))) pred2 <- NULL
+	if(all(is.null(LBSPR))){
+		pred2 <- NULL
+		LF2_new <- NULL
+	}
 
 
 	par(mfcol=dim, mar=c(0,0,0,0), omi=c(1,1,1,0.2))
@@ -99,7 +102,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	if(all(is.null(ylim))) ylim <- c(0, 0.1)
 		xlim <- c(min(bins), max(bins))
 	for(i in 1:length(seq_along(all_lc_years))){
-		yr <- all_lc_years[i]
+		yr <- i
 		for(f in 1:nf){
 			if(f==1){
 				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
