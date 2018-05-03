@@ -84,10 +84,6 @@ runstack <- function(savedir,
 		## generate data
 		###################
 			lh_inp <- rmvnorm(1, mean=mean[param], sigma=cov[which(rownames(cov) %in% param), which(colnames(cov) %in% param)])
-			vbk_choose <- ifelse("K" %in% param, exp(lh_inp[,"K"]), exp(mean["K"]))
-			M_choose <- ifelse("M" %in% param, exp(lh_inp[,"M"]), exp(mean["M"]))
-			Linf_choose <- ifelse("Loo" %in% param, exp(lh_inp[,"Loo"]), exp(mean["Loo"]))
-			Lmat_choose <- ifelse("Lm" %in% param, exp(lh_inp[,"Lm"]), exp(mean["Lm"]))
 
 			if(Fscenario=="equil"){
 				SigmaF_inp <- 0.001
