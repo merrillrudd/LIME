@@ -103,11 +103,11 @@ runstack <- function(savedir,
 				# CVlen_inp <- lh$CVlen
 				Fdynamics_inp <- "Endogenous"
 			}
-			plist <- create_lh_list(linf=Linf_choose, vbk=vbk_choose,
+			plist <- create_lh_list(linf=exp(lh_inp[,"Loo"]), vbk=exp(lh_inp[,"K"]),
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
-									M=M_choose,
-									M50=Lmat_choose, maturity_input="length",
-									S50=Lmat_choose, S95=Lmat_choose*1.2, selex_input="length",
+									M=exp(lh_inp[,"M"]),
+									M50=exp(lh_inp[,"Lm"]), maturity_input="length",
+									S50=exp(lh_inp[,"Lm"]), S95=exp(lh_inp[,"Lm"])*1.2, selex_input="length",
 									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
 									# AgeMax=Amax_choose,
 									binwidth=1,
