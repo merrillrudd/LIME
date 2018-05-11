@@ -35,6 +35,10 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 		bins <- as.numeric(colnames(LF_array))
 		bw <- bins[1]
 	}
+	n_yr <- rep(0, nrow(LFlist[[1]]))
+	for(i in 1:length(LFlist)){
+		n_yr <- n_yr + rowSums(LFlist[[i]])
+	}
 
 	nf <- length(LFlist)
 	LCyrs <- lapply(1:nf, function(x){
@@ -135,9 +139,9 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 				mtext(side=3, true_years[i], font=2, cex=2, line=-2)
 				warning("Input years for length composition data do not match number of years in analysis")
 			}
-			if(all(is.null(true_years))) mtext(side=3, line=-3, true_years[i], font=2, cex=2)
-			if(all(is.null(true_years))==FALSE) mtext(side=3, line=-2, true_years[i], font=2)
-			if(n==TRUE) print_letter(xy=c(0.15,0.9), paste0("n = ", sum(obs[i,,])), cex=2)
+			# if(all(is.null(true_years))) mtext(side=3, line=-3, true_years[i], font=2, cex=2)
+			mtext(side=3, line=-2, true_years[i], font=2)
+			if(n==TRUE) mtext(side=3, line=-3.5, paste0("n = ", n_yr[i]))
 		}
 	mtext(side=1, "Length bin (cm)", outer=TRUE, line=4, cex=1.5)
 	mtext(side=2, "Proportion", outer=TRUE, line=5, cex=1.5)
