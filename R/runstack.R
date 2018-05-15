@@ -337,11 +337,19 @@ runstack <- function(savedir,
 		res <- lapply(1:nrow(nodes), function(x){
 		# for(x in 1:nrow(nodes)){
 			## life history inputs -- nodes
-			vbk_inp <- ifelse("K" %in% param, exp(nodes[x,"K"]), exp(mean["K"]))
-			M_inp <- ifelse("M" %in% param, exp(nodes[x,"M"]), exp(mean["M"]))
-			linf_inp <- ifelse("Loo" %in% param, exp(nodes[x,"Loo"]), exp(mean["Loo"]))
-			Lmat_inp <- ifelse("Lm" %in% param, exp(nodes[x,"Lm"]), exp(mean["Lm"]))
-			Amax_inp <- ifelse("tmax" %in% param, exp(nodes[x,"tmax"]), exp(mean["tmax"]))
+			vbk_inp <- ifelse(any(param=="K"), exp(nodes[x,"K"]), exp(mean["K"]))
+			M_inp <- ifelse(any(param=="M"), exp(nodes[x,"M"]), exp(mean["M"]))
+			if(any(param=="Loo")==FALSE) linf_inp <- exp(mean["Loo"])
+			if(any(param=="Loo")){
+				if(any(colnames(nodes)=="Loo")) linf_inp <- exp(nodes[x,"Loo"])
+				if(any(colnames(nodes)=="LmLoo")) linf_inp <- (1/nodes[x,"LmLoo"]) * exp(mean["Lm"])
+			}
+			if(any(param=="Lm")==FALSE) Lmat_inp <- exp(mean["Lm"])
+			if(any(param=="Lm")){
+				if(any(colnames(nodes)=="Lm")) Lmat_inp <- exp(nodes[x,"Lm"])
+				if(any(colnames(nodes)=="LmLoo")) Lmat_inp <- nodes[x,"LmLoo"] * exp(mean["Loo"])
+			}		
+			Amax_inp <- ifelse(any(param=="tmax"), exp(nodes[x,"tmax"]), exp(mean["tmax"]))
 			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp,
 									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
 										M=M_inp,
