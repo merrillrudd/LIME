@@ -100,7 +100,7 @@ runstack <- function(savedir,
 				Fdynamics_inp <- "Endogenous"
 			}
 			plist <- create_lh_list(linf=exp(lh_inp[,"Loo"]), vbk=exp(lh_inp[,"K"]),
-									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
+									lwa=0.01, lwb=3.04,
 									M=exp(lh_inp[,"M"]),
 									M50=exp(lh_inp[,"Lm"]), maturity_input="length",
 									S50=exp(lh_inp[,"Lm"]), S95=exp(lh_inp[,"Lm"])*1.2, selex_input="length",
@@ -245,7 +245,7 @@ runstack <- function(savedir,
 
 			## life history inputs
 			lhinp <- create_lh_list(linf=exp(mean["Loo"]), vbk=exp(mean["K"]),
-									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
+									lwa=0.01, lwb=3.04,
 									M=exp(mean["M"]),
 									M50=exp(mean["Lm"]), maturity_input="length",
 									S50=exp(mean["Lm"]), S95=exp(mean["Lm"])*1.2, selex_input="length",
@@ -339,19 +339,11 @@ runstack <- function(savedir,
 			## life history inputs -- nodes
 			vbk_inp <- ifelse(any(param=="K"), exp(nodes[x,"K"]), exp(mean["K"]))
 			M_inp <- ifelse(any(param=="M"), exp(nodes[x,"M"]), exp(mean["M"]))
-			if(any(param=="Loo")==FALSE) linf_inp <- exp(mean["Loo"])
-			if(any(param=="Loo")){
-				if(any(colnames(nodes)=="Loo")) linf_inp <- exp(nodes[x,"Loo"])
-				if(any(colnames(nodes)=="LmLoo")) linf_inp <- (1/nodes[x,"LmLoo"]) * exp(mean["Lm"])
-			}
-			if(any(param=="Lm")==FALSE) Lmat_inp <- exp(mean["Lm"])
-			if(any(param=="Lm")){
-				if(any(colnames(nodes)=="Lm")) Lmat_inp <- exp(nodes[x,"Lm"])
-				if(any(colnames(nodes)=="LmLoo")) Lmat_inp <- nodes[x,"LmLoo"] * exp(mean["Loo"])
-			}		
+			linf_inp <- ifelse(any(param=="Loo"), exp(nodes[x,"Loo"]), exp(mean["Loo"]))
+			Lmat_inp <- ifelse(any(param=="Lm"), exp(nodes[x,"Lm"]), exp(mean["Lm"]))	
 			Amax_inp <- ifelse(any(param=="tmax"), exp(nodes[x,"tmax"]), exp(mean["tmax"]))
 			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp,
-									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
+									lwa=0.01, lwb=3.04,
 										M=M_inp,
 										M50=Lmat_inp, maturity_input="length",
 										S50=Lmat_inp, S95=Lmat_inp*1.2, selex_input="length",
