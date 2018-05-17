@@ -109,22 +109,6 @@ runstack <- function(savedir,
 									binwidth=1,
 									theta=10)
 
-			add <- 2
-			while(is.na(plist$M95)){
-				plist <- create_lh_list(linf=exp(lh_inp[,"Loo"]), vbk=exp(lh_inp[,"K"]),
-									lwa=0.01, lwb=3.04,
-									M=exp(lh_inp[,"M"]),
-									AgeMax=ceiling(plist$AgeMax*add),
-									M50=exp(lh_inp[,"Lm"]), maturity_input="length",
-									S50=exp(lh_inp[,"Lm"]), S95=min(exp(lh_inp[,"Loo"])*0.95, exp(lh_inp[,"Lm"])*1.2), selex_input="length",
-									SigmaF=SigmaF_inp, SigmaR=SigmaR_inp, rho=rho_inp,
-									# AgeMax=Amax_choose,
-									binwidth=1,
-									theta=10)		
-				add <- add+1		
-			}
-
-
 			if(rewrite==TRUE | file.exists(file.path(iterpath, "True.rds"))==FALSE){
 				## use seed + 1000 to generate data
 				if(sim_model=="LIME"){
