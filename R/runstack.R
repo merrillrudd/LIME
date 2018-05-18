@@ -8,7 +8,8 @@
 #' @param param parameters (column names for nodes)
 #' @param mean means of each parameter value,
 #' @param cov covariance matrix across parameters
-#' @param modname model name to save in directory
+#' @param taxon taxonomic level for distributions
+#' @param dim description of dimensional name
 #' @param data_avail data available to model, default = "LC", can adjust to "Catch_LC", "Index_LC", or "Index_Catch_LC"
 #' @param max_gradient maximum final gradient criterion, default = 0.001
 #' @param C_type default = 0 (no catch data), 1=catch in numbers, 2= catch in biomass
@@ -21,7 +22,6 @@
 #' @param Fscenario fishing mortality scenario to generate data
 #' @param model default="LIME", alternate = "LBSPR"
 #' @param sim_model default="LIME", alterate = "LBSPR"
-#' @param MC monte carlo =FALSE, or number for the number of draws
 
 
 #' @useDynLib LIME
@@ -34,7 +34,8 @@ runstack <- function(savedir,
 					param, 
 					mean, 
 					cov, 
-					modname, 
+					taxon,
+					dim, 
 					data_avail="LC", 
 					max_gradient=0.001, 
 					C_type=0, 
@@ -47,8 +48,7 @@ runstack <- function(savedir,
 					Fscenario=NULL,
 					Nyears=NULL,
 					model="LIME",
-					sim_model="LIME",
-					MC=FALSE){
+					sim_model="LIME"){
 
 	## check inputs and find directories
 	if(simulation == TRUE){
@@ -77,7 +77,7 @@ runstack <- function(savedir,
 
 	## simulation only -- generate data and test run with true values
 	## should only be run at species level
-	if(simulation==TRUE & grepl("Species", modname)){
+	if(simulation==TRUE){
 		set.seed(seed)
 		
 		###################
@@ -240,7 +240,7 @@ runstack <- function(savedir,
 	}
 
 	## run at means from FishLife for ensemble parameters
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_Means_", model,".rds")))==FALSE){	
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_Means_", model,"_", taxon, ".rds")))==FALSE){	
 
 			## life history inputs
 			lhinp <- create_lh_list(linf=exp(mean["Loo"]), vbk=exp(mean["K"]),
@@ -284,19 +284,19 @@ runstack <- function(savedir,
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
-					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_Means.txt")))
+					write("model NA", file.path(iterpath, paste0("modelNA_Means_", taxon,".txt")))
 				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 					if(gradient==FALSE){
-						write("highgradient", file.path(iterpath, paste0(modname, "_highgradient_Means.txt")))
+						write("highgradient", file.path(iterpath, paste0("highgradient_Means_", taxon,".txt")))
 					}
 					if(pdHess==FALSE){
-						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_Means.txt")))
+						write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_Means_",taxon,".txt")))
 					}
 					## save results if converged
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_Means_LIME.rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("res_Means_LIME_",taxon,".rds")))	
 				}
 		}
 		if(model=="LBSPR"){
@@ -326,13 +326,13 @@ runstack <- function(savedir,
 				LB_pars@BinMax <- input$linf * 1.3
 
 				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
-				saveRDS(lbspr_res, file.path(iterpath, paste0(modname, "_res_Means_LBSPR.rds")))	
+				saveRDS(lbspr_res, file.path(iterpath, paste0("res_Means_LBSPR_",taxon,".rds")))	
 		}
 	}	
 	
 
 	## predictive stacking
-	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_stacking_", model, ".rds")))==FALSE){
+	if(rewrite==TRUE | file.exists(file.path(iterpath, paste0("res_stacking_", model, "_", taxon, "_", dim, ".rds")))==FALSE){
 		res <- lapply(1:nrow(nodes), function(x){
 		# for(x in 1:nrow(nodes)){
 			## life history inputs -- nodes
@@ -382,18 +382,18 @@ runstack <- function(savedir,
 
 				## flag non-convergence or NAs
 				if(all(is.null(out$df))){
-					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_node_", x, ".txt")))
+					write("model NA", file.path(iterpath, paste0("modelNA_node_", x, "_", taxon, "_", dim, ".txt")))
 				}
 				if(all(is.null(out$df))==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
 					if(gradient==FALSE){
-						write("highgradient", file.path(iterpath,paste0(modname, "_highgradient_node_", x, ".txt")))
+						write("highgradient", file.path(iterpath,paste0("highgradient_node_", x, "_", taxon, "_", dim, ".txt")))
 					}
 					if(pdHess==FALSE){
-						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_node_", x, ".txt")))
+						write("Hessian not positive definite", file.path(iterpath, paste0("pdHess_node_", x, "_", taxon, "_", dim, ".txt")))
 					}
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_node_", x, ".rds")))	
+					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0("_res_node_", x, "_", taxon, "_", dim, ".rds")))	
 				}
 		}
 		if(model=="LBSPR"){
@@ -428,119 +428,12 @@ runstack <- function(savedir,
 					
 				return(out)
 		})
-			saveRDS(res, file.path(iterpath, paste0(modname, "_res_stacking_", model, ".rds")))
+			saveRDS(res, file.path(iterpath, paste0("res_stacking_", model, "_", taxon, "_", dim, ".rds")))
 			files <- list.files(path=file.path(iterpath))
-			remove <- files[grepl(paste0(modname,"_res_node"), files)]
+			remove <- files[grepl(paste0("res_node"), files)]
 			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
 	}
 
-	## predictive stacking
-	if(MC!=FALSE){
-		if(rewrite==TRUE | file.exists(file.path(iterpath, paste0(modname, "_res_MonteCarlo_", model, ".rds")))==FALSE){
-		draws <- rmvnorm(MC, mean=mean[which(names(mean) %in% param)], sigma=cov[which(rownames(cov) %in% param), which(colnames(cov) %in% param)])
-		names(draws) <- param
-
-		res <- lapply(1:nrow(draws), function(x){
-		# for(x in 1:nrow(draws)){
-			## life history inputs -- draws
-			vbk_inp <- ifelse("K" %in% param, exp(draws[x,"K"]), exp(mean["K"]))
-			M_inp <- ifelse("M" %in% param, exp(draws[x,"M"]), exp(mean["M"]))
-			linf_inp <- ifelse("Loo" %in% param, exp(draws[x,"Loo"]), exp(mean["Loo"]))
-			Lmat_inp <- ifelse("Lm" %in% param, exp(draws[x,"Lm"]), exp(mean["Lm"]))
-			Amax_inp <- ifelse("tmax" %in% param, exp(draws[x,"tmax"]), exp(mean["tmax"]))
-			lhinp <- create_lh_list(linf=linf_inp, vbk=vbk_inp,
-									lwa=exp(mean["Winfinity"])/(exp(mean["Loo"])^3.04), lwb=3.04,
-										M=M_inp,
-										M50=Lmat_inp, maturity_input="length",
-										S50=Lmat_inp, S95=min(linf_inp*0.95, Lmat_inp*1.2), selex_input="length",
-										SigmaF=0.1, SigmaR=0.737,
-										# AgeMax=Amax_inp,
-										binwidth=1,
-										theta=10)			
-
-		if(simulation==TRUE){
-			data <- readRDS(file.path(iterpath, "True.rds"))
-			input_data <- list("years"=data$years, "LF"=data$LF)
-		}
-
-
-			input <- create_inputs(lh=lhinp, input_data=input_data)
-
-		if(model=="LIME"){
-				if(is.vector(input$LF[,,1])) Rdet <- TRUE
-				if(is.vector(input$LF[,,1])==FALSE) Rdet <- FALSE
-				out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)	
-
-				## check_convergence
-				isNA <- all(is.null(out$df))
-				if(isNA==TRUE){
-					## before entering loop, check:
-					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
-					isNA <- all(is.null(out$df))
-				}
-				if(isNA==FALSE){
-					gradient <- out$opt$max_gradient <= max_gradient
-					pdHess <- out$Sdreport$pdHess
-				}	
-
-				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
-				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName=paste0(modname, "_draw_", x))
-				# }
-
-				## flag non-convergence or NAs
-				if(all(is.null(out$df))){
-					write("model NA", file.path(iterpath, paste0(modname, "_modelNA_draw_", x, ".txt")))
-				}
-				if(all(is.null(out$df))==FALSE){
-					gradient <- out$opt$max_gradient <= max_gradient
-					pdHess <- out$Sdreport$pdHess
-					if(gradient==FALSE){
-						write("highgradient", file.path(iterpath,paste0(modname, "_highgradient_draw_", x, ".txt")))
-					}
-					if(pdHess==FALSE){
-						write("Hessian not positive definite", file.path(iterpath, paste0(modname, "_pdHess_draw_", x, ".txt")))
-					}
-					if(gradient == TRUE & pdHess == TRUE) saveRDS(out, file.path(iterpath, paste0(modname, "_res_draw_", x, ".rds")))	
-				}
-		}
-		if(model=="LBSPR"){
-				LB_lengths <- new("LB_lengths")
-				LB_lengths@LMids <- input$mids
-				LB_lengths@LData <- as.matrix(input$LF[,,1], ncol=Nyears)
-				LB_lengths@Years <- as.numeric(rownames(input$LF))
-				LB_lengths@NYears <- Nyears
-				LB_lengths@L_units <- "cm"
-
-					##----------------------------------------------------------------
-					## Step 2: Specify biological inputs and parameter starting values
-					##----------------------------------------------------------------
-				LB_pars <- new("LB_pars")
-				LB_pars@MK <- input$M/input$vbk
-				LB_pars@Linf <- input$linf
-				LB_pars@L50 <- input$ML50
-				LB_pars@L95 <- input$ML95
-				LB_pars@Walpha <- input$lwa
-				LB_pars@Wbeta <- input$lwb
-				LB_pars@BinWidth <- input$binwidth	
-				LB_pars@SL50 <- input$SL50
-				LB_pars@SL95 <- input$SL95
-				LB_pars@R0 <- input$R0
-				LB_pars@Steepness <- ifelse(input$h==1, 0.99, input$h)
-				LB_pars@BinMin <- 0
-				LB_pars@BinMax <- input$linf * 1.3
-
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
-				out <- lbspr_res			
-		}
-					
-				return(out)
-		})
-			saveRDS(res, file.path(iterpath, paste0(modname, "_res_MonteCarlo_", model, ".rds")))
-			files <- list.files(path=file.path(iterpath))
-			remove <- files[grepl(paste0(modname,"_res_draw"), files)]
-			ignore <- sapply(1:length(remove), function(x) unlink(file.path(iterpath, remove[x]), TRUE))
-		}
-	}
 
 	return(paste0("Ran iter ", iter, " in ", savedir))
 }
