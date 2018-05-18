@@ -181,7 +181,17 @@ runstack <- function(savedir,
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
+					if(pdHess==FALSE){
+						input$theta <- 50
+						out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet, fix_more="log_theta")
+					}
+					isNA <- all(is.null(out$df))
+					if(isNA==FALSE){
+						gradient <- out$opt$max_gradient <= max_gradient
+						pdHess <- out$Sdreport$pdHess
+					}	
 				}	
+
 
 				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
 				# 	out <- get_converged(results=out, saveFlagsDir=iterpath, saveFlagsName="IterTrue")
@@ -270,12 +280,21 @@ runstack <- function(savedir,
 				## check_convergence
 				isNA <- all(is.null(out$df))
 				if(isNA==TRUE){
-					gradient <- FALSE
-					pdHess <- FALSE
+					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 				}
+				isNA <- all(is.null(out$df))
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
+					if(pdHess==FALSE){
+						input$theta <- 50
+						out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet, fix_more="log_theta")
+					}
+					isNA <- all(is.null(out$df))
+					if(isNA==FALSE){
+						gradient <- out$opt$max_gradient <= max_gradient
+						pdHess <- out$Sdreport$pdHess
+					}	
 				}	
 
 				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
@@ -367,13 +386,21 @@ runstack <- function(savedir,
 				## check_convergence
 				isNA <- all(is.null(out$df))
 				if(isNA==TRUE){
-					## before entering loop, check:
-					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist)
-					isNA <- all(is.null(out$df))
+					out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=FALSE, C_type=C_type, LFdist=LFdist, Rdet=Rdet)
 				}
+				isNA <- all(is.null(out$df))
 				if(isNA==FALSE){
 					gradient <- out$opt$max_gradient <= max_gradient
 					pdHess <- out$Sdreport$pdHess
+					if(pdHess==FALSE){
+						input$theta <- 50
+						out <- run_LIME(modpath=NULL, input=input, data_avail=data_avail, rewrite=TRUE, newtonsteps=3, C_type=C_type, LFdist=LFdist, Rdet=Rdet, fix_more="log_theta")
+					}
+					isNA <- all(is.null(out$df))
+					if(isNA==FALSE){
+						gradient <- out$opt$max_gradient <= max_gradient
+						pdHess <- out$Sdreport$pdHess
+					}	
 				}	
 
 				# if(all(is.null(out$df))==FALSE & (gradient == FALSE | pdHess == FALSE)){
