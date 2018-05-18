@@ -4,16 +4,13 @@
 \alias{runstack}
 \title{Predictive stacking}
 \usage{
-runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
+runstack(savedir, nodes, param, mean, cov, taxon, dim, data_avail = "LC",
   max_gradient = 0.001, C_type = 0, LFdist = 1, rewrite = TRUE,
   input_data = NULL, simulation = FALSE, iter = NULL, seed = NULL,
-  Fscenario = NULL, Nyears = NULL, model = "LIME", sim_model = "LIME",
-  MC = FALSE)
+  Fscenario = NULL, Nyears = NULL, model = "LIME", sim_model = "LIME")
 }
 \arguments{
 \item{savedir}{directory to save results}
-
-\item{lh}{life history list, with elements contained as output from LIME::create_lh_list}
 
 \item{nodes}{matrix of nodes where each column is a different parameter and each row is a value from a distribution}
 
@@ -23,7 +20,9 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 
 \item{cov}{covariance matrix across parameters}
 
-\item{modname}{model name to save in directory}
+\item{taxon}{taxonomic level for distributions}
+
+\item{dim}{description of dimensional name}
 
 \item{data_avail}{data available to model, default = "LC", can adjust to "Catch_LC", "Index_LC", or "Index_Catch_LC"}
 
@@ -48,8 +47,6 @@ runstack(savedir, lh, nodes, param, mean, cov, modname, data_avail = "LC",
 \item{model}{default="LIME", alternate = "LBSPR"}
 
 \item{sim_model}{default="LIME", alterate = "LBSPR"}
-
-\item{MC}{monte carlo =FALSE, or number for the number of draws}
 }
 \value{
 prints how many iterations were run in model directory
