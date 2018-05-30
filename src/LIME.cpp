@@ -716,8 +716,6 @@ Type objective_function<Type>::operator() ()
   REPORT( sigma_I );
   REPORT( CV_L );
   REPORT( SPR_t );
-  REPORT( SB0_t );
-  REPORT( SBf_t );
 
   // Random effects
   REPORT( Nu_input );
