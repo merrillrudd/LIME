@@ -234,9 +234,11 @@ Type objective_function<Type>::operator() ()
   int n_a2;
   n_a2 = match_ages.size();
   Type SB0 = 0;
+  Type SB01 = 0;
   for(int a=0;a<n_a;a++){
     for(int a2=0;a2<n_a2;a2++){
       if(ages(a) == match_ages(a2)) SB0 += (exp(beta)*Type(n_s)) * exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
+      if(ages(a) == match_ages(a2)) SB01 += exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
     }
     
   }
@@ -276,28 +278,44 @@ Type objective_function<Type>::operator() ()
 
   //over time by age
   matrix<Type> N_ta(n_t,n_a); // abundance
+  matrix<Type> N_ta1(n_t,n_a); // abundance per recruit
   matrix<Type> SB_ta(n_t,n_a); // spawning biomass
+  matrix<Type> SB_ta1(n_t,n_a); // spawning biomass per recruit
   matrix<Type> TB_ta(n_t,n_a); // total biomass
   N_ta.setZero();
   SB_ta.setZero();
   TB_ta.setZero();
+  N_ta1.setZero();
+  SB_ta.setZero();
 
   //over time
   vector<Type> N_t(n_t); // abundance
   vector<Type> SB_t(n_t); //spawning biomass
+  vector<Type> SB_t1(n_t); // spawning biomass per recruit
   vector<Type> TB_t(n_t); //total biomass
   N_t.setZero();
   SB_t.setZero();
+  SB_t1.setZero();
   TB_t.setZero();
 
   for(int a=0;a<n_a;a++){
     // Population abundance
-    if(a==0) N_ta(0,a) = R_t(0);
-    if((a>=1) & (a<(n_a-1))) N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_ta(0,a-1));
-    if(a==(n_a-1)) N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1)));
+    if(a==0){
+      N_ta(0,a) = R_t(0);
+      N_ta1(0,a) = 1;
+    }
+    if((a>=1) & (a<(n_a-1))){
+      N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_ta(0,a-1));
+      N_ta1(0,a) = N_ta1(0,a-1) * exp(-M - F_ta(0,a-1));
+    }
+    if(a==(n_a-1)){
+      N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1)));
+      N_ta1(0,a) = (N_ta1(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1))); 
+    }
 
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a);
+    SB_ta1(0,a) = N_ta1(0,a) * Mat_a(a) * W_a(a);
 
     // Total biomass
     TB_ta(0,a) = N_ta(0,a) * W_a(a);
@@ -305,6 +323,7 @@ Type objective_function<Type>::operator() ()
     //Annual values
     if(a>0) N_t(0) += N_ta(0,a);
     SB_t(0) += SB_ta(0,a);
+    SB_t1(0) += SB_ta1(0,a);
     TB_t(0) += TB_ta(0,a);
   }
 
@@ -359,12 +378,22 @@ Type objective_function<Type>::operator() ()
     for(int a=0;a<n_a;a++){
       
       // Population abundance
-      if((t>=1) & (a==0)) N_ta(t,a) = R_t(t);
-      if((t>=1) & (a>=1) & (a<(n_a-1))) N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1)); 
-      if((t>=1) & (a==(n_a-1))) N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1))) + (N_ta(t-1,a) * exp(-M - F_ta(t-1,a)));
+      if((t>=1) & (a==0)){
+        N_ta(t,a) = R_t(t);
+        N_ta1(t,a) = 1;
+      }
+      if((t>=1) & (a>=1) & (a<(n_a-1))){
+        N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1)); 
+        N_ta1(t,a) = N_ta1(t-1,a-1) * exp(-M - F_ta(t-1,a-1)); 
+      }
+      if((t>=1) & (a==(n_a-1))){
+        N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1))) + (N_ta(t-1,a) * exp(-M - F_ta(t-1,a)));
+        N_ta1(t,a) = (N_ta1(t-1,a-1) * exp(-M - F_ta(t-1,a-1))) + (N_ta1(t-1,a) * exp(-M - F_ta(t-1,a)));
+      }
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
+      SB_ta1(t,a) = N_ta1(t,a) * Mat_a(a) * W_a(a);
 
       // Total biomass
       TB_ta(t,a) = N_ta(t,a)*W_a(a);
@@ -372,6 +401,7 @@ Type objective_function<Type>::operator() ()
       //Annual values
       if(a>0) N_t(t) += N_ta(t,a);
       SB_t(t) += SB_ta(t,a);
+      SB_t1(t) += SB_ta1(t,a);
       TB_t(t) += TB_ta(t,a);
     }
   }
@@ -458,41 +488,19 @@ Type objective_function<Type>::operator() ()
 
 
   // // ========= spawning potential ratio ==============================
-  matrix<Type> Na0(n_t,n_a);
-  matrix<Type> Naf(n_t,n_a);
-
-  // SPR
-  vector<Type> SB0_t(n_t);
-  vector<Type> SBf_t(n_t);
   vector<Type> SPR_t(n_t);
-  SB0_t.setZero();
-  SBf_t.setZero();
   SPR_t.setZero();
 
   for(int t=0;t<n_t;t++){
-    for(int a=0;a<n_a;a++){
-      if(a==0){
-        Na0(t,a) = 1;
-        Naf(t,a) = 1;
-      }
-      if((a>0) & (a<(n_a-1))){
-        Na0(t,a) = Na0(t,a-1)*exp(-M);
-        Naf(t,a) = Naf(t,a-1)*exp(-M-F_ta(t,a));
-      }
-      if(a==(n_a-1)){
-        Na0(t,a) = (Na0(t,a-1)*exp(-M))/(1-exp(-M));
-        Naf(t,a) = (Naf(t,a-1)*exp(-M-F_ta(t,a)))/(1-exp(-M-F_ta(t,a)));
-      }
-
-      if(a>0){
-        SB0_t(t) += Na0(t,a)*Mat_a(a)*W_a(a);
-        SBf_t(t) += Naf(t,a)*Mat_a(a)*W_a(a);
-      }
-    }
-    SPR_t(t) = SBf_t(t)/SB0_t(t);
+    SPR_t(t) = SB_t1(t)/SB01;
   }
 
-
+  // Likelihood contributions from site-aggregated observations
+  vector<Type> D_t(n_t);
+  D_t.setZero();
+    for(int t=0;t<n_t;t++){
+       D_t(t) = SB_t(t)/SB0;
+    }
 
   // ========= Build likelihood ==============================
 
@@ -637,12 +645,6 @@ Type objective_function<Type>::operator() ()
     if(SigRpen==1) jnll_comp(6) = Type(-1)*sigrp;
 
     jnll = sum(jnll_comp);
-
-  // Likelihood contributions from site-aggregated observations
-    vector<Type> D_t(n_t);
-    for(int t=0;t<n_t;t++){
-       D_t(t) = SB_t(t)/SB0;
-    }
 
     vector<Type> lN_t(n_t);
     vector<Type> lSB_t(n_t);
