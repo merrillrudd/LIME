@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="multifleet")
+devtools::install_github("merrillrudd/LIME")
 library(LIME)
 
 devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
@@ -71,11 +71,12 @@ true <- generate_data(modpath=NULL,
 					  Rdynamics="Constant",
 					  lh=lh,
 					  Nyears=20,
-					  Nyears_comp=c(20),
+					  Nyears_comp=20,
 					  comp_sample=200,
 					  init_depl=0.7,
 					  seed=123,
 					  fleet_proportions=1)
+
 
 ## plot simulated data
 par(mfrow=c(3,2))
@@ -165,6 +166,7 @@ plot_output(Inputs=Inputs,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
 			set_ylim=list("SPR" = c(0,1)))
+
 
 #######################################
 ## Length-data only
