@@ -234,11 +234,9 @@ Type objective_function<Type>::operator() ()
   int n_a2;
   n_a2 = match_ages.size();
   Type SB0 = 0;
-  Type SB01 = 0;
   for(int a=0;a<n_a;a++){
     for(int a2=0;a2<n_a2;a2++){
       if(ages(a) == match_ages(a2)) SB0 += (exp(beta)*Type(n_s)) * exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
-      if(ages(a) == match_ages(a2)) SB01 += exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
     }
     
   }
@@ -278,44 +276,35 @@ Type objective_function<Type>::operator() ()
 
   //over time by age
   matrix<Type> N_ta(n_t,n_a); // abundance
-  matrix<Type> N_ta1(n_t,n_a); // abundance per recruit
   matrix<Type> SB_ta(n_t,n_a); // spawning biomass
-  matrix<Type> SB_ta1(n_t,n_a); // spawning biomass per recruit
   matrix<Type> TB_ta(n_t,n_a); // total biomass
   N_ta.setZero();
   SB_ta.setZero();
   TB_ta.setZero();
-  N_ta1.setZero();
   SB_ta.setZero();
 
   //over time
   vector<Type> N_t(n_t); // abundance
   vector<Type> SB_t(n_t); //spawning biomass
-  vector<Type> SB_t1(n_t); // spawning biomass per recruit
   vector<Type> TB_t(n_t); //total biomass
   N_t.setZero();
   SB_t.setZero();
-  SB_t1.setZero();
   TB_t.setZero();
 
   for(int a=0;a<n_a;a++){
     // Population abundance
     if(a==0){
       N_ta(0,a) = R_t(0);
-      N_ta1(0,a) = 1;
     }
     if((a>=1) & (a<(n_a-1))){
       N_ta(0,a) = N_ta(0,a-1) * exp(-M - F_ta(0,a-1));
-      N_ta1(0,a) = N_ta1(0,a-1) * exp(-M - F_ta(0,a-1));
     }
     if(a==(n_a-1)){
       N_ta(0,a) = (N_ta(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1)));
-      N_ta1(0,a) = (N_ta1(0,a-1) * exp(-M - F_ta(0,a-1))) / (1 - exp(-M - F_ta(0,a-1))); 
     }
 
     // Spawning biomass
     SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a);
-    SB_ta1(0,a) = N_ta1(0,a) * Mat_a(a) * W_a(a);
 
     // Total biomass
     TB_ta(0,a) = N_ta(0,a) * W_a(a);
@@ -323,7 +312,6 @@ Type objective_function<Type>::operator() ()
     //Annual values
     if(a>0) N_t(0) += N_ta(0,a);
     SB_t(0) += SB_ta(0,a);
-    SB_t1(0) += SB_ta1(0,a);
     TB_t(0) += TB_ta(0,a);
   }
 
@@ -380,20 +368,16 @@ Type objective_function<Type>::operator() ()
       // Population abundance
       if((t>=1) & (a==0)){
         N_ta(t,a) = R_t(t);
-        N_ta1(t,a) = 1;
       }
       if((t>=1) & (a>=1) & (a<(n_a-1))){
         N_ta(t,a) = N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1)); 
-        N_ta1(t,a) = N_ta1(t-1,a-1) * exp(-M - F_ta(t-1,a-1)); 
       }
       if((t>=1) & (a==(n_a-1))){
         N_ta(t,a) = (N_ta(t-1,a-1) * exp(-M - F_ta(t-1,a-1))) + (N_ta(t-1,a) * exp(-M - F_ta(t-1,a)));
-        N_ta1(t,a) = (N_ta1(t-1,a-1) * exp(-M - F_ta(t-1,a-1))) + (N_ta1(t-1,a) * exp(-M - F_ta(t-1,a)));
       }
 
       // Spawning biomass
       SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
-      SB_ta1(t,a) = N_ta1(t,a) * Mat_a(a) * W_a(a);
 
       // Total biomass
       TB_ta(t,a) = N_ta(t,a)*W_a(a);
@@ -401,7 +385,6 @@ Type objective_function<Type>::operator() ()
       //Annual values
       if(a>0) N_t(t) += N_ta(t,a);
       SB_t(t) += SB_ta(t,a);
-      SB_t1(t) += SB_ta1(t,a);
       TB_t(t) += TB_ta(t,a);
     }
   }
@@ -491,9 +474,37 @@ Type objective_function<Type>::operator() ()
   vector<Type> SPR_t(n_t);
   SPR_t.setZero();
 
+  //no relation to last year
+  matrix<Type> NFequil_ta(n_t,n_a);
+  matrix<Type> NUequil_ta(n_t,n_a);
+  vector<Type> SBF_t(n_t);
+  vector<Type> SBU_t(n_t);
+  SBF_t.setZero();
+  SBU_t.setZero();
   for(int t=0;t<n_t;t++){
-    SPR_t(t) = SB_t1(t)/SB01;
+    for(int a=0;a<n_a;a++){
+      if(a==0){
+        NFequil_ta(t,a) = 1;
+        NUequil_ta(t,a) = 1;
+      }
+      if((a>=1) & (a<(n_a-1))){
+        NFequil_ta(t,a) = NFequil_ta(t,a-1) * exp(-M - F_ta(t,a-1));
+        NUequil_ta(t,a) = NUequil_ta(t,a-1) * exp(-M);
+      }
+      if(a==(n_a-1)){
+        NFequil_ta(t,a) = (NFequil_ta(t,a-1) * exp(-M - F_ta(t,a-1))) / (1 - exp(-M - F_ta(t,a-1)));
+        NUequil_ta(t,a) = (NUequil_ta(t,a-1) * exp(-M)) / (1-exp(-M));
+      }
+    }
+
+    for(int a=0;a<n_a;a++){
+      SBF_t(t) += NFequil_ta(t,a) * Mat_a(a) * W_a(a)
+      SBU_t(t) += NUequil_ta(t,a) * Mat_a(a) * W_a(a)
+    }
+
+    SPR_t(t) = SBF_t(t)/SBU_t(t);
   }
+
 
   // Likelihood contributions from site-aggregated observations
   vector<Type> D_t(n_t);
