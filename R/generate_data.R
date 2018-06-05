@@ -60,7 +60,7 @@ generate_data <-
         init_depl_input <- init_depl
         ## simulated data with no spatial structure in growth
         DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions)
-        if(all(is.na(DataList))==FALSE) write(iseed, file.path(modpath, iter, paste0("init_depl_seed", iseed,".txt")))
+        if(all(is.na(DataList))==FALSE & all(is.null(modpath)==FALSE)) write(iseed, file.path(modpath, iter, paste0("init_depl_seed", iseed,".txt")))
          
     }
 
@@ -74,7 +74,7 @@ generate_data <-
             init_depl_input <- runif(1,init_depl[1],init_depl[2])
             ## simulated data with no spatial structure in growth
             DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_proportions=fleet_proportions), error=function(e) NA)
-            if(all(is.na(DataList))==FALSE) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
+            if(all(is.na(DataList))==FALSE & all(is.null(modpath)==FALSE)) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }
 
@@ -90,12 +90,12 @@ generate_data <-
     if(derive_quants==TRUE){
         ## project the truth forward
         inits$C_ft <- DataList$Cw_ft
-        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=TRUE, randomR=TRUE, mirror=FALSE)
+        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=FALSE, vals_selex_ft=DataList$S_fl, mirror=FALSE, Rdet=FALSE, est_totalF=FALSE, prop_f=1, est_F_ft=TRUE)
         ParList <- TmbList$Parameters    
 
         # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
 
-        obj <- MakeADFun(data=Inputs[["Data"]], parameters=ParList, random=Inputs[["Random"]], map=Inputs[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
+        obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
         Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
         inits$MSY <- Derived$MSY

@@ -15,7 +15,6 @@
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
 #' @param mgt_type removals based on F (default) or catch
 #' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
-#' @param nburn number of years of simulation burn in, default=20
 #' @importFrom stats rnorm
 #' @return named list of attributes of true population/data
 #' @export
@@ -31,8 +30,7 @@ sim_pop <-
            seed,
            sample_type = 'catch',
            mgt_type = 'F',
-           fleet_proportions,
-           nburn=20) {
+           fleet_proportions) {
 
     with(lh, {
       ##########################
@@ -40,12 +38,8 @@ sim_pop <-
       ##########################
 
       Nyears_real <- Nyears
-      tyears_real <- nburn + Nyears
-      nburn_real <- nburn
 
       Nyears <- Nyears * nseasons
-      nburn <- nburn * nseasons
-      tyears <- (nburn_real+Nyears_real) * nseasons
       Nyears_comp <- Nyears_comp * nseasons
 
 
@@ -55,7 +49,7 @@ sim_pop <-
       set.seed(seed)
     
       ## recruitment deviations
-      RecDev <- c(0,rnorm(tyears_real-1, mean = -(SigmaR ^ 2) / 2, sd = SigmaR))
+      RecDev <- c(0,rnorm(Nyears_real-1, mean = -(SigmaR ^ 2) / 2, sd = SigmaR))
     
       ## autocorrelated recruitment deviations
       RecDev_AR <- rep(NA, length(RecDev))
@@ -65,28 +59,28 @@ sim_pop <-
           RecDev_AR[t - 1] * rho + sqrt(1 - rho ^ 2) * RecDev[t]
       }
       if(nseasons > 1){
-        # RecDev2 <- rep(0, tyears)
+        # RecDev2 <- rep(0, Nyears)
         # RecDev2[seq(1,length(RecDev2),by=nseasons)] <- RecDev_AR
-        RecDev2 <- unlist(lapply(1:tyears_real, function(x) rep(RecDev_AR[x], nseasons)))
+        RecDev2 <- unlist(lapply(1:Nyears_real, function(x) rep(RecDev_AR[x], nseasons)))
         RecDev_AR <- RecDev2
       }
 
       ## fishing mortality deviations
       if(length(SigmaF)==1 & nfleets>1) SigmaF <- rep(SigmaF, nfleets)
       FishDev_f <- t(sapply(1:nfleets, function(x){
-        c(0, rnorm(tyears-1, mean = -(SigmaF[x] ^ 2) / 2, sd = SigmaF[x]))
+        c(0, rnorm(Nyears-1, mean = -(SigmaF[x] ^ 2) / 2, sd = SigmaF[x]))
       }))
     
       ## abundance index observation error
       if(length(SigmaI)==1 & nfleets>1) SigmaI <- rep(SigmaI, nfleets)
       IndexDev_f <- t(sapply(1:nfleets, function(x){
-        rnorm(tyears, mean = -(SigmaI[x] ^ 2) / 2, sd = SigmaI[x])
+        rnorm(Nyears, mean = -(SigmaI[x] ^ 2) / 2, sd = SigmaI[x])
       }))
 
       ## catch observation error
       if(length(SigmaC)==1 & nfleets>1) SigmaC <- rep(SigmaC, nfleets)
       CatchDev_f <- t(sapply(1:nfleets, function(x){
-        rnorm(tyears, mean = -(SigmaC[x] ^ 2) / 2, sd = SigmaC[x])
+        rnorm(Nyears, mean = -(SigmaC[x] ^ 2) / 2, sd = SigmaC[x])
       }))
 
 
@@ -96,15 +90,15 @@ sim_pop <-
       if (Rdynamics == "Pulsed"){
         choose <- sample(1:2, 1)
         R_t <- c(
-          "initial" = rep(R0, floor(tyears / 3)),
-          "pulse1" = rep(ifelse(choose==1, (R0 / 2), (R0 * 2)), floor(tyears / 3)),
-          "pulse2" = rep(ifelse(choose==1, (R0 *2), (R0 / 2)), tyears - (2 * floor(tyears / 3)))
+          "initial" = rep(R0, floor(Nyears / 3)),
+          "pulse1" = rep(ifelse(choose==1, (R0 / 2), (R0 * 2)), floor(Nyears / 3)),
+          "pulse2" = rep(ifelse(choose==1, (R0 *2), (R0 / 2)), Nyears - (2 * floor(Nyears / 3)))
         ) * exp(RecDev_AR)
         # R_t[which(RecDev_AR==0)] <- 0
       }
 
       if (Rdynamics == "Constant") {
-        R_t <- (rep(R0, tyears)) * exp(RecDev_AR)
+        R_t <- (rep(R0, Nyears)) * exp(RecDev_AR)
         # R_t[which(RecDev_AR==0)] <- 0
       }
 
@@ -170,7 +164,7 @@ sim_pop <-
       if(length(Fdynamics)==1 & nfleets>1) Fdynamics <- rep(Fdynamics, nfleets)
       
       ## fishing mortality dynamics
-      F_ft <- matrix(NA, nrow=nfleets, ncol=tyears)
+      F_ft <- matrix(NA, nrow=nfleets, ncol=Nyears)
       if(any(Fdynamics=="Constant")){
         index <- which(Fdynamics=="Constant")
         for(i in 1:length(index)){
@@ -192,22 +186,22 @@ sim_pop <-
       if (any(Fdynamics == "None")){
         index <- which(Fdynamics=="None")
         for(i in 1:length(index)){
-          F_ft[index[i],] <- rep(0, tyears) * exp(FishDev_f[index[i],])
+          F_ft[index[i],] <- rep(0, Nyears) * exp(FishDev_f[index[i],])
         }
       }
 
       ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
-      F_atf <- array(NA, dim=c(length(ages), tyears, nfleets))
+      F_atf <- array(NA, dim=c(length(ages), Nyears, nfleets))
       for(f in 1:nfleets){
-        for(t in 1:tyears){
+        for(t in 1:Nyears){
           for(a in 1:length(ages)){
             F_atf[a,t,f] <- F_ft[f,t] * S_fa[f,a]
           }
         }
       }
 
-      F_at <- matrix(NA, nrow=length(ages), ncol=tyears)
-      for(t in 1:tyears){
+      F_at <- matrix(NA, nrow=length(ages), ncol=Nyears)
+      for(t in 1:Nyears){
         for(a in 1:length(ages)){
           F_at[a,t] <- sum(F_atf[a,t,])
         }
@@ -219,7 +213,7 @@ sim_pop <-
       ##########################
 
       ## year 1 abundance at age
-      N_at <- N_at0 <- matrix(NA, nrow = length(L_a), ncol = tyears)
+      N_at <- N_at0 <- matrix(NA, nrow = length(L_a), ncol = Nyears)
       for (a in 1:length(L_a)) {
         if (a == 1) {
           N_at[a, 1] <- R_t[1]
@@ -236,7 +230,7 @@ sim_pop <-
       }
 
       ## year 1 biomass quantities
-      TB_t <- SB_t <- rep(NA, tyears)
+      TB_t <- SB_t <- rep(NA, Nyears)
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
 
@@ -246,21 +240,21 @@ sim_pop <-
       # }
 
       ## year 1 catch
-      Cn_atf <- Cw_atf <- array(NA, c(length(L_a), tyears, nfleets))
+      Cn_atf <- Cw_atf <- array(NA, c(length(L_a), Nyears, nfleets))
       for(f in 1:nfleets){
         Cn_atf[,1,f] <- N_at[,1] * (1 - exp(-M - F_atf[,1,f])) * (F_atf[,1,f] / (M + F_atf[a,1,f]))
         Cw_atf[,1,f] <- Cn_atf[,1,f] * W_a
       }
 
       ## unfished spawning biomass
-      SB0 <- sum(R0 * exp(-M * nseasons * ages[which(ages %% 1 ==0)]) * W_a[which(ages %% 1 ==0)] * Mat_a[which(ages %% 1 ==0)])      
+      SB0 <- sum(calc_equil_abund(ages=ages, M=M, F=0, R0=R0, S_fa=S_fa) * W_a * Mat_a)      
 
 
       ##########################
       ## Projection
       ##########################
 
-      for (t in 2:tyears) {
+      for (t in 2:Nyears) {
         ## fishing effort based on spawning biomass
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
@@ -314,7 +308,7 @@ sim_pop <-
 
       F_ft <- t(sapply(1:nfleets, function(x){
         sub <- F_atf[,,x]
-        findMax <- sapply(1:tyears, function(y){
+        findMax <- sapply(1:Nyears, function(y){
           sub2 <- sub[,y]
           return(max(sub2))
         })
@@ -340,7 +334,7 @@ sim_pop <-
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
 
           F_fy <- t(sapply(1:nfleets, function(y){
-              sapply(1:tyears_real, function(x) {
+              sapply(1:Nyears_real, function(x) {
                 if (nseasons == 1)
                   time_index <- x
                 if (nseasons > 1)
@@ -352,10 +346,10 @@ sim_pop <-
 
       if(pool==FALSE) N_t <- colSums(N_at[-1,])
       if(pool==TRUE){
-          N_t <- colSums(N_at[-1, which(1:tyears %% nseasons == 0)])
-          SB_t <- SB_t[which(1:tyears %% nseasons == 0)]
-          TB_t <- TB_t[which(1:tyears %% nseasons == 0)]
-          SPR_t <- SPR_t[which(1:tyears %% nseasons == 0)]
+          N_t <- colSums(N_at[-1, which(1:Nyears %% nseasons == 0)])
+          SB_t <- SB_t[which(1:Nyears %% nseasons == 0)]
+          TB_t <- TB_t[which(1:Nyears %% nseasons == 0)]
+          SPR_t <- SPR_t[which(1:Nyears %% nseasons == 0)]
 
           Cn_ft <- t(sapply(1:nfleets, function(y){
               sapply(1:Nyears_real, function(x) {
@@ -379,7 +373,7 @@ sim_pop <-
           Cw_t <- colSums(Cw_ft)     
 
           F_ft <- t(sapply(1:nfleets, function(y){
-              sapply(1:tyears_real, function(x) {
+              sapply(1:Nyears_real, function(x) {
                 if (nseasons == 1)
                   time_index <- x
                 if (nseasons > 1)
@@ -389,7 +383,7 @@ sim_pop <-
           }))
           F_t <- colSums(F_ft)  
 
-          R_t <- sapply(1:tyears_real, function(x) {
+          R_t <- sapply(1:Nyears_real, function(x) {
             if (nseasons == 1)
               time_index <- x
             if (nseasons > 1)
@@ -410,15 +404,15 @@ sim_pop <-
       if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
 
       ## years with observed length comps
-      oyears_mat <- matrix(0, nrow=nfleets, ncol=tyears)
+      oyears_mat <- matrix(0, nrow=nfleets, ncol=Nyears)
       for(f in 1:nfleets){
-        oyears <- (tyears-Nyears_comp[f] + 1):tyears
+        oyears <- (Nyears-Nyears_comp[f] + 1):Nyears
         oyears_mat[f,oyears] <- 1
       }
 
-      obs_per_year <- matrix(0, nrow=nfleets, ncol=tyears)
+      obs_per_year <- matrix(0, nrow=nfleets, ncol=Nyears)
       for(f in 1:nfleets){
-        for(t in 1:tyears){
+        for(t in 1:Nyears){
           if(oyears_mat[f,t]!=0) obs_per_year[f,t] <- (comp_sample/nseasons)
         }
       }
@@ -427,7 +421,7 @@ sim_pop <-
         AgeToLengthComp(
           lh = lh,
           S_a = lh$S_fa[x,],
-          tyears = tyears,
+          tyears = Nyears,
           N_at = N_at,
           comp_sample = obs_per_year[x,],
           sample_type = sample_type
@@ -437,7 +431,7 @@ sim_pop <-
         AgeToLengthComp(
           lh = lh,
           S_a = lh$S_fa[x,],
-          tyears = tyears,
+          tyears = Nyears,
           N_at = N_at0,
           comp_sample = obs_per_year[x,],
           sample_type = sample_type
@@ -452,8 +446,8 @@ sim_pop <-
       LF_tf <- LF0_tf <- NULL
       if (pool == TRUE) {
         for(f in 1:nfleets){
-          LF_tf[[f]] <- LF0_tf[[f]] <- matrix(NA, nrow=tyears, ncol=ncol(LF[[1]]))
-         for (y in 1:tyears) {
+          LF_tf[[f]] <- LF0_tf[[f]] <- matrix(NA, nrow=Nyears, ncol=ncol(LF[[1]]))
+         for (y in 1:Nyears) {
             if (nseasons == 1) {
               LF_tf[[f]][y,] <- LF[[f]][y,]
               LF0_tf[[f]][y,] <- LF0[[f]][y,]
@@ -465,7 +459,7 @@ sim_pop <-
             }
           }
           obs_per_year <- t(sapply(1:nfleets, function(y){
-            sapply(1:tyears_real, function(x) {
+            sapply(1:Nyears_real, function(x) {
               if (nseasons == 1)
                 time_index <- x
               if (nseasons > 1)
@@ -483,8 +477,8 @@ sim_pop <-
         colnames(LF_tf[[f]]) <- mids
         colnames(LF0_tf[[f]]) <- mids
         if(pool==TRUE){
-          rownames(LF_tf[[f]]) <- 1:tyears_real
-          rownames(LF0_tf[[f]]) <- 1:tyears_real
+          rownames(LF_tf[[f]]) <- 1:Nyears_real
+          rownames(LF0_tf[[f]]) <- 1:Nyears_real
         }
       }
 
@@ -492,20 +486,20 @@ sim_pop <-
       ########################################################
       ## Expected mean length in catch
       ########################################################
-      ML_ft <- matrix(NA, nrow=nfleets, ncol=tyears)
+      ML_ft <- matrix(NA, nrow=nfleets, ncol=Nyears)
       for(f in 1:nfleets){
-        for (t in 1:tyears) {
+        for (t in 1:Nyears) {
           vul_pop <- sum(N_at[, t] * S_fa[f,])
           vul_lengths <- sum(vul_pop * plb[[f]][t,] * mids)
           ML_ft[f,t] <- vul_lengths / vul_pop
         }
       }
-      if (pool == TRUE) ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:tyears %% nseasons == 0)]))
+      if (pool == TRUE) ML_ft <- t(sapply(1:nfleets, function(x) ML_ft[x,which(1:Nyears %% nseasons == 0)]))
 
-      lh$plb <- lapply(1:length(plb), function(x) plb[[x]][-c(1:nburn),])
+      lh$plb <- lapply(1:length(plb), function(x) plb[[x]])
       lh$plba <- plba
-      lh$page <- lapply(1:length(page), function(x) page[[x]][-c(1:nburn),])
-      lh$N_at <- N_at[,-c(1:nburn)]
+      lh$page <- lapply(1:length(page), function(x) page[[x]])
+      lh$N_at <- N_at
       lh$nlbins <- length(mids)
       if (pool == TRUE) {
         lh$Nyears <- Nyears_real
@@ -515,23 +509,23 @@ sim_pop <-
         lh$Nyears <- Nyears
         lh$years <- 1:Nyears
       }
-      obs_per_year <- matrix(obs_per_year[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
+      obs_per_year <- matrix(obs_per_year, nrow=nfleets, ncol=Nyears)
       colnames(obs_per_year) <- 1:Nyears
       lh$obs_per_year <- obs_per_year
       lh$RecDev <- RecDev_AR
-      lh$FishDev_f <- matrix(FishDev_f[,-c(1:nburn_real)], nrow=nfleets, ncol=Nyears_real)
+      lh$FishDev_f <- matrix(FishDev_f, nrow=nfleets, ncol=Nyears_real)
       lh$SB0 <- SB0
-      lh$F_ft <- matrix(F_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
-      lh$F_fy <- matrix(F_fy[,-c(1:nburn_real)], nrow=nfleets, ncol=Nyears_real)
+      lh$F_ft <- matrix(F_ft, nrow=nfleets, ncol=Nyears)
+      lh$F_fy <- matrix(F_fy, nrow=nfleets, ncol=Nyears_real)
 
       LF_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(mids))
+          sub <- matrix(LF_tf[[x]], nrow=Nyears_real, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(mids))
+          sub <- matrix(LF_ft[[x]], nrow=Nyears, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
@@ -539,12 +533,12 @@ sim_pop <-
       })
       LF0_tfout <- lapply(1:nfleets, function(x){
         if(pool==TRUE){
-          sub <- matrix(LF0_tf[[x]][-c(1:nburn_real),], nrow=Nyears_real, ncol=length(mids))
+          sub <- matrix(LF0_tf[[x]], nrow=Nyears_real, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF0_ft[[x]][-c(1:nburn),], nrow=Nyears, ncol=length(mids))
+          sub <- matrix(LF0_ft[[x]], nrow=Nyears, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
@@ -553,20 +547,20 @@ sim_pop <-
       lh$LF_tlf <- LF_tfout
       lh$LF0_tlf <- LF0_tfout
       lh$LF <- LF_tfout
-      lh$ML_ft <- matrix(ML_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
-      lh$R_t <- R_t[-c(1:nburn)]
-      lh$N_t <- N_t[-c(1:nburn)]
-      lh$SB_t <- SB_t[-c(1:nburn)]
-      lh$D_t <- D_t[-c(1:nburn)]
-      lh$SPR_t <- SPR_t[-c(1:nburn)]
+      lh$ML_ft <- matrix(ML_ft, nrow=nfleets, ncol=Nyears)
+      lh$R_t <- R_t
+      lh$N_t <- N_t
+      lh$SB_t <- SB_t
+      lh$D_t <- D_t
+      lh$SPR_t <- SPR_t
       lh$SPR <- SPR
-      lh$Cn_ft <- matrix(Cn_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
-      lh$Cw_ft <- matrix(Cw_ft[,-c(1:nburn)], nrow=nfleets,  ncol=Nyears) 
-      lh$F_t <- F_t[-c(1:nburn)]
-      lh$F_y <- F_y[-c(1:nburn_real)]
+      lh$Cn_ft <- matrix(Cn_ft, nrow=nfleets, ncol=Nyears)
+      lh$Cw_ft <- matrix(Cw_ft, nrow=nfleets,  ncol=Nyears) 
+      lh$F_t <- F_t
+      lh$F_y <- F_y
       lh$F40 <- F40
       lh$Fmax <- Fmax
-      lh$I_ft <- matrix(I_ft[,-c(1:nburn)], nrow=nfleets, ncol=Nyears)
+      lh$I_ft <- matrix(I_ft, nrow=nfleets, ncol=Nyears)
       lh$fleet_proportions <- fleet_proportions
 
 
