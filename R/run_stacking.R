@@ -1,3 +1,18 @@
+#' Run stacking algorithm
+#'
+#' \code{run_stacking} runs stacking algorithm for length-based stock assessment methods given quadrature nodes
+#' @author M.B. Rudd
+#' @param modpath, the directory to save results
+#' @param iter, the iteration for a simulation study, default=NULL for an assessment
+#' @param lh, the life history list output from LIME::create_lh_list
+#' @param model, "LIME" or "LBSPR"
+#' @param nodes, data frame of nodes mapped to life history parameters, number of rows = number of nodes, number of columns = life history parameter K, Loo, M, Lm
+#' @param dim, "1D" to label 1-d stacking, "2D" to label 2-d stacking
+#' @param input_data, default=NULL for simulation study, data list following rules by LIME for regular assessment
+#' @importFrom stats uniroot optimize
+
+#' @return List, a tagged list of potentially useful benchmarks
+#' @export
 run_stacking <- function(modpath, iter=NULL, lh, model, nodes, dim, input_data=NULL){
 
 	if(all(is.null(iter))==FALSE){
