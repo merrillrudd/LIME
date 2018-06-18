@@ -63,7 +63,7 @@ runstack <- function(savedir,
 	}
 	if(simulation == FALSE){
 		if(all(is.null(input_data))) stop("Must specify input data list with at least years and Length frequency matrix (array or list for multi-fleet)")
-		if(is.null(iter)==FALSE | is.null(seed)==FALSE | is.null(Fscenario)==FALSE | is.null(Nyears)==FALSE) warning("Ignoring iter, seed, and Fscenario when simulation==FALSE")
+		if(is.null(iter)==FALSE | is.null(seed)==FALSE | is.null(Fscenario)==FALSE) warning("Ignoring iter, seed, and Fscenario when simulation==FALSE")
 		iterpath <- file.path(savedir)
 		dir.create(iterpath, showWarnings=FALSE)
 	}
@@ -352,7 +352,7 @@ runstack <- function(savedir,
 				LB_pars@BinMin <- 0
 				LB_pars@BinMax <- input$linf * 1.3
 
-				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
+				lbspr_res <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths, na.rm=TRUE)
 				saveRDS(lbspr_res, file.path(iterpath, paste0("res_Means_LBSPR_",taxon,".rds")))	
 		}
 	}	
