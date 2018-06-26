@@ -99,7 +99,10 @@ for(iter in 1:length(itervec)){
     if(simulation==FALSE & is.null(modpath)) iterpath <- NULL
 
     if(rewrite==FALSE & is.null(modpath)==FALSE){
-      if(file.exists(file.path(iterpath, "LIME_output.rds"))) next
+      if(file.exists(file.path(iterpath, "LIME_output.rds"))){
+        output <- readRDS(file.path(iterpath, "LIME_output.rds"))
+        next
+      }
     }
 
     if(rewrite==TRUE & is.null(modpath)==FALSE){
@@ -295,14 +298,6 @@ for(iter in 1:length(itervec)){
 
 
 
-# FUN <- function(InputMat, log=TRUE, rel=FALSE){
-#           index <- which(is.na(InputMat[,2])==FALSE)
-#           if(log==TRUE) return(c( exp(InputMat[index,1]-1.96*InputMat[index,2]), rev(exp(InputMat[index,1]+1.96*InputMat[index,2]))))
-#           if(log==FALSE) return(c( InputMat[index,1]-1.96*InputMat[index,2], rev(InputMat[index,1]+1.96*InputMat[index,2])))
-# } 
-#   plot(Report$F_t, lwd=2, col="blue", ylim=c(0, max(Report$F_t)*1.5), type="l")
-#   polygon( y=FUN(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),], log=TRUE), x=c(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE), rev(which(is.na(summary(Sdreport)[which(rownames(summary(Sdreport))=="lF_t"),2])==FALSE))), col=rgb(0,0,1,alpha=0.2), border=NA)
-
       ## can calculate derived quants later if you want
       output$obj <- obj_save
       output$opt <- opt_save
@@ -324,7 +319,16 @@ for(iter in 1:length(itervec)){
         rm(obj_save)
   }
 
-  if(is.null(modpath)==FALSE) saveRDS(output, file.path(iterpath, "LIME_output.rds"))
+  if(is.null(modpath)==FALSE){
+    if(rewrite==TRUE | file.exists(file.path(iterpath, "LIME_output.rds"))==FALSE){
+      saveRDS(output, file.path(iterpath, "LIME_output.rds"))
+    }
+    if(rewrite==FALSE){
+      output <- readRDS(file.path(iterpath, "LIME_output.rds"))
+    }
+  }
+
   return(output)
+
 
 }
