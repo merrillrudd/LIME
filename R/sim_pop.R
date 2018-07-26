@@ -317,7 +317,7 @@ sim_pop <-
       F_t <- colSums(F_ft)
 
 
-      SBPR_t <-
+      SPR_t <-
         sapply(1:length(F_t), function(x)
           calc_ref(
             ages = ages,
@@ -328,20 +328,7 @@ sim_pop <-
             F = F_t[x],
             type="SBPR"
           ))
-      SBPR <- SBPR_t[length(SBPR_t)]
-      SPR_t <-
-        sapply(1:length(F_t), function(x)
-          calc_ref(
-            ages = ages,
-            Mat_a = Mat_a,
-            W_a = W_a,
-            M = M,
-            S_fa = S_fa,
-            F = F_t[x],
-            type="SPR"
-          ))
       SPR <- SPR_t[length(SPR_t)]
-
 
       Cn_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x])))
       Cw_ft <- t(sapply(1:nfleets, function(x) colSums(Cn_atf[,,x] * W_a)))
@@ -363,7 +350,6 @@ sim_pop <-
           SB_t <- SB_t[which(1:Nyears %% nseasons == 0)]
           TB_t <- TB_t[which(1:Nyears %% nseasons == 0)]
           SPR_t <- SPR_t[which(1:Nyears %% nseasons == 0)]
-          SBPR_t <- SBPR_t[which(1:Nyears %% nseasons == 0)]
 
           Cn_ft <- t(sapply(1:nfleets, function(y){
               sapply(1:Nyears_real, function(x) {
@@ -568,8 +554,6 @@ sim_pop <-
       lh$D_t <- D_t
       lh$SPR_t <- SPR_t
       lh$SPR <- SPR
-      lh$SBPR_t <- SBPR_t
-      lh$SBPR <- SBPR
       lh$Cn_ft <- matrix(Cn_ft, nrow=nfleets, ncol=Nyears)
       lh$Cw_ft <- matrix(Cw_ft, nrow=nfleets,  ncol=Nyears) 
       lh$F_t <- F_t
