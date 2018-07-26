@@ -259,8 +259,10 @@ if("SB" %in% plot){
 }
     
 if("Selex" %in% plot){
+  mids <- Inputs$Data$lbmids
 
 plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
+
   if(all(is.null(LBSPR))==FALSE){
     for(i in 1:length(xLC_lbspr)){
       SL50 <- LBSPR$SL50[i]
@@ -284,7 +286,6 @@ plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Sele
     }
   }
 
-  mids <- Inputs$Data$lbmids
   if(all(is.null(Report))==FALSE){
     if(nf>1){
       colfn <- colorRampPalette(c("red","blue"))
