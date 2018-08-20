@@ -27,7 +27,6 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 	if(all(is.null(Inputs))==FALSE){
 		LF_array <- Inputs$Data$LF_tlf
 		LF_df <- LFreq_df(LF_array)
-		LF_df$Year <- factor(LF_df$Year)
 		bins <- as.numeric(colnames(LF_array))
 		bw <- bins[1]
 	}
@@ -35,13 +34,13 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 	nyears <- length(years)
 	n_yr <- rep(0, nyears)
 	for(i in 1:nyears){
-		sub <- LF_df %>% filter(Year==years[i])
+		sub <- LF_df %>% dplyr::filter(Year==years[i])
 		n_yr[i] <- nrow(sub)
 	}
 
 	nf <- length(unique(LF_df$Fleet))
 	LCyrs <- lapply(1:nf, function(x){
-		sub <- LF_df %>% filter(Fleet==x)
+		sub <- LF_df %>% dplyr::filter(Fleet==x)
 		yrs <- unique(sub$Year)[order(unique(sub$Year))]
 		return(yrs)
 	})
@@ -92,64 +91,17 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 		LF2_new <- NULL
 	}
 
+p <- qplot(data = LF_df,
+      x = Length,
+      y = ..count../sum(..count..),
+      color = Fleet,
+      fill = Fleet,
+      geom = "histogram",
+      binwidth = bw) + 
+	facet_wrap(~Year) +
+	xlab("Length bin (cm)") + ylab("Proportion")
+if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
+p
 
-p <- ggplot(LF_df) + 
-	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=5) +
-	scale_fill_brewer(palette="Set1") +
-	facet_wrap(Year, ncol=5, dir="v", scale="free_y") +
-	ylab("Proportion") + xlab("Length bin (cm)") +
-	mytheme()
-
-
-	par(mfcol=dim, mar=c(0,0,0,0), omi=c(1,1,1,0.2))
-
-	if(nf>1){
-      colfn <- colorRampPalette(c("red","blue"))
-      cols <- colfn(nf)
-    }
-    if(nf==1) cols <- "#228B22"
-
-	if(all(is.null(ylim))) ylim <- c(0, 0.1)
-		xlim <- c(min(bins), max(bins))
-	for(i in 1:length(seq_along(all_lc_years))){
-		yr <- i
-		for(f in 1:nf){
-			if(f==1){
-				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
-				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
-				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
-					lines(x=bins, y=LF2_new[which(as.numeric(rownames(LF2_new))==yr),], col="#AA00AA", lwd=4)
-				box()
-			}
-			if(f>1 & all_lc_years[yr] %in% LCyrs[[f]]){
-				par(new=TRUE)
-				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, col=paste0(cols[f],"50"), xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim)
-				if(sum(LFlist[[f]][yr,])>0){
-					if(length(Tyrs)>1) lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[f], lwd=4)
-					if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[f], lwd=4)
-				}
-			}
-		}
-
-			# xlabs <- pretty(seq_along(bins))
-			# plot_labs <- rep(NA, length(xlabs))
-			# if(xlabs[1]!=0) warning("Should start length bin labels at 0")
-			# plot_labs[1] <- 0
-			# elabs <- as.numeric(lbhighs[xlabs][which(is.na(lbhighs[xlabs])==FALSE)])
-			# plot_labs[2:(length(elabs)+1)] <- elabs
-			# if(is.na(plot_labs[length(plot_labs)])) plot_labs[length(plot_labs)] <- max(elabs) + elabs[1]	
-
-			if(i %% dim[1] == 0 | i==length(all_lc_years)) axis(1, cex.axis=2)
-			if(i %in% 1:dim[1]) axis(2, at=pretty(ylim), las=2, cex.axis=2)
-			if(all(is.null(true_years))==FALSE & length(true_years)!=length(true_years)){
-				mtext(side=3, true_years[i], font=2, cex=2, line=-2)
-				warning("Input years for length composition data do not match number of years in analysis")
-			}
-			# if(all(is.null(true_years))) mtext(side=3, line=-3, true_years[i], font=2, cex=2)
-			mtext(side=3, line=-2, true_years[i], font=2)
-			if(n==TRUE) mtext(side=3, line=-3.5, paste0("n = ", n_yr[i]))
-		}
-	mtext(side=1, "Length bin (cm)", outer=TRUE, line=4, cex=1.5)
-	mtext(side=2, "Proportion", outer=TRUE, line=5, cex=1.5)
-
+return(p)
 }
