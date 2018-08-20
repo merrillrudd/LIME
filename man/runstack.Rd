@@ -7,7 +7,8 @@
 runstack(savedir, nodes, param, mean, cov, taxon, dim, data_avail = "LC",
   max_gradient = 0.001, C_type = 0, LFdist = 1, rewrite = TRUE,
   input_data = NULL, simulation = FALSE, iter = NULL, seed = NULL,
-  Fscenario = NULL, Nyears = NULL, model = "LIME", sim_model = "LIME")
+  Fscenario = NULL, Nyears = NULL, model = "LIME",
+  sim_model = "LIME")
 }
 \arguments{
 \item{savedir}{directory to save results}
@@ -57,4 +58,3 @@ prints how many iterations were run in model directory
 \author{
 M.B. Rudd
 }
-

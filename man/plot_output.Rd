@@ -4,9 +4,10 @@
 \alias{plot_output}
 \title{plot LIME output}
 \usage{
-plot_output(Inputs = NULL, Report = NULL, Sdreport = NULL, LBSPR = NULL,
-  lh, true_years = NULL, True = NULL, plot = c("Fish", "Rec", "SPR", "ML",
-  "SB", "Selex"), set_ylim = list(SPR = c(0, 1)), legend = FALSE)
+plot_output(Inputs = NULL, Report = NULL, Sdreport = NULL,
+  LBSPR = NULL, lh, true_years = NULL, True = NULL,
+  plot = c("Fish", "Rec", "SPR", "ML", "SB", "Selex"),
+  set_ylim = list(SPR = c(0, 1)), legend = FALSE)
 }
 \arguments{
 \item{Inputs}{LIME input file}
@@ -36,4 +37,3 @@ figure with length composition data and model fits if Report or LBSPR are specif
 \author{
 M.B. Rudd
 }
-

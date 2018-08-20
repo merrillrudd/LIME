@@ -20,4 +20,3 @@ vector of directory paths
 \author{
 M.B. Rudd
 }
-

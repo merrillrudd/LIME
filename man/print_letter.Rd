@@ -22,4 +22,3 @@ text on a figure panel
 \author{
 T.A. Branch
 }
-

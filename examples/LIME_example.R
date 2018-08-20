@@ -4,9 +4,11 @@ rm(list=ls())
 
 devtools::install_github("merrillrudd/LIME")
 library(LIME)
+library(dplyr)
+library(ggplot2)
 
-devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
-library(TMBhelper)
+devtools::install_github("merrillrudd/RuddR")
+library(RuddR)
 
 ###************************************
 ## Section 1: Single fleet
@@ -77,7 +79,6 @@ true <- generate_data(modpath=NULL,
 					  seed=123,
 					  fleet_proportions=1)
 
-
 ## plot simulated data
 par(mfrow=c(3,2))
 plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
@@ -100,14 +101,20 @@ for(f in 1:lh$nfleets){
 #######################################
 ## Length comp data input options
 #######################################
-## Option 1: Length comp array
+## Option 1: Length comp matrix
+LF_matrix <- true$LF[,,1] ## matrix with rows = years, columns = upper length bins, no 3rd dimension due to only 1 fleet
+
+## Option 2: Length comp array
 LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd dimension = fleets
 
-## Option 2: Length comp list
+## Option 3: Length comp list
 LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
 
+## convert matrix, array, or list to data frame
+LF_df <- LFreq_df(LF=LF_list)
+
 	## plot length composition data using LF_list
-	plot_LCfits(LFlist=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+	plot_LCfits(LF_df=LF_df) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
 ## example with length data only
 data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
@@ -150,6 +157,7 @@ hessian <- Sdreport$pdHess
 gradient <- rich$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+
 ##----------------------------------------------------
 ## Step 4: Plot results
 ## ---------------------------------------------------
@@ -191,6 +199,27 @@ gradient <- lc_only$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
 
+## LBSPR
+library(LBSPR)
+LB_pars <- new("LB_pars")
+LB_pars@MK <- inputs_all$M/inputs_all$vbk
+LB_pars@Linf <- inputs_all$linf
+LB_pars@L50 <- inputs_all$ML50
+LB_pars@L95 <- inputs_all$ML95
+LB_pars@Walpha <- inputs_all$lwa
+LB_pars@Wbeta <- inputs_all$lwb
+LB_pars@R0 <- inputs_all$R0
+LB_pars@Steepness <- ifelse(inputs_all$h==1, 0.99, inputs_all$h)
+LB_pars@BinWidth <- inputs_all$binwidth
+
+LB_lengths <- new("LB_lengths")
+LB_lengths@LMids <- inputs_all$mids
+LB_lengths@LData <- t(matrix(inputs_all$LF, ncol=length(inputs_all$mids)))
+LB_lengths@Years <- as.numeric(rownames(inputs_all$LF))
+LB_lengths@NYears <- ncol(LB_lengths@LData)
+
+lbspr <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
+
 ## plot length composition data
 plot_LCfits(LFlist=LF_list, 
 			Inputs=Inputs, 
@@ -202,8 +231,13 @@ plot_output(Inputs=Inputs,
 			Sdreport=Sdreport, 
 			lh=lh,
 			True=true, 
+			LBSPR=lbspr,
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("Fish" =c(0,1), "SPR" = c(0,1), "SB"=c(0,2)))		
+			set_ylim=list("Fish" =c(0,1), "SPR" = c(0,1), "SB"=c(0,2)))	
+
+
+
+
 
 ## but it looks like F is allowed to vary too much between years, so let's try adjusting SigmaF lower
 inputs_LC$SigmaF <- 0.1 ## adjusted down from 0.2

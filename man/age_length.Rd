@@ -24,4 +24,3 @@ matrix - probability of being in a length bin given age
 \author{
 M.B. Rudd
 }
-

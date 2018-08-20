@@ -5,8 +5,8 @@
 \title{TMB input formatting}
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
-  est_more, fix_more, est_F_ft, f_startval_ft, rdev_startval_t, est_selex_f,
-  vals_selex_ft, Rdet, mirror, est_totalF, prop_f)
+  est_more, fix_more, est_F_ft, f_startval_ft, rdev_startval_t,
+  est_selex_f, vals_selex_ft, Rdet, mirror, est_totalF, prop_f)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -54,4 +54,3 @@ List, a tagged list of Data, Parameters, Random, Map
 \author{
 M.B. Rudd
 }
-

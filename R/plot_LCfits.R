@@ -3,7 +3,7 @@
 #' \code{plot_LCfits} plot length composition data with option for model fits from LIME and LB-SPR
 #'
 #' @author M.B. Rudd
-#' @param LFlist list of length frequency matrices
+#' @param LF_df list of length frequency matrices
 #' @param Inputs LIME input file; default NULL if only plotting length data
 #' @param Report LIME report file; default NULL if only plotting length data
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
@@ -16,39 +16,37 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, dim=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, dim=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
-		LFlist=LFlist
-		bins <- as.numeric(colnames(LFlist[[1]]))
-		bw <- bins[2] - bins[1]
+		lengths <- unique(LF_df$Length)[order(unique(LF_df$Length))]
+		bw <- binwidth
+		bins <- seq(bw, max(lengths), by=bw)
 	}
 	if(all(is.null(Inputs))==FALSE){
 		LF_array <- Inputs$Data$LF_tlf
-		LFlist <- list()
-		for(i in 1:Inputs$Data$n_f){
-			LFlist[[i]] <- matrix(LF_array[,,i], nrow=nrow(LF_array), ncol=ncol(LF_array))
-			colnames(LFlist[[i]]) <- colnames(LF_array)
-			rownames(LFlist[[i]]) <- rownames(LF_array)
-		}
+		LF_df <- LFreq_df(LF_array)
+		LF_df$Year <- factor(LF_df$Year)
 		bins <- as.numeric(colnames(LF_array))
 		bw <- bins[1]
 	}
-	n_yr <- rep(0, nrow(LFlist[[1]]))
-	for(i in 1:length(LFlist)){
-		n_yr <- n_yr + rowSums(LFlist[[i]])
+	years <- unique(LF_df$Year)[order(unique(LF_df$Year))]
+	nyears <- length(years)
+	n_yr <- rep(0, nyears)
+	for(i in 1:nyears){
+		sub <- LF_df %>% filter(Year==years[i])
+		n_yr[i] <- nrow(sub)
 	}
 
-	nf <- length(LFlist)
+	nf <- length(unique(LF_df$Fleet))
 	LCyrs <- lapply(1:nf, function(x){
-		rownames(LFlist[[x]])[which(rowSums(LFlist[[x]]) > 0)]
+		sub <- LF_df %>% filter(Fleet==x)
+		yrs <- unique(sub$Year)[order(unique(sub$Year))]
+		return(yrs)
 	})
-	lbhighs <- as.numeric(colnames(LFlist[[1]]))
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
 	if(all(is.null(true_years))) true_years <- all_lc_years
-
-	if(all(is.null(dim))) dim <- c(ceiling(sqrt(length(all_lc_years))), ceiling(sqrt(length(all_lc_years))))
 
 
 	if(all(is.null(Inputs))) Tyrs <- all_lc_years
@@ -95,6 +93,14 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 	}
 
 
+p <- ggplot(LF_df) + 
+	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=5) +
+	scale_fill_brewer(palette="Set1") +
+	facet_wrap(Year, ncol=5, dir="v", scale="free_y") +
+	ylab("Proportion") + xlab("Length bin (cm)") +
+	mytheme()
+
+
 	par(mfcol=dim, mar=c(0,0,0,0), omi=c(1,1,1,0.2))
 
 	if(nf>1){
@@ -109,7 +115,7 @@ plot_LCfits <- function(LFlist=NULL, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=
 		yr <- i
 		for(f in 1:nf){
 			if(f==1){
-				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), type="h", lwd=5, xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
+				plot(x=bins, y=as.numeric(LFlist[[f]][yr,]/sum(LFlist[[f]][yr,])), xlim=xlim, xaxs="i", yaxs="i", xaxt="n", yaxt="n", ylim=ylim, col=paste0(cols[1],"50"))
 				if(length(Tyrs)>1)	lines(x=bins, y=pred[[f]][which(Tyrs==yr),], col=cols[1], lwd=4)
 				if(length(Tyrs)==1) lines(x=bins, y=pred[[f]], col=cols[1], lwd=4)
 					lines(x=bins, y=LF2_new[which(as.numeric(rownames(LF2_new))==yr),], col="#AA00AA", lwd=4)

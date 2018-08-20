@@ -23,4 +23,3 @@ Specifically used to merge life history information with other model settings; f
 \author{
 M.B. Rudd
 }
-

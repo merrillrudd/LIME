@@ -26,4 +26,3 @@ vector of expected abundance at age
 \author{
 M.B. Rudd
 }
-

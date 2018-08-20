@@ -25,4 +25,3 @@ prints how many iterations were run in model directory
 \author{
 M.B. Rudd
 }
-

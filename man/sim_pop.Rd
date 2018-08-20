@@ -42,4 +42,3 @@ named list of attributes of true population/data
 \author{
 M.B. Rudd
 }
-

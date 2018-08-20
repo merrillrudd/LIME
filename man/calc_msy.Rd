@@ -28,4 +28,3 @@ yield per recruit, in biomass
 \author{
 M.B. Rudd
 }
-

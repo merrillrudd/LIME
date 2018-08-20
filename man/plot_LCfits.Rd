@@ -4,11 +4,12 @@
 \alias{plot_LCfits}
 \title{plot length composition data and model fits}
 \usage{
-plot_LCfits(LFlist = NULL, Inputs = NULL, Report = NULL, LBSPR = NULL,
-  ylim = NULL, dim = NULL, n = FALSE, true_years = NULL)
+plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
+  Report = NULL, LBSPR = NULL, ylim = NULL, dim = NULL,
+  n = FALSE, true_years = NULL)
 }
 \arguments{
-\item{LFlist}{list of length frequency matrices}
+\item{LF_df}{list of length frequency matrices}
 
 \item{Inputs}{LIME input file; default NULL if only plotting length data}
 
@@ -33,4 +34,3 @@ figure with length composition data and model fits if Report or LBSPR are specif
 \author{
 M.B. Rudd
 }
-

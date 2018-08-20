@@ -4,8 +4,8 @@
 \alias{generate_data}
 \title{Generate data for simulation testing}
 \usage{
-generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE, Nyears,
-  Nyears_comp, comp_sample, rewrite = TRUE, init_depl,
+generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE,
+  Nyears, Nyears_comp, comp_sample, rewrite = TRUE, init_depl,
   derive_quants = FALSE, seed, mgt_type = "F", fleet_proportions = 1)
 }
 \arguments{
@@ -48,4 +48,3 @@ print how many iterations were written into the model directory
 \author{
 M.B. Rudd
 }
-

@@ -4,7 +4,7 @@
 \alias{calc_ref}
 \title{Per recruit calculation and spawning potential ratio}
 \usage{
-calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, type = "SPR")
+calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, type = "SBPR")
 }
 \arguments{
 \item{ages}{vector of ages}
@@ -35,4 +35,3 @@ Use this function with uniroot to find the value of F that results in SPR matchi
 \author{
 M.B. Rudd
 }
-

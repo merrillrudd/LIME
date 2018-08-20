@@ -28,4 +28,3 @@ use newtons method to find instantaneous f
 \author{
 s.j.d. martell
 }
-
