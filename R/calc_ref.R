@@ -28,7 +28,7 @@ calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE, type="SBPR"){
         Fish <- sum(Naf*Mat_a*W_a)
     }
     if(type=="SPR"){
-        NoFish <- sum(Na0*Mat_a*W_a*Mat_a*W_a)
+        Nofish <- sum(Na0*Mat_a*W_a*Mat_a*W_a)
         Fish <- sum(Naf*Mat_a*W_a*Mat_a*W_a)
     }
     if(type=="Biomass" | type=="biomass"){
