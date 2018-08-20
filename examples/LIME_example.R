@@ -4,11 +4,7 @@ rm(list=ls())
 
 devtools::install_github("merrillrudd/LIME")
 library(LIME)
-library(dplyr)
 library(ggplot2)
-
-devtools::install_github("merrillrudd/RuddR")
-library(RuddR)
 
 ###************************************
 ## Section 1: Single fleet
@@ -32,7 +28,7 @@ lh <- create_lh_list(vbk=0.21,
 					 M=0.27, 
 					 binwidth=1,
 					 CVlen=0.1,
-					 SigmaR=0.737,
+					 SigmaR=0.6,
 					 SigmaF=0.2,
 					 SigmaC=0.1,
 					 SigmaI=0.1,
@@ -113,14 +109,18 @@ LF_list <- lapply(1:lh$nfleets, function(x) true$LF[,,x]) ##list with 1 element 
 ## convert matrix, array, or list to data frame
 LF_df <- LFreq_df(LF=LF_list)
 
-	## plot length composition data using LF_list
-	plot_LCfits(LF_df=LF_df) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
+	## plot length composition data using LF_df
+	plot_LCfits(LF_df=LF_df, binwidth=1) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
 
+
+#######################################
+## Create data input list
+#######################################
 ## example with length data only
-data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
+data_LF <- list("years"=1:true$Nyears, "LF"=LF_df)
 
 ##if using multinomial distribution, must specify annual effective sample size by fleet
-data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_per_year)
+data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_df, "neff_ft"=true$obs_per_year)
 
 ## create model inputs with life history information and data
 ## outputs length data as array
@@ -129,7 +129,7 @@ inputs_LC <- create_inputs(lh=lh, input_data=data_LF)
 #######################################
 ## Other data type input options
 #######################################
-data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
+data_all <- list("years"=1:true$Nyears, "LF"=LF_df, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
 inputs_all <- create_inputs(lh=lh, input_data=data_all)
 
 ##----------------------------------------------------
@@ -162,7 +162,7 @@ hessian == TRUE & gradient == TRUE
 ## Step 4: Plot results
 ## ---------------------------------------------------
 ## plot length composition data and fits
-plot_LCfits(LFlist=LF_list, 
+plot_LCfits(LF_df=LF_df, 
 			Inputs=Inputs, 
 			Report=Report)		
 
@@ -198,6 +198,29 @@ hessian <- Sdreport$pdHess
 gradient <- lc_only$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+check <- TMBhelper::Check_Identifiable(lc_only$obj)
+
+## narrow penalty on F
+inputs_LC_new <- inputs_LC
+inputs_LC_new$SigmaF <- 0.1
+
+lc_only2 <- run_LIME(modpath=NULL, 
+				input=inputs_LC_new,
+				data_avail="LC")
+
+## check TMB inputs
+Inputs <- lc_only2$Inputs
+
+## Report file
+Report <- lc_only2$Report
+
+## Standard error report
+Sdreport <- lc_only2$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- lc_only$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
 
 ## LBSPR
 library(LBSPR)
@@ -221,9 +244,10 @@ LB_lengths@NYears <- ncol(LB_lengths@LData)
 lbspr <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 
 ## plot length composition data
-plot_LCfits(LFlist=LF_list, 
+plot_LCfits(LF_df=LF_df, 
 			Inputs=Inputs, 
-			Report=Report)		
+			Report=Report,
+			LBSPR=lbspr)		
 
 ## plot model output
 plot_output(Inputs=Inputs, 
