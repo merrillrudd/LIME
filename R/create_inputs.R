@@ -80,34 +80,34 @@ create_inputs <- function(lh, input_data){
 
         ## make sure length bins from life history and observed data match
         if(is.data.frame(dat_input$LF)){
-            stop("Input data as length frequency matrix with years along rows and length bins along columns. For multiple fleets, input array where 3rd dimension is by fleet, or list with matrices of equal dimension and zeros for no observations. ")
-            # max_bin <- max(c(ceiling(max(length_raw$Value)*1.25)))
-            # mids <- seq(bins_dim[1], max_bin - (bw/2), by=bw)
-            # highs <- seq(bins_dim[1] + (bw/2), max_bin, by=bw)
-            # lows <- highs - bw
-            # time <- dat_input$years
-            # check_dim <- dim(dat_input$LF)
-            # if(check_dim[2]!=length(highs)) stop("Is your matrix cast as a data frame? Data frame input must be in long form, with column names 'Fleet', 'Time', and 'Value'")
-            # LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
-            # for(f in 1:dat_input$nfleets){
-            #     lfind <- length_raw %>% filter(Fleet==f)
-            #     lfreq <- t(sapply(1:length(time), function(x){
-            #         sub <- lfind %>% filter(Time==time[x])
-            #         if(nrow(sub)>0){
-            #             out <- sapply(1:length(highs), function(y){
-            #                 sub2 <- sub$Value[which(sub$Value > highs[y]-bw & sub$Value <= highs[y])]
-            #                 return(length(sub2))
-            #             })
-            #         }
-            #         if(nrow(sub)==0) out <- rep(0, length(highs))
-            #         return(out)
-            #     })) 
+            # stop("Input data as length frequency matrix with years along rows and length bins along columns. For multiple fleets, input array where 3rd dimension is by fleet, or list with matrices of equal dimension and zeros for no observations. ")
+            max_bin <- max(c(ceiling(max(dat_input$LF$Length)*1.25)))
+            mids <- seq(bw/2, max_bin - (bw/2), by=bw)
+            highs <- seq(bw, max_bin, by=bw)
+            lows <- highs - bw
+            time <- dat_input$years
+            check_dim <- c(length(time), length(mids))
+            if(check_dim[2]!=length(highs)) stop("Is your matrix cast as a data frame? Data frame input must be in long form, with column names 'Fleet', 'Year', and 'Length'")
+            LF <- array(NA, dim=c(length(time), length(highs), dat_input$nfleets))
+            for(f in 1:dat_input$nfleets){
+                lfind <- length_raw %>% dplyr::filter(Fleet==f)
+                lfreq <- t(sapply(1:length(time), function(x){
+                    sub <- lfind %>% dplyr::filter(Year==time[x])
+                    if(nrow(sub)>0){
+                        out <- sapply(1:length(highs), function(y){
+                            sub2 <- sub$Length[which(sub$Length > highs[y]-bw & sub$Length <= highs[y])]
+                            return(length(sub2))
+                        })
+                    }
+                    if(nrow(sub)==0) out <- rep(0, length(highs))
+                    return(out)
+                })) 
 
-            #     LF[,,f] <- lfreq
-            # }
-            # rownames(LF) <- time
-            # colnames(LF) <- highs
-            # dat_input$LF <- LF
+                LF[,,f] <- lfreq
+            }
+            rownames(LF) <- time
+            colnames(LF) <- highs
+            dat_input$LF <- LF
         }
 
         if(is.list(dat_input$LF)){
