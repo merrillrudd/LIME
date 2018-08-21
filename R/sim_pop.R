@@ -524,7 +524,7 @@ sim_pop <-
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF_ft[[x]], nrow=Nyears, ncol=length(mids))
+          sub <- matrix(LF_tf[[x]], nrow=Nyears, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
@@ -537,7 +537,7 @@ sim_pop <-
           rownames(sub) <- 1:Nyears_real
         }
         if(pool==FALSE){
-          sub <- matrix(LF0_ft[[x]], nrow=Nyears, ncol=length(mids))
+          sub <- matrix(LF0_tf[[x]], nrow=Nyears, ncol=length(mids))
           colnames(sub) <- mids
           rownames(sub) <- 1:Nyears
         }
