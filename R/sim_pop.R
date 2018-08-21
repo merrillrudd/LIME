@@ -122,8 +122,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = 0.4,
-            type="SPR")$root,
+            ref = 0.4)$root,
           error = function(e)
             NA
         )
@@ -138,8 +137,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = init_depl,
-            type="SPR")$root,
+            ref = init_depl)$root,
           error = function(e)
             NA
         )
@@ -156,8 +154,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = 0.05,
-            type="SPR")$root,
+            ref = 0.05)$root,
           error = function(e)
             NA
         )
