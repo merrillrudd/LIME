@@ -119,20 +119,20 @@ if(all(is.null(Report))==FALSE){
 	df_all <- rbind(LF_df2, pred_df2)
 
 	if(all(is.null(LBSPR))==FALSE){
-		pred_df2_mod2 <- pred_df_mod2 %>% mutate("Type"="Predicted") %>% mutate("Model"="LBSPR")
-		df_all <- rbind(df_all, pred_df2_mod2)
+		pred_df2_mod2 <- pred_df_mod2 %>% mutate("Type"="Predicted") %>% mutate("Model"="LBSPR") %>% mutate("Fleet"=factor(1))
+		df_all <- dplyr::bind_rows(df_all, pred_df2_mod2)
 	}
 
 	p <- ggplot(df_all) + 
 		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet), alpha=0.6) +
-		geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, linetype=Model, color=Fleet), lwd=1.2) +
+		geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, color=Model), lwd=1.2) +
 		scale_fill_brewer(palette="Set1") +
-		scale_color_brewer(palette="Set1") +
+		scale_color_brewer(palette="Set1", direction=-1) +
 		facet_wrap(Year~., ncol=5, dir="v")  +
 		xlab("Length bin (cm)") + ylab("Proportion")
 
 }
-if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
+if(nf==1) p <- p + guides(fill=FALSE)
 p
 
 return(p)
