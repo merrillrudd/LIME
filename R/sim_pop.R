@@ -325,8 +325,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa,
-            F = F_t[x],
-            type="SBPR"
+            F = F_t[x]
           ))
       SPR <- SPR_t[length(SPR_t)]
 
