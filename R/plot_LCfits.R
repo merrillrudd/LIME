@@ -7,6 +7,7 @@
 #' @param Inputs LIME input file; default NULL if only plotting length data
 #' @param Report LIME report file; default NULL if only plotting length data
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
+#' @param plot_fit default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
 #' @param true_years optional vector of true years to label years of length comp
 #' @importFrom graphics abline axis barplot box legend lines mtext par
@@ -14,7 +15,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -106,6 +107,7 @@ if(all(is.null(Inputs))){
 p <- ggplot(LF_df) + 
 	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=binwidth, alpha=0.6) +
 	scale_fill_brewer(palette="Set1") +
+	scale_color_brewer(palette="Set1") +
 	facet_wrap(Year~., ncol=5, dir="v") +
 	ylab("Proportion") + xlab("Length bin (cm)")
 if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
@@ -122,13 +124,28 @@ if(all(is.null(Report))==FALSE){
 		df_all <- dplyr::bind_rows(df_all, pred_df2_mod2)
 	}
 
+  if(length(unique(df_all$Model))>1){
 	p <- ggplot(df_all) + 
 		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet), alpha=0.6) +
-		geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, color=Model), lwd=1.2) +
 		scale_fill_brewer(palette="Set1") +
-		scale_color_brewer(palette="Set1", direction=-1) +
 		facet_wrap(Year~., ncol=5, dir="v")  +
 		xlab("Length bin (cm)") + ylab("Proportion")
+	if(plot_fit==TRUE){
+		p <- p + geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, color=Model), lwd=1.2) +
+				scale_color_brewer(palette="Set1", direction=-1)
+	}
+  }
+  if(length(unique(df_all$Fleet))>1){
+  	p <- ggplot(df_all) + 
+		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet), alpha=0.6) +
+		scale_fill_brewer(palette="Set1") +
+		facet_wrap(Year~., ncol=5, dir="v")  +
+		xlab("Length bin (cm)") + ylab("Proportion")
+	if(plot_fit==TRUE){
+		p <- p + geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, color=Fleet), lwd=1.2) +
+				scale_color_brewer(palette="Set1")
+	}
+  }
 if(nf==1) p <- p + guides(fill=FALSE)
 
 }
