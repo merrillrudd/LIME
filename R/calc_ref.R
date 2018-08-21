@@ -24,19 +24,19 @@ calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE, type="SPR"){
 
         ## ignore recruits
     # really sbpr
-    if(type=="SPR"){ 
+    # if(type=="SPR"){ 
         Nofish <- sum(Na0*Mat_a*W_a)
         Fish <- sum(Naf*Mat_a*W_a)
-    }
+    # }
     # really spr
-    if(type=="SPR2"){ 
-        Nofish <- sum(Na0*Mat_a*W_a*Mat_a*W_a)
-        Fish <- sum(Naf*Mat_a*W_a*Mat_a*W_a)
-    }
-    if(type=="Biomass" | type=="biomass"){
-        Nofish <- sum(Na0*W_a)
-        Fish <- sum(Naf*W_a)
-    }
+    # if(type=="SPR2"){ 
+        # Nofish <- sum(Na0*Mat_a*W_a*Mat_a*W_a)
+        # Fish <- sum(Naf*Mat_a*W_a*Mat_a*W_a)
+    # }
+    # if(type=="Biomass" | type=="biomass"){
+    #     Nofish <- sum(Na0*W_a)
+    #     Fish <- sum(Naf*W_a)
+    # }
 
         ## automatically returns SPR
         ratio <- Fish/Nofish
