@@ -23,11 +23,13 @@ calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE, type="SPR"){
     Naf <- calc_equil_abund(ages=ages, M=M, F=F, S_fa=S_fa, R0=1)
 
         ## ignore recruits
-    if(type=="SPR"){ # really sbpr
+    # really sbpr
+    if(type=="SPR"){ 
         Nofish <- sum(Na0*Mat_a*W_a)
         Fish <- sum(Naf*Mat_a*W_a)
     }
-    if(type=="SPR2"){ # really spr
+    # really spr
+    if(type=="SPR2"){ 
         Nofish <- sum(Na0*Mat_a*W_a*Mat_a*W_a)
         Fish <- sum(Naf*Mat_a*W_a*Mat_a*W_a)
     }
