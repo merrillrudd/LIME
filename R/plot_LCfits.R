@@ -106,7 +106,7 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 
 if(all(is.null(Inputs))){
 p <- ggplot(LF_df) + 
-	geom_histogram(aes(x=Length, y=..count../sum(..count..)), binwidth=binwidth) +
+	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=binwidth, alpha=0.6) +
 	scale_fill_brewer(palette="Set1") +
 	facet_wrap(Year~., ncol=5, dir="v") +
 	ylab("Proportion") + xlab("Length bin (cm)")
@@ -118,14 +118,16 @@ if(all(is.null(Report))==FALSE){
 	pred_df2 <- pred_df %>% mutate("Type"="Predicted") %>% mutate("Model"="LIME")
 	df_all <- rbind(LF_df2, pred_df2)
 
-	if(all(is.null(lbspr))==FALSE){
+	if(all(is.null(LBSPR))==FALSE){
 		pred_df2_mod2 <- pred_df_mod2 %>% mutate("Type"="Predicted") %>% mutate("Model"="LBSPR")
 		df_all <- rbind(df_all, pred_df2_mod2)
 	}
 
 	p <- ggplot(df_all) + 
-		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet)) +
-		geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, linetype=Model), lwd=1.2) +
+		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet), alpha=0.6) +
+		geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, linetype=Model, color=Fleet), lwd=1.2) +
+		scale_fill_brewer(palette="Set1") +
+		scale_color_brewer(palette="Set1") +
 		facet_wrap(Year~., ncol=5, dir="v")  +
 		xlab("Length bin (cm)") + ylab("Proportion")
 
