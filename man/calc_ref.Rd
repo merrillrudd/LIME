@@ -4,7 +4,7 @@
 \alias{calc_ref}
 \title{Per recruit calculation and spawning potential ratio}
 \usage{
-calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, type = "SBPR")
+calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE)
 }
 \arguments{
 \item{ages}{vector of ages}
@@ -20,8 +20,6 @@ calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, type = "SBPR")
 \item{S_fa}{selectivity by fleet by age}
 
 \item{ref}{FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref}
-
-\item{type}{"SPR" or "Biomass"}
 }
 \value{
 List, a tagged list of potentially useful benchmarks
