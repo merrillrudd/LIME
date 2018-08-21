@@ -7,8 +7,6 @@
 #' @param Inputs LIME input file; default NULL if only plotting length data
 #' @param Report LIME report file; default NULL if only plotting length data
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
-#' @param ylim ylim for plot; default NULL
-#' @param dim dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
 #' @param true_years optional vector of true years to label years of length comp
 #' @importFrom graphics abline axis barplot box legend lines mtext par
@@ -16,7 +14,7 @@
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, ylim=NULL, dim=NULL, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, n=FALSE, true_years=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -110,6 +108,7 @@ p <- ggplot(LF_df) +
 	scale_fill_brewer(palette="Set1") +
 	facet_wrap(Year~., ncol=5, dir="v") +
 	ylab("Proportion") + xlab("Length bin (cm)")
+if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
 }
 
 if(all(is.null(Report))==FALSE){
@@ -130,9 +129,9 @@ if(all(is.null(Report))==FALSE){
 		scale_color_brewer(palette="Set1", direction=-1) +
 		facet_wrap(Year~., ncol=5, dir="v")  +
 		xlab("Length bin (cm)") + ylab("Proportion")
+if(nf==1) p <- p + guides(fill=FALSE)
 
 }
-if(nf==1) p <- p + guides(fill=FALSE)
 p
 
 return(p)
