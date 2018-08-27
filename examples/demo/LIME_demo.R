@@ -4,9 +4,6 @@ rm(list=ls())
 devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
 library(LIME)
 
-devtools::install_github("kaskr/TMB_contrib_R/TMBhelper", dependencies=TRUE)
-library(TMBhelper)
-
 library(ggplot2)
 library(dplyr)
 
@@ -21,7 +18,7 @@ library(dplyr)
 	## Step 1: Read in length data
 	##----------------------------------------------------------------
 
-setwd("C:\\merrill\\LIME\\LIME_examples\\demo")
+setwd("C:\\merrill\\LIME\\examples\\demo")
 data <- read.csv("Length_singleyear.csv", header=TRUE)
 
 ## identify length bins
@@ -77,7 +74,9 @@ LFlist[[1]] <- matrix(input_data$LF[,,1], nrow=length(input_data$years))
 colnames(LFlist[[1]]) <- input_data$highs
 rownames(LFlist[[1]]) <- input_data$years
 
-plot_LCfits(LFlist=LFlist, ylim=c(0,0.2), true_years=input_data$years)
+LFdf <- LFreq_df(LFlist)
+
+plot_LCfits(LF_df=LFdf)
 
 res <- run_LIME(modpath=NULL, input=input_data, data_avail="LC", Rdet=TRUE)
 
@@ -113,7 +112,7 @@ ucl_spr <- spr + 1.96 * sd_spr
 
 save <- data.frame("model"="LIME", "run"="singleyear", "spr"=spr, "lcl_spr"=lcl_spr, "ucl_spr"=ucl_spr)
 
-F50 <- with(lh, uniroot(f=calc_ref, lower=0, upper=3, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, ref=0.5, type="SPR"))$root
+F50 <- with(lh, uniroot(f=calc_ref, lower=0, upper=3, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, ref=0.5))$root
 Report$F_y/F50
 (1-spr)/(1-F50)
 
@@ -122,9 +121,8 @@ Report$D_t
 
 ## plot length composition data and fits
 plot_LCfits(Inputs=Inputs, 
-			Report=Report,
-			ylim=c(0,0.2),
-			true_years=input_data$years)
+			Report=Report)
+
 abline(v=lh$linf, col="red", lwd=2, lty=2)		
 
 ## plot model output
@@ -198,15 +196,11 @@ geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
 ylim(c(0,max(ucl_spr))) +
 xlab("Run") + ylab("SPR")
 
-(1-spr2)/(1-F50)
-
 
 ## plot length composition data and fits
 plot_LCfits(Inputs=Inputs, 
 			Report=Report,
-			ylim=c(0,0.3),
-			LBSPR=lbspr_res,
-			true_years=input_data$years)		
+			LBSPR=lbspr_res)		
 abline(v=lh$linf, lwd=2, lty=2, col="red")
 
 
@@ -259,8 +253,6 @@ LF_new <- lweight3 * nsamps
 rownames(LF_new) <- years
 colnames(LF_new) <- bins
 
-plot_LCfits(LFlist=list("LF"=LF_new), ylim=c(0,0.3), dim=c(5,3))
-
 	##----------------------------------------------------------------
 	## Step 3: Run LIME
 	##----------------------------------------------------------------
@@ -286,6 +278,7 @@ hessian <- Sdreport$pdHess
 gradient <- res$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+check <- Check_Identifiable2(res$obj)
 
 
 	##----------------------------------------------------------------
@@ -312,7 +305,7 @@ geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
 scale_y_continuous(limits=c(0,1)) +
 xlab("Run") + ylab("SPR")
 
-plot_LCfits(Inputs=Inputs, Report=Report, ylim=c(0,0.25), true_years=years)
+plot_LCfits(Inputs=Inputs, Report=Report)
 
 ## plot model output
 plot_output(Inputs=Inputs, 
@@ -353,7 +346,7 @@ geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
 scale_y_continuous(limits=c(0,NA)) +
 xlab("Run") + ylab("SPR")
 
-plot_LCfits(Inputs=Inputs, Report=Report, LBSPR=lbspr_res, ylim=c(0,0.25))
+plot_LCfits(Inputs=Inputs, Report=Report, LBSPR=lbspr_res)
 
 ## plot model output
 plot_output(Inputs=Inputs, 
@@ -387,8 +380,10 @@ LF[[2]] <- matrix(data_1ymf[,3], nrow=1, ncol=length(bins))
 rownames(LF[[1]]) <- rownames(LF[[2]]) <- "2016"
 colnames(LF[[1]]) <- colnames(LF[[2]]) <- bins
 
+LF_mf <- LFreq_df(LF)
+
 ## plot length composition
-plot_LCfits(LFlist=LF, ylim=c(0,0.25))
+plot_LCfits(LF_df=LF_mf)
 
 	##----------------------------------------------------------------
 	## Step 2: Specify biological inputs and parameter starting values
@@ -427,7 +422,7 @@ data_list <- list("years"=2016, "LF"=LF)
 
 input_data <- create_inputs(lh=lh2, input_data=data_list)
 
-res2 <- run_LIME(modpath=NULL, input=input_data, data_avail="LC", est_totalF=TRUE, LFdist=0, Rdet=TRUE)
+res2 <- run_LIME(modpath=NULL, input=input_data, data_avail="LC", est_totalF=TRUE, LFdist=0, Rdet=TRUE, newtonsteps=3)
 
 ## check TMB inputs
 Inputs <- res2$Inputs
@@ -470,9 +465,7 @@ xlab("Run") + ylab("SPR")
 
 ## plot length composition data and fits
 plot_LCfits(Inputs=Inputs, 
-			Report=Report,
-			ylim=c(0,0.3),
-			true_years=input_data$years)		
+			Report=Report)		
 
 ## plot model output
 plot_output(Inputs=Inputs, 
@@ -506,9 +499,10 @@ for(i in 1:2){
 	colnames(LFmymf[[i]]) <- bins
 }
 
+LF_mf_my <- LFreq_df(LFmymf)
 
 ## plot length composition
-plot_LCfits(LFlist=LFmymf, ylim=c(0,0.25), dim=c(5,3))
+plot_LCfits(LF_df=LF_mf_my)
 
 
 
@@ -563,7 +557,7 @@ geom_linerange(aes(x=run, ymin=lcl_spr, ymax=ucl_spr, color=model)) +
 scale_y_continuous(limits=c(0,NA)) +
 xlab("Run") + ylab("SPR")
 
-plot_LCfits(Inputs=Inputs, Report=Report, ylim=c(0,0.25), true_years=years)
+plot_LCfits(Inputs=Inputs, Report=Report)
 
 ## plot model output
 plot_output(Inputs=Inputs, 

@@ -9,13 +9,12 @@
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
 #' @param plot_fit default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
-#' @param true_years optional vector of true years to label years of length comp
 #' @importFrom graphics abline axis barplot box legend lines mtext par
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE, true_years=NULL){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -27,7 +26,7 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 		LF_array <- Inputs$Data$LF_tlf
 		LF_prop <- array(NA, dim=dim(LF_array))
 		for(a in 1:dim(LF_prop)[3]){
-			sub <- LF_array[,,a]
+			sub <- matrix(LF_array[,,a], nrow=nrow(LF_array), ncol=ncol(LF_array))
 			for(y in 1:nrow(sub)){
 				LF_prop[y,,a] <- sub[y,]/sum(sub[y,])
 			}			
@@ -59,7 +58,6 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 		return(yrs)
 	})
 	all_lc_years <- min(as.numeric(unlist(LCyrs))):max(as.numeric(unlist(LCyrs)))
-	if(all(is.null(true_years))) true_years <- all_lc_years
 
 
 	if(all(is.null(Inputs))) Tyrs <- all_lc_years
@@ -68,7 +66,7 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 	if(all(is.null(Report))==FALSE){
 		# pred <- Report$plb
 			pred <- lapply(1:nf, function(x){
-				sub <- Report$plb[,,x]
+				sub <- matrix(Report$plb[,,x], nrow=length(Tyrs))
 				rownames(sub) <- Tyrs
 				colnames(sub) <- Inputs$Data$lbmids
 				return(sub)
