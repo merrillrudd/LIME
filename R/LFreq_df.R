@@ -56,5 +56,9 @@ LFreq_df <- function(LF){
 		byFleet <- do.call(rbind, byFleet)
 	}
 
-	return(byFleet)
+	out <- byFleet
+	out$Fleet <- factor(out$Fleet)
+	out$Year <- factor(out$Year)
+
+	return(out)
 }
