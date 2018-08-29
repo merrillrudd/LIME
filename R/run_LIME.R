@@ -75,8 +75,8 @@ run_LIME <- function(modpath,
                       # est_F_ft=TRUE
                       # f_startval_ft=NULL
                       # rdev_startval_t=NULL
-                      # est_selex_f=TRUE
-                      # vals_selex_ft=-1
+                      # # est_selex_f=TRUE
+                      # # vals_selex_ft=-1
                       # Rdet=FALSE
                       # newtonsteps=3
                       # F_up=10
@@ -216,8 +216,8 @@ for(iter in 1:length(itervec)){
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
-        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
+        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=TRUE, bias.correct=TRUE), error=function(e) NA)
+        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=TRUE, bias.correct=TRUE), error=function(e) NA)
         # if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
         # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
         jnll <- obj$report()$jnll   
@@ -292,9 +292,10 @@ for(iter in 1:length(itervec)){
         Report = tryCatch( obj_save$report(), error=function(x) NA)
         output$Report <- Report
 
-        if(length(TmbList$Random) > 0) Sdreport = tryCatch( sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
-        if(length(TmbList$Random) == 0) Sdreport <- tryCatch(sdreport(obj_save), error=function(x) NA)
-              output$Sdreport <- Sdreport
+        Sdreport <- tryCatch( opt_save[["SD"]], error=function(x) NA)
+        # if(length(TmbList$Random) > 0) Sdreport = tryCatch(sdreport(obj_save, bias.correct=TRUE), error=function(x) NA )
+        # if(length(TmbList$Random) == 0) Sdreport <- tryCatch(sdreport(obj_save), error=function(x) NA)
+        output$Sdreport <- Sdreport
 
 
 

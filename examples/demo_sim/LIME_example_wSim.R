@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-# devtools::install_github("merrillrudd/LIME")
+devtools::install_github("merrillrudd/LIME")
 library(LIME)
 library(ggplot2)
 library(dplyr)
