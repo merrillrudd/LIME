@@ -5,8 +5,7 @@
 \title{plot length composition data and model fits}
 \usage{
 plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
-  Report = NULL, LBSPR = NULL, ylim = NULL, dim = NULL,
-  n = FALSE, true_years = NULL)
+  Report = NULL, LBSPR = NULL, plot_fit = TRUE, n = FALSE)
 }
 \arguments{
 \item{LF_df}{list of length frequency matrices}
@@ -17,13 +16,9 @@ plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
 
 \item{LBSPR}{LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL}
 
-\item{ylim}{ylim for plot; default NULL}
-
-\item{dim}{dimensions of plot; default NULL if not specified, will approximate best based on number of years to plot}
+\item{plot_fit}{default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only}
 
 \item{n}{if TRUE, will display sample size of length comp data; default FALSE}
-
-\item{true_years}{optional vector of true years to label years of length comp}
 }
 \value{
 figure with length composition data and model fits if Report or LBSPR are specified
