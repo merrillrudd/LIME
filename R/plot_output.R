@@ -271,20 +271,20 @@ plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Sele
       sd95 <- sqrt(LBSPR$var_S95[i])
 
       S_l2 <- 1.0/(1+exp(-log(19)*(mids-SL50)/(SL95-SL50))) # Selectivity-at-Length
-      S_l2_low <- 1.0/(1+exp(-log(19)*(mids-(SL50-1.96*sd50))/((SL95-1.96*sd95)-(SL50-1.96*sd50)))) 
-      S_l2_up <- 1.0/(1+exp(-log(19)*(mids-(SL50+1.96*sd50))/((SL95+1.96*sd95)-(SL50+1.96*sd50)))) 
-      polygon(x=c(mids, rev(mids)), y=c(S_l2_low, rev(S_l2_up)), col="#AA00AA40", border=NA)
+      # S_l2_low <- 1.0/(1+exp(-log(19)*(mids-(SL50-1.96*sd50))/((SL95-1.96*sd95)-(SL50-1.96*sd50)))) 
+      # S_l2_up <- 1.0/(1+exp(-log(19)*(mids-(SL50+1.96*sd50))/((SL95+1.96*sd95)-(SL50+1.96*sd50)))) 
+      # polygon(x=c(mids, rev(mids)), y=c(S_l2_low, rev(S_l2_up)), col="#AA00AA40", border=NA)
       lines(x=mids, y=S_l2, col="#AA00AA", lwd=2)
     }
   # legend("bottomright", col=c("#228B22", "#AA00AA", "black", "black","black"), lwd=2, legend=c("LIME", "LB-SPR", "SPR 40%", "SPR 30%", "Observed"), cex=1.7, lty=c(1,1,2,3,0), pch=c(19,19,NA,NA,17))
   }
-  if(all(is.null(Sdreport))==FALSE){
-    if(all(is.na(Sdreport))==FALSE){
-      sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_fl"),]
-      sd[,2][which(is.na(sd[,2]))] <- 0
-      # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
-    }
-  }
+  # if(all(is.null(Sdreport))==FALSE){
+  #   if(all(is.na(Sdreport))==FALSE){
+  #     sd <- summary(Sdreport)[which(rownames(summary(Sdreport))=="S_fl"),]
+  #     sd[,2][which(is.na(sd[,2]))] <- 0
+  #     # ylim <- c(0, max(max(read_sdreport(sd, log=TRUE))*1.2))#, ymax))
+  #   }
+  # }
 
   if(all(is.null(Report))==FALSE){
     if(nf>1){
@@ -298,10 +298,10 @@ plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Sele
       if(nf > 1) lty <- f+1
       if(nf ==1) lty <- 1
       if(all(is.null(True))==FALSE) lines(True$S_fl[f,], lwd=2, lty=lty)
-      if(all(is.na(Sdreport))==FALSE){
-        index <- seq(f,nrow(sd),by=nf)
-        polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(mids[which(is.na(sd[index,2])==FALSE)], rev(mids[which(is.na(sd[index,2])==FALSE)])), col=paste0(cols[f],"40"), border=NA)  
-      }
+      # if(all(is.na(Sdreport))==FALSE){
+      #   index <- seq(f,nrow(sd),by=nf)
+      #   polygon( y=read_sdreport(sd[index,], log=FALSE), x=c(mids[which(is.na(sd[index,2])==FALSE)], rev(mids[which(is.na(sd[index,2])==FALSE)])), col=paste0(cols[f],"40"), border=NA)  
+      # }
     }
   }
 
