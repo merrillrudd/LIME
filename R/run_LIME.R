@@ -75,8 +75,8 @@ run_LIME <- function(modpath,
                       # est_F_ft=TRUE
                       # f_startval_ft=NULL
                       # rdev_startval_t=NULL
-                      # # est_selex_f=TRUE
-                      # # vals_selex_ft=-1
+                      # est_selex_f=TRUE
+                      # vals_selex_ft=-1
                       # Rdet=FALSE
                       # newtonsteps=3
                       # F_up=10
