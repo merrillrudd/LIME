@@ -147,12 +147,12 @@ if("Fish" %in% plot){
   }
 
   if(all(is.null(True))==FALSE) lines(True$F_y, lwd=2)
-  if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
-    points(x=xLC_lbspr, LBSPR$FM*(lh$M*lh$nseasons),col="#AA00AA", pch=19, cex=2, xpd=NA)
-    index <- which(is.na(LBSPR$var_FM)==FALSE)
-    ignore <- sapply(1:length(xLC_lbspr), function(x) segments(x0=xLC_lbspr[x],x1=xLC_lbspr[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$var_FM[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$var_FM[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
-    lines(x=xLC_lbspr, y=LBSPR$FM_smooth*(lh$M*lh$nseasons), col="#AA00AA", lw=2)
-  }
+  # if(all(is.null(LBSPR))==FALSE & all(is.null(Report))==FALSE){
+  #   points(x=xLC_lbspr, LBSPR$FM*(lh$M*lh$nseasons),col="#AA00AA", pch=19, cex=2, xpd=NA)
+  #   index <- which(is.na(LBSPR$var_FM)==FALSE)
+  #   ignore <- sapply(1:length(xLC_lbspr), function(x) segments(x0=xLC_lbspr[x],x1=xLC_lbspr[x],y0=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)-1.96*sqrt(LBSPR$var_FM[index[x]]), y1=LBSPR$FM[index[x]]*(lh$M*lh$nseasons)+1.96*sqrt(LBSPR$var_FM[index[x]]), lwd=4, col=paste0("#AA00AA","40")))
+  #   lines(x=xLC_lbspr, y=LBSPR$FM_smooth*(lh$M*lh$nseasons), col="#AA00AA", lw=2)
+  # }
 }
 
 if("Rec" %in% plot){
