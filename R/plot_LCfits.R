@@ -4,17 +4,19 @@
 #'
 #' @author M.B. Rudd
 #' @param LF_df list of length frequency matrices
+#' @param binwidth bin width for plotting data with LF_df
 #' @param Inputs LIME input file; default NULL if only plotting length data
 #' @param Report LIME report file; default NULL if only plotting length data
 #' @param LBSPR LBSPR results - must have pLF = probability of being harvested in a length bin; default NULL
 #' @param plot_fit default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
+#' @param time_labels default=NULL, otherwise a vector of time series names
 #' @importFrom graphics abline axis barplot box legend lines mtext par
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE, time_labels=NULL){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -43,12 +45,20 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 		bins <- as.numeric(colnames(LF_array))
 		bw <- bins[1]
 	}
-	years <- unique(LF_df$Year)[order(unique(LF_df$Year))]
+	years <- unique(as.numeric(LF_df$Year))[order(unique(as.numeric(LF_df$Year)))] #unique(LF_df$Year)[order(as.numeric(unique(LF_df$Year)))]
 	nyears <- length(years)
-	n_yr <- rep(0, nyears)
-	for(i in 1:nyears){
-		sub <- LF_df %>% dplyr::filter(Year==years[i])
-		n_yr[i] <- nrow(sub)
+	# n_yr <- rep(0, nyears)
+	# for(i in 1:nyears){
+	# 	sub <- LF_df %>% dplyr::filter(Year==years[i])
+	# 	n_yr[i] <- nrow(sub)
+	# }
+	if(all(is.null(time_labels))==FALSE){
+		time <- sapply(1:nrow(LF_df), function(x){
+			return(time_labels[LF_df$Year[x]])
+		})
+		LF_df <- data.frame(LF_df)
+		LF_df$Month <- sapply(1:nrow(LF_df), function(x) strsplit(time[x],"_")[[1]][1])
+		LF_df$Year2 <- sapply(1:nrow(LF_df), function(x) strsplit(time[x],"_")[[1]][2])
 	}
 
 	nf <- length(unique(LF_df$Fleet))
@@ -68,7 +78,7 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 			pred <- lapply(1:nf, function(x){
 				sub <- matrix(Report$plb[,,x], nrow=length(Tyrs))
 				rownames(sub) <- Tyrs
-				colnames(sub) <- Inputs$Data$lbmids
+				colnames(sub) <- colnames(Inputs$Data$LF_tlf)
 				return(sub)
 			})
 
@@ -87,7 +97,7 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 	if(all(is.null(LBSPR))==FALSE){
 		pred2 <- t(LBSPR@pLCatch)
 		rownames(pred2) <- years
-		colnames(pred2) <- LBSPR@LMids
+		colnames(pred2) <- LBSPR@LMids[1:ncol(pred2)]
 
 			pred_df_mod2 <- reshape2::melt(pred2)
 			names(pred_df_mod2) <- c("Year", "Length", "Proportion")
@@ -106,8 +116,13 @@ p <- ggplot(LF_df) +
 	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=binwidth, alpha=0.6) +
 	scale_fill_brewer(palette="Set1") +
 	scale_color_brewer(palette="Set1") +
-	facet_wrap(Year~., ncol=5, dir="v") +
 	ylab("Proportion") + xlab("Length bin (cm)")
+if("Month" %in% colnames(LF_df)){
+	p <- p + facet_wrap(Year2~factor(Month), dir="v")
+}
+if("Month" %in% colnames(LF_df)==FALSE){
+	p <- p + facet_wrap(Year~., dir="v")
+}
 if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
 }
 
@@ -126,8 +141,13 @@ if(all(is.null(Report))==FALSE){
 	p <- ggplot(df_all) + 
 		geom_ribbon(data=df_all %>% filter(Type=="Observed"), aes(x=Length, ymin=0, ymax=Proportion, fill=Fleet), alpha=0.6) +
 		scale_fill_brewer(palette="Set1") +
-		facet_wrap(Year~., ncol=5, dir="v")  +
 		xlab("Length bin (cm)") + ylab("Proportion")
+	if("Month" %in% colnames(LF_df)){
+		p <- p + facet_wrap(Year2~factor(Month), dir="v")
+	}
+	if("Month" %in% colnames(LF_df)==FALSE){
+		p <- p + facet_wrap(Year~., dir="v")
+	}
 	if(plot_fit==TRUE){
 		p <- p + geom_line(data=df_all %>% filter(Type=="Predicted"), aes(x=Length, y=Proportion, color=Model), lwd=1.2) +
 				scale_color_brewer(palette="Set1", direction=-1)

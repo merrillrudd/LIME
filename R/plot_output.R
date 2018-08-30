@@ -259,7 +259,7 @@ if("SB" %in% plot){
 }
     
 if("Selex" %in% plot){
-  mids <- Inputs$Data$lbmids
+  mids <- as.numeric(colnames(Inputs$Data$LF_tlf))
 
 plot(x=1, y=1, type="n", xlim=c(min(mids),max(mids)), ylim=c(0, 1.1), ylab="Selectivity at length", xlab="Length (cm)", xaxs="i", yaxs="i", cex.axis=2, cex.lab=2)
 
