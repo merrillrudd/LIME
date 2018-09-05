@@ -8,7 +8,7 @@ library(ggplot2)
 library(dplyr)
 
 LIME_dir <- "C:\\merrill\\LIME\\examples"
-demo_dir <- file.path(LIME_dir, "demo_sim")
+demo_dir <- file.path(LIME_dir, "demo_pulldata")
 
 ##----------------------------------------------------------------
 ## Step 1: Specify biological inputs and parameter starting values
