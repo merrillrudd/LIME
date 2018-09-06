@@ -92,7 +92,7 @@ if(all(is.null(Inputs))){
 par(mfrow=dim, mar=c(4,5,2,2))
 
 if(all(is.null(Inputs))==FALSE){
-  F50 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, S_fa=Report$S_fa, ref=0.5)$root, error=function(e) NA)
+  F40 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, S_fa=Report$S_fa, ref=0.4)$root, error=function(e) NA)
   F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=200, ages=lh$ages, Mat_a=Report$Mat_a, W_a=Report$W_a, M=Report$M, S_fa=Report$S_fa, ref=0.3)$root, error=function(e) NA)
 }
     col_total <- "#228B22"
@@ -123,7 +123,7 @@ if("Fish" %in% plot){
       # index <- seq(f, nrow(sd), by=nf)
       if(all(is.na(Sdreport))==FALSE){
         yvals <- read_sdreport(sd_total, log=TRUE)
-        yvals[which(is.finite(yvals)==FALSE)] <- max(yvals[-which(is.finite(yvals)==FALSE)])
+        # yvals[which(is.finite(yvals)==FALSE)] <- max(yvals[-which(is.finite(yvals)==FALSE)])
         polygon( y=yvals, x=c(which(is.na(sd_total[,2])==FALSE), rev(which(is.na(sd_total[,2])==FALSE))), col=paste0(col_total,"40"), border=NA)  
       }
 
@@ -141,7 +141,7 @@ if("Fish" %in% plot){
 
   if(all(is.null(Inputs))==FALSE){  
     makelines <- sapply(1:nf, function(x){
-      abline(h=F50[x]*ns, lwd=2, lty=2)
+      abline(h=F40[x]*ns, lwd=2, lty=2)
       abline(h=F30[x]*ns, lwd=2, lty=3)
     })
   }
