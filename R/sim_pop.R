@@ -398,6 +398,7 @@ sim_pop <-
       ## abundance index
       if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
       I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))
+      Effort_ft <- t(sapply(1:nfleets, function(x) C_ft[x,]/(qcoef[x]*TB_t)))
 
       ## age to length comp
       if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
@@ -560,6 +561,7 @@ sim_pop <-
       lh$F40 <- F40
       lh$Fmax <- Fmax
       lh$I_ft <- matrix(I_ft, nrow=nfleets, ncol=Nyears)
+      lh$E_ft <- matrix(Effort_ft, nrow=nfleets, ncol=Nyears)
       lh$fleet_proportions <- fleet_proportions
 
 
