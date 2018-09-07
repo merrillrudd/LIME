@@ -102,7 +102,7 @@ sim_pop <-
         # R_t[which(RecDev_AR==0)] <- 0
       }
 
-      if(Rdynamics="BevertonHolt"){
+      if(Rdynamics=="BevertonHolt"){
         R_t <- rep(NA, Nyears)
         R_t[1] <- R0 * exp(RecDev_AR[1])
       }
