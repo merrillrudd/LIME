@@ -25,8 +25,12 @@ LFreq_df <- function(LF){
 			}
 			byYear <- lapply(1:length(years), function(y){
 				sub2 <- sub[y,]
-				lengths <- unlist(sapply(1:length(bins), function(z) rep(bins[z],sub2[z])))
-				df <- data.frame("Fleet"=x, "Year"=years[y], "Length"=lengths)
+				if(sum(sub2)>0){
+					lengths <- unlist(sapply(1:length(bins), function(z) rep(bins[z],sub2[z])))
+					df <- data.frame("Fleet"=x, "Year"=years[y], "Length"=lengths)
+				} else{
+					df <- NULL
+				}
 				return(df)
 			})
 			byYear <- do.call(rbind, byYear)
