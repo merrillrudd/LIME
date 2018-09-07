@@ -102,6 +102,11 @@ sim_pop <-
         # R_t[which(RecDev_AR==0)] <- 0
       }
 
+      if(Rdynamics="BevertonHolt"){
+        R_t <- rep(NA, Nyears)
+        R_t[1] <- R0 * exp(RecDev_AR[1])
+      }
+
     ## with multi-seasons, currently spreading out recruitment across seasons in one year
     ## to properly calculate initial F if recruitment is only in one season, need to spread out calculation across the year instead of per-recruit in calc_ref
         R_t <- R_t/nseasons
@@ -256,6 +261,9 @@ sim_pop <-
 
       for (t in 2:Nyears) {
         ## fishing effort based on spawning biomass
+        if(Rdynamics=="BevertonHolt"){
+          R_t[t] <- ((4 * h * R0 * SB_t[t-1]) / (SB0 * (1-h) + SB_t[t-1] * (5*h-1))) * exp(RecDev_AR[t])
+        }
         if (any(Fdynamics == "Endogenous")) {
           index <- which(Fdynamics == "Endogenous")
           for(i in 1:length(index)){
