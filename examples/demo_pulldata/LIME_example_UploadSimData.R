@@ -1,7 +1,11 @@
 rm(list=ls())
 
-## Packages
-
+#####################
+## Load packages
+#####################
+## install LIME from github
+## installation instructions available at https://github.com/merrillrudd/LIME/wiki/2---Introduction-and-installation
+## (will need to download Rtools and some R package dependencies available on CRAN)
 devtools::install_github("merrillrudd/LIME")
 library(LIME)
 library(ggplot2)
@@ -105,8 +109,8 @@ plot_LCfits(LF_df=LF_df)
 ###############################
 
 par(mfrow=c(2,1))
-plot(years, catch_matrix, type="l", lwd=2, ylim=c(0, max(catch_matrix)*1.2))
-plot(years, index_matrix, type="l", lwd=2, ylim=c(0, max(index_matrix)*1.2))
+plot(years, catch_matrix, type="l", lwd=2, ylim=c(0, max(catch_matrix)*1.2), xlab="Year", ylab="Catch (biomass)")
+plot(years, index_matrix, type="l", lwd=2, ylim=c(0, max(index_matrix)*1.2), xlab="Year", ylab="Abundance index")
 
 
 #######################################
@@ -126,74 +130,11 @@ data_all <- list("years"=years, "LF"=LF_df, "I_ft"=index_matrix, "C_ft"=catch_ma
 inputs_all <- create_inputs(lh=lh, input_data=data_all)
 
 ##----------------------------------------------------
-## Step 3: Run model
+## Step 3: Run models
 ## ---------------------------------------------------
 #######################################
-## Data-rich test
+## length-data only
 #######################################
-rich <- run_LIME(modpath=NULL, 
-				input=inputs_all,
-				data_avail="Index_Catch_LC",
-				C_type=2) 
-
-## check TMB inputs
-Inputs <- rich$Inputs
-
-## Report file
-Report <- rich$Report
-
-## Standard error report
-Sdreport <- rich$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- rich$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-
-##----------------------------------------------------
-## Step 4: Plot results
-## ---------------------------------------------------
-## plot length composition data and fits
-plot_LCfits(Inputs=Inputs, 
-			Report=Report)		
-
-## plot just the length composition data
-plot_LCfits(Inputs=Inputs, 
-			Report=Report,
-			plot_fit=FALSE)
-
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("SPR" = c(0,1)))
-
-
-#######################################
-## Length-data only
-#######################################
-
-lc_only <- run_LIME(modpath=NULL, 
-				input=inputs_LC,
-				data_avail="LC")
-
-## check TMB inputs
-Inputs <- lc_only$Inputs
-
-## Report file
-Report <- lc_only$Report
-
-## Standard error report
-Sdreport <- lc_only$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- lc_only$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
 
 ## LBSPR
 library(LBSPR)
@@ -216,6 +157,28 @@ LB_lengths@NYears <- ncol(LB_lengths@LData)
 
 lbspr <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 
+## LIME
+lc_only <- run_LIME(modpath=NULL, 
+				input=inputs_LC,
+				data_avail="LC")
+
+## check TMB inputs
+Inputs <- lc_only$Inputs
+
+## Report file
+Report <- lc_only$Report
+
+## Standard error report
+Sdreport <- lc_only$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- lc_only$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
+
+##----------------------------------------------------
+## Step 4: Plot results
+## ---------------------------------------------------
 ## plot length composition data
 plot_LCfits(Inputs=Inputs, 
 			Report=Report,
@@ -231,9 +194,49 @@ plot_output(Inputs=Inputs,
 			set_ylim=list("Fish" =c(0,1), "SPR" = c(0,1), "SB"=c(0,2)))	
 
 
+
+#######################################
+## Data-rich test
+#######################################
+## include abundance index, catch, and length composition data with LIME
+rich <- run_LIME(modpath=NULL, 
+				input=inputs_all,
+				data_avail="Index_Catch_LC",
+				C_type=2) 
+
+## check TMB inputs
+Inputs <- rich$Inputs
+
+## Report file
+Report <- rich$Report
+
+## Standard error report
+Sdreport <- rich$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- rich$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
+
+## plot length composition data and fits
+plot_LCfits(Inputs=Inputs, 
+			Report=Report,
+			LBSPR=lbspr)	
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			LBSPR=lbspr,
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("SPR" = c(0,1)))
+
+
 #######################################
 ## Catch + length data
 #######################################
+## include catch and length data with LIME
 catch_lc <- run_LIME(modpath=NULL, 
 				input=inputs_all,
 				data_avail="Catch_LC",
@@ -252,7 +255,6 @@ Sdreport <- catch_lc$Sdreport
 hessian <- Sdreport$pdHess
 gradient <- catch_lc$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
-
 
 ## plot length composition data
 plot_LCfits(Inputs=Inputs, 
@@ -305,12 +307,42 @@ plot_output(Inputs=Inputs,
 ## Shorter time series and data gaps
 ## ---------------------------------------------------
 
-length_5 <- length_matrix[16:20,]
-index_10 <- matrix(index_matrix[,11:20], nrow=nrow(index_matrix))
+## still modeling over 20 years but with data gaps
+## all data types must still be 20 years long
+## 		but with 0s for years with no length composition data
+## 		-1 for years with no catch or abundance data
+## remove first 15 years of length data
+length_5 <- length_matrix
+length_5[1:15,] <- 0
 
-data_gaps <- list("years"=years, "LF"=length_5, "C_ft"=catch_matrix, "I_ft"=index_10)
+## remove first 10 years of index data
+index_10 <- index_matrix
+index_10[1:10] <- -1
 
+## remove every other year of catch data
+catch_alt <- catch_matrix
+catch_alt[seq(2,length(catch_matrix),by=2)] <- -1
+
+## plot length data
+lf5_df <- LFreq_df(length_5)
+plot_LCfits(lf5_df)
+
+## plot catch and effort
+par(mfrow=c(2,1))
+cplot <- catch_alt
+cplot[which(cplot < 0)] <- NA
+plot(years, cplot, type="o", pch=19, lwd=2, ylim=c(0, max(catch_matrix)*1.2), xlab="Year", ylab="Catch (biomass)")
+
+iplot <- index_10
+iplot[which(iplot < 0)] <- NA
+plot(years, iplot, type="o", pch=19, lwd=2, ylim=c(0, max(index_matrix)*1.2), xlab="Year", ylab="Abundance index")
+
+## setup data list
+data_gaps <- list("years"=years, "LF"=length_5, "C_ft"=catch_alt, "I_ft"=index_10)
+
+## data inputs
 inputs_gaps <- create_inputs(lh=lh, input_data=data_gaps)
+
 
 #######################################
 ## Data-rich test
@@ -320,26 +352,53 @@ rich_gaps <- run_LIME(modpath=NULL,
 				data_avail="Index_Catch_LC",
 				C_type=2) 
 
-check <- TMBhelper::Check_Identifiable(lc_only$obj)
-
-## narrow penalty on F
-inputs_LC_new <- inputs_LC
-inputs_LC_new$SigmaF <- 0.1
-
-lc_only2 <- run_LIME(modpath=NULL, 
-				input=inputs_LC_new,
-				data_avail="LC")
+## check that all parameters are identifiable
+check <- TMBhelper::Check_Identifiable(rich_gaps$obj)
 
 ## check TMB inputs
-Inputs <- lc_only2$Inputs
+Inputs <- rich_gaps$Inputs
 
 ## Report file
-Report <- lc_only2$Report
+Report <- rich_gaps$Report
 
 ## Standard error report
-Sdreport <- lc_only2$Sdreport
+Sdreport <- rich_gaps$Sdreport
 
 ## check convergence
 hessian <- Sdreport$pdHess
-gradient <- lc_only$opt$max_gradient <= 0.001
+gradient <- rich_gaps$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
+
+### compare with LBSPR using last 5 years of length data
+## LBSPR
+LB_pars <- new("LB_pars")
+LB_pars@MK <- inputs_gaps$M/inputs_gaps$vbk
+LB_pars@Linf <- inputs_gaps$linf
+LB_pars@L50 <- inputs_gaps$ML50
+LB_pars@L95 <- inputs_gaps$ML95
+LB_pars@Walpha <- inputs_gaps$lwa
+LB_pars@Wbeta <- inputs_gaps$lwb
+LB_pars@R0 <- inputs_gaps$R0
+LB_pars@Steepness <- ifelse(inputs_gaps$h==1, 0.99, inputs_gaps$h)
+LB_pars@BinWidth <- inputs_gaps$binwidth
+
+LB_lengths <- new("LB_lengths")
+LB_lengths@LMids <- inputs_gaps$mids
+
+LF5_lbspr <- matrix(inputs_gaps$LF[-which(rowSums(inputs_gaps$LF)==0),,1], ncol=length(inputs_gaps$mids))
+rownames(LF5_lbspr) <- which(rowSums(inputs_gaps$LF[,,1])>0)
+LB_lengths@LData <- t(LF5_lbspr)
+LB_lengths@Years <- as.numeric(rownames(LF5_lbspr))
+LB_lengths@NYears <- nrow(LF5_lbspr)
+
+lbspr2 <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
+
+## plot model output
+## points show years with length data
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			LBSPR=lbspr2,
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("SPR" = c(0,1), "SB"=c(0,2)))		
