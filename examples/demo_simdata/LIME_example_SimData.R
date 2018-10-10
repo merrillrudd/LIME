@@ -204,9 +204,10 @@ hessian <- Sdreport$pdHess
 gradient <- lc_only$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
 
+## hessian not positive definite -- the following line helps diagnose which parameters can't be estimated 
 check <- TMBhelper::Check_Identifiable(lc_only$obj)
 
-## narrow penalty on F
+## issues estimating F - try a more narrow penalty on F
 inputs_LC_new <- inputs_LC
 inputs_LC_new$SigmaF <- 0.1
 
@@ -453,7 +454,7 @@ LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd
 
 ## Option 2: Length comp list
 LF_list <- lapply(1:lh_mf$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
-
+# LF_list <- LF_list[[2]]
 ## convert matrix, array, or list to data frame
 LF_df <- LFreq_df(LF=LF_list)
 
@@ -749,10 +750,12 @@ inputs_all <- create_inputs(lh=lh_ms, input_data=data_all)
 #######################################
 ## Data-rich test
 #######################################
+## did not converge with dirichlet-multinomial
 rich <- run_LIME(modpath=NULL, 
 				input=inputs_all,
 				data_avail="Index_Catch_LC",
-				C_type=2)
+				C_type=2,
+				LFdist=0)
 
 ## check TMB inputs
 Inputs <- rich$Inputs
@@ -786,7 +789,8 @@ plot_output(Inputs=Inputs,
 #######################################
 lc_only <- run_LIME(modpath=NULL, 
 				input=inputs_LC,
-				data_avail="LC")
+				data_avail="LC",
+				LFdist=0)
 
 
 ## check TMB inputs
@@ -802,232 +806,6 @@ Sdreport <- lc_only$Sdreport
 hessian <- Sdreport$pdHess
 gradient <- lc_only$opt$max_gradient <= 0.001
 hessian == TRUE & gradient == TRUE
-
-lc_only2 <- get_converged(results=lc_only)
-
-## check TMB inputs
-Inputs <- lc_only2$Inputs
-
-## Report file
-Report <- lc_only2$Report
-
-## Standard error report
-Sdreport <- lc_only2$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- lc_only2$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-## plot length composition data and fits
-plot_LCfits(LF_df=LF_list, 
-			Inputs=Inputs, 
-			Report=Report)		
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh,
-			True=true, 
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("SPR" = c(0,1)))
-
-##----------------------------------------------------
-## Check multiple seasons with multiple fleets
-## ---------------------------------------------------
-## life history list
-lh_mfms <- with(lh, create_lh_list(
-						 vbk=vbk, 
-					 	 linf=linf, 
-						 t0=t0,
-						 lwa=lwa, 
-						 lwb=lwb, 
-						 S50=c(20,30), 
-						 S95=c(26,36), 
-						 selex_input="length",
-						 selex_type=c("logistic","logistic"),
-						 M50=ML50,
-						 M95=NULL,
-						 maturity_input="length",
-						 M=M, 
-						 h=h,
-						 binwidth=binwidth,
-						 CVlen=CVlen,
-						 SigmaR=SigmaR,
-						 SigmaF=SigmaF,
-						 SigmaC=SigmaC,
-						 SigmaI=SigmaI,
-						 R0=R0,
-						 ## adjust rate for 4 seasons
-						 Frate=Frate/4,
-						 qcoef=qcoef,
-						 start_ages=0,
-						 rho=rho,
-						 ## change seasons to 4
-						 nseasons=4,
-						 nfleets=2))
-
-## generate data
-true <- generate_data(modpath=NULL,
-					  itervec=1, 
-					  Fdynamics=c("Constant","Endogenous"),
-					  Rdynamics="Constant",
-					  lh=lh_mfms,
-					  Nyears=20,
-					  Nyears_comp=c(20,10),
-					  comp_sample=200,
-					  init_depl=0.7,
-					  seed=123,
-					  fleet_proportions=c(0.6,0.4),
-					  pool=FALSE)
-
-
-## plot simulated data
-par(mfrow=c(3,2))
-plot(true$SPR_t, type="l", ylim=c(0,1), lwd=2, xlab="Time", ylab="SPR")
-plot(true$R_t, type="l", ylim=c(0,3), lwd=2, xlab="Time", ylab="Recruitment")
-plot(x=1,y=1,type="n", ylim=c(0,max(true$F_t)*1.2), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Fishing mortality")
-lty <- ifelse(lh$nfleets==1,1,2)
-for(f in 1:lh$nfleets){
-	lines(true$F_ft[f,], lwd=2, lty=lty)
-}
-lines(true$F_t, lwd=2)
-plot(true$D_t, type="l", ylim=c(0,2), lwd=2, xlab="Time", ylab="Relative spawning biomass")
-plot(x=1, y=1, type="n", ylim=c(0,max(true$Cw_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Catch (biomass)")
-for(f in 1:lh$nfleets){
-	lines(true$Cw_ft[f,], lwd=2, lty=lty)
-}
-plot(x=1, y=1, type="n", ylim=c(0,max(true$I_ft)), xlim=c(1,length(true$SPR_t)), xlab="Time", ylab="Abundance index")
-for(f in 1:lh$nfleets){
-	lines(true$I_ft[f,], lwd=2, lty=lty)
-}
-
-#######################################
-## Length comp data input options
-#######################################
-## Option 1: Length comp array
-LF_array <- true$LF ## array with rows = years, columns = upper length bins, 3rd dimension = fleets
-
-## Option 2: Length comp list
-LF_list <- lapply(1:lh_mfms$nfleets, function(x) true$LF[,,x]) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
-
-	## plot length composition data using LF_list
-	plot_LCfits(LF_df=LF_list) ## "Inputs" argument just must be a list with "LF" as one of the components, e.g. plot_LCfits(Inputs=list("LF"=true$LF))
-
-
-## example with length data only
-data_LF <- list("years"=1:true$Nyears, "LF"=LF_array)
-
-##if using multinomial distribution, must specify annual effective sample size by fleet
-data_LF_neff <- list("years"=1:true$Nyears, "LF"=LF_array, "neff_ft"=true$obs_per_year)
-
-## create model inputs with life history information and data
-## outputs length data as array
-inputs_LC <- create_inputs(lh=lh_mfms, input_data=data_LF)
-
-#######################################
-## Other data type input options
-#######################################
-colnames(true$I_ft) <- colnames(true$Cw_ft) <- colnames(true$obs_per_year) <- 1:true$Nyears
-data_all <- list("years"=1:true$Nyears, "LF"=LF_array, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft, "neff_ft"=true$obs_per_year)
-inputs_all <- create_inputs(lh=lh_mfms, input_data=data_all)
-
-##----------------------------------------------------
-## Run model
-## ---------------------------------------------------
-#######################################
-## Data-rich test
-#######################################
-rich <- run_LIME(modpath=NULL, 
-				input=inputs_all,
-				data_avail="Index_Catch_LC",
-				C_type=2)
-
-
-## check TMB inputs
-Inputs <- rich$Inputs
-
-## Report file
-Report <- rich$Report
-
-## Standard error report
-Sdreport <- rich$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- rich$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-rich2 <- get_converged(results=rich)
-
-## check TMB inputs
-Inputs <- rich2$Inputs
-
-## Report file
-Report <- rich2$Report
-
-## Standard error report
-Sdreport <- rich2$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- rich2$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-
-## plot length composition data and fits
-plot_LCfits(LF_df=LF_list, 
-			Inputs=Inputs, 
-			Report=Report)		
-
-## plot model output
-plot_output(Inputs=Inputs, 
-			Report=Report,
-			Sdreport=Sdreport, 
-			lh=lh_mfms,
-			True=true, 
-			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
-			set_ylim=list("SPR" = c(0,1)))
-
-#######################################
-## Length only
-#######################################
-lc_only <- run_LIME(modpath=NULL, 
-				input=inputs_LC,
-				data_avail="LC")
-
-
-## check TMB inputs
-Inputs <- rich$Inputs
-
-## Report file
-Report <- rich$Report
-
-## Standard error report
-Sdreport <- rich$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- rich$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
-lc_only2 <- get_converged(results=lc_only)
-
-## check TMB inputs
-Inputs <- lc_only2$Inputs
-
-## Report file
-Report <- lc_only2$Report
-
-## Standard error report
-Sdreport <- lc_only2$Sdreport
-
-## check convergence
-hessian <- Sdreport$pdHess
-gradient <- lc_only2$opt$max_gradient <= 0.001
-hessian == TRUE & gradient == TRUE
-
 
 ## plot length composition data and fits
 plot_LCfits(LF_df=LF_list, 
