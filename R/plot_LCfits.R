@@ -112,18 +112,18 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 	}
 
 if(all(is.null(Inputs))){
-p <- ggplot(LF_df) + 
-	geom_histogram(aes(x=Length, y=..count../sum(..count..), color=Fleet, fill=Fleet), binwidth=binwidth, alpha=0.6) +
-	scale_fill_brewer(palette="Set1") +
-	scale_color_brewer(palette="Set1") +
-	ylab("Proportion") + xlab("Length bin (cm)")
-if("Month" %in% colnames(LF_df)){
-	p <- p + facet_wrap(Year2~factor(Month), dir="v")
-}
-if("Month" %in% colnames(LF_df)==FALSE){
-	p <- p + facet_wrap(Year~., dir="v")
-}
-if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
+	p <- ggplot(LF_df) + 
+		geom_histogram(aes(x=Length, y=..density.., color=Fleet, fill=Fleet), position="identity", binwidth=binwidth, alpha=0.6) +
+		scale_fill_brewer(palette="Set1") +
+		scale_color_brewer(palette="Set1") +
+		ylab("Proportion") + xlab("Length bin (cm)")
+	if("Month" %in% colnames(LF_df)){
+		p <- p + facet_wrap(Year2~factor(Month), dir="v")
+	}
+	if("Month" %in% colnames(LF_df)==FALSE){
+		p <- p + facet_wrap(Year~., dir="v")
+	}
+	if(nf==1) p <- p + guides(color=FALSE, fill=FALSE)
 }
 
 if(all(is.null(Report))==FALSE){
