@@ -58,12 +58,12 @@ sim_pop <-
         RecDev_AR[t] <-
           RecDev_AR[t - 1] * rho + sqrt(1 - rho ^ 2) * RecDev[t]
       }
-      if(nseasons > 1){
-        # RecDev2 <- rep(0, Nyears)
-        # RecDev2[seq(1,length(RecDev2),by=nseasons)] <- RecDev_AR
-        RecDev2 <- unlist(lapply(1:Nyears_real, function(x) rep(RecDev_AR[x], nseasons)))
-        RecDev_AR <- RecDev2
-      }
+      # if(nseasons > 1){
+      #   # RecDev2 <- rep(0, Nyears)
+      #   # RecDev2[seq(1,length(RecDev2),by=nseasons)] <- RecDev_AR
+      #   RecDev2 <- unlist(lapply(1:Nyears_real, function(x) rep(RecDev_AR[x], nseasons)))
+      #   RecDev_AR <- RecDev2
+      # }
 
       ## fishing mortality deviations
       if(length(SigmaF)==1 & nfleets>1) SigmaF <- rep(SigmaF, nfleets)
@@ -98,19 +98,22 @@ sim_pop <-
       }
 
       if (Rdynamics == "Constant") {
-        R_t <- (rep(R0, Nyears)) * exp(RecDev_AR)
+        R_t <- (rep(R0, Nyears_real)) * exp(RecDev_AR)
         # R_t[which(RecDev_AR==0)] <- 0
       }
 
       if(Rdynamics=="BevertonHolt"){
-        R_t <- rep(NA, Nyears)
+        R_t <- rep(NA, Nyears_real)
         R_t[1] <- R0 * exp(RecDev_AR[1])
       }
 
     ## with multi-seasons, currently spreading out recruitment across seasons in one year
     ## to properly calculate initial F if recruitment is only in one season, need to spread out calculation across the year instead of per-recruit in calc_ref
-        R_t <- R_t/nseasons
+        # R_t <- R_t/nseasons
 
+      ## multi-seasons - one recruitment event per year
+      R_t_new <- unlist(lapply(1:Nyears_real, function(x) c(R_t[x], rep(0,nseasons-1))))
+      R_t <- R_t_new
 
       #####################################
       ## Effort dynamics
