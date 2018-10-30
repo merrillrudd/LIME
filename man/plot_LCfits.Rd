@@ -5,10 +5,13 @@
 \title{plot length composition data and model fits}
 \usage{
 plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
-  Report = NULL, LBSPR = NULL, plot_fit = TRUE, n = FALSE)
+  Report = NULL, LBSPR = NULL, plot_fit = TRUE, n = FALSE,
+  time_labels = NULL)
 }
 \arguments{
 \item{LF_df}{list of length frequency matrices}
+
+\item{binwidth}{bin width for plotting data with LF_df}
 
 \item{Inputs}{LIME input file; default NULL if only plotting length data}
 
@@ -19,6 +22,8 @@ plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
 \item{plot_fit}{default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only}
 
 \item{n}{if TRUE, will display sample size of length comp data; default FALSE}
+
+\item{time_labels}{default=NULL, otherwise a vector of time series names}
 }
 \value{
 figure with length composition data and model fits if Report or LBSPR are specified
