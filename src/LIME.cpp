@@ -361,6 +361,7 @@ Type objective_function<Type>::operator() ()
     // Recruitment
     if(Rdet==0) R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1))) * exp(Nu_input(S_yrs(t)-1) - pow(sigma_R,2)/Type(2));
     if(Rdet==1) R_t(t) = ((4 * h * exp(beta) * SB_t(t-1)) / (SB0 * (1-h) + SB_t(t-1) * (5*h-1)));
+    if(S_yrs(t) == S_yrs(t-1)) R_t(t) = 0;
     
     // Age-structured dynamics
     for(int a=0;a<n_a;a++){
