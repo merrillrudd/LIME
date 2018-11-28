@@ -214,6 +214,9 @@ function(vbk,
     S_fa <- t(sapply(1:nfleets, function(x){
         colSums(t(plba_a)*S_fl[x,])
     }))
+    if(start_ages==0){
+        S_fa[,1] <- 1e-5
+    }
 
     if(any(selex_type=="dome")==FALSE) Sfull <- NULL
 
