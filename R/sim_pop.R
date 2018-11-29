@@ -15,6 +15,7 @@
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
 #' @param mgt_type removals based on F (default) or catch
 #' @param fleet_proportions vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.
+#' @param nareas number of areas, default = 1, if greater than 1, must be equal to the number of fleets
 #' @importFrom stats rnorm
 #' @return named list of attributes of true population/data
 #' @export
@@ -30,7 +31,8 @@ sim_pop <-
            seed,
            sample_type = 'catch',
            mgt_type = 'F',
-           fleet_proportions) {
+           fleet_proportions,
+           nareas) {
 
     with(lh, {
       ##########################
@@ -41,6 +43,8 @@ sim_pop <-
 
       Nyears <- Nyears * nseasons
       Nyears_comp <- Nyears_comp * nseasons
+
+      if((nareas > 1) & (nareas != nfleets)) stop("Number of fleets must be equal to the number of areas if nareas > 1")
 
 
       ##########################
@@ -221,26 +225,58 @@ sim_pop <-
       ##########################
 
       ## year 1 abundance at age
-      N_at <- N_at0 <- matrix(NA, nrow = length(L_a), ncol = Nyears)
+      N_ats <- N_ats0 <- array(NA, dim=c(length(L_a), Nyears, nareas)) #nrow = length(L_a), ncol = Nyears)
+      N_at <- N_at0 <- matrix(0, nrow = length(L_a), ncol = Nyears)
+
       for (a in 1:length(L_a)) {
         if (a == 1) {
-          N_at[a, 1] <- R_t[1]
-          N_at0[a, 1] <- R_t[1]
+          for(i in 1:nareas){
+            N_ats[a,1,i] <- R_t[1]/nareas
+            N_ats0[a,1,i] <- R_t[1]/nareas
+          }
         }
         if (a > 1 & a < length(L_a)) {
-          N_at[a, 1] <- N_at[a - 1, 1] * exp(-M - F_at[a-1,1])
-          N_at0[a, 1] <- N_at0[a - 1, 1] * exp(-M)
+          if(nareas > 1){
+            for(i in 1:nareas){
+              N_ats[a,1,i] <- N_ats[a - 1, 1, i] * exp(-M - F_atf[a-1,1,i])
+              N_ats0[a,1,i] <- N_ats0[a - 1, 1, i] * exp(-M)
+            }            
+          }
+          if(nareas == 1){
+            N_ats[a,1,1] <- N_ats[a-1, 1, 1] * exp(-M - F_at[a-1,1])
+            N_ats0[a,1,1] <- N_ats[a-1,1,1] * exp(-M)
+          }
+
         }
         if (a == length(L_a)) {
-          N_at[a, 1] <- (N_at[a - 1, 1] * exp(-M - F_at[a-1,1])) / (1 - exp(-M - F_at[a-1,1]))
-          N_at0[a, 1] <- (N_at0[a - 1, 1] * exp(-M)) / (1 - exp(-M))
+          if(nareas > 1){
+            for(i in 1:nareas){
+              N_ats[a, 1, i] <- (N_ats[a - 1, 1, i] * exp(-M - F_atf[a-1,1,i])) / (1 - exp(-M - F_atf[a-1,1,i]))
+              N_ats0[a, 1, i] <- (N_ats0[a - 1, 1, i] * exp(-M)) / (1 - exp(-M))
+            }
+          }
+          if(nareas == 1){
+            N_ats[a, 1,1] <- (N_ats[a - 1, 1,1] * exp(-M - F_at[a-1,1])) / (1 - exp(-M - F_at[a-1,1]))
+            N_ats0[a, 1,1] <- (N_ats0[a - 1, 1,1] * exp(-M)) / (1 - exp(-M))        
+          }
+        }
+      }
+
+      for(a in 1:length(L_a)){
+        for(i in 1:nareas){
+          N_at[a,1] <- N_at[a,1] + N_ats[a,1,i]
+          N_at0[a,1] <- N_at0[a,1] + N_ats0[a,1,i]
         }
       }
 
       ## year 1 biomass quantities
       TB_t <- SB_t <- rep(NA, Nyears)
+      TB_ts <- matrix(NA, nrow=Nyears, ncol=nareas)
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
+      for(i in 1:nareas){
+        TB_ts[i] <- sum(N_ats[,1,i] * W_a)
+      }
 
       # if(is.numeric(Fdynamics) & mgt_type=="catch"){
       #   F_t[1] <- max(0.01, getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1]))
@@ -250,8 +286,14 @@ sim_pop <-
       ## year 1 catch
       Cn_atf <- Cw_atf <- array(NA, c(length(L_a), Nyears, nfleets))
       for(f in 1:nfleets){
-        Cn_atf[,1,f] <- N_at[,1] * (1 - exp(-M - F_atf[,1,f])) * (F_atf[,1,f] / (M + F_atf[a,1,f]))
-        Cw_atf[,1,f] <- Cn_atf[,1,f] * W_a
+        if(nareas == 1){
+          Cn_atf[,1,f] <- N_at[,1] * (1 - exp(-M - F_atf[,1,f])) * (F_atf[,1,f] / (M + F_atf[a,1,f]))
+          Cw_atf[,1,f] <- Cn_atf[,1,f] * W_a
+        }
+        if(nareas > 1){
+          Cn_atf[,1,f] <- N_ats[,1,f] * (1 - exp(-M - F_atf[,1,f])) * (F_atf[,1,f] / (M + F_atf[a,1,f]))
+          Cw_atf[,1,f] <- Cn_atf[,1,f] * W_a          
+        }
       }
 
       ## unfished spawning biomass
@@ -287,22 +329,50 @@ sim_pop <-
         ## age-structured dynamics
         for (a in 1:length(L_a)) {
           if (a == 1) {
-            N_at[a, t] <- R_t[t]
-            N_at0[a, t] <- R_t[t]
+            for(i in 1:nareas){
+              N_ats[a, t, i] <- R_t[t]/nareas
+              N_ats0[a, t, i] <- R_t[t]/nareas
+            }
           }
           if (a > 1 & a < length(L_a)) {
-            N_at[a, t] <- N_at[a - 1, t - 1] * exp(-M - F_at[a-1,t-1])
-            N_at0[a, t] <- N_at0[a - 1, t - 1] * exp(-M)
+            if(nareas > 1){
+              for(i in 1:nareas){
+                N_ats[a, t, i] <- N_ats[a - 1, t - 1, i] * exp(-M - F_atf[a-1,t-1,i])
+                N_ats0[a, t, i] <- N_ats0[a - 1, t - 1, i] * exp(-M)
+              }              
+            }
+            if(nareas == 1){
+                N_ats[a, t, 1] <- N_ats[a - 1, t - 1, 1] * exp(-M - F_at[a-1,t-1])
+                N_ats0[a, t, 1] <- N_ats0[a - 1, t - 1, 1] * exp(-M)              
+            }
           }
           if (a == length(L_a)) {
-            N_at[a, t] <- (N_at[a - 1, t - 1] * exp(-M - F_at[a-1,t-1])) + (N_at[a, t - 1] * exp(-M - F_at[a,t-1]))
-            N_at0[a, t] <- (N_at0[a - 1, t - 1] * exp(-M)) + (N_at0[a, t - 1] * exp(-M))
+            if(nareas > 1){
+              for(i in 1:nareas){
+                N_ats[a, t, i] <- (N_ats[a - 1, t - 1, i] * exp(-M - F_atf[a-1,t-1,i])) + (N_ats[a, t - 1, i] * exp(-M - F_atf[a,t-1,i]))
+                N_ats0[a, t, i] <- (N_ats0[a - 1, t - 1, i] * exp(-M)) + (N_ats0[a, t - 1,i] * exp(-M))
+              }
+            }
+            if(nareas == 1){
+              N_ats[a, t,1] <- (N_ats[a - 1, t - 1,1] * exp(-M - F_at[a-1,t-1])) + (N_ats[a, t - 1,1] * exp(-M - F_at[a,t-1]))
+              N_ats0[a, t,1] <- (N_ats0[a - 1, t - 1,1] * exp(-M)) + (N_ats0[a, t - 1,1] * exp(-M))
+            }
+          }
+        }
+
+        for(a in 1:length(L_a)){
+          for(i in 1:nareas){
+            N_at[a,t] <- N_at[a,t] + N_ats[a,t,i]
+            N_at0[a,t] <- N_at0[a,t] + N_ats0[a,t,i]
           }
         }
 
           ## spawning biomass
           SB_t[t] <- sum((N_at[, t] * W_a * Mat_a))
           TB_t[t] <- sum(N_at[, t] * W_a)
+          for(i in 1:nareas){
+            TB_ts[t,i] <- sum(N_ats[,t,i] * W_a)
+          }
 
           # if(is.numeric(Fdynamics) & mgt_type=="catch"){
           #   F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
@@ -311,8 +381,14 @@ sim_pop <-
 
           ## catch
           for(f in 1:nfleets){
-            Cn_atf[,t,f] <- N_at[,t] * (1 - exp(-M - F_atf[,t,f])) * (F_atf[,t,f] / (M + F_atf[,t,f]))
-            Cw_atf[,t,f] <- Cn_atf[,t,f] * W_a
+            if(nareas == 1){
+              Cn_atf[,t,f] <- N_at[,t] * (1 - exp(-M - F_atf[,t,f])) * (F_atf[,t,f] / (M + F_atf[,t,f]))
+              Cw_atf[,t,f] <- Cn_atf[,t,f] * W_a
+            }
+            if(nareas > 1){
+              Cn_atf[,t,f] <- N_ats[,t,f] * (1 - exp(-M - F_atf[,t,f])) * (F_atf[,t,f] / (M + F_atf[,t,f]))
+              Cw_atf[,t,f] <- Cn_atf[,t,f] * W_a              
+            }
           }
 
       }
@@ -408,8 +484,8 @@ sim_pop <-
 
       ## abundance index
       if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
-      I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))
-      Effort_ft <- t(sapply(1:nfleets, function(x) Cw_ft[x,]/(qcoef[x]*TB_t)))
+      I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_ts[,x] * exp(IndexDev_f[x,])))
+      Effort_ft <- t(sapply(1:nfleets, function(x) Cw_ft[x,]/(qcoef[x]*TB_ts[,x])))
 
       ## age to length comp
       if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
@@ -429,24 +505,45 @@ sim_pop <-
       }
 
       LFinfo <-lapply(1:nfleets, function(x){
-        AgeToLengthComp(
-          lh = lh,
-          S_a = lh$S_fa[x,],
-          tyears = Nyears,
-          N_at = N_at,
-          comp_sample = obs_per_year[x,],
-          sample_type = sample_type
-        )
+        if(nareas == 1){
+          AgeToLengthComp(
+            lh = lh,
+            S_a = lh$S_fa[x,],
+            tyears = Nyears,
+            N_at = N_at,
+            comp_sample = obs_per_year[x,],
+            sample_type = sample_type)          
+        }
+        if(nareas > 1){
+          AgeToLengthComp(
+            lh = lh,
+            S_a = lh$S_fa[x,],
+            tyears = Nyears,
+            N_at = N_ats[,,x],
+            comp_sample = obs_per_year[x,],
+            sample_type = sample_type)
+        } 
+
       })
       LF0info <- lapply(1:nfleets, function(x){
-        AgeToLengthComp(
+        if(nareas == 1){
+         AgeToLengthComp(
           lh = lh,
           S_a = lh$S_fa[x,],
           tyears = Nyears,
           N_at = N_at0,
           comp_sample = obs_per_year[x,],
-          sample_type = sample_type
-        )
+          sample_type = sample_type)         
+        }
+        if(nareas > 1){
+         AgeToLengthComp(
+          lh = lh,
+          S_a = lh$S_fa[x,],
+          tyears = Nyears,
+          N_at = N_ats0[,,x],
+          comp_sample = obs_per_year[x,],
+          sample_type = sample_type)   
+        }
       })
       plba <- lapply(1:nfleets, function(x) LFinfo[[x]]$plba)
       plb <- lapply(1:nfleets, function(x) LFinfo[[x]]$plb)
@@ -511,6 +608,7 @@ sim_pop <-
       lh$plba <- plba
       lh$page <- lapply(1:length(page), function(x) page[[x]])
       lh$N_at <- N_at
+      lh$N_ats <- N_ats
       lh$nlbins <- length(mids)
       if (pool == TRUE) {
         lh$Nyears <- Nyears_real

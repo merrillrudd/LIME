@@ -11,12 +11,13 @@
 #' @param plot_fit default = TRUE if Report file or LBSPR file is included, plot the model fits, otherwise plot data only
 #' @param n if TRUE, will display sample size of length comp data; default FALSE
 #' @param time_labels default=NULL, otherwise a vector of time series names
+#' @param plot_type default = "density", alternate = "counts"
 #' @importFrom graphics abline axis barplot box legend lines mtext par
 #' 
 #' @return figure with length composition data and model fits if Report or LBSPR are specified
 #' 
 #' @export
-plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE, time_labels=NULL){
+plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=NULL, plot_fit=TRUE, n=FALSE, time_labels=NULL, plot_type="density"){
 	# dev.new()
 
 	if(all(is.null(Inputs))){
@@ -61,9 +62,10 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 		LF_df$Year2 <- sapply(1:nrow(LF_df), function(x) strsplit(time[x],"_")[[1]][2])
 	}
 
-	nf <- length(unique(LF_df$Fleet))
+	fleet_names <- unique(LF_df$Fleet)
+	nf <- length(fleet_names)
 	LCyrs <- lapply(1:nf, function(x){
-		sub <- LF_df %>% dplyr::filter(Fleet==x)
+		sub <- LF_df %>% dplyr::filter(Fleet==fleet_names[x])
 		yrs <- unique(sub$Year)[order(unique(sub$Year))]
 		return(yrs)
 	})
@@ -113,10 +115,15 @@ plot_LCfits <- function(LF_df=NULL, binwidth=1, Inputs=NULL, Report=NULL, LBSPR=
 
 if(all(is.null(Inputs))){
 	p <- ggplot(LF_df) + 
-		geom_histogram(aes(x=Length, y=..density.., color=Fleet, fill=Fleet), position="identity", binwidth=binwidth, alpha=0.6) +
 		scale_fill_brewer(palette="Set1") +
 		scale_color_brewer(palette="Set1") +
 		ylab("Proportion") + xlab("Length bin (cm)")
+	if(plot_type=="density"){
+		p <- p + geom_histogram(aes(x=Length, y=..density.., color=Fleet, fill=Fleet), position="identity", binwidth=binwidth, alpha=0.6)
+	}
+	if(plot_type=="counts"){
+		p <- p + geom_histogram(aes(x=Length, y=..count.., color=Fleet, fill=Fleet), position="identity", binwidth=binwidth, alpha=0.6)
+	}
 	if("Month" %in% colnames(LF_df)){
 		p <- p + facet_wrap(Year2~factor(Month), dir="v")
 	}
@@ -133,7 +140,7 @@ if(all(is.null(Report))==FALSE){
 	df_all <- rbind(LF_df2, pred_df2)
 
 	if(all(is.null(LBSPR))==FALSE){
-		pred_df2_mod2 <- pred_df_mod2 %>% mutate("Type"="Predicted") %>% mutate("Model"="LBSPR") %>% mutate("Fleet"=factor(1))
+		pred_df2_mod2 <- pred_df_mod2 %>% mutate("Type"="Predicted") %>% mutate("Model"="LBSPR") %>% mutate("Fleet"=factor(fleet_names[1]))
 		df_all <- dplyr::bind_rows(df_all, pred_df2_mod2)
 	}
 
