@@ -6,7 +6,7 @@
 \usage{
 sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
   init_depl = 0.99, seed, sample_type = "catch", mgt_type = "F",
-  fleet_proportions)
+  fleet_proportions, nareas)
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
@@ -32,6 +32,8 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 \item{mgt_type}{removals based on F (default) or catch}
 
 \item{fleet_proportions}{vector specifying the relative size of each fleet in terms of fishing pressure. must have length = nfleets and sum to 1.}
+
+\item{nareas}{number of areas, default = 1, if greater than 1, must be equal to the number of fleets}
 }
 \value{
 named list of attributes of true population/data
