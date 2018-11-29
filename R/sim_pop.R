@@ -38,7 +38,7 @@ sim_pop <-
       ##########################
       ## Initial calcs
       ##########################
-
+      if(Nyears == 1) stop("Must simulate at least two years")
       Nyears_real <- Nyears
 
       Nyears <- Nyears * nseasons
