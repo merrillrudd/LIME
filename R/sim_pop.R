@@ -506,7 +506,7 @@ sim_pop <-
 
       LFinfo <-lapply(1:nfleets, function(x){
         if(nareas == 1){
-          AgeToLengthComp(
+          lf <- AgeToLengthComp(
             lh = lh,
             S_a = lh$S_fa[x,],
             tyears = Nyears,
@@ -515,7 +515,7 @@ sim_pop <-
             sample_type = sample_type)          
         }
         if(nareas > 1){
-          AgeToLengthComp(
+          lf <- AgeToLengthComp(
             lh = lh,
             S_a = lh$S_fa[x,],
             tyears = Nyears,
@@ -523,11 +523,11 @@ sim_pop <-
             comp_sample = obs_per_year[x,],
             sample_type = sample_type)
         } 
-
+        return(lf)
       })
       LF0info <- lapply(1:nfleets, function(x){
         if(nareas == 1){
-         AgeToLengthComp(
+         lf <- AgeToLengthComp(
           lh = lh,
           S_a = lh$S_fa[x,],
           tyears = Nyears,
@@ -536,7 +536,7 @@ sim_pop <-
           sample_type = sample_type)         
         }
         if(nareas > 1){
-         AgeToLengthComp(
+         lf <- AgeToLengthComp(
           lh = lh,
           S_a = lh$S_fa[x,],
           tyears = Nyears,
@@ -544,6 +544,7 @@ sim_pop <-
           comp_sample = obs_per_year[x,],
           sample_type = sample_type)   
         }
+        return(lf)
       })
       plba <- lapply(1:nfleets, function(x) LFinfo[[x]]$plba)
       plb <- lapply(1:nfleets, function(x) LFinfo[[x]]$plb)
