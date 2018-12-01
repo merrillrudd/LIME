@@ -275,7 +275,7 @@ sim_pop <-
       TB_t[1] <- sum(N_at[, 1] * W_a)
       SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
       for(i in 1:nareas){
-        TB_ts[i] <- sum(N_ats[,1,i] * W_a)
+        TB_ts[,i] <- sum(N_ats[,1,i] * W_a)
       }
 
       # if(is.numeric(Fdynamics) & mgt_type=="catch"){
@@ -484,8 +484,14 @@ sim_pop <-
 
       ## abundance index
       if(length(qcoef)!=nfleets) qcoef <- rep(qcoef, nfleets)
-      I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_ts[,x] * exp(IndexDev_f[x,])))
-      Effort_ft <- t(sapply(1:nfleets, function(x) Cw_ft[x,]/(qcoef[x]*TB_ts[,x])))
+      if(nareas > 1){
+        I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_ts[,x] * exp(IndexDev_f[x,])))
+        Effort_ft <- t(sapply(1:nfleets, function(x) Cw_ft[x,]/(qcoef[x]*TB_ts[,x])))
+      }
+      if(nareas == 1){
+        I_ft <- t(sapply(1:nfleets, function(x) qcoef[x] * TB_t * exp(IndexDev_f[x,])))
+        Effort_ft <- t(sapply(1:nfleets, function(x) Cw_ft[x,]/(qcoef[x]*TB_t)))
+      }
 
       ## age to length comp
       if(length(Nyears_comp)!=nfleets) Nyears_comp <- rep(Nyears_comp, nfleets)
