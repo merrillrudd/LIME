@@ -25,9 +25,9 @@ calc_derived_quants = function( Obj, lh ){
   #     lh_new <- with(lh, create_lh_list(vbk=vbk, linf=linf, lwa=lwa, lwb=lwb, S50=Report$S50, S95=Report$S95, selex_input="length", M50=ML50, M95=ML95, maturity_input="length", selex_type="logistic", binwidth=binwidth, t0=t0, CVlen=CVlen, SigmaC=SigmaC, SigmaI=SigmaI, SigmaR=Report$sigma_R, SigmaF=SigmaF, R0=exp(Report$beta), h=Report$h, qcoef=Report$qcoef, M=M, AgeMax=AgeMax, start_ages=ages[1], nseasons=1))
   # }
 
-  SPR <- with(lh, calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, F=Report$F_t[length(Report$F_t)], ref=FALSE))
-  F30 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, ref=0.3)$root), error=function(e) NA) * lh_new$nseasons
-  F40 <- tryCatch(with(lh_new, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, ref=0.4)$root), error=function(e) NA) * lh_new$nseasons
+  SPR <- with(Data, calc_ref(ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, F=Report$F_t[length(Report$F_t)], ref=FALSE))
+  F30 <- tryCatch(with(Data, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, ref=0.3)$root), error=function(e) NA) * lh_new$nseasons
+  F40 <- tryCatch(with(Data, uniroot(calc_ref, lower=0, upper=50, ages=ages, Mat_a=Mat_a, W_a=W_a, M=M, S_fa=Report$S_fa, ref=0.4)$root), error=function(e) NA) * lh_new$nseasons
   FF30 <- FF40 <- NULL
   if(is.na(F30)==FALSE) FF30 <- Report$F_t/F30
   if(is.na(F40)==FALSE) FF40 <- Report$F_t/F40
@@ -37,8 +37,8 @@ calc_derived_quants = function( Obj, lh ){
   Cw_t <- Report$Cw_t_hat
 
   # MSY calculations
-  fmsy <- optimize(calc_msy, ages=lh_new$ages, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a, S_fa=Report$S_fa, lower=0, upper=10, maximum=TRUE)$maximum
-  msy <- calc_msy(F=fmsy, ages=lh_new$ages, M=lh_new$M, R0=exp(Report$beta), W_a=lh_new$W_a, S_fa=Report$S_fa)
+  fmsy <- optimize(calc_msy, ages=Data$ages, M=Data$M, R0=exp(Report$beta), W_a=Data$W_a, S_fa=Report$S_fa, lower=0, upper=10, maximum=TRUE)$maximum
+  msy <- calc_msy(F=fmsy, ages=Data$ages, M=Data$M, R0=exp(Report$beta), W_a=Data$W_a, S_fa=Report$S_fa)
 
   # Yield_Fn = function( Fmean, Return_type="Yield" ){
   #   # Modify data
@@ -73,11 +73,11 @@ calc_derived_quants = function( Obj, lh ){
 
   # # Calculate Fmsy
   Fmsy = fmsy
-  TBmsy = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta), S_fa=Report$S_fa) * lh_new$W_a)
-  SBmsy = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta), S_fa=Report$S_fa) * lh_new$W_a * lh_new$Mat_a)
+  TBmsy = sum(calc_equil_abund(ages=Data$ages, M=Data$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta), S_fa=Report$S_fa) * Data$W_a)
+  SBmsy = sum(calc_equil_abund(ages=Data$ages, M=Data$M, F=fmsy/lh_new$nseasons, R0=exp(Report$beta), S_fa=Report$S_fa) * Data$W_a * Data$Mat_a)
   MSY = msy
-  TB0 = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=0, R0=exp(Report$beta), S_fa=Report$S_fa) * lh_new$W_a)
-  SB0 = sum(calc_equil_abund(ages=lh_new$ages, M=lh_new$M, F=0, R0=exp(Report$beta), S_fa=Report$S_fa) * lh_new$W_a * lh_new$Mat_a)
+  TB0 = sum(calc_equil_abund(ages=Data$ages, M=Data$M, F=0, R0=exp(Report$beta), S_fa=Report$S_fa) * Data$W_a)
+  SB0 = sum(calc_equil_abund(ages=Data$ages, M=Data$M, F=0, R0=exp(Report$beta), S_fa=Report$S_fa) * Data$W_a * Data$Mat_a)
 
   # Return
   Return <- list("SPR"=SPR, "F30"=F30, "F40"=F40, "FF30"=FF30, "FF40"=FF40, "Fmsy"=Fmsy, "FFmsy"=Report$F_t/Fmsy, "SB0"=SB0, "TB0"=TB0, "TB_t"=TB_t, "SB_t"=Report$SB_t, "MSY"=MSY, "TBmsy"=TBmsy, "SBmsy"=SBmsy, "TBBmsy"=TB_t/TBmsy, "SBBmsy"=Report$SB_t/SBmsy)
