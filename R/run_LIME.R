@@ -304,7 +304,7 @@ for(iter in 1:length(itervec)){
       output$opt <- opt_save
 
       if(derive_quants==TRUE){
-          Derived = calc_derived_quants( Obj=obj_save, lh=lh )
+          Derived = calc_derived_quants( Obj=obj_save, lh=input )
           output$Derived <- Derived
       }
 
