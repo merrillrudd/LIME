@@ -402,9 +402,9 @@ format_input <- function(input,
             }
 
             if(any(est_rdev_t_inp == 0)){
-                Map[["Nu_input"]] <- Parameters$Nu_input
+                Map[["Nu_input"]] <- seq_along(Parameters$Nu_input)
                 Map[["Nu_input"]][which(est_rdev_t_inp == 0)] <- NA
-                Map[["Nu_input"]][which(est_rdev_t_inp != 0)] <- 1:length(which(est_rdev_t_inp != 0))
+                # Map[["Nu_input"]][which(est_rdev_t_inp != 0)] <- 1:length(which(est_rdev_t_inp != 0))
                 Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
             }
             if(all(est_rdev_t_inp == 0)){
