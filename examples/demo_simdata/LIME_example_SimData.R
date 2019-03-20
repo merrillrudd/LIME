@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME")
+devtools::install_github("merrillrudd/LIME", ref="development")
 library(LIME)
 library(ggplot2)
 library(dplyr)
@@ -303,6 +303,55 @@ plot_output(Inputs=Inputs,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
 			set_ylim=list("SPR" = c(0,1), "SB"=c(0,2)))		
+
+
+### remove some years of catch
+LF_list2 <- lapply(1:lh$nfleets, function(x){
+	out <- LF_list[[x]]
+	out[1:15,] <- 0
+	return(out)
+}) ##list with 1 element per fleet, and each element is a matrix with rows = years, columns = upper length bins
+LF_df2 <- LFreq_df(LF_list2)
+
+
+data_rm <- list("years"=1:true$Nyears, "LF"=LF_df2, "I_ft"=true$I_ft, "C_ft"=true$Cw_ft)
+inputs_rm <- create_inputs(lh=lh, input_data=data_rm)
+
+catch_lc2 <- run_LIME(modpath=NULL, 
+				input=inputs_rm,
+				data_avail="Catch_LC",
+				C_type=2,
+				est_rdev_t = c(rep(0,5),rep(1,15)))
+
+## check TMB inputs
+Inputs <- catch_lc2$Inputs
+
+## Report file
+Report <- catch_lc2$Report
+
+## Standard error report
+Sdreport <- catch_lc2$Sdreport
+
+## check convergence
+hessian <- Sdreport$pdHess
+gradient <- catch_lc2$opt$max_gradient <= 0.001
+hessian == TRUE & gradient == TRUE
+
+
+## plot length composition data
+plot_LCfits(Inputs=Inputs, 
+			Report=Report)		
+
+## plot model output
+plot_output(Inputs=Inputs, 
+			Report=Report,
+			Sdreport=Sdreport, 
+			lh=lh,
+			True=true, 
+			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
+			set_ylim=list("SPR" = c(0,1), "SB"=c(0,2)))		
+
+
 
 #######################################
 ## Index + length data
