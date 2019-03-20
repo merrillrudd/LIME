@@ -132,6 +132,7 @@ for(iter in 1:length(itervec)){
     output <- NULL
     output$input <- input
     output$data_avail <- data_avail
+    if(grepl("catch", tolower(data_avail)) & C_type == 0) stop("If including catch data,  must specify C_type as 1 for numbers or 2 for biomass.")
 
     if(all(vals_selex_ft < 0)){
       vals_selex_ft_new <- matrix(-1, nrow=input$nfleets, ncol=length(input$highs))
