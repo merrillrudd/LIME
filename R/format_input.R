@@ -402,7 +402,7 @@ format_input <- function(input,
             }
 
             if(any(est_rdev_t_inp == 0)){
-                Map[["Nu_input"]] <- est_rdev_t_inp
+                Map[["Nu_input"]] <- Parameters$Nu_input
                 Map[["Nu_input"]][which(est_rdev_t_inp == 0)] <- NA
                 Map[["Nu_input"]] <- factor(Map[["Nu_input"]])
             }
