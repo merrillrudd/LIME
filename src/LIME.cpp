@@ -604,7 +604,7 @@ Type objective_function<Type>::operator() ()
   for(int f=0;f<n_fl;f++){
     for(int t=0;t<n_t;t++){  
           // probability of index at that sample
-        if(C_ft(f,t)>0){
+        if(C_ft(f,t)>=0){
           if(C_type==1) log_pC_ft(f,t) += dlognorm( C_ft(f,t), log(Cn_ft(f,t)), sigma_C, true);
           if(C_type==2) log_pC_ft(f,t) += dlognorm( C_ft(f,t), log(Cw_ft(f,t)), sigma_C, true);
         }
