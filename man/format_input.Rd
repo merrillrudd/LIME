@@ -6,7 +6,7 @@
 \usage{
 format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
   est_more, fix_more, est_F_ft, f_startval_ft, rdev_startval_t,
-  est_selex_f, vals_selex_ft, Rdet, mirror, est_totalF, prop_f)
+  est_selex_f, vals_selex_ft, est_rdev_t, mirror, est_totalF, prop_f)
 }
 \arguments{
 \item{input}{tagged list of LIME inputs. Output from create_inputs.}
@@ -37,7 +37,7 @@ format_input(input, data_avail, Fpen, SigRpen, SigRprior, LFdist, C_type,
 
 \item{vals_selex_ft}{input selectivity-at-length (columns) by fleet (rows) - negative values in the first column indicate to estimate selectivity}
 
-\item{Rdet}{default=FALSE to estimate recruitment deviations, TRUE=deterministic recruitment}
+\item{est_rdev_t}{default=TRUE to estimate recruitment deviations, or specify vector with 0 to turn off deviations in a specific year and 1 to keep them on}
 
 \item{mirror}{vector of parameter names to mirror between fleets}
 
