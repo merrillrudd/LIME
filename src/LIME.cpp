@@ -235,9 +235,9 @@ Type objective_function<Type>::operator() ()
   n_a2 = match_ages.size();
   Type SB0 = 0;
   for(int a=0;a<n_a;a++){
-    for(int a2=0;a2<n_a2;a2++){
-      if(ages(a) == match_ages(a2)) SB0 += (exp(beta)*Type(n_s)) * exp(-M * Type(n_s) * Type(ages(a))) * W_a(a) * Mat_a(a);
-    }
+    // for(int a2=0;a2<n_a2;a2++){
+      SB0 += (exp(beta) * exp(-M * Type(a))) * W_a(a) * Mat_a(a);
+    // }
     
   }
   
