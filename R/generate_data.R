@@ -110,6 +110,7 @@ generate_data <-
         inits$F40 <- Derived$F40
         inits$FF40 <- Derived$FF40
         inits$TBmsy <- Derived$TBmsy
+        inits$TBBmsy <- Derived$TBBmsy
     }
 
       if(is.null(modpath)==FALSE) saveRDS(inits, file.path(iterpath, "True.rds"))
