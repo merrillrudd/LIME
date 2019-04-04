@@ -100,17 +100,18 @@ generate_data <-
         obj <- MakeADFun(data=TmbList[["Data"]], parameters=ParList, random=TmbList[["Random"]], map=TmbList[["Map"]],inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")  
         Derived <- calc_derived_quants(Obj=obj, lh=lh) 
 
-        inits$MSY <- Derived$MSY
-        inits$Fmsy <- Derived$Fmsy
-        inits$FFmsy <- Derived$FFmsy
-        inits$SBBmsy <- Derived$SBBmsy
-        inits$SBmsy <- Derived$SBmsy
-        inits$F30 <- Derived$F30
-        inits$FF30 <- Derived$FF30
-        inits$F40 <- Derived$F40
-        inits$FF40 <- Derived$FF40
-        inits$TBmsy <- Derived$TBmsy
-        inits$TBBmsy <- Derived$TBBmsy
+        inits$Derived <- Derived
+        # inits$MSY <- Derived$MSY
+        # inits$Fmsy <- Derived$Fmsy
+        # inits$FFmsy <- Derived$FFmsy
+        # inits$SBBmsy <- Derived$SBBmsy
+        # inits$SBmsy <- Derived$SBmsy
+        # inits$F30 <- Derived$F30
+        # inits$FF30 <- Derived$FF30
+        # inits$F40 <- Derived$F40
+        # inits$FF40 <- Derived$FF40
+        # inits$TBmsy <- Derived$TBmsy
+        # inits$TBBmsy <- Derived$TBBmsy
     }
 
       if(is.null(modpath)==FALSE) saveRDS(inits, file.path(iterpath, "True.rds"))
