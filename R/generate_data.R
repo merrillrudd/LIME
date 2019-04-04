@@ -92,7 +92,7 @@ generate_data <-
     if(derive_quants==TRUE){
         ## project the truth forward
         inits$C_ft <- DataList$Cw_ft
-        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=FALSE, vals_selex_ft=DataList$S_fl, mirror=FALSE, est_totalF=FALSE, prop_f=1, est_F_ft=TRUE)
+        TmbList <- format_input(input=inits, data_avail="Index_Catch_LC", Fpen=1, SigRpen=1, SigRprior=c(0.737,0.3), LFdist=1, C_type=2, est_more=FALSE, fix_more=FALSE, f_startval_ft=DataList$F_ft, rdev_startval_t=DataList$R_t, est_selex_f=FALSE, vals_selex_ft=DataList$S_fl, est_rdev_t=TRUE, mirror=FALSE, est_totalF=FALSE, prop_f=1, est_F_ft=TRUE)
         ParList <- TmbList$Parameters    
 
         # dyn.load(paste0(cpp_dir, "\\", dynlib("LIME")))       
