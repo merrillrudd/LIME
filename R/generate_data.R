@@ -103,6 +103,7 @@ generate_data <-
 
   # MSY calculations
   Fmsy <- optimize(calc_msy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=inits$S_fa, lower=0, upper=10, maximum=TRUE)$maximum
+  FFmsy <- inits$F_t/Fmsy
   msy <- calc_msy(F=Fmsy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=inits$S_fa)
   Bmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=inits$S_fa, R0=inits$R0) * inits$W_a)
   SBmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=inits$S_fa, R0=inits$R0) * inits$W_a * inits$Mat_a)
