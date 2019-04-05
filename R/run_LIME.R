@@ -315,7 +315,7 @@ for(iter in 1:length(itervec)){
           SBmsy <- sum(calc_equil_abund(ages=input$ages, M=input$M, F=Fmsy, S_fa=Report$S_fa, R0=exp(Report$beta)) * input$W_a * input$Mat_a)        
 
           SBBmsy <- Report$SB_t/SBmsy
-          BBmsy <- Report$B_t/Bmsy
+          BBmsy <- Report$TB_t/Bmsy
 
           Derived <- NULL
           Derived$Fmsy <- Fmsy
