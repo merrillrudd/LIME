@@ -317,6 +317,13 @@ for(iter in 1:length(itervec)){
           SBBmsy <- Report$SB_t/SBmsy
           BBmsy <- Report$TB_t/Bmsy
 
+
+          F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=50, ages=input$ages, Mat_a=input$Mat_a, W_a=input$W_a, M=input$M, S_fa=Report$S_fa, ref=0.3)$root, error=function(e) NA) * input$$nseasons
+          F40 <- tryCatch(uniroot(calc_ref, lower=0, upper=50, ages=input$ages, Mat_a=input$Mat_a, W_a=input$W_a, M=input$M, S_fa=Report$S_fa, ref=0.4)$root, error=function(e) NA) * input$nseasons
+          FF30 <- FF40 <- NULL
+          if(is.na(F30)==FALSE) FF30 <- Report$F_t/F30
+          if(is.na(F40)==FALSE) FF40 <- Report$F_t/F40
+
           Derived <- NULL
           Derived$Fmsy <- Fmsy
           Derived$FFmsy <- FFmsy
@@ -325,6 +332,10 @@ for(iter in 1:length(itervec)){
           Derived$BBmsy <- BBmsy
           Derived$SBmsy <- SBmsy
           Derived$SBBmsy <- SBBmsy
+          Derived$F30 <- F30
+          Derived$F40 <- F40
+          Derived$FF30 <- FF30
+          Derived$FF40 <- FF40
           output$Derived <- Derived
         }
       }

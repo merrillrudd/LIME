@@ -111,6 +111,8 @@ generate_data <-
   SBBmsy <- inits$SB_t/SBmsy
   BBmsy <- inits$B_t/Bmsy
 
+  inits$F30 <- F30
+  inits$F40 <- F40
   inits$FF30 <- FF30
   inits$FF40 <- FF40
   inits$Fmsy <- Fmsy
