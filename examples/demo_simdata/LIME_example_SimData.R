@@ -2,7 +2,7 @@ rm(list=ls())
 
 ## Packages
 
-devtools::install_github("merrillrudd/LIME", ref="development")
+devtools::install_github("merrillrudd/LIME")
 library(LIME)
 library(ggplot2)
 library(dplyr)
@@ -75,8 +75,8 @@ true <- generate_data(modpath=NULL,
 					  comp_sample=200,
 					  init_depl=0.7,
 					  seed=123,
-					  fleet_proportions=1)
-
+					  fleet_proportions=1,
+					  derive_quants=TRUE)
 
 ## plot simulated data
 par(mfrow=c(3,2))
@@ -144,7 +144,8 @@ inputs_all <- create_inputs(lh=lh, input_data=data_all)
 rich <- run_LIME(modpath=NULL, 
 				input=inputs_all,
 				data_avail="Index_Catch_LC",
-				C_type=2) 
+				C_type=2,
+				derive_quants=TRUE) 
 
 ## check TMB inputs
 Inputs <- rich$Inputs
@@ -181,6 +182,9 @@ plot_output(Inputs=Inputs,
 			True=true, 
 			plot=c("Fish","Rec","SPR","ML","SB","Selex"), 
 			set_ylim=list("SPR" = c(0,1)))
+
+plot(true$BBmsy, ylim=c(0,4))
+lines(rich$Derived$BBmsy)
 
 
 #######################################
