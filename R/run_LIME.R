@@ -318,7 +318,7 @@ for(iter in 1:length(itervec)){
           BBmsy <- Report$TB_t/Bmsy
 
 
-          F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=50, ages=input$ages, Mat_a=input$Mat_a, W_a=input$W_a, M=input$M, S_fa=Report$S_fa, ref=0.3)$root, error=function(e) NA) * input$$nseasons
+          F30 <- tryCatch(uniroot(calc_ref, lower=0, upper=50, ages=input$ages, Mat_a=input$Mat_a, W_a=input$W_a, M=input$M, S_fa=Report$S_fa, ref=0.3)$root, error=function(e) NA) * input$nseasons
           F40 <- tryCatch(uniroot(calc_ref, lower=0, upper=50, ages=input$ages, Mat_a=input$Mat_a, W_a=input$W_a, M=input$M, S_fa=Report$S_fa, ref=0.4)$root, error=function(e) NA) * input$nseasons
           FF30 <- FF40 <- NULL
           if(is.na(F30)==FALSE) FF30 <- Report$F_t/F30
