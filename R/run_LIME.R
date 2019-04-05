@@ -305,8 +305,28 @@ for(iter in 1:length(itervec)){
       output$opt <- opt_save
 
       if(derive_quants==TRUE){
-          Derived = calc_derived_quants( Obj=obj_save, lh=input )
+        if(all(is.na(Report))) Derived <- "Model NA"
+        if(all(is.na(Report))==FALSE){
+                    # MSY calculations
+          Fmsy <- optimize(calc_msy, ages=input$ages, M=input$M, R0=exp(Report$beta), W_a=input$W_a, S_fa=Report$S_fa, lower=0, upper=10, maximum=TRUE)$maximum
+          FFmsy <- Report$F_t/Fmsy
+          msy <- calc_msy(F=Fmsy, ages=input$ages, M=input$M, R0=exp(Report$beta), W_a=input$W_a, S_fa=Report$S_fa)
+          Bmsy <- sum(calc_equil_abund(ages=input$ages, M=input$M, F=Fmsy, S_fa=Report$S_fa, R0=exp(Report$beta)) * input$W_a)
+          SBmsy <- sum(calc_equil_abund(ages=input$ages, M=input$M, F=Fmsy, S_fa=Report$S_fa, R0=exp(Report$beta)) * input$W_a * input$Mat_a)        
+
+          SBBmsy <- Report$SB_t/SBmsy
+          BBmsy <- Report$B_t/Bmsy
+
+          Derived <- NULL
+          Derived$Fmsy <- Fmsy
+          Derived$FFmsy <- FFmsy
+          Derived$msy <- msy
+          Derived$Bmsy <- Bmsy
+          Derived$BBmsy <- BBmsy
+          Derived$SBmsy <- SBmsy
+          Derived$SBBmsy <- SBBmsy
           output$Derived <- Derived
+        }
       }
 
         output$df <- df
