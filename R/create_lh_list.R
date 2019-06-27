@@ -257,6 +257,7 @@ function(vbk,
     Outs$dome_sd <- dome_sd
     Outs$selex_type <- selex_type
     Outs$selex_input <- selex_input
+    Outs$plba <- plba_a
     Outs$maturity_input <- maturity_input
     Outs$h <- h
     Outs$qcoef <- qcoef
