@@ -300,7 +300,7 @@ sim_pop <-
       }
 
       ## unfished spawning biomass
-      SB0 <- sum(calc_equil_abund(ages=ages, M=M, F=0, R0=R0, S_fa=S_fa) * W_a * Mat_a)      
+      SB0 <- sum(calc_equil_abund(ages=ages, M=M, F=rep(0,nrow(S_fa)), R0=R0, S_fa=S_fa) * W_a * Mat_a)      
 
 
       ##########################
