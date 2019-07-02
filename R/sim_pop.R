@@ -134,7 +134,8 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = 0.4)$root,
+            ref = 0.4,
+            fleet_prop=fleet_proportions)$root,
           error = function(e)
             NA
         )
@@ -149,7 +150,8 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = init_depl)$root,
+            ref = init_depl,
+            fleet_prop=fleet_proportions)$root,
           error = function(e)
             NA
         )
@@ -166,7 +168,8 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa, 
-            ref = 0.05)$root,
+            ref = 0.05,
+            fleet_prop=fleet_proportions)$root,
           error = function(e)
             NA
         )
@@ -412,7 +415,8 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa,
-            F = F_t[x]
+            F = F_ft[,x],
+            fleet_prop=fleet_proportions
           ))
       SPR <- SPR_t[length(SPR_t)]
 

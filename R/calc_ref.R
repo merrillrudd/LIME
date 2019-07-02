@@ -7,19 +7,23 @@
 #' @param Mat_a from report file / true file for simulation
 #' @param W_a from report file / true file for simulation
 #' @param M from report file / true file for simulation
-#' @param F proposed F to calculate reference point
+#' @param F proposed F to calculate reference point, if S_fa has more than 1 fleet, requires F as a vector, one for each fleet
 #' @param S_fa selectivity by fleet by age
 #' @param ref FALSE outputs SPR, ref= a value between 0 and 1 can be used with uniroot to find the F at which SPR=ref
+#' @param fleet_prop fleet proportions
 
 #' @return List, a tagged list of potentially useful benchmarks
 #' @details Use this function with uniroot to find the value of F that results in SPR matching the specified reference value (e.g. 0.30 to find F30)
 #' @export
-calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE){
+calc_ref <- function(ages, Mat_a, W_a, M, F, S_fa, ref=FALSE, fleet_prop=1){
 
     ## calculate spawning biomass per recruit in fished and unfished condition
     ## a function of specified level of fishing mortality and ability to estimate selectivity parameters
-    Na0 <- calc_equil_abund(ages=ages, M=M, F=0, S_fa=S_fa, R0=1)
-    Naf <- calc_equil_abund(ages=ages, M=M, F=F, S_fa=S_fa, R0=1)
+
+    F_inp <- sapply(1:nrow(S_fa), function(x) F*fleet_prop[x])
+    # if(ref!=FALSE) F_inp <- F
+    Na0 <- calc_equil_abund(ages=ages, M=M, F=rep(0,length(fleet_prop)), S_fa=S_fa, R0=1)
+    Naf <- calc_equil_abund(ages=ages, M=M, F=F_inp, S_fa=S_fa, R0=1)
 
         ## ignore recruits
     # really sbpr

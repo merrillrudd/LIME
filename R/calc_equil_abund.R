@@ -5,7 +5,7 @@
 #' @author M.B. Rudd
 #' @param ages vector of ages
 #' @param M natural mortality
-#' @param F fishing mortality
+#' @param F proposed F to calculate reference point, if S_fa has more than 1 fleet, requires F as a vector, one for each fleet
 #' @param S_fa selectivity by fleet by age
 #' @param R0 recruitment
 
@@ -19,7 +19,7 @@ calc_equil_abund <- function(ages, M, F, S_fa, R0){
 	nfleets <- nrow(S_fa)
 	Fmat <- matrix(NA, nrow=nfleets, ncol=length(ages))
 	for(i in 1:nfleets){
-		Fmat[i,] <- S_fa[i,]*F
+		Fmat[i,] <- S_fa[i,]*F[i]
 	}
 	Ftotal <- colSums(Fmat)
 
