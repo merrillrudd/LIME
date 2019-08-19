@@ -158,9 +158,11 @@ LB_lengths@NYears <- ncol(LB_lengths@LData)
 lbspr <- LBSPRfit(LB_pars=LB_pars, LB_lengths=LB_lengths)
 
 ## LIME
+# inputs_LC$SigmaR <- 0.0001
 lc_only <- run_LIME(modpath=NULL, 
 				input=inputs_LC,
-				data_avail="LC")
+				data_avail="LC",
+				est_rdev_t=c(rep(0,10),rep(1,10)))
 
 ## check TMB inputs
 Inputs <- lc_only$Inputs
