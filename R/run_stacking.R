@@ -15,6 +15,8 @@
 #' @export
 run_stacking <- function(modpath, iter=NULL, lh, model, nodes, dim, input_data=NULL){
 
+	stop("Deprecated: please use function bioensembles::run_stacking.")
+
 	if(all(is.null(iter))==FALSE){
 		iterpath <- file.path(modpath, iter)
 		if(file.exists(file.path(iterpath, "True.rds"))==FALSE) stop("Generated data not available in directory")

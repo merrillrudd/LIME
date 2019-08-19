@@ -50,6 +50,8 @@ runstack <- function(savedir,
 					model="LIME",
 					sim_model="LIME"){
 
+	stop("Deprecated: please use function bioensembles::run_stacking.")
+
 	## check inputs and find directories
 	if(simulation == TRUE){
 		if(is.null(iter)) stop("Must specify iteration number when simulation==TRUE")
