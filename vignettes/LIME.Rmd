@@ -72,14 +72,15 @@ devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
 
 4. Install LIME:
 ```{r install_LIME, eval=FALSE}
-devtools::install_github("merrillrudd/LIME", dependencies=TRUE, ref="multifleet")
+devtools::install_github("merrillrudd/LIME", dependencies=TRUE)
 ```
 
 The installation may produce error messages requiring other packages. You can download those from CRAN if they are not automatically downloaded in the LIME installation process, and then start from the step that produced the error. Again, please use the contact info in Bug Reports if this doesn't work, as you may have discovered a new installation error... congratulations!
 
-## Load the Package
+## Load packages
 ```{r, message=FALSE}
 library(LIME)
+library(tidyverse)
 ```
 
 # Step 1: Specify biological inputs and starting values
@@ -215,7 +216,7 @@ The `generate_data` function has several settings for which the user is required
  - `Rdynamics`: Pattern for recruitment dynamics; options include `Constant`, or `Pulsed`.
  - `Nyears`: number of years for your simulated population.
  - `Nyears_comp`: number of years to generate length data; e.g. if 10 years and `Nyears` is 20 years, will be the last 10 years in the 20 year time series. Must correspond to the number of fleets, e.g. c(20,10) would mean 20 years of length data for fleet 1 and 10 years of length data for fleet 2.
- - `comp_sample`: nominal sample size of length data annually; e.g. 200 length measurements collected annually. If there is more than 1 fleet and only 1 number is specified, that number will apply to all fleets (e.g. 200 samples in each fleet).
+ - `comp_sample`: nominal sample size of length data for each year; e.g. vector of length 20 (1 for each year), with 200 length measurements collected annually. If there is more than 1 fleet and only 1 number is specified, that number will apply to all fleets (e.g. 200 samples in each fleet).
  - `init_depl`: initial depletion, or the proportion of the unfished population biomass in the first year of the population to be modeled. Specifying a single value indicates the initial depletion (e.g. 0.5) or two values indicates the lower and upper bounds of a uniform distribution for which the population simulation will randomly draw a depletion value (e.g. c(0.1,0.9)).
  -  `seed`: set a seed for random numbers for generating process deviations.
 
@@ -234,7 +235,7 @@ true <- generate_data(modpath=NULL,
             lh=lh,
             Nyears=20,
             Nyears_comp=c(20),
-            comp_sample=200,
+            comp_sample=rep(200,20),
             init_depl=0.7,
             seed=123,
             fleet_proportions=1)
@@ -250,11 +251,16 @@ plot(true$I_ft[1,], type="l", lwd=4, xlab="Year", ylab="Abundance index", ylim=c
 ```
 
 
-The `LIME` package includes the `plot_LCfits` function which can first be used to plot the length frequency data, and later used to plot the model fits to the length frequency data. The `plot_LCfits` function requires the length frequency data in list form, where each element of the list is the length frequency data for a single fleet, structured as a matrix with years along the rows and length bins along the column. 
+The `LIME` package includes the `plot_LCfits` function which can first be used to plot the length frequency data, and later used to plot the model fits to the length frequency data. The `plot_LCfits` function requires the length frequency data in data frame form, which can be formatted correctly using the `LFreq_df` function. 
 
-The following code converts the length frequency array `true_LF` output from the `generate_data` function into a list to use in the `plot_LCfits` function:
+```{r df}
+LF_df <- LFreq_df(true$LF)
+```
+
+The length frequency data frame can then be used in the `plot_LCfits` function.
+
 ```{r, fig.height=6, fig.width=8, tidy=TRUE, fig.cap="Generated length composition data, labeled by years 1-20."}
-plot_LCfits(LFlist=list("LF"=true$LF[,,1]))
+plot_LCfits(LF_df=LF_df)
 ```
 
 
@@ -287,7 +293,7 @@ LF_array_sub
 ```
 
 
-**Option 2: List**
+**Option 3: List**
 
 The length composition data could also be a list of matrices (one for each fleet).
 
@@ -297,7 +303,6 @@ LF_list <- list()
 LF_list[[1]] <- LF_array_sub[,,1]
 LF_list
 ```
-
 
 ### Catch and abundance index
 
@@ -516,9 +521,10 @@ hessian==TRUE & gradient == TRUE
 #### Plot results
 
 
-We can use the same LF_list as was calculated in the data-rich case, but compare the LIME model fits from the model that excluded catch and abundance index:
+We can use the same LF_df as was calculated in the data-rich case, but compare the LIME model fits from the model that excluded catch and abundance index:
 ```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the LIME model run with length composition data only."}
-plot_LCfits(LFlist=LF_list,
+
+plot_LCfits(LF_df=LF_df,
             Inputs=lc_only$Inputs,
             Report=lc_only$Report)
 ```
@@ -589,7 +595,7 @@ hessian==TRUE & gradient == TRUE
 
 Model fits including catch data with length composition data:
 ```{r, tidy=TRUE, fig.height=6, fig.width=8, fig.cap="Fits to length composition data for the LIME model run with catch and length data."}
-plot_LCfits(LFlist=LF_list,
+plot_LCfits(LF_df=LF_df,
             Inputs=catch_lc$Inputs,
             Report=catch_lc$Report)
 ```
@@ -683,7 +689,7 @@ true_dome <- generate_data(modpath=NULL,
             lh=lh_dome,
             Nyears=20,
             Nyears_comp=20,
-            comp_sample=200,
+            comp_sample=rep(200,20),
             init_depl=0.7,
             seed=123)
 
@@ -703,7 +709,7 @@ plot(lh_dome$S_fl[1,], type="l", lwd=4, xlab="Length (cm)", ylab="Proportion sel
 run_dome <- run_LIME(modpath=NULL, 
                   input=inputs_dome,
                   data_avail="LC",
-                  vals_selex_ft=inputs_dome)
+                  vals_selex_ft=inputs_dome$S_fl)
 
 plot_output(Inputs=run_dome$Inputs,
             Report=run_dome$Report,
@@ -758,7 +764,7 @@ true_mf1 <- generate_data(modpath=NULL,
             lh=lh_mf1,
             Nyears=20,
             Nyears_comp=c(20,10),
-            comp_sample=200,
+            comp_sample=rep(200, 20),
             init_depl=0.7,
             seed=123,
             fleet_proportions=c(0.6,0.4))
@@ -787,15 +793,16 @@ lines(true_mf1$I_ft[2,], col=cols[2])
 ```
 
 
-Move the generated data from an array to a list to plot the data.
+Move the generated data from an array to a data frame to plot the data.
 ```{r, echo=FALSE}
 LF_list <- lapply(1:true_mf1$nfleets, function(x){
   return(true_mf1$LF[,,x])
 })
+LF_df <- LFreq_df(LF_list)
 ```
 
 ```{r, fig.height=6, fig.width=8, tidy=TRUE, fig.cap="Generated length composition data, labeled by years 1-20."}
-plot_LCfits(LFlist=LF_list)
+plot_LCfits(LF_df=LF_df)
 ```
 
 ```{r, tidy=TRUE}
