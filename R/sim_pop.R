@@ -283,7 +283,7 @@ sim_pop <-
 
       if(is.numeric(Fdynamics) & mgt_type=="catch"){
         F_ft[1,] <- max(0.01, getFt(ct=Fdynamics, m=M, sa=S_fa[1,], wa=W_a, na=N_at[,1]))
-        F_ft[1,] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
+        # F_ft[1,] <- min(c(Fmax, F_ft[1,1]), na.rm=TRUE)
       }
 
       ## year 1 catch
