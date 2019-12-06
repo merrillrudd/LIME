@@ -281,10 +281,10 @@ sim_pop <-
         TB_ts[,i] <- sum(N_ats[,1,i] * W_a)
       }
 
-      # if(is.numeric(Fdynamics) & mgt_type=="catch"){
-      #   F_t[1] <- max(0.01, getFt(ct=C_t[1], m=M, sa=S_a, wa=W_a, na=N_at[,1]))
-      #   F_t[1] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
-      # }
+      if(is.numeric(Fdynamics) & mgt_type=="catch"){
+        F_ft[1,] <- max(0.01, getFt(ct=Fdynamics, m=M, sa=S_fa[1,], wa=W_a, na=N_at[,1]))
+        F_ft[1,] <- min(c(Fmax, F_t[1]), na.rm=TRUE)
+      }
 
       ## year 1 catch
       Cn_atf <- Cw_atf <- array(NA, c(length(L_a), Nyears, nfleets))
@@ -377,10 +377,10 @@ sim_pop <-
             TB_ts[t,i] <- sum(N_ats[,t,i] * W_a)
           }
 
-          # if(is.numeric(Fdynamics) & mgt_type=="catch"){
-          #   F_t[y] <- max(0.01,getFt(ct=C_t[y], m=M, sa=S_a, wa=W_a, na=N_at[,y]))
-          #   # F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
-          # }
+          if(is.numeric(Fdynamics) & mgt_type=="catch"){
+            F_ft[1,y] <- max(0.01,getFt(ct=Fdynamics, m=M, sa=S_fa[1,], wa=W_a, na=N_at[,y]))
+            # F_t[y] <- min(c(Fmax, F_t[y]), na.rm=TRUE)
+          }
 
           ## catch
           for(f in 1:nfleets){
