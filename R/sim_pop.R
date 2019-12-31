@@ -415,7 +415,7 @@ sim_pop <-
             W_a = W_a,
             M = M,
             S_fa = S_fa,
-            F = F_ft[,x],
+            F = F_t[,x],
             fleet_prop=fleet_proportions
           ))
       SPR <- SPR_t[length(SPR_t)]
