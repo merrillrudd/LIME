@@ -13,7 +13,8 @@
 #' @param Nyears_comp number of years to generate length composition data
 #' @param comp_sample sample size of length composition data each year
 #' @param rewrite TRUE will re-run OM and observation model. FALSE will skip if it's already written in directory.
-#' @param init_depl default=0.4, can specify a different value or 2 values that indicate range from which to choose them
+#' @param init_depl default=NULL, can specify a starting depletion, initial F (using init_F), or 2 values that indicate range from which to choose them
+#' @param init_F default=NULL, can specify a starting F, an initial depletion (using init_depl), or 2 vaues that indicate range from which to choose them 
 #' @param derive_quants default=FALSE (takes longer to run), can set to TRUE to output additional derived quantities.
 #' @param seed single seed or vector of seeds for each iteration
 #' @param mgt_type removals based on F (default) or catch
@@ -35,13 +36,15 @@ generate_data <-
             Nyears_comp, 
             comp_sample, 
             rewrite=TRUE, 
-            init_depl, 
+            init_depl = NULL,
+            init_F = NULL,  
             derive_quants=FALSE, 
             seed, 
             mgt_type="F",
             fleet_proportions=1,
             nareas = 1){
 
+    if(all(is.null(init_depl)) & all(is.null(init_F))) stop("must specify initial depletion or initial fishing mortality rate")
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
     for(iter in itervec){
@@ -57,25 +60,44 @@ generate_data <-
         }
     }
 
+    if(all(is.null(init_depl)) == FALSE){
+      init_type = "depl"
+      init <- init_depl
+      init_depl_inp <- init_depl
+      init_F_inp <- NULL
+    }
+    if(all(is.null(init_F)) == FALSE){
+      init_type = "F"
+      init <- init_F
+      init_depl_inp <- NULL
+      init_F_inp <- init_F
+    }
+
     ## if level of depletion in first year is specified:
-    if(length(init_depl)==1){
-        init_depl_input <- init_depl
+    if(length(init)==1){
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions, nareas = nareas)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_inp, init_F = init_F_inp, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions, nareas = nareas)
         if(all(is.na(DataList))==FALSE & all(is.null(modpath)==FALSE)) write(iseed, file.path(modpath, iter, paste0("init_depl_seed", iseed,".txt")))
-         
     }
 
   
-    ## if we are choosing randomly from a range of initial depletion:
-    if(length(init_depl)==2){
+    ## if we are choosing randomly from a range :
+    if(length(init)==2){
+
         DataList <- NA
         add <- 0
         while(all(is.na(DataList))){
             seed_init <- iseed + add
-            init_depl_input <- runif(1,init_depl[1],init_depl[2])
+            if(init_type == "depl"){
+              init_depl_input <- runif(1,init_depl[1],init_depl[2])
+              init_F_input <- NULL
+            }
+            if(init_type == "F"){
+              init_F_input <- runif(1,init_F[1], init_F[2])
+              init_depl_input <- NULL
+            }
             ## simulated data with no spatial structure in growth
-            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, seed=seed_init, fleet_proportions=fleet_proportions, nareas = nareas), error=function(e) NA)
+            DataList <- tryCatch(sim_pop(lh=lh, pool=pool, Nyears=Nyears, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_input, init_F = init_F_input, seed=seed_init, fleet_proportions=fleet_proportions, nareas = nareas), error=function(e) NA)
             if(all(is.na(DataList))==FALSE & all(is.null(modpath)==FALSE)) write(seed_init, file.path(modpath, iter, paste0("init_depl_seed", seed_init,".txt")))
             if(all(is.na(DataList))) add <- add + 1000
         }

@@ -10,7 +10,8 @@
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample sample size of length composition data annually
-#' @param init_depl initial depletion on which to calculate F1; default = 0.99
+#' @param init_depl default=NULL, can specify a starting depletion, initial F (using init_F), or 2 values that indicate range from which to choose them
+#' @param init_F default=NULL, can specify a starting F, an initial depletion (using init_depl), or 2 vaues that indicate range from which to choose them 
 #' @param seed set seed for generating stochastic time series
 #' @param sample_type a character vector specifying if the length comps are sampled from the 'catch' (default) or from the population
 #' @param mgt_type removals based on F (default) or catch
@@ -27,7 +28,8 @@ sim_pop <-
            Rdynamics,
            Nyears_comp,
            comp_sample,
-           init_depl=0.99,
+           init_depl = NULL,
+           init_F = NULL,
            seed,
            sample_type = 'catch',
            mgt_type = 'F',
@@ -135,26 +137,32 @@ sim_pop <-
             M = M,
             S_fa = S_fa, 
             ref = 0.4,
-            fleet_prop=fleet_proportions)$root,
+            fleet_prop=fleet_proportions,
+            type = "spr")$root,
           error = function(e)
             NA
         )
-      Finit <-
-        tryCatch(
-          uniroot(
-            calc_ref,
-            lower = 0,
-            upper = 200,
-            ages = ages,
-            Mat_a = Mat_a,
-            W_a = W_a,
-            M = M,
-            S_fa = S_fa, 
-            ref = init_depl,
-            fleet_prop=fleet_proportions)$root,
-          error = function(e)
-            NA
-        )
+      if(all(is.null(init_F))==FALSE){
+        Finit <- init_F
+      } else {
+        Finit <-
+          tryCatch(
+            uniroot(
+              calc_ref,
+              lower = 0,
+              upper = 200,
+              ages = ages,
+              Mat_a = Mat_a,
+              W_a = W_a,
+              M = M,
+              S_fa = S_fa, 
+              ref = init_depl,
+              fleet_prop=fleet_proportions,
+              type = "depletion")$root,
+            error = function(e)
+              NA
+          )        
+      }
       if (is.na(Finit))
         stop("F corresponding to initial depletion does not exist")
       Fmax <-
@@ -169,7 +177,8 @@ sim_pop <-
             M = M,
             S_fa = S_fa, 
             ref = 0.05,
-            fleet_prop=fleet_proportions)$root,
+            fleet_prop=fleet_proportions,
+            type = "depletion")$root,
           error = function(e)
             NA
         )
