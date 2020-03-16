@@ -103,7 +103,7 @@ generate_data <-
         }
 
     }
-    if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
+    # if(length(init_depl)!=1 & length(init_depl)!=2) stop("init_depl must be a single proportion or 2 numbers inidicating minimum or maximum of range")
 
     inits <- create_inputs(lh=lh, input_data=DataList)
     inits$B_t <- sapply(1:ncol(inits$N_at), function(x) sum(inits$N_at[,x] * inits$W_a))
@@ -124,11 +124,11 @@ generate_data <-
   # Cw_t <- Report$Cw_t_hat
 
   # MSY calculations
-  Fmsy <- optimize(calc_msy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=inits$S_fa, lower=0, upper=10, maximum=TRUE)$maximum
+  Fmsy <- optimize(calc_msy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=matrix(rep(1,ncol(inits$S_fa)),nrow=inits$nfleets), lower=0, upper=10, maximum=TRUE)$maximum #inits$S_fa
   FFmsy <- inits$F_t/Fmsy
-  msy <- calc_msy(F=Fmsy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=inits$S_fa)
-  Bmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=inits$S_fa, R0=inits$R0) * inits$W_a)
-  SBmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=inits$S_fa, R0=inits$R0) * inits$W_a * inits$Mat_a)
+  msy <- calc_msy(F=Fmsy, ages=inits$ages, M=inits$M, R0=inits$R0, W_a=inits$W_a, S_fa=matrix(rep(1,ncol(inits$S_fa)),nrow=inits$nfleets)) #inits$S_fa
+  Bmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=matrix(rep(1,ncol(inits$S_fa)),nrow=inits$nfleets), R0=inits$R0) * inits$W_a)
+  SBmsy <- sum(calc_equil_abund(ages=inits$ages, M=inits$M, F=Fmsy, S_fa=matrix(rep(1,ncol(inits$S_fa)),nrow=inits$nfleets), R0=inits$R0) * inits$W_a * inits$Mat_a)
 
   SBBmsy <- inits$SB_t/SBmsy
   BBmsy <- inits$B_t/Bmsy
