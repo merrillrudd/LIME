@@ -13,7 +13,7 @@
 getFt <- function(ct,m,sa,wa,na)
 {	#use newtons root finding method to get ft
 	ft 	<- ct/(sum(na*exp(-m/2)*wa*sa))	
-	for(iter in 1:9)
+	for(iter in 1:10)
 	{
 		t1	<- wa*na
 		t2	<- exp(-m-ft*sa)
