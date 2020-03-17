@@ -44,7 +44,7 @@ generate_data <-
             fleet_proportions=1,
             nareas = 1){
 
-    if(all(is.null(init_depl)) & all(is.null(init_F))) stop("must specify initial depletion or initial fishing mortality rate")
+    if(all(is.null(init_depl)) & all(is.null(init_F)) & length(Fdynamics) == 1) stop("must specify initial depletion, initial fishing mortality rate, or input F time series via Fdynamics")
     if(is.null(modpath) & length(itervec)>1) stop("must specify path to save simulation iterations")
     if(is.null(modpath)) itervec <- 1
     for(iter in itervec){
@@ -71,6 +71,12 @@ generate_data <-
       init <- init_F
       init_depl_inp <- NULL
       init_F_inp <- init_F
+    }
+    if(is.matrix(Fdynamics)){
+      init_type = "F_vec"
+      init <- "F_vec"
+      init_depl_input <- NULL
+      init_F_inp <- NULL
     }
 
     ## if level of depletion in first year is specified:

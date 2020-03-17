@@ -6,7 +6,7 @@
 #' @param lh list of life history information, from create_lh_list
 #' @param Nyears number of years to simulate
 #' @param pool if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length
-#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input number to project forward using a specific F.
+#' @param Fdynamics Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input matrix with dimensions fleets = rows, years = columns
 #' @param Rdynamics Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH
 #' @param Nyears_comp number of years of length composition data
 #' @param comp_sample sample size of length composition data annually
@@ -76,6 +76,7 @@ sim_pop <-
       FishDev_f <- t(sapply(1:nfleets, function(x){
         c(0, rnorm(Nyears-1, mean = -(SigmaF[x] ^ 2) / 2, sd = SigmaF[x]))
       }))
+      
     
       ## abundance index observation error
       if(length(SigmaI)==1 & nfleets>1) SigmaI <- rep(SigmaI, nfleets)
@@ -142,6 +143,7 @@ sim_pop <-
           error = function(e)
             NA
         )
+     if(is.matrix(Fdynamics)==FALSE){
       if(all(is.null(init_F))==FALSE){
         Finit <- init_F
       } else {
@@ -213,6 +215,13 @@ sim_pop <-
           F_ft[index[i],] <- rep(0, Nyears) * exp(FishDev_f[index[i],])
         }
       }
+    }
+    if(is.matrix(Fdynamics)){
+      F_ft <- Fdynamics
+      for(i in 1:nrow(F_ft)){
+        F_ft[i,] <- F_ft[i,] * exp(FishDev_f[i,])
+      }
+    }
 
       ## fishing mortality = include selectivity and Finit with effort dynamics and relative weight of fishery to scale each fishery
       F_atf <- array(NA, dim=c(length(ages), Nyears, nfleets))
@@ -290,7 +299,7 @@ sim_pop <-
         TB_ts[,i] <- sum(N_ats[,1,i] * W_a)
       }
 
-      if(is.numeric(Fdynamics) & mgt_type=="catch"){
+      if(is.numeric(Fdynamics) & length(Fdynamics)== 1 & mgt_type=="catch"){
         F_ft[1,] <- max(0.01, getFt(ct=Fdynamics, m=M, sa=S_fa[1,], wa=W_a, na=N_at[,1]))
         # F_ft[1,] <- min(c(Fmax, F_ft[1,1]), na.rm=TRUE)
       }
@@ -688,7 +697,7 @@ sim_pop <-
       lh$F_t <- F_t
       lh$F_y <- F_y
       lh$F40 <- F40
-      lh$Fmax <- Fmax
+      # lh$Fmax <- Fmax
       lh$I_ft <- matrix(I_ft, nrow=nfleets, ncol=Nyears)
       lh$E_ft <- matrix(Effort_ft, nrow=nfleets, ncol=Nyears)
       lh$fleet_proportions <- fleet_proportions
