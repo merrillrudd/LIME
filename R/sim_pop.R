@@ -294,7 +294,7 @@ sim_pop <-
       TB_t <- SB_t <- rep(NA, Nyears)
       TB_ts <- matrix(NA, nrow=Nyears, ncol=nareas)
       TB_t[1] <- sum(N_at[, 1] * W_a)
-      SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a)
+      SB_t[1] <- sum(N_at[, 1] * W_a * Mat_a) * 0.5
       for(i in 1:nareas){
         TB_ts[,i] <- sum(N_ats[,1,i] * W_a)
       }
@@ -318,7 +318,7 @@ sim_pop <-
       }
 
       ## unfished spawning biomass
-      SB0 <- sum(calc_equil_abund(ages=ages, M=M, F=rep(0,nrow(S_fa)), R0=R0, S_fa=S_fa) * W_a * Mat_a)      
+      SB0 <- sum(calc_equil_abund(ages=ages, M=M, F=rep(0,nrow(S_fa)), R0=R0, S_fa=S_fa) * W_a * Mat_a * 0.5)       
 
 
       ##########################
@@ -389,7 +389,7 @@ sim_pop <-
         }
 
           ## spawning biomass
-          SB_t[t] <- sum((N_at[, t] * W_a * Mat_a))
+          SB_t[t] <- sum((N_at[, t] * W_a * Mat_a * 0.5))
           TB_t[t] <- sum(N_at[, t] * W_a)
           for(i in 1:nareas){
             TB_ts[t,i] <- sum(N_ats[,t,i] * W_a)
