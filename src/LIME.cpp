@@ -237,6 +237,7 @@ Type objective_function<Type>::operator() ()
     // }
     
   }
+  SB0 = SB0 * Type(0.5);
   
   // // ============ joint F rate including selectivity ===========================
 
@@ -300,7 +301,7 @@ Type objective_function<Type>::operator() ()
     }
 
     // Spawning biomass
-    SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a);
+    SB_ta(0,a) = N_ta(0,a) * Mat_a(a) * W_a(a) * Type (0.5);
 
     // Total biomass
     TB_ta(0,a) = N_ta(0,a) * W_a(a);
@@ -373,7 +374,7 @@ Type objective_function<Type>::operator() ()
       }
 
       // Spawning biomass
-      SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a);
+      SB_ta(t,a) = N_ta(t,a)*Mat_a(a)*W_a(a) * Type(0.5);
 
       // Total biomass
       TB_ta(t,a) = N_ta(t,a)*W_a(a);
@@ -494,8 +495,8 @@ Type objective_function<Type>::operator() ()
     }
 
     for(int a=0;a<n_a;a++){
-      SBF_t(t) += NFequil_ta(t,a) * Mat_a(a) * W_a(a);
-      SBU_t(t) += NUequil_ta(t,a) * Mat_a(a) * W_a(a);
+      SBF_t(t) += NFequil_ta(t,a) * Mat_a(a) * W_a(a) * Type(0.5);
+      SBU_t(t) += NUequil_ta(t,a) * Mat_a(a) * W_a(a) * Type(0.5);
     }
 
     SPR_t(t) = SBF_t(t)/SBU_t(t);
