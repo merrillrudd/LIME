@@ -78,11 +78,14 @@ generate_data <-
       init_depl_input <- NULL
       init_F_inp <- NULL
     }
+    if(is.matrix(Rdynamics)){
+      R_inp <- Rdynamics[,iter]
+    } else {R_inp <- Rdynamics}
 
     ## if level of depletion in first year is specified:
     if(length(init)==1){
         ## simulated data with no spatial structure in growth
-        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=Rdynamics, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_inp, init_F = init_F_inp, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions, nareas = nareas)
+        DataList <- sim_pop(lh=lh, Nyears=Nyears, pool=pool, Fdynamics=Fdynamics, Rdynamics=R_inp, Nyears_comp=Nyears_comp, comp_sample=comp_sample, init_depl=init_depl_inp, init_F = init_F_inp, seed=iseed, mgt_type=mgt_type, fleet_proportions=fleet_proportions, nareas = nareas)
         if(all(is.na(DataList))==FALSE & all(is.null(modpath)==FALSE)) write(iseed, file.path(modpath, iter, paste0("init_depl_seed", iseed,".txt")))
     }
 

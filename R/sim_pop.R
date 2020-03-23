@@ -94,6 +94,9 @@ sim_pop <-
       #########################
       ## Setup recruitment
       #########################
+      if(length(Rdynamics) > 1){
+        R_t <- (rep(R0, Nyears_real)) * exp(Rdynamics)
+      }
       if (Rdynamics == "Pulsed"){
         choose <- sample(1:2, 1)
         R_t <- c(
