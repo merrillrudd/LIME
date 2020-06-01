@@ -4,10 +4,18 @@
 \alias{plot_output}
 \title{plot LIME output}
 \usage{
-plot_output(Inputs = NULL, Report = NULL, Sdreport = NULL,
-  LBSPR = NULL, lh, true_years = NULL, True = NULL,
+plot_output(
+  Inputs = NULL,
+  Report = NULL,
+  Sdreport = NULL,
+  LBSPR = NULL,
+  lh,
+  true_years = NULL,
+  True = NULL,
   plot = c("Fish", "Rec", "SPR", "ML", "SB", "Selex"),
-  set_ylim = list(SPR = c(0, 1)), legend = FALSE)
+  set_ylim = list(SPR = c(0, 1)),
+  legend = FALSE
+)
 }
 \arguments{
 \item{Inputs}{LIME input file}

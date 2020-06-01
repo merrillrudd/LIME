@@ -4,8 +4,7 @@
 \alias{run_stacking}
 \title{Run stacking algorithm}
 \usage{
-run_stacking(modpath, iter = NULL, lh, model, nodes, dim,
-  input_data = NULL)
+run_stacking(modpath, iter = NULL, lh, model, nodes, dim, input_data = NULL)
 }
 \arguments{
 \item{modpath, }{the directory to save results}

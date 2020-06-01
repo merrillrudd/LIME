@@ -4,14 +4,34 @@
 \alias{run_LIME}
 \title{run LIME model - simulation mode}
 \usage{
-run_LIME(modpath, input, data_avail, Fpen = 1, SigRpen = 1,
-  SigRprior = c(0.737, 0.3), LFdist = 1, C_type = 0,
-  est_more = FALSE, fix_more = FALSE, est_F_ft = TRUE,
-  f_startval_ft = NULL, rdev_startval_t = NULL, est_selex_f = TRUE,
-  vals_selex_ft = -1, est_rdev_t = TRUE, newtonsteps = 3,
-  F_up = 10, S50_up = NULL, derive_quants = FALSE, itervec = NULL,
-  simulation = FALSE, rewrite = TRUE, mirror = NULL,
-  est_totalF = FALSE, prop_f = 1)
+run_LIME(
+  modpath,
+  input,
+  data_avail,
+  Fpen = 1,
+  SigRpen = 1,
+  SigRprior = c(0.737, 0.3),
+  LFdist = 1,
+  C_type = 0,
+  est_more = FALSE,
+  fix_more = FALSE,
+  est_F_ft = TRUE,
+  f_startval_ft = NULL,
+  rdev_startval_t = NULL,
+  est_selex_f = TRUE,
+  vals_selex_ft = -1,
+  est_rdev_t = TRUE,
+  newtonsteps = 3,
+  F_up = 10,
+  S50_up = NULL,
+  derive_quants = FALSE,
+  itervec = NULL,
+  simulation = FALSE,
+  rewrite = TRUE,
+  mirror = NULL,
+  est_totalF = FALSE,
+  prop_f = 1
+)
 }
 \arguments{
 \item{modpath}{model directory}

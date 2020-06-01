@@ -4,9 +4,17 @@
 \alias{plot_LCfits}
 \title{plot length composition data and model fits}
 \usage{
-plot_LCfits(LF_df = NULL, binwidth = 1, Inputs = NULL,
-  Report = NULL, LBSPR = NULL, plot_fit = TRUE, n = FALSE,
-  time_labels = NULL, plot_type = "density")
+plot_LCfits(
+  LF_df = NULL,
+  binwidth = 1,
+  Inputs = NULL,
+  Report = NULL,
+  LBSPR = NULL,
+  plot_fit = TRUE,
+  n = FALSE,
+  time_labels = NULL,
+  plot_type = "density"
+)
 }
 \arguments{
 \item{LF_df}{list of length frequency matrices}

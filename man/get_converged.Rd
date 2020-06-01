@@ -4,8 +4,12 @@
 \alias{get_converged}
 \title{Check convergence and re-run for common issues}
 \usage{
-get_converged(results, max_gradient = 0.001, saveFlagsDir = FALSE,
-  saveFlagsName = FALSE)
+get_converged(
+  results,
+  max_gradient = 0.001,
+  saveFlagsDir = FALSE,
+  saveFlagsName = FALSE
+)
 }
 \arguments{
 \item{results}{list of LIME results from `run_LIME`}
