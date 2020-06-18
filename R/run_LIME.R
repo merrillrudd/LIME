@@ -30,7 +30,7 @@
 #' @param est_totalF TRUE estimate total F instead of by fleet
 #' @param prop_f proportion of catch from each fleet
 #' @importFrom TMB MakeADFun sdreport
-#' @importFrom TMBhelper Optimize
+#' @importFrom TMBhelper fit_tmb
 #' @importFrom utils write.csv
 #' 
 
@@ -217,10 +217,13 @@ for(iter in 1:length(itervec)){
 
         ## Run optimizer
         # opt <- tryCatch( nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, upper=Upr, lower=Lwr, control=list(trace=1, eval.max=1e4, iter.max=1e4, rel.tol=1e-10) ), error=function(e) NA)    
-        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
-        # if(is.numeric(newtonsteps)) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
-        # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::Optimize(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
+        # opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
+        if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+        if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
+        opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
+
+        # if(is.numeric(newtonsteps)) opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
+        # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
         jnll <- obj$report()$jnll   
         if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
           opt[["final_gradient"]] = obj$gr( opt$par ) 
@@ -237,7 +240,8 @@ for(iter in 1:length(itervec)){
               obj <- MakeADFun(data=TmbList[["Data"]], parameters=TmbList[["Parameters"]],
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::fit_tmb(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                # opt <-  TMBhelper::fit_tmb(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){
@@ -260,7 +264,7 @@ for(iter in 1:length(itervec)){
                 obj <- MakeADFun(data=TmbList[["Data"]], parameters=TmbList[["Parameters"]],
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
-                opt <-  tryCatch(TMBhelper::Optimize(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
+                opt <-  tryCatch(TMBhelper::fit_tmb(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
                 jnll <- obj$report()$jnll
               }
             }
@@ -277,8 +281,8 @@ for(iter in 1:length(itervec)){
                         opt_save <- opt
                         obj_save <- obj
                         jnll_save <- jnll
-                }
-              }
+                  }
+               }
             if(all(is.na(opt_save[["final_gradient"]]))==FALSE){
               if(max(abs(opt_save[["final_gradient"]]))<=0.001) break
             }
