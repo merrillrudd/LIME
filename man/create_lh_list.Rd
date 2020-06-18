@@ -4,14 +4,41 @@
 \alias{create_lh_list}
 \title{Create new life history list}
 \usage{
-create_lh_list(vbk, linf, lwa, lwb, S50, M50, S95 = NULL, M95 = NULL,
-  Sslope = NULL, Mslope = NULL, selex_input = "length",
-  maturity_input = "length", selex_type = "logistic", dome_sd = NULL,
-  binwidth = 1, t0 = -0.01, CVlen = 0.1, SigmaC = 0.001,
-  SigmaI = 0.001, SigmaR = 0.737, SigmaF = 0.2, R0 = 1, h = 1,
-  qcoef = 1e-05, M = NULL, AgeMax = NULL, Fequil = 0.5,
-  Frate = 0.2, start_ages = 0, rho = 0, theta = 1, nseasons = 1,
-  nfleets = 1)
+create_lh_list(
+  vbk,
+  linf,
+  lwa,
+  lwb,
+  S50,
+  M50,
+  S95 = NULL,
+  M95 = NULL,
+  Sslope = NULL,
+  Mslope = NULL,
+  selex_input = "length",
+  maturity_input = "length",
+  selex_type = "logistic",
+  dome_sd = NULL,
+  binwidth = 1,
+  t0 = -0.01,
+  CVlen = 0.1,
+  SigmaC = 0.001,
+  SigmaI = 0.001,
+  SigmaR = 0.737,
+  SigmaF = 0.2,
+  R0 = 1,
+  h = 1,
+  qcoef = 1e-05,
+  M = NULL,
+  AgeMax = NULL,
+  Fequil = 0.5,
+  Frate = 0.2,
+  start_ages = 0,
+  rho = 0,
+  theta = 1,
+  nseasons = 1,
+  nfleets = 1
+)
 }
 \arguments{
 \item{vbk}{von Bertalanffy k Brody growth coefficient}

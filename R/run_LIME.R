@@ -220,7 +220,6 @@ for(iter in 1:length(itervec)){
         # opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
         if(is.numeric(newtonsteps)) opt <- tryCatch(TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
         if(is.numeric(newtonsteps)==FALSE) opt <- tryCatch(TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE), error=function(e) NA)
-        opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
 
         # if(is.numeric(newtonsteps)) opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
         # if(is.numeric(newtonsteps)==FALSE) opt <- TMBhelper::fit_tmb(obj=obj, upper=Upr, lower=Lwr, loopnum=3, getsd=FALSE)
@@ -241,7 +240,6 @@ for(iter in 1:length(itervec)){
                             random=TmbList[["Random"]], map=TmbList[["Map"]], 
                             inner.control=list(maxit=1e3), hessian=FALSE, DLL="LIME")
                 opt <-  tryCatch(TMBhelper::fit_tmb(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE), error=function(e) NA)
-                # opt <-  TMBhelper::fit_tmb(obj=obj, start= obj$env$last.par.best[-obj$env$random] + rnorm(length(obj$par),0,0.2), upper=Upr, lower=Lwr, newtonsteps=newtonsteps, getsd=FALSE)
                 jnll <- obj$report()$jnll
             }
             if(all(is.na(opt))==FALSE & is.na(jnll)==FALSE){

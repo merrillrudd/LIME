@@ -4,6 +4,7 @@
 \alias{calc_ref}
 \title{Per recruit calculation and spawning potential ratio}
 \usage{
+<<<<<<< HEAD
 calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, fleet_prop = 1,
   type = "SPR")
 }
@@ -25,6 +26,7 @@ calc_ref(ages, Mat_a, W_a, M, F, S_fa, ref = FALSE, fleet_prop = 1,
 \item{fleet_prop}{fleet proportions}
 
 \item{type}{option spawning biomass per recruit (SPR) or biomass per recruit ("Depletion")}
+
 }
 \value{
 List, a tagged list of potentially useful benchmarks

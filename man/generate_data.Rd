@@ -4,10 +4,24 @@
 \alias{generate_data}
 \title{Generate data for simulation testing}
 \usage{
-generate_data(modpath, itervec, Fdynamics, Rdynamics, lh, pool = TRUE,
-  Nyears, Nyears_comp, comp_sample, rewrite = TRUE, init_depl = NULL,
-  init_F = NULL, derive_quants = FALSE, seed, mgt_type = "F",
-  fleet_proportions = 1, nareas = 1)
+generate_data(
+  modpath,
+  itervec,
+  Fdynamics,
+  Rdynamics,
+  lh,
+  pool = TRUE,
+  Nyears,
+  Nyears_comp,
+  comp_sample,
+  rewrite = TRUE,
+  init_depl,
+  derive_quants = FALSE,
+  seed,
+  mgt_type = "F",
+  fleet_proportions = 1,
+  nareas = 1
+)
 }
 \arguments{
 \item{modpath}{directory to save generated data}

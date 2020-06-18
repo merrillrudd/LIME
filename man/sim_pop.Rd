@@ -4,9 +4,21 @@
 \alias{sim_pop}
 \title{Operating model}
 \usage{
-sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
-  init_depl = NULL, init_F = NULL, seed, sample_type = "catch",
-  mgt_type = "F", fleet_proportions, nareas)
+sim_pop(
+  lh,
+  Nyears,
+  pool,
+  Fdynamics,
+  Rdynamics,
+  Nyears_comp,
+  comp_sample,
+  init_depl = 0.99,
+  seed,
+  sample_type = "catch",
+  mgt_type = "F",
+  fleet_proportions,
+  nareas
+)
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
