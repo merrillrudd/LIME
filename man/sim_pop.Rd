@@ -5,8 +5,8 @@
 \title{Operating model}
 \usage{
 sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
-  init_depl = 0.99, seed, sample_type = "catch", mgt_type = "F",
-  fleet_proportions, nareas)
+  init_depl = NULL, init_F = NULL, seed, sample_type = "catch",
+  mgt_type = "F", fleet_proportions, nareas)
 }
 \arguments{
 \item{lh}{list of life history information, from create_lh_list}
@@ -15,7 +15,7 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 
 \item{pool}{if nseasons (in life history list) is greater than one, pool the generated data into annual time steps, or leave at the season-level? FALSE will generate shorter time step life history info, mean length}
 
-\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input number to project forward using a specific F.}
+\item{Fdynamics}{Specify name of pattern of fishing mortality dynamics, Constant, Endogenous, Oneway, or None. Input matrix with dimensions fleets = rows, years = columns}
 
 \item{Rdynamics}{Specify name of pattern of recruitment dynamics, Constant, Pulsed, Pulsed_up, or BH}
 
@@ -23,7 +23,9 @@ sim_pop(lh, Nyears, pool, Fdynamics, Rdynamics, Nyears_comp, comp_sample,
 
 \item{comp_sample}{sample size of length composition data annually}
 
-\item{init_depl}{initial depletion on which to calculate F1; default = 0.99}
+\item{init_depl}{default=NULL, can specify a starting depletion, initial F (using init_F), or 2 values that indicate range from which to choose them}
+
+\item{init_F}{default=NULL, can specify a starting F, an initial depletion (using init_depl), or 2 vaues that indicate range from which to choose them}
 
 \item{seed}{set seed for generating stochastic time series}
 

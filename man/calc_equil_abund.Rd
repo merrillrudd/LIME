@@ -11,7 +11,7 @@ calc_equil_abund(ages, M, F, S_fa, R0)
 
 \item{M}{natural mortality}
 
-\item{F}{fishing mortality}
+\item{F}{proposed F to calculate reference point, if S_fa has more than 1 fleet, requires F as a vector, one for each fleet}
 
 \item{S_fa}{selectivity by fleet by age}
 
